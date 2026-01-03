@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { buildAuthorizationUrl, generateState } from '@/infrastructure/strava/oauth';
 import { saveStravaOauthState } from '@/infrastructure/strava/store';
 import { resolveAthleteId } from '@/infrastructure/garmin/auth';
+import { stravaConfig } from '@/infrastructure/strava/config';
 
 export const runtime = 'nodejs';
 
@@ -12,13 +13,21 @@ export async function GET(request: NextRequest) {
         return redirectToLogin(request);
     }
 
-    const state = generateState();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+    if (!stravaConfig.clientId || !stravaConfig.clientSecret || !stravaConfig.redirectUri) {
+        return redirectToError(request, 'missing_config');
+    }
 
-    await saveStravaOauthState(state, athleteId, expiresAt);
+    try {
+        const state = generateState();
+        const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
 
-    const authUrl = buildAuthorizationUrl(state);
-    return NextResponse.redirect(authUrl);
+        await saveStravaOauthState(state, athleteId, expiresAt);
+
+        const authUrl = buildAuthorizationUrl(state);
+        return NextResponse.redirect(authUrl);
+    } catch (error) {
+        return redirectToError(request, error instanceof Error && /missing/i.test(error.message) ? 'missing_config' : 'connect_failed');
+    }
 }
 
 function redirectToLogin(request: NextRequest) {
@@ -36,4 +45,14 @@ function getSafeNextPath(request: NextRequest, fallback: string) {
     }
     const selfPath = `${pathname}${search}`;
     return selfPath || fallback;
+}
+
+function redirectToError(request: NextRequest, code: 'missing_config' | 'connect_failed') {
+    const url = new URL(request.url);
+    const from = url.searchParams.get('from');
+    const targetPath = from === 'settings' ? '/settings' : '/onboarding';
+    const redirectUrl = new URL(targetPath, request.url);
+    redirectUrl.searchParams.set('connect', 'strava');
+    redirectUrl.searchParams.set('error', code);
+    return NextResponse.redirect(redirectUrl);
 }

@@ -37,6 +37,14 @@ export const metadata: Metadata = {
     "endurance",
   ],
   authors: [{ name: "The Long Game" }],
+  manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
   openGraph: {
     title: "The Long Game | Precision Running Training",
     description: "Training that adapts to you. Built on science. Not opinions.",
@@ -45,7 +53,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b0f14",
+  themeColor: "#0D1B2A",
   width: "device-width",
   initialScale: 1,
 };
@@ -61,3 +69,4 @@ export default function RootLayout({
     </html>
   );
 }
+

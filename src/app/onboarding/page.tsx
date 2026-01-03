@@ -8,6 +8,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { ProgressBar } from '@/components/onboarding/ui';
@@ -183,16 +184,32 @@ function calculateReadiness(data: OnboardingData): { status: ReadinessStatus; ba
     return { status: 'ready', baseWeeksNeeded: 0 };
 }
 
+function formatConnectError(provider: string | null, error: string | null): string | null {
+    if (!provider || !error) return null;
+    const label = provider === 'garmin' ? 'Garmin' : provider === 'strava' ? 'Strava' : 'Device';
+    if (error === 'missing_config') {
+        return `${label} isn’t configured yet. Add the ${label.toUpperCase()} client ID, secret, and redirect URL, then try again.`;
+    }
+    if (error === 'connect_failed') {
+        return `We couldn’t start the ${label} connection. Try again, or enter VO2max manually.`;
+    }
+    return `We couldn’t start the ${label} connection.`;
+}
+
 // =============================================================================
 // MAIN ONBOARDING PAGE
 // =============================================================================
 
 export default function OnboardingPage() {
+    const searchParams = useSearchParams();
     const [step, setStep] = useState<OnboardingStep>('welcome');
     const [data, setData] = useState<OnboardingData>(INITIAL_ONBOARDING_DATA);
     const [mounted, setMounted] = useState(false);
     const [showResumePrompt, setShowResumePrompt] = useState(false);
     const [savedProgress, setSavedProgress] = useState<{ step: OnboardingStep; data: OnboardingData } | null>(null);
+    const connectProvider = searchParams.get('connect');
+    const connectError = searchParams.get('error');
+    const connectErrorMessage = formatConnectError(connectProvider, connectError);
     const [planGenerated, setPlanGenerated] = useState(false);
     const [generationError, setGenerationError] = useState<string | null>(null);
     const router = useRouter();
@@ -385,12 +402,12 @@ export default function OnboardingPage() {
                     <DeviceImportScreen
                         onGarminConnect={() => {
                             if (typeof window !== 'undefined') {
-                                window.open('/api/garmin/connect', '_blank', 'noopener,noreferrer');
+                                window.open('/api/garmin/connect?from=onboarding', '_blank', 'noopener,noreferrer');
                             }
                         }}
                         onStravaConnect={() => {
                             if (typeof window !== 'undefined') {
-                                window.open('/api/strava/connect', '_blank', 'noopener,noreferrer');
+                                window.open('/api/strava/connect?from=onboarding', '_blank', 'noopener,noreferrer');
                             }
                         }}
                         onManualEntry={() => {
@@ -405,6 +422,7 @@ export default function OnboardingPage() {
                             }
                             goToNext();
                         }}
+                        connectError={connectErrorMessage}
                         onBack={goBack}
                     />
                 )}

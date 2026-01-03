@@ -46,6 +46,17 @@ export default function SettingsPage() {
     useEffect(() => {
         setWebhookUrl(`${window.location.origin}/api/garmin/webhook`);
         setStravaWebhookUrl(`${window.location.origin}/api/strava/webhook`);
+        const params = new URLSearchParams(window.location.search);
+        const connect = params.get('connect');
+        const error = params.get('error');
+        if (connect && error) {
+            const message = formatConnectError(connect, error);
+            if (connect === 'garmin') {
+                setGarminMessage(message);
+            } else if (connect === 'strava') {
+                setStravaMessage(message);
+            }
+        }
         void refreshGarminStatus();
         void refreshStravaStatus();
     }, []);
@@ -68,7 +79,7 @@ export default function SettingsPage() {
     };
 
     const handleGarminConnect = () => {
-        window.location.href = '/api/garmin/connect';
+        window.location.href = '/api/garmin/connect?from=settings';
     };
 
     const handleGarminDisconnect = async () => {
@@ -175,7 +186,7 @@ export default function SettingsPage() {
     };
 
     const handleStravaConnect = () => {
-        window.location.href = '/api/strava/connect';
+        window.location.href = '/api/strava/connect?from=settings';
     };
 
     const handleStravaDisconnect = async () => {
@@ -614,4 +625,15 @@ export default function SettingsPage() {
             </main>
         </div>
     );
+}
+
+function formatConnectError(provider: string, error: string) {
+    const label = provider === 'garmin' ? 'Garmin' : provider === 'strava' ? 'Strava' : 'Device';
+    if (error === 'missing_config') {
+        return `${label} isn’t configured yet. Add the ${label.toUpperCase()} client ID, secret, and redirect URL, then try again.`;
+    }
+    if (error === 'connect_failed') {
+        return `We couldn’t start the ${label} connection. Try again in a moment.`;
+    }
+    return `We couldn’t start the ${label} connection.`;
 }

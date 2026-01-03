@@ -279,6 +279,7 @@ interface DeviceImportScreenProps {
     onManualEntry: () => void;
     onContinue: () => void;
     onBack: () => void;
+    connectError?: string | null;
 }
 
 export function DeviceImportScreen({
@@ -286,7 +287,8 @@ export function DeviceImportScreen({
     onStravaConnect,
     onManualEntry,
     onContinue,
-    onBack
+    onBack,
+    connectError,
 }: DeviceImportScreenProps) {
     const [garminStatus, setGarminStatus] = useState<{
         connected: boolean;
@@ -406,6 +408,12 @@ export function DeviceImportScreen({
                     onClick={onManualEntry}
                 />
             </OptionGrid>
+
+            {connectError && (
+                <div className="mt-6 rounded-xl border border-[var(--color-error)]/30 bg-[var(--bg-elevated)] px-4 py-3 text-body-sm text-[var(--color-error)]">
+                    {connectError}
+                </div>
+            )}
 
             <div className="mt-6 space-y-3 text-body-sm text-[var(--text-muted)]">
                 <p>Connecting opens a new tab. Return here once you finish and this screen will refresh.</p>
