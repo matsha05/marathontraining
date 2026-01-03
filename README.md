@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# The Long Game
 
-## Getting Started
+> A daily training plan you can actually trust.
 
-First, run the development server:
+## What This Is
+
+**The simplest answer to:** "I want to run a marathon. What do I do today?"
+
+You log in. You see your workout. Running, strength, mobility—all in one place. All calculated for you. All based on science from coaches who've trained world-class athletes.
+
+No more stitching together random running plans, strength programs, and prehab routines. No more hoping they fit. Just one plan, every day, that accounts for everything.
+
+---
+
+## Why This Exists
+
+**The Problem:** Training plans are everywhere—apps, books, coaches—but they don't talk to each other. Running plans ignore strength. Strength plans ignore running. You end up:
+- Guessing how to combine them
+- Getting injured because the load doesn't add up
+- Becoming a "skinny runner" because you dropped lifting
+- Never trusting if you're doing it right
+
+**The Solution:** One integrated plan. Running is the priority. Strength makes sure you get there healthy and don't lose what you've built. Every workout is prescribed. Every pace is calculated. You just show up and execute.
+
+---
+
+## What Makes It Different
+
+| Other Apps | The Long Game |
+|------------|---------------|
+| Running plan only | Running + Strength + Mobility |
+| Generic paces | Paces calculated from YOUR race time (VDOT) |
+| Static plan | Adapts to your Garmin health data |
+| "Based on science" | Built on Hansons, Daniels, Seiler, Dicharry |
+| Manual logging | Syncs with Garmin automatically |
+
+---
+
+## Who It's For
+
+Someone who:
+- Wants to run a marathon (or 5K, 10K, half, ultra)
+- Doesn't want to give up strength training
+- Wants a plan they can trust without second-guessing
+- Is tired of Googling "how to combine running and lifting"
+
+---
+
+## How It Works
+
+### 1. Tell us your goal
+Pick your race. Enter your best recent race time. We calculate your VDOT—the single number that determines all your training paces.
+
+### 2. Get your plan
+We build a periodized plan: Base → Build → Peak → Taper. Every day has exactly what you need.
+
+### 3. Connect Garmin (optional)
+We pull your sleep, HRV, stress, and workout data. Your plan adjusts based on how recovered you are.
+
+### 4. Execute
+Open the app each morning. See today's workout. Do it. Log it. Repeat.
+
+---
+
+## The Science
+
+We don't make this up. Every workout is rooted in proven methodologies:
+
+| Source | What We Use |
+|--------|-------------|
+| **Jack Daniels** | VDOT paces, workout structure |
+| **Hansons** | 6-day structure, cumulative fatigue |
+| **Stephen Seiler** | 80/20 polarized training |
+| **Jay Dicharry** | Durability assessments, injury prevention |
+| **Kelly Starrett** | Movement prep, mobility |
+
+---
+
+## Tech
+
+- **Frontend:** Next.js, TypeScript, Tailwind
+- **Icons:** Lucide-animated
+- **Backend:** Supabase
+- **Integrations:** Garmin Connect API (health + activities)
+
+---
+
+## Run It Locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## The Vision
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This is the app that finally answers: *"I want to run a marathon, but I don't know what to do today, and I don't want to stop lifting."*
 
-## Learn More
+Log in. See the plan. Trust the plan.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Train smart. Stay strong. Go the distance.**
