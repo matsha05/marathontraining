@@ -46,6 +46,7 @@ import {
     RaceInputScreen,
     EasyPaceInputScreen,
     DeviceImportScreen,
+    ManualVo2maxInputScreen,
     HardEffortInputScreen,
     EstimationFlowScreen,
     VdotRevealScreen,
@@ -377,18 +378,40 @@ export default function OnboardingPage() {
                 {step === 'device-import' && (
                     <DeviceImportScreen
                         onGarminConnect={() => {
-                            // TODO: Implement Garmin OAuth
-                            console.log('Garmin connect');
+                            if (typeof window !== 'undefined') {
+                                window.open('/api/garmin/connect', '_blank', 'noopener,noreferrer');
+                            }
                         }}
                         onStravaConnect={() => {
-                            // TODO: Implement Strava OAuth
-                            console.log('Strava connect');
+                            if (typeof window !== 'undefined') {
+                                window.open('/api/strava/connect', '_blank', 'noopener,noreferrer');
+                            }
                         }}
                         onManualEntry={() => {
-                            // For now, fall back to estimation
-                            setData(prev => ({ ...prev, calibrationMethod: 'estimate' }));
-                            setStep('estimation-flow');
+                            setData(prev => ({ ...prev, calibrationMethod: 'device' }));
+                            setStep('manual-vo2max');
                         }}
+                        onContinue={() => {
+                            if (data.vdot === null) {
+                                setData(prev => ({ ...prev, calibrationMethod: 'estimate' }));
+                                setStep('estimation-flow');
+                                return;
+                            }
+                            goToNext();
+                        }}
+                        onBack={goBack}
+                    />
+                )}
+
+                {step === 'manual-vo2max' && (
+                    <ManualVo2maxInputScreen
+                        value={data.vdot}
+                        onChange={(vdot) => setData(prev => ({
+                            ...prev,
+                            vdot,
+                            vdotConfidence: vdot !== null ? 'high' : prev.vdotConfidence,
+                        }))}
+                        onContinue={goToNext}
                         onBack={goBack}
                     />
                 )}

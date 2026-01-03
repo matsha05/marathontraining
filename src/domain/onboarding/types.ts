@@ -27,6 +27,7 @@ export type OnboardingStep =
     | 'race-input'
     | 'easy-pace-input'
     | 'device-import'
+    | 'manual-vo2max'
     | 'hard-effort-input'
     | 'estimation-flow'
     | 'vdot-reveal'
@@ -273,6 +274,7 @@ export function getNextStep(
         case 'device-import':
         case 'hard-effort-input':
         case 'estimation-flow':
+        case 'manual-vo2max':
             return 'vdot-reveal';
 
         case 'vdot-reveal':
@@ -361,6 +363,9 @@ export function getPreviousStep(
         case 'estimation-flow':
             return 'calibration-method';
 
+        case 'manual-vo2max':
+            return 'device-import';
+
         case 'vdot-reveal':
             switch (data.calibrationMethod) {
                 case 'race': return 'race-input';
@@ -433,6 +438,7 @@ const STEP_PROGRESS: Record<OnboardingStep, number> = {
     'race-input': 30,
     'easy-pace-input': 30,
     'device-import': 30,
+    'manual-vo2max': 30,
     'hard-effort-input': 30,
     'estimation-flow': 30,
     'vdot-reveal': 40,
@@ -554,7 +560,7 @@ export function isStepComplete(step: OnboardingStep, data: OnboardingData): bool
             return data.easyPaceMinutes !== null && data.easyPaceSeconds !== null;
 
         case 'device-import':
-            return data.vdot !== null; // Set by import
+            return true;
 
         case 'hard-effort-input':
             return data.effortType !== null &&
@@ -562,6 +568,9 @@ export function isStepComplete(step: OnboardingStep, data: OnboardingData): bool
 
         case 'estimation-flow':
             return data.experienceLevel !== null;
+
+        case 'manual-vo2max':
+            return data.vdot !== null;
 
         case 'vdot-reveal':
             return data.vdot !== null;

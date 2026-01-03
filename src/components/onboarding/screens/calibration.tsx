@@ -7,7 +7,7 @@
  * device import, hard effort, estimation, and VDOT reveal screens
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Heart, Loader2 } from 'lucide-react';
 import {
     QuestionScreen,
@@ -277,6 +277,7 @@ interface DeviceImportScreenProps {
     onGarminConnect: () => void;
     onStravaConnect: () => void;
     onManualEntry: () => void;
+    onContinue: () => void;
     onBack: () => void;
 }
 
@@ -284,8 +285,70 @@ export function DeviceImportScreen({
     onGarminConnect,
     onStravaConnect,
     onManualEntry,
+    onContinue,
     onBack
 }: DeviceImportScreenProps) {
+    const [garminStatus, setGarminStatus] = useState<{
+        connected: boolean;
+        lastActivityAt?: string | null;
+        lastHealthDate?: string | null;
+    }>({ connected: false });
+    const [stravaStatus, setStravaStatus] = useState<{
+        connected: boolean;
+        lastActivityAt?: string | null;
+    }>({ connected: false });
+    const [statusLoading, setStatusLoading] = useState(false);
+
+    const refreshStatus = useCallback(async () => {
+        setStatusLoading(true);
+        try {
+            const [garminRes, stravaRes] = await Promise.allSettled([
+                fetch('/api/garmin/status'),
+                fetch('/api/strava/status'),
+            ]);
+
+            if (garminRes.status === 'fulfilled' && garminRes.value.ok) {
+                const garminJson = await garminRes.value.json();
+                setGarminStatus({
+                    connected: Boolean(garminJson.connected),
+                    lastActivityAt: garminJson.lastActivityAt ?? null,
+                    lastHealthDate: garminJson.lastHealthDate ?? null,
+                });
+            }
+
+            if (stravaRes.status === 'fulfilled' && stravaRes.value.ok) {
+                const stravaJson = await stravaRes.value.json();
+                setStravaStatus({
+                    connected: Boolean(stravaJson.connected),
+                    lastActivityAt: stravaJson.lastActivityAt ?? null,
+                });
+            }
+        } finally {
+            setStatusLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        void refreshStatus();
+        window.addEventListener('focus', refreshStatus);
+        return () => {
+            window.removeEventListener('focus', refreshStatus);
+        };
+    }, [refreshStatus]);
+
+    const anyConnected = garminStatus.connected || stravaStatus.connected;
+    const continueLabel = anyConnected ? 'Continue' : 'Continue without import';
+
+    const formatDate = (value?: string | null) => {
+        if (!value) return null;
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return null;
+        return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    };
+
+    const garminLast = formatDate(garminStatus.lastActivityAt) || formatDate(garminStatus.lastHealthDate);
+    const stravaLast = formatDate(stravaStatus.lastActivityAt);
+
     useKeyboardNavigation({
         onBack,
         onNumber: (num) => {
@@ -293,28 +356,39 @@ export function DeviceImportScreen({
             if (num === 2) onStravaConnect();
             if (num === 3) onManualEntry();
         },
+        onEnter: onContinue,
     });
 
     return (
         <QuestionScreen onBack={onBack}>
             <QuestionHeader
                 title="Connect your device to import fitness data."
-                subtitle="We'll pull your VO2max estimate and recent training history."
+                subtitle="We'll pull recent training history. If you know your VO2max, you can enter it now."
             />
 
             <OptionGrid>
                 <OptionButton
-                    label="Connect Garmin"
-                    description="Import VO2max and training data"
+                    label={garminStatus.connected ? 'Garmin connected' : 'Connect Garmin'}
+                    description={
+                        garminStatus.connected
+                            ? `Connected${garminLast ? ` · Last sync ${garminLast}` : ''}`
+                            : 'Import activities + recovery signals'
+                    }
                     shortcut="1"
                     icon={<Heart className="w-5 h-5" />}
+                    selected={garminStatus.connected}
                     onClick={onGarminConnect}
                 />
                 <OptionButton
-                    label="Connect Strava"
-                    description="Import activities and fitness trends"
+                    label={stravaStatus.connected ? 'Strava connected' : 'Connect Strava'}
+                    description={
+                        stravaStatus.connected
+                            ? `Connected${stravaLast ? ` · Last activity ${stravaLast}` : ''}`
+                            : 'Import activities + fitness trends'
+                    }
                     shortcut="2"
                     icon={<Heart className="w-5 h-5" />}
+                    selected={stravaStatus.connected}
                     onClick={onStravaConnect}
                 />
                 <OptionButton
@@ -324,6 +398,78 @@ export function DeviceImportScreen({
                     onClick={onManualEntry}
                 />
             </OptionGrid>
+
+            <div className="mt-6 space-y-3 text-body-sm text-[var(--text-muted)]">
+                <p>Connecting opens a new tab. Return here once you finish and this screen will refresh.</p>
+                <button
+                    type="button"
+                    onClick={refreshStatus}
+                    className="text-[var(--color-accent)] hover:underline"
+                >
+                    {statusLoading ? 'Checking connection...' : 'Refresh connection status'}
+                </button>
+            </div>
+
+            <ContinueButton onClick={onContinue} label={continueLabel} />
+        </QuestionScreen>
+    );
+}
+
+// =============================================================================
+// MANUAL VO2MAX INPUT SCREEN
+// =============================================================================
+
+interface ManualVo2maxInputScreenProps {
+    value: number | null;
+    onChange: (value: number | null) => void;
+    onContinue: () => void;
+    onBack: () => void;
+}
+
+export function ManualVo2maxInputScreen({
+    value,
+    onChange,
+    onContinue,
+    onBack,
+}: ManualVo2maxInputScreenProps) {
+    const canContinue = value !== null && value >= 20 && value <= 90;
+
+    useKeyboardNavigation({
+        onEnter: canContinue ? onContinue : undefined,
+        onBack,
+    });
+
+    return (
+        <QuestionScreen onBack={onBack}>
+            <QuestionHeader
+                title="Enter your VO2max"
+                subtitle="Use the number from your watch or Garmin/Strava profile."
+            />
+
+            <TextInput
+                value={value?.toString() ?? ''}
+                onChange={(nextValue) => {
+                    if (!nextValue.trim()) {
+                        onChange(null);
+                        return;
+                    }
+                    const parsed = Number(nextValue);
+                    onChange(Number.isFinite(parsed) ? parsed : null);
+                }}
+                type="number"
+                min={20}
+                max={90}
+                step={1}
+                placeholder="e.g. 52"
+                autoFocus
+                suffix="VO2max"
+            />
+
+            <p className="mt-4 text-body-sm text-[var(--text-muted)]">
+                Most runners fall between 30 and 70. We use this to set your training paces.
+            </p>
+
+            <ContinueButton onClick={onContinue} disabled={!canContinue} />
         </QuestionScreen>
     );
 }
