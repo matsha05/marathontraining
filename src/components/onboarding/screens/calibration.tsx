@@ -299,7 +299,8 @@ export function DeviceImportScreen({
         connected: boolean;
         lastActivityAt?: string | null;
     }>({ connected: false });
-    const [statusLoading, setStatusLoading] = useState(false);
+    const [statusLoading, setStatusLoading] = useState(true);
+    const [authRequired, setAuthRequired] = useState(false);
 
     const refreshStatus = useCallback(async () => {
         setStatusLoading(true);
@@ -308,31 +309,43 @@ export function DeviceImportScreen({
                 fetch('/api/garmin/status'),
                 fetch('/api/strava/status'),
             ]);
+            let sawAuthed = false;
+            let sawUnauthorized = false;
 
             if (garminRes.status === 'fulfilled') {
                 if (garminRes.value.status === 401) {
+                    sawUnauthorized = true;
                     setGarminStatus({ connected: false });
                 } else if (garminRes.value.ok) {
+                    sawAuthed = true;
                     const garminJson = await garminRes.value.json();
                     setGarminStatus({
                         connected: Boolean(garminJson.connected),
                         lastActivityAt: garminJson.lastActivityAt ?? null,
                         lastHealthDate: garminJson.lastHealthDate ?? null,
                     });
+                } else {
+                    sawAuthed = true;
                 }
             }
 
             if (stravaRes.status === 'fulfilled') {
                 if (stravaRes.value.status === 401) {
+                    sawUnauthorized = true;
                     setStravaStatus({ connected: false });
                 } else if (stravaRes.value.ok) {
+                    sawAuthed = true;
                     const stravaJson = await stravaRes.value.json();
                     setStravaStatus({
                         connected: Boolean(stravaJson.connected),
                         lastActivityAt: stravaJson.lastActivityAt ?? null,
                     });
+                } else {
+                    sawAuthed = true;
                 }
             }
+
+            setAuthRequired(sawUnauthorized && !sawAuthed);
         } finally {
             setStatusLoading(false);
         }
@@ -358,12 +371,17 @@ export function DeviceImportScreen({
 
     const garminLast = formatDate(garminStatus.lastActivityAt) || formatDate(garminStatus.lastHealthDate);
     const stravaLast = formatDate(stravaStatus.lastActivityAt);
+    const connectState = authRequired ? 'auth' : statusLoading ? 'loading' : 'ready';
+    const connectDisabled = connectState !== 'ready';
+    const handleSignIn = () => {
+        window.location.href = '/login?next=/onboarding';
+    };
 
     useKeyboardNavigation({
         onBack,
         onNumber: (num) => {
-            if (num === 1) onGarminConnect();
-            if (num === 2) onStravaConnect();
+            if (num === 1 && !connectDisabled) onGarminConnect();
+            if (num === 2 && !connectDisabled) onStravaConnect();
             if (num === 3) onManualEntry();
         },
         onEnter: onContinue,
@@ -376,30 +394,55 @@ export function DeviceImportScreen({
                 subtitle="We'll pull recent training history. If you know your VO2max, you can enter it now."
             />
 
+            {authRequired && !statusLoading && (
+                <div className="mb-6 rounded-xl border border-[var(--border-base)] bg-[var(--bg-elevated)] p-4">
+                    <p className="text-body-sm text-[var(--text-muted)]">
+                        Sign in to connect Garmin or Strava and keep your training data synced. You can continue without connecting and link devices later.
+                    </p>
+                    <button
+                        type="button"
+                        onClick={handleSignIn}
+                        className="btn btn-secondary w-full mt-3"
+                    >
+                        Sign in to connect devices
+                    </button>
+                </div>
+            )}
+
             <OptionGrid>
                 <OptionButton
                     label={garminStatus.connected ? 'Garmin connected' : 'Connect Garmin'}
                     description={
                         garminStatus.connected
                             ? `Connected${garminLast ? ` · Last sync ${garminLast}` : ''}`
-                            : 'Import activities + recovery signals'
+                            : connectState === 'auth'
+                                ? 'Sign in to connect and import activities'
+                                : connectState === 'loading'
+                                    ? 'Checking connection status...'
+                                    : 'Import activities + recovery signals'
                     }
                     shortcut="1"
                     icon={<Heart className="w-5 h-5" />}
                     selected={garminStatus.connected}
                     onClick={onGarminConnect}
+                    disabled={connectDisabled}
                 />
                 <OptionButton
                     label={stravaStatus.connected ? 'Strava connected' : 'Connect Strava'}
                     description={
                         stravaStatus.connected
                             ? `Connected${stravaLast ? ` · Last activity ${stravaLast}` : ''}`
-                            : 'Import activities + fitness trends'
+                            : connectState === 'auth'
+                                ? 'Sign in to connect and import activities'
+                                : connectState === 'loading'
+                                    ? 'Checking connection status...'
+                                    : 'Import activities + fitness trends'
                     }
                     shortcut="2"
                     icon={<Heart className="w-5 h-5" />}
                     selected={stravaStatus.connected}
                     onClick={onStravaConnect}
+                    disabled={connectDisabled}
                 />
                 <OptionButton
                     label="Enter VO2max manually"

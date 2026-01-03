@@ -10,8 +10,8 @@ import { HeartIcon } from '@/components/ui/heart';
 import { FlameIcon } from '@/components/ui/flame';
 import { CheckIcon } from '@/components/ui/check';
 import { ArrowRightIcon } from '@/components/ui/arrow-right';
-import { SunIcon } from '@/components/ui/sun';
-import { MoonIcon } from '@/components/ui/moon';
+import { SiteHeader } from '@/components/ui/SiteHeader';
+import { Footer } from '@/components/ui/Footer';
 
 /**
  * THE LONG GAME - Landing Page
@@ -21,7 +21,7 @@ import { MoonIcon } from '@/components/ui/moon';
 
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(true);
 
   useEffect(() => {
     setMounted(true);
@@ -35,37 +35,9 @@ export default function LandingPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen landing-shell">
+    <div className="min-h-screen landing-shell flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 left-0 right-0 z-50 glass border-b border-[var(--border-muted)]">
-        <div className="container-page h-[var(--header-height)] flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[var(--color-accent)] flex items-center justify-center">
-              <ActivityIcon size={20} className="text-black" />
-            </div>
-            <span className="text-heading-sm">The Long Game</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={toggleTheme}
-              className="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-[var(--bg-muted)] transition-colors"
-            >
-              {isDark ? (
-                <SunIcon size={18} className="text-[var(--text-muted)]" />
-              ) : (
-                <MoonIcon size={18} className="text-[var(--text-muted)]" />
-              )}
-            </button>
-            <Link href="/login" className="btn btn-ghost">
-              Log in
-            </Link>
-            <Link href="/onboarding" className="btn btn-gradient">
-              Get Started
-            </Link>
-          </div>
-        </div>
-      </header>
+      <SiteHeader isDark={isDark} onToggleTheme={toggleTheme} />
 
       {/* Hero */}
       <section className="hero-section hero-surface">
@@ -165,41 +137,41 @@ export default function LandingPage() {
       <section className="section">
         <div className="container-page">
           <div className="grid md:grid-cols-2 gap-12">
-          <div>
-            <p className="text-label mb-3 text-[var(--text-subtle)]">THE PROBLEM</p>
-            <h2 className="text-display-md mb-6">
-              Plans don't talk to each other.
-            </h2>
-            <p className="text-body-lg text-[var(--text-muted)] mb-6">
-              Running plans ignore strength. Strength plans ignore running. You end up guessing
-              how to combine them, hoping the load adds up, and often getting injured.
-            </p>
-            <p className="text-body-md text-[var(--text-muted)]">
-              Or worse—you drop lifting entirely and become "skinny runner."
-            </p>
-          </div>
+            <div>
+              <p className="text-label mb-3 text-[var(--text-subtle)]">THE PROBLEM</p>
+              <h2 className="text-display-md mb-6">
+                Plans don't talk to each other.
+              </h2>
+              <p className="text-body-lg text-[var(--text-muted)] mb-6">
+                Running plans ignore strength. Strength plans ignore running. You end up guessing
+                how to combine them, hoping the load adds up, and often getting injured.
+              </p>
+              <p className="text-body-md text-[var(--text-muted)]">
+                Or worse—you drop lifting entirely and become "skinny runner."
+              </p>
+            </div>
 
-          <div>
-            <p className="text-label mb-3 text-[var(--color-accent)]">THE SOLUTION</p>
-            <h2 className="text-display-md mb-6">
-              One integrated plan.
-            </h2>
-            <ul className="space-y-4">
-              {[
-                'Running is the priority—we build toward your race',
-                'Strength keeps you healthy (and not skinny)',
-                'Every workout is prescribed—no guessing',
-                'Every pace is calculated from YOUR race time',
-                'Syncs with Garmin to adjust for recovery',
-              ].map((item) => (
-                <li key={item} className="flex items-start gap-3">
-                  <CheckIcon size={20} className="text-[var(--color-accent)] mt-0.5 flex-shrink-0" />
-                  <span className="text-body-md">{item}</span>
-                </li>
-              ))}
-            </ul>
+            <div>
+              <p className="text-label mb-3 text-[var(--color-accent)]">THE SOLUTION</p>
+              <h2 className="text-display-md mb-6">
+                One integrated plan.
+              </h2>
+              <ul className="space-y-4">
+                {[
+                  'Running is the priority—we build toward your race',
+                  'Strength keeps you healthy (and not skinny)',
+                  'Every workout is prescribed—no guessing',
+                  'Every pace is calculated from YOUR race time',
+                  'Syncs with Garmin to adjust for recovery',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3">
+                    <CheckIcon size={20} className="text-[var(--color-accent)] mt-0.5 flex-shrink-0" />
+                    <span className="text-body-md">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-        </div>
         </div>
       </section>
 
@@ -251,22 +223,10 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 border-t border-[var(--border-base)]">
-        <div className="container-page">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-[var(--color-accent)] flex items-center justify-center">
-                <ActivityIcon size={16} className="text-black" />
-              </div>
-              <span className="text-body-sm">The Long Game</span>
-            </div>
-
-            <p className="text-caption">
-              Hansons · Daniels · Seiler · Dicharry · Starrett
-            </p>
-          </div>
-        </div>
-      </footer>
+      <div className="mt-auto">
+        <Footer />
+      </div>
     </div>
   );
 }
+

@@ -139,6 +139,7 @@ interface OptionButtonProps {
     icon?: ReactNode;
     warning?: boolean;
     recommended?: boolean;
+    disabled?: boolean;
 }
 
 export function OptionButton({
@@ -150,17 +151,20 @@ export function OptionButton({
     icon,
     warning,
     recommended,
+    disabled,
 }: OptionButtonProps) {
     return (
         <button
             onClick={onClick}
+            disabled={disabled}
             className={`
                 w-full p-4 rounded-xl border text-left transition-all
                 ${selected
                     ? 'bg-[var(--color-accent)] text-[#04110b] border-transparent'
-                    : 'bg-[var(--bg-elevated)] border-[var(--border-base)] hover:border-[var(--border-emphasis)]'
+                    : 'bg-[var(--bg-elevated)] border-[var(--border-base)]'
                 }
                 ${warning && !selected ? 'border-[var(--color-warning)]' : ''}
+                ${disabled ? 'opacity-60 cursor-not-allowed' : 'hover:border-[var(--border-emphasis)]'}
             `}
         >
             <div className="flex items-start gap-3">
