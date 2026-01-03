@@ -17,7 +17,13 @@ export interface GarminTokenRecord {
     scopes?: string[];
 }
 
-export type GarminOauthState = Database['public']['Tables']['garmin_oauth_states']['Row'];
+export interface GarminOauthState {
+    athlete_id: string;
+    code_verifier: string;
+    created_at: string;
+    expires_at: string;
+    state: string;
+}
 
 export async function saveOauthState(state: string, athleteId: string, codeVerifier: string, expiresAt: string) {
     const supabase = getSupabaseServerClient();
