@@ -17,6 +17,8 @@ export interface GarminTokenRecord {
     scopes?: string[];
 }
 
+type GarminOauthState = Database['public']['Tables']['garmin_oauth_states']['Row'];
+
 export async function saveOauthState(state: string, athleteId: string, codeVerifier: string, expiresAt: string) {
     const supabase = getSupabaseServerClient();
     const { error } = await supabase
@@ -31,7 +33,7 @@ export async function saveOauthState(state: string, athleteId: string, codeVerif
     if (error) throw error;
 }
 
-export async function consumeOauthState(state: string) {
+export async function consumeOauthState(state: string): Promise<GarminOauthState | null> {
     const supabase = getSupabaseServerClient();
     const { data, error } = await supabase
         .from('garmin_oauth_states')
@@ -41,7 +43,7 @@ export async function consumeOauthState(state: string) {
         .maybeSingle();
 
     if (error) throw error;
-    return data ?? null;
+    return (data as GarminOauthState | null) ?? null;
 }
 
 export async function upsertGarminTokens(record: GarminTokenRecord) {

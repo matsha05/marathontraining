@@ -116,6 +116,7 @@ export default function TechnicalLanding() {
                             Synthesizes Hansons, Daniels VDOT, Seiler&apos;s polarized model, and
                             Starrett&apos;s durability standards into one coherent system.
                         </p>
+                        <div className="signal-line mb-10" />
 
                         {/* CTA */}
                         <div className="flex flex-wrap items-center gap-4 mb-12">
@@ -235,7 +236,7 @@ export default function TechnicalLanding() {
                                     vdot/calculator.ts
                                 </span>
                             </div>
-                            <pre className="p-4 text-body-sm font-mono overflow-x-auto">
+                            <pre className="p-5 text-body-md font-mono overflow-x-auto">
                                 <code>
                                     <span style={{ color: "var(--color-text-muted)" }}>// Calculate VDOT from race result</span>
                                     {"\n"}

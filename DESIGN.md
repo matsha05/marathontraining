@@ -179,6 +179,13 @@ Badge variant: `.domain-badge` (applies 15% opacity background)
 - Card padding: 20-24px
 - Element gap within cards: 16px
 
+### Signature Motifs
+
+- `hero-visual`: layered gradient card for hero-side storytelling
+- `signal-line`: thin gradient divider for emphasis and pacing
+- `proof-row` + `proof-chip`: compact social proof blocks for onboarding/auth
+- `cta-panel`: elevated CTA container with subtle brand glow
+
 ---
 
 ## Accessibility

@@ -1136,12 +1136,167 @@ textarea.input {
   border-radius: var(--radius-2xl);
   padding: 48px;
   box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(520px circle at 12% -20%, color-mix(in srgb, var(--color-accent) 18%, transparent), transparent 60%),
+    radial-gradient(420px circle at 90% 0%, color-mix(in srgb, var(--color-strength) 14%, transparent), transparent 65%);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.cta-panel > * {
+  position: relative;
+  z-index: 1;
 }
 
 @media (max-width: 768px) {
   .cta-panel {
     padding: 32px;
   }
+}
+
+/* =============================================================================
+   SIGNATURE HERO MOTIFS
+   ============================================================================= */
+
+.hero-visual {
+  position: relative;
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--border-base);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.hero-visual::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(420px circle at 12% -10%, color-mix(in srgb, var(--color-accent) 26%, transparent), transparent 60%),
+    radial-gradient(520px circle at 88% 20%, color-mix(in srgb, var(--color-strength) 18%, transparent), transparent 65%);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.hero-visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--text-subtle) 14%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--text-subtle) 12%, transparent) 1px, transparent 1px);
+  background-size: 72px 72px;
+  opacity: 0.05;
+  pointer-events: none;
+}
+
+.hero-visual-inner {
+  position: relative;
+  z-index: 1;
+  padding: 28px;
+  display: grid;
+  gap: 16px;
+}
+
+.hero-visual-card {
+  background: color-mix(in srgb, var(--bg-elevated) 92%, transparent);
+  border: 1px solid var(--border-base);
+  border-radius: var(--radius-xl);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.signal-line {
+  height: 2px;
+  width: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-accent), color-mix(in srgb, var(--color-strength) 70%, var(--color-accent)));
+  box-shadow: 0 8px 20px -16px color-mix(in srgb, var(--color-accent) 60%, transparent);
+}
+
+.metric-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  background: var(--bg-inset);
+  border: 1px solid var(--border-base);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.stat-grid {
+  display: grid;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.auth-shell {
+  background-image:
+    radial-gradient(600px circle at 12% -10%, color-mix(in srgb, var(--color-accent) 16%, transparent), transparent 60%),
+    radial-gradient(500px circle at 90% 0%, color-mix(in srgb, var(--color-strength) 12%, transparent), transparent 65%);
+}
+
+.onboarding-shell {
+  background-image:
+    radial-gradient(700px circle at 14% -16%, color-mix(in srgb, var(--color-accent) 12%, transparent), transparent 60%),
+    radial-gradient(600px circle at 85% 12%, color-mix(in srgb, var(--color-durability) 12%, transparent), transparent 65%);
+}
+
+.proof-row {
+  display: grid;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+@media (min-width: 768px) {
+  .proof-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.proof-chip {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-base);
+  border-radius: var(--radius-xl);
+  padding: 12px 16px;
+  box-shadow: var(--shadow-sm);
+  text-align: left;
+}
+
+.auth-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(420px circle at 10% 0%, color-mix(in srgb, var(--color-accent) 18%, transparent), transparent 60%),
+    radial-gradient(360px circle at 90% 15%, color-mix(in srgb, var(--color-strength) 14%, transparent), transparent 65%);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.auth-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* =============================================================================

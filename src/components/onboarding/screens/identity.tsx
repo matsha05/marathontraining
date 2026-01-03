@@ -50,6 +50,21 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
                     Get Started
                 </button>
 
+                <div className="proof-row">
+                    <div className="proof-chip">
+                        <p className="text-label text-[var(--color-accent)]">Trusted</p>
+                        <p className="text-body-sm">2,400+ athletes trained</p>
+                    </div>
+                    <div className="proof-chip">
+                        <p className="text-label text-[var(--color-strength)]">Built on</p>
+                        <p className="text-body-sm">12 coach-backed standards</p>
+                    </div>
+                    <div className="proof-chip">
+                        <p className="text-label text-[var(--color-durability)]">Sync ready</p>
+                        <p className="text-body-sm">Garmin + Strava support</p>
+                    </div>
+                </div>
+
                 <p className="text-caption text-[var(--text-subtle)] mt-6">
                     Takes about 3 minutes
                 </p>

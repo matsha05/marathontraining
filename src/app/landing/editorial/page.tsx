@@ -198,28 +198,20 @@ export default function EditorialLanding() {
                         </div>
 
                         <div className="relative">
-                            <div
-                                className="aspect-square rounded-2xl p-8 flex flex-col justify-center"
-                                style={{ background: "var(--color-bg-card)" }}
-                            >
-                                <div className="text-center">
-                                    <div className="text-display-md text-data mb-2">87%</div>
-                                    <p className="text-body-sm mb-6" style={{ color: "var(--color-text-muted)" }}>
+                            <div className="hero-visual">
+                                <div className="hero-visual-inner text-center">
+                                    <p className="text-label text-[var(--color-accent)]">Injury risk</p>
+                                    <div className="text-display-xl text-data gradient-text">87%</div>
+                                    <p className="text-body-sm text-[var(--text-muted)] mb-6">
                                         of runners get injured during marathon training
                                     </p>
-                                    <div
-                                        className="h-px w-24 mx-auto mb-6"
-                                        style={{ background: "var(--color-border)" }}
-                                    />
-                                    <p
-                                        className="text-2xl font-bold mb-2"
-                                        style={{ color: "var(--color-text-primary)" }}
-                                    >
-                                        Not with HybridCoach.
-                                    </p>
-                                    <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
-                                        Our approach puts durability first.
-                                    </p>
+                                    <div className="signal-line mb-6" />
+                                    <div className="hero-visual-card">
+                                        <p className="text-heading-sm">Not with HybridCoach.</p>
+                                        <p className="text-body-sm text-[var(--text-muted)]">
+                                            Our approach puts durability first.
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>

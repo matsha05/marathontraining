@@ -70,31 +70,71 @@ export default function LandingPage() {
       {/* Hero */}
       <section className="hero-section hero-surface">
         <div className="container-page">
-          <div className="max-w-3xl">
-          <p className="text-label text-[var(--color-accent)] mb-4 flex items-center gap-2">
-            <ActivityIcon size={14} />
-            PRECISION TRAINING
-          </p>
+          <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
+            <div>
+              <p className="text-label text-[var(--color-accent)] mb-4 flex items-center gap-2">
+                <ActivityIcon size={14} />
+                PRECISION TRAINING
+              </p>
 
-          <h1 className="text-display-xl mb-6">
-            A daily plan you can<br />
-            <span className="gradient-text">actually trust.</span>
-          </h1>
+              <h1 className="text-display-xl mb-6">
+                A daily plan you can<br />
+                <span className="gradient-text">actually trust.</span>
+              </h1>
 
-          <p className="text-body-lg text-[var(--text-muted)] mb-10 max-w-2xl">
-            Running, strength, mobility—all in one place. Every pace calculated from your race time.
-            Every workout based on science from coaches who've trained world-class athletes.
-          </p>
+              <p className="text-body-lg text-[var(--text-muted)] mb-10 max-w-2xl">
+                Running, strength, mobility—all in one place. Every pace calculated from your race time.
+                Every workout based on science from coaches who've trained world-class athletes.
+              </p>
 
-          <div className="flex flex-wrap items-center gap-4">
-            <Link href="/onboarding" className="btn btn-gradient btn-lg group">
-              Build Your Plan
-              <ArrowRightIcon size={18} className="group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link href="#methodology" className="btn btn-secondary btn-lg">
-              See the Science
-            </Link>
-          </div>
+              <div className="flex flex-wrap items-center gap-4">
+                <Link href="/onboarding" className="btn btn-gradient btn-lg group">
+                  Build Your Plan
+                  <ArrowRightIcon size={18} className="group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <Link href="#methodology" className="btn btn-secondary btn-lg">
+                  See the Science
+                </Link>
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="hero-visual">
+                <div className="hero-visual-inner">
+                  <div className="flex items-center justify-between">
+                    <p className="text-label">Today</p>
+                    <span className="metric-chip">Week 3 · Build Phase</span>
+                  </div>
+                  <div>
+                    <p className="text-display-md text-data">8.2 mi</p>
+                    <p className="text-body-sm text-[var(--text-muted)]">
+                      Tempo @ 6:45/mi · 60 min total
+                    </p>
+                  </div>
+                  <div className="signal-line" />
+                  <div className="stat-grid">
+                    <div className="hero-visual-card">
+                      <p className="text-label mb-1">Weekly Load</p>
+                      <p className="text-heading-md text-data">32.4 mi</p>
+                      <p className="text-caption">+6% vs last week</p>
+                    </div>
+                    <div className="hero-visual-card">
+                      <p className="text-label mb-1">Durability</p>
+                      <p className="text-heading-md text-data">92%</p>
+                      <p className="text-caption">Movement readiness</p>
+                    </div>
+                  </div>
+                  <div className="hero-visual-card">
+                    <div className="flex items-center justify-between">
+                      <p className="text-label">Next Up</p>
+                      <span className="text-caption text-[var(--color-strength)]">Strength</span>
+                    </div>
+                    <p className="text-body-md">Posterior chain + core stability</p>
+                    <p className="text-caption">45 min · No equipment</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -102,14 +142,14 @@ export default function LandingPage() {
       {/* What You Get */}
       <section className="section-tight section-contrast">
         <div className="container-page">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
               { icon: CalendarDaysIcon, label: 'Daily Plan', desc: 'Know exactly what to do' },
               { icon: ChartLineIcon, label: 'VDOT Paces', desc: 'Calculated from your race' },
               { icon: HeartIcon, label: 'Garmin Sync', desc: 'Adapts to your recovery' },
               { icon: FlameIcon, label: 'Stay Strong', desc: 'Strength training built in' },
             ].map((item, i) => (
-              <div key={item.label} className="text-center md:text-left animate-fade-in" style={{ animationDelay: `${i * 100}ms` }}>
+              <div key={item.label} className="card p-5 text-center md:text-left animate-fade-in" style={{ animationDelay: `${i * 100}ms` }}>
                 <div className="w-14 h-14 rounded-2xl bg-[var(--color-accent)]/10 flex items-center justify-center mx-auto md:mx-0 mb-4">
                   <item.icon size={24} className="text-[var(--color-accent)]" />
                 </div>

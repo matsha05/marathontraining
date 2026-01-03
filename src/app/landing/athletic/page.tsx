@@ -144,7 +144,14 @@ export default function AthleticLanding() {
 
                         {/* Stats Panel */}
                         <div className="relative">
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="hero-visual">
+                                <div className="hero-visual-inner">
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-label">System Snapshot</p>
+                                        <span className="metric-chip">12 week block</span>
+                                    </div>
+                                    <div className="signal-line" />
+                                    <div className="grid grid-cols-2 gap-4">
                                 {[
                                     { value: "5K", label: "TO ULTRA", sublabel: "All distances covered" },
                                     { value: "2x", label: "STRENGTH", sublabel: "Sessions per week" },
@@ -153,8 +160,7 @@ export default function AthleticLanding() {
                                 ].map((stat, i) => (
                                     <div
                                         key={i}
-                                        className="card p-6 backdrop-blur-sm"
-                                        style={{ background: "color-mix(in srgb, var(--bg-elevated) 70%, transparent)" }}
+                                        className="hero-visual-card"
                                     >
                                         <div className="text-display-md text-data gradient-text mb-1">
                                             {stat.value}
@@ -167,6 +173,8 @@ export default function AthleticLanding() {
                                         </div>
                                     </div>
                                 ))}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

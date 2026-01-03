@@ -55,7 +55,7 @@ export function QuestionScreen({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.2 }}
-            className={`min-h-screen landing-shell flex flex-col items-center justify-center px-6 py-12 ${className}`}
+            className={`min-h-screen landing-shell onboarding-shell flex flex-col items-center justify-center px-6 py-12 ${className}`}
         >
             <div className="w-full max-w-lg">
                 {showBack && onBack && (
