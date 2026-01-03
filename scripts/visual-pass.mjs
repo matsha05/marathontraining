@@ -52,12 +52,29 @@ async function findOpenPort(ports) {
   return null;
 }
 
+let devProcess = null;
+
+function stopServer() {
+  if (devProcess && !devProcess.killed) {
+    devProcess.kill('SIGTERM');
+  }
+}
+
+process.on('exit', stopServer);
+process.on('SIGINT', () => {
+  stopServer();
+  process.exit(1);
+});
+process.on('SIGTERM', () => {
+  stopServer();
+  process.exit(1);
+});
+
 async function main() {
   const requestedPort = Number(getArg('--port')) || null;
   const baseUrlArg = getArg('--base-url');
   const skipServer = isFlag('--no-server');
 
-  let devProcess = null;
   let baseUrl = baseUrlArg;
 
   if (!skipServer) {
@@ -76,7 +93,7 @@ async function main() {
     const ready = await waitForServer(baseUrl);
     if (!ready) {
       console.error(`Dev server did not respond at ${baseUrl}`);
-      devProcess.kill('SIGTERM');
+      stopServer();
       process.exit(1);
     }
   }
@@ -105,12 +122,11 @@ async function main() {
   }
   await browser.close();
 
-  if (devProcess) {
-    devProcess.kill('SIGTERM');
-  }
+  stopServer();
 }
 
 main().catch((err) => {
   console.error(err);
+  stopServer();
   process.exit(1);
 });
