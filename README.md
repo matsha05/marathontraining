@@ -94,6 +94,20 @@ npm run dev
 
 ---
 
+## Visual QA
+
+Playwright sweep that spins up the dev server, captures key pages, and writes screenshots to `tmp/visual-pass/`.
+
+```bash
+npm run visual:check
+```
+
+Optional:
+- `npm run visual:check -- --port 3010`
+- `npm run visual:check -- --base-url http://127.0.0.1:3000 --no-server`
+
+---
+
 ## The Vision
 
 This is the app that finally answers: *"I want to run a marathon, but I don't know what to do today, and I don't want to stop lifting."*
