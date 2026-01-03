@@ -45,7 +45,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#ffffff",
+  themeColor: "#0b0f14",
   width: "device-width",
   initialScale: 1,
 };
@@ -56,7 +56,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${instrumentSans.variable} ${plexMono.variable}`}>
+    <html lang="en" className={`dark ${spaceGrotesk.variable} ${instrumentSans.variable} ${plexMono.variable}`}>
       <body>{children}</body>
     </html>
   );
