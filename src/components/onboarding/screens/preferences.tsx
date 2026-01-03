@@ -8,7 +8,6 @@
 
 import { useState, useEffect } from 'react';
 import { Loader2, Check, AlertTriangle, ArrowRight } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import {
     QuestionScreen,
     QuestionHeader,
@@ -380,25 +379,15 @@ export function GeneratingScreen({ onComplete }: GeneratingScreenProps) {
 
 interface CompleteScreenProps {
     data: OnboardingData;
+    onViewDashboard: () => void;
+    onViewPlan: () => void;
 }
 
-export function CompleteScreen({ data }: CompleteScreenProps) {
-    const router = useRouter();
-
+export function CompleteScreen({ data, onViewDashboard, onViewPlan }: CompleteScreenProps) {
     const goalLabel = TRAINING_GOALS.find(g => g.value === data.trainingGoal)?.label ?? 'Training';
     const weeksToRace = data.raceDate
         ? Math.floor((new Date(data.raceDate).getTime() - Date.now()) / (7 * 24 * 60 * 60 * 1000))
         : null;
-
-    const handleViewPlan = () => {
-        clearOnboardingProgress();
-        router.push('/plan');
-    };
-
-    const handleViewDashboard = () => {
-        clearOnboardingProgress();
-        router.push('/dashboard');
-    };
 
     return (
         <QuestionScreen showBack={false}>
@@ -427,13 +416,13 @@ export function CompleteScreen({ data }: CompleteScreenProps) {
 
             <div className="mt-8 space-y-3">
                 <button
-                    onClick={handleViewPlan}
+                    onClick={onViewPlan}
                     className="btn btn-gradient btn-lg w-full"
                 >
                     View full plan
                 </button>
                 <button
-                    onClick={handleViewDashboard}
+                    onClick={onViewDashboard}
                     className="btn btn-secondary w-full"
                 >
                     Go to dashboard

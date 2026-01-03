@@ -154,7 +154,7 @@ export const CALIBRATION_METHODS = [
     {
         value: 'device',
         label: 'Import from Garmin or Strava',
-        description: 'Uses your device\'s VO2max estimate',
+        description: 'Import training history and optionally enter VO2max',
         icon: Heart,
     },
     {

@@ -43,7 +43,10 @@ export async function GET(request: NextRequest) {
         },
     });
 
-    await supabase.auth.exchangeCodeForSession(code);
+    const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+    if (exchangeError) {
+        return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(exchangeError.message)}`, request.url));
+    }
 
     return NextResponse.redirect(new URL(nextPath, request.url));
 }

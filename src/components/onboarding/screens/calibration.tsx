@@ -307,21 +307,29 @@ export function DeviceImportScreen({
                 fetch('/api/strava/status'),
             ]);
 
-            if (garminRes.status === 'fulfilled' && garminRes.value.ok) {
-                const garminJson = await garminRes.value.json();
-                setGarminStatus({
-                    connected: Boolean(garminJson.connected),
-                    lastActivityAt: garminJson.lastActivityAt ?? null,
-                    lastHealthDate: garminJson.lastHealthDate ?? null,
-                });
+            if (garminRes.status === 'fulfilled') {
+                if (garminRes.value.status === 401) {
+                    setGarminStatus({ connected: false });
+                } else if (garminRes.value.ok) {
+                    const garminJson = await garminRes.value.json();
+                    setGarminStatus({
+                        connected: Boolean(garminJson.connected),
+                        lastActivityAt: garminJson.lastActivityAt ?? null,
+                        lastHealthDate: garminJson.lastHealthDate ?? null,
+                    });
+                }
             }
 
-            if (stravaRes.status === 'fulfilled' && stravaRes.value.ok) {
-                const stravaJson = await stravaRes.value.json();
-                setStravaStatus({
-                    connected: Boolean(stravaJson.connected),
-                    lastActivityAt: stravaJson.lastActivityAt ?? null,
-                });
+            if (stravaRes.status === 'fulfilled') {
+                if (stravaRes.value.status === 401) {
+                    setStravaStatus({ connected: false });
+                } else if (stravaRes.value.ok) {
+                    const stravaJson = await stravaRes.value.json();
+                    setStravaStatus({
+                        connected: Boolean(stravaJson.connected),
+                        lastActivityAt: stravaJson.lastActivityAt ?? null,
+                    });
+                }
             }
         } finally {
             setStatusLoading(false);

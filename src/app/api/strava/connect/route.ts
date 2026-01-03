@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     const { athleteId } = await resolveAthleteId(request);
 
     if (!athleteId) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        return redirectToLogin(request);
     }
 
     const state = generateState();
@@ -19,4 +19,21 @@ export async function GET(request: NextRequest) {
 
     const authUrl = buildAuthorizationUrl(state);
     return NextResponse.redirect(authUrl);
+}
+
+function redirectToLogin(request: NextRequest) {
+    const nextPath = getSafeNextPath(request, '/onboarding');
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('next', nextPath);
+    return NextResponse.redirect(loginUrl);
+}
+
+function getSafeNextPath(request: NextRequest, fallback: string) {
+    const { searchParams, pathname, search } = new URL(request.url);
+    const explicitNext = searchParams.get('next');
+    if (explicitNext && explicitNext.startsWith('/')) {
+        return explicitNext;
+    }
+    const selfPath = `${pathname}${search}`;
+    return selfPath || fallback;
 }

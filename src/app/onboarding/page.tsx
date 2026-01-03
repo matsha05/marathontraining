@@ -9,7 +9,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { ProgressBar } from '@/components/onboarding/ui';
+import { createPlanFromOnboarding, savePlan } from '@/domain/plan/service';
 
 // Types and utilities
 import {
@@ -21,6 +23,7 @@ import {
     getStepProgress,
     saveOnboardingProgress,
     loadOnboardingProgress,
+    clearOnboardingProgress,
     Sex,
     TrainingGoal,
     FitnessDuration,
@@ -190,6 +193,9 @@ export default function OnboardingPage() {
     const [mounted, setMounted] = useState(false);
     const [showResumePrompt, setShowResumePrompt] = useState(false);
     const [savedProgress, setSavedProgress] = useState<{ step: OnboardingStep; data: OnboardingData } | null>(null);
+    const [planGenerated, setPlanGenerated] = useState(false);
+    const [generationError, setGenerationError] = useState<string | null>(null);
+    const router = useRouter();
 
     // Load saved progress on mount
     useEffect(() => {
@@ -565,11 +571,39 @@ export default function OnboardingPage() {
                 )}
 
                 {step === 'generating' && (
-                    <GeneratingScreen onComplete={goToNext} />
+                    <GeneratingScreen
+                        onComplete={async () => {
+                            // Actually generate the plan here
+                            const result = createPlanFromOnboarding(data);
+                            if (result.success) {
+                                const saveResult = savePlan(result.data);
+                                if (saveResult.success) {
+                                    setPlanGenerated(true);
+                                    goToNext();
+                                } else {
+                                    setGenerationError('Failed to save your plan. Please try again.');
+                                    setStep('readiness-check');
+                                }
+                            } else {
+                                setGenerationError(result.error.message);
+                                setStep('readiness-check');
+                            }
+                        }}
+                    />
                 )}
 
                 {step === 'complete' && (
-                    <CompleteScreen data={data} />
+                    <CompleteScreen
+                        data={data}
+                        onViewDashboard={() => {
+                            clearOnboardingProgress();
+                            router.push('/dashboard');
+                        }}
+                        onViewPlan={() => {
+                            clearOnboardingProgress();
+                            router.push('/plan');
+                        }}
+                    />
                 )}
             </AnimatePresence>
         </>

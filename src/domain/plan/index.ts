@@ -17,6 +17,13 @@ export * from './mileage';
 // Main generator
 export { generatePlan, calculateWeeksToRace, getWeekFocus } from './generator';
 
+// Service layer (transformation, CRUD, queries)
+export * from './service';
+
+// React Context (state management)
+export { PlanProvider, usePlan, useUpcomingWorkouts, useIsRestDay } from './context';
+export type { PlanState, PlanActions, PlanContextValue, PlanStatus } from './context';
+
 // Workout templates
 export {
     EASY_TEMPLATES,
