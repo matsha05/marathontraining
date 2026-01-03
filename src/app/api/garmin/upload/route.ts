@@ -47,9 +47,9 @@ export async function POST(request: Request) {
         activityId,
         summary.activityType ?? null,
         summary,
-        fit.summary as Record<string, unknown>,
-        fit.laps,
-        fit.records,
+        fit.summary as import('@/infrastructure/supabase/types').Json,
+        fit.laps as import('@/infrastructure/supabase/types').Json,
+        fit.records as import('@/infrastructure/supabase/types').Json,
         'manual'
     );
 

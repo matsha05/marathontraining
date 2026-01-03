@@ -24,7 +24,8 @@
  * 
  * TYPOGRAPHY
  * -----------
- * Display: Inter Variable (or SF Pro) - Athletic, geometric, highly legible
+ * Display: Space Grotesk - Athletic, geometric, highly legible
+ * Body: Instrument Sans - Refined, neutral, high readability
  * - Headlines: Semibold/Bold, tight tracking (-0.025em to -0.03em)
  * - Large numbers: Bold, tighter tracking for data display
  * 
@@ -32,7 +33,7 @@
  * - Used sparingly for hero headlines and methodology sections
  * - Adds gravitas without being Old World
  * 
- * Mono: JetBrains Mono / SF Mono - Technical data, pace displays
+ * Mono: IBM Plex Mono / SF Mono - Technical data, pace displays
  * - Paces, times, distances in monospace for alignment and precision feel
  * 
  * TYPE SCALE (8px base, 1.25 ratio)
@@ -52,30 +53,30 @@
  * -------------
  * 
  * Background Palette (Dark Mode - Primary):
- * - bg-primary: #0a0a0a (near-black, athletic)
- * - bg-secondary: #111111 (cards, elevated surfaces)
- * - bg-tertiary: #1a1a1a (inputs, subtle distinction)
+ * - bg-primary: #0b0f14 (near-black, athletic)
+ * - bg-secondary: #121820 (cards, elevated surfaces)
+ * - bg-tertiary: #1a222d (inputs, subtle distinction)
  * 
  * Background Palette (Light Mode):
- * - bg-primary: #fafafa (warm white)
+ * - bg-primary: #f7f8fa (cool white)
  * - bg-secondary: #ffffff (cards)
- * - bg-tertiary: #f5f5f5 (inputs)
+ * - bg-tertiary: #f1f4f7 (inputs)
  * 
  * Text Palette:
- * - text-primary: white/#0a0a0a (high contrast)
- * - text-secondary: #888888/#666666 (supporting text)
- * - text-muted: #555555/#999999 (tertiary, labels)
+ * - text-primary: #f1f5f9/#0d1117 (high contrast)
+ * - text-secondary: #b0b9c5/#5a6676 (supporting text)
+ * - text-muted: #7d8794/#8b95a5 (tertiary, labels)
  * 
  * Accent Colors (Training Domains):
- * - Running: #22c55e (green-500) - Forward momentum, go
- * - Strength: #3b82f6 (blue-500) - Stability, power
- * - Durability: #a855f7 (purple-500) - Flexibility, recovery
+ * - Running: #19e38c (volt green) - Forward momentum, go
+ * - Strength: #3a6bff (strength blue) - Stability, power
+ * - Durability: #7a5cff (durability violet) - Flexibility, recovery
  * 
  * Semantic Colors:
- * - success: #22c55e (green)
- * - warning: #f59e0b (amber)
- * - error: #ef4444 (red)
- * - info: #3b82f6 (blue)
+ * - success: #19e38c (green)
+ * - warning: #f4b740 (amber)
+ * - error: #e5484d (red)
+ * - info: #3a6bff (blue)
  * 
  * SPACING SYSTEM (8px grid)
  * --------------------------

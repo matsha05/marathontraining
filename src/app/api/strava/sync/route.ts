@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
             `strava:${activityId}`,
             summary.activityType ?? null,
             { ...summary, source: 'strava' },
-            activity,
+            activity as import('@/infrastructure/supabase/types').Json,
             null,
             null,
             'strava'

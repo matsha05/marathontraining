@@ -88,16 +88,21 @@ export function calculateInjuryRisk(profile: Partial<OnboardingProfile>): Injury
     // This would need age from the full profile
 
     // Cap score at 5
-    score = Math.min(5, score) as 1 | 2 | 3 | 4 | 5;
+    const clampedScore = Math.min(5, Math.max(1, score));
+    const finalScore: InjuryRiskAssessment['score'] =
+        clampedScore <= 1 ? 1 :
+            clampedScore === 2 ? 2 :
+                clampedScore === 3 ? 3 :
+                    clampedScore === 4 ? 4 : 5;
 
     // Determine level
     let level: InjuryRiskAssessment['level'] = 'low';
-    if (score >= 4) level = 'very_high';
-    else if (score >= 3) level = 'high';
-    else if (score >= 2) level = 'moderate';
+    if (finalScore >= 4) level = 'very_high';
+    else if (finalScore >= 3) level = 'high';
+    else if (finalScore >= 2) level = 'moderate';
 
     // Determine if calibration week is required
-    const requiresCalibration = score >= 3 || weeklyMiles < 10;
+    const requiresCalibration = finalScore >= 3 || weeklyMiles < 10;
 
     // Add calibration week recommendation if needed
     if (requiresCalibration && !recommendations.includes('Use calibration week')) {
@@ -105,7 +110,7 @@ export function calculateInjuryRisk(profile: Partial<OnboardingProfile>): Injury
     }
 
     return {
-        score,
+        score: finalScore,
         level,
         factors,
         recommendations,

@@ -96,14 +96,14 @@ export default function DashboardPage() {
     };
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen landing-shell">
             <AppHeader streak={MOCK_INSIGHTS.currentStreak} />
 
-            <main className="container-page py-8">
+            <main className="container-page py-10">
                 {/* Greeting + Readiness */}
                 <div className="flex items-start justify-between mb-10">
                     <div>
-                        <p className="text-body-md text-[var(--text-muted)] mb-1">Good morning</p>
+                        <p className="text-body-sm text-[var(--text-muted)] mb-1">Good morning</p>
                         <h1 className="text-display-md">{MOCK_ATHLETE.name}</h1>
                     </div>
 

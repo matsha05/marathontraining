@@ -6,12 +6,12 @@ export default function EditorialLanding() {
     return (
         <div className="min-h-screen landing-shell" style={{ backgroundColor: "var(--color-bg-primary)" }}>
             {/* Navigation */}
-            <nav className="sticky top-0 left-0 right-0 z-40 glass">
+            <nav className="sticky top-0 left-0 right-0 z-40 glass border-b border-[var(--border-muted)]">
                 <div className="max-w-7xl mx-auto px-6 h-[var(--header-height)] flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <Link
                             href="/"
-                            className="flex items-center gap-2 text-xs font-medium transition-colors hover:text-[var(--color-accent)]"
+                            className="flex items-center gap-2 text-body-sm font-medium transition-colors hover:text-[var(--color-accent)]"
                             style={{ color: "var(--color-text-secondary)" }}
                         >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -43,7 +43,7 @@ export default function EditorialLanding() {
                             <a
                                 key={item.label}
                                 href={item.href}
-                                className="text-sm font-medium transition-colors hover:text-[var(--color-accent)]"
+                                className="text-body-sm font-medium transition-colors hover:text-[var(--color-accent)]"
                                 style={{ color: "var(--color-text-secondary)" }}
                             >
                                 {item.label}
@@ -55,7 +55,7 @@ export default function EditorialLanding() {
                         <button className="btn btn-secondary btn-sm">
                             Log In
                         </button>
-                        <button className="btn btn-primary btn-sm">
+                        <button className="btn btn-gradient btn-sm">
                             Start Training
                         </button>
                     </div>
@@ -85,7 +85,7 @@ export default function EditorialLanding() {
                             }}
                         >
                             <span className="w-2 h-2 rounded-full bg-[var(--color-accent)]" />
-                            <span className="text-sm font-medium" style={{ color: "var(--color-accent)" }}>
+                            <span className="text-body-sm font-medium" style={{ color: "var(--color-accent)" }}>
                                 Built for former strength athletes
                             </span>
                         </div>
@@ -110,7 +110,7 @@ export default function EditorialLanding() {
 
                         {/* CTA */}
                         <div className="flex flex-wrap items-center gap-4 animate-slide-up animate-delay-300">
-                            <button className="btn btn-primary btn-lg">
+                            <button className="btn btn-gradient btn-lg">
                                 Create Your Plan
                             </button>
                             <button className="btn btn-secondary btn-lg flex items-center gap-2">
@@ -129,7 +129,7 @@ export default function EditorialLanding() {
                                 {[1, 2, 3, 4, 5].map((i) => (
                                     <div
                                         key={i}
-                                        className="w-10 h-10 rounded-full border-2 flex items-center justify-center text-xs font-bold"
+                                        className="w-10 h-10 rounded-full border-2 flex items-center justify-center text-caption font-bold"
                                         style={{
                                             borderColor: "var(--color-bg-primary)",
                                             background: `hsl(${i * 30 + 10}, 70%, 50%)`,
@@ -144,7 +144,7 @@ export default function EditorialLanding() {
                                 <p className="font-semibold" style={{ color: "var(--color-text-primary)" }}>
                                     2,400+ athletes trained
                                 </p>
-                                <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+                                <p className="text-body-sm" style={{ color: "var(--color-text-muted)" }}>
                                     with an average 4.9★ rating
                                 </p>
                             </div>
@@ -204,7 +204,7 @@ export default function EditorialLanding() {
                             >
                                 <div className="text-center">
                                     <div className="text-display-md text-data mb-2">87%</div>
-                                    <p className="text-sm mb-6" style={{ color: "var(--color-text-muted)" }}>
+                                    <p className="text-body-sm mb-6" style={{ color: "var(--color-text-muted)" }}>
                                         of runners get injured during marathon training
                                     </p>
                                     <div
@@ -217,7 +217,7 @@ export default function EditorialLanding() {
                                     >
                                         Not with HybridCoach.
                                     </p>
-                                    <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                                    <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                                         Our approach puts durability first.
                                     </p>
                                 </div>
@@ -283,7 +283,7 @@ export default function EditorialLanding() {
                                 >
                                     {feature.title}
                                 </h3>
-                                <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                                <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                                     {feature.description}
                                 </p>
                             </div>
@@ -338,7 +338,7 @@ export default function EditorialLanding() {
                                     >
                                         {item.title}
                                     </h3>
-                                    <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                                    <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                                         {item.desc}
                                     </p>
                                 </div>
@@ -384,13 +384,13 @@ export default function EditorialLanding() {
                                     {race.name}
                                 </div>
                                 <div
-                                    className="text-xs mb-2"
+                                    className="text-caption mb-2"
                                     style={{ color: "var(--color-accent)" }}
                                 >
                                     {race.focus}
                                 </div>
                                 <div
-                                    className="text-xs"
+                                    className="text-caption"
                                     style={{ color: "var(--color-text-muted)" }}
                                 >
                                     {race.weeks} weeks
@@ -415,11 +415,11 @@ export default function EditorialLanding() {
                         Get your personalized training plan in under 5 minutes.
                         Just enter a recent race time and your goal.
                     </p>
-                    <button className="btn btn-primary btn-lg">
+                    <button className="btn btn-gradient btn-lg">
                         Create Your Free Plan
                     </button>
                     <p
-                        className="text-sm mt-4"
+                        className="text-body-sm mt-4"
                         style={{ color: "var(--color-text-muted)" }}
                     >
                         No credit card required. Start training today.
@@ -440,7 +440,7 @@ export default function EditorialLanding() {
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                         <div className="flex items-center gap-3">
                             <div
-                                className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white text-sm"
+                                className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white text-body-sm"
                                 style={{ background: "var(--gradient-primary)" }}
                             >
                                 HC
@@ -454,7 +454,7 @@ export default function EditorialLanding() {
                         </div>
 
                         <p
-                            className="text-sm"
+                            className="text-caption"
                             style={{ color: "var(--color-text-muted)" }}
                         >
                             © 2026 HybridCoach. Built for athletes who refuse to choose.

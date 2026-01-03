@@ -28,7 +28,7 @@ export async function resolveAthleteId(request?: Request | NextRequest): Promise
     }
 
     if (supabaseUrl && supabaseAnonKey) {
-        const cookieStore = cookies();
+        const cookieStore = await cookies();
         const supabase = createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
             cookies: {
                 getAll() {

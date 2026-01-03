@@ -4,14 +4,14 @@ import Link from "next/link";
 
 export default function AthleticLanding() {
     return (
-        <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: "var(--color-bg-primary)" }}>
+        <div className="min-h-screen overflow-x-hidden landing-shell" style={{ backgroundColor: "var(--color-bg-primary)" }}>
             {/* Navigation */}
-            <nav className="sticky top-0 left-0 right-0 z-40 glass">
+            <nav className="sticky top-0 left-0 right-0 z-40 glass border-b border-[var(--border-muted)]">
                 <div className="max-w-7xl mx-auto px-6 h-[var(--header-height)] flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <Link
                             href="/"
-                            className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider transition-colors hover:text-cyan-400"
+                            className="flex items-center gap-2 text-body-sm font-semibold uppercase tracking-wider transition-colors hover:text-[var(--color-accent)]"
                             style={{ color: "var(--color-text-secondary)" }}
                         >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -21,7 +21,7 @@ export default function AthleticLanding() {
                         </Link>
                         <div className="hidden sm:block h-6 w-px" style={{ background: "var(--color-border)" }} />
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-teal-500 flex items-center justify-center font-bold text-white">
+                            <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white" style={{ background: "var(--gradient-primary)" }}>
                                 HC
                             </div>
                             <span className="font-bold text-xl" style={{ color: "var(--color-text-primary)" }}>
@@ -40,7 +40,7 @@ export default function AthleticLanding() {
                             <a
                                 key={item.label}
                                 href={item.href}
-                                className="text-sm font-semibold uppercase tracking-wide transition-colors hover:text-cyan-400"
+                                className="text-body-sm font-semibold uppercase tracking-wide transition-colors hover:text-[var(--color-accent)]"
                                 style={{ color: "var(--color-text-secondary)" }}
                             >
                                 {item.label}
@@ -48,7 +48,7 @@ export default function AthleticLanding() {
                         ))}
                     </div>
 
-                    <button className="bg-gradient-to-r from-cyan-400 to-teal-500 text-white font-bold text-sm py-2.5 px-6 rounded-full hover:shadow-lg hover:shadow-cyan-500/30 transition-all">
+                    <button className="btn btn-gradient btn-sm">
                         GET STARTED
                     </button>
                 </div>
@@ -58,9 +58,20 @@ export default function AthleticLanding() {
             <section className="relative hero-full flex items-start hero-section">
                 {/* Animated gradient background */}
                 <div className="absolute inset-0">
-                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-cyan-500/20 via-transparent to-teal-500/10" />
-                    <div className="absolute bottom-0 right-0 w-[600px] h-[600px] rounded-full bg-gradient-to-t from-emerald-500/20 to-transparent blur-3xl" />
-                    <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-gradient-to-b from-cyan-400/10 to-transparent blur-3xl" />
+                    <div
+                        className="absolute top-0 left-0 w-full h-full"
+                        style={{
+                            background: "linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 18%, transparent), transparent 55%, color-mix(in srgb, var(--color-strength) 12%, transparent))"
+                        }}
+                    />
+                    <div
+                        className="absolute bottom-0 right-0 w-[600px] h-[600px] rounded-full blur-3xl"
+                        style={{ background: "radial-gradient(circle, color-mix(in srgb, var(--color-strength) 18%, transparent), transparent 70%)" }}
+                    />
+                    <div
+                        className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full blur-3xl"
+                        style={{ background: "radial-gradient(circle, color-mix(in srgb, var(--color-accent) 12%, transparent), transparent 70%)" }}
+                    />
                 </div>
 
                 {/* Grid pattern overlay */}
@@ -77,9 +88,15 @@ export default function AthleticLanding() {
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
                         <div>
                             {/* Badge */}
-                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500/20 to-teal-500/20 border border-cyan-500/30 mb-8">
-                                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                                <span className="text-label text-cyan-400">
+                            <div
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8"
+                                style={{
+                                    background: "linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 18%, transparent), color-mix(in srgb, var(--color-strength) 18%, transparent))",
+                                    border: "1px solid color-mix(in srgb, var(--color-accent) 32%, transparent)"
+                                }}
+                            >
+                                <span className="w-2 h-2 rounded-full bg-[var(--color-accent)] animate-pulse" />
+                                <span className="text-label text-[var(--color-accent)]">
                                     For Hybrid Athletes
                                 </span>
                             </div>
@@ -88,13 +105,13 @@ export default function AthleticLanding() {
                             <h1 className="text-display-xl mb-6 leading-[0.98]">
                                 <span style={{ color: "var(--color-text-primary)" }}>TRAIN FOR</span>
                                 <br />
-                                <span className="bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 bg-clip-text text-transparent">
+                                <span className="gradient-text">
                                     ENDURANCE.
                                 </span>
                                 <br />
                                 <span style={{ color: "var(--color-text-primary)" }}>KEEP YOUR</span>
                                 <br />
-                                <span className="bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 bg-clip-text text-transparent">
+                                <span className="gradient-text">
                                     STRENGTH.
                                 </span>
                             </h1>
@@ -110,15 +127,15 @@ export default function AthleticLanding() {
 
                             {/* CTA Buttons */}
                             <div className="flex flex-wrap gap-4">
-                                <button className="btn btn-lg group bg-gradient-to-r from-cyan-400 to-teal-500 text-white font-bold hover:shadow-xl hover:shadow-cyan-500/30">
+                                <button className="btn btn-gradient btn-lg group">
                                     START YOUR PLAN
                                     <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                                     </svg>
                                 </button>
                                 <button
-                                    className="btn btn-lg border-2 border-cyan-500/50 hover:bg-cyan-500/10 transition-all"
-                                    style={{ color: "var(--color-text-primary)" }}
+                                    className="btn btn-secondary btn-lg"
+                                    style={{ borderColor: "color-mix(in srgb, var(--color-accent) 32%, var(--border-base))", color: "var(--color-text-primary)" }}
                                 >
                                     WATCH DEMO
                                 </button>
@@ -139,13 +156,13 @@ export default function AthleticLanding() {
                                         className="card p-6 backdrop-blur-sm"
                                         style={{ background: "color-mix(in srgb, var(--bg-elevated) 70%, transparent)" }}
                                     >
-                                        <div className="text-display-md text-data bg-gradient-to-r from-cyan-400 to-teal-400 bg-clip-text text-transparent mb-1">
+                                        <div className="text-display-md text-data gradient-text mb-1">
                                             {stat.value}
                                         </div>
                                         <div className="text-label" style={{ color: "var(--color-text-primary)" }}>
                                             {stat.label}
                                         </div>
-                                        <div className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
+                                        <div className="text-caption mt-1" style={{ color: "var(--color-text-muted)" }}>
                                             {stat.sublabel}
                                         </div>
                                     </div>
@@ -158,27 +175,29 @@ export default function AthleticLanding() {
 
             {/* Horizontal Scroll Feature Strip */}
             <section className="section-tight section-contrast">
-                <div className="flex items-center gap-12 animate-scroll whitespace-nowrap px-6">
-                    {[
-                        "VDOT Calculated Paces",
-                        "Built-in Strength Work",
-                        "Daily Durability Routines",
-                        "Injury Prevention System",
-                        "Race-Specific Training",
-                        "Nutrition Reminders",
-                        "Progressive Overload",
-                        "Taper Optimization",
-                    ].map((item, i) => (
-                        <div key={i} className="flex items-center gap-4">
-                            <span className="text-cyan-400">◆</span>
-                            <span
-                                className="font-bold text-sm uppercase tracking-wider"
-                                style={{ color: "var(--color-text-secondary)" }}
-                            >
-                                {item}
-                            </span>
-                        </div>
-                    ))}
+                <div className="container-page">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                        {[
+                            "VDOT Calculated Paces",
+                            "Built-in Strength Work",
+                            "Daily Durability Routines",
+                            "Injury Prevention System",
+                            "Race-Specific Training",
+                            "Nutrition Reminders",
+                            "Progressive Overload",
+                            "Taper Optimization",
+                        ].map((item, i) => (
+                            <div key={i} className="flex items-center justify-center gap-3">
+                                <span className="text-[var(--color-accent)]">◆</span>
+                                <span
+                                    className="text-caption font-semibold uppercase tracking-wider"
+                                    style={{ color: "var(--color-text-secondary)" }}
+                                >
+                                    {item}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </section>
 
@@ -186,15 +205,21 @@ export default function AthleticLanding() {
             <section id="program" className="section">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="text-center mb-16">
-                        <div className="inline-block px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500/20 to-teal-500/20 border border-cyan-500/30 mb-6">
-                            <span className="text-sm font-bold text-cyan-400 uppercase tracking-wider">
+                        <div
+                            className="inline-block px-4 py-2 rounded-full mb-6"
+                            style={{
+                                background: "linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 18%, transparent), color-mix(in srgb, var(--color-strength) 18%, transparent))",
+                                border: "1px solid color-mix(in srgb, var(--color-accent) 32%, transparent)"
+                            }}
+                        >
+                            <span className="text-label text-[var(--color-accent)]">
                                 The System
                             </span>
                         </div>
                         <h2 className="text-display-md mb-6" style={{ color: "var(--color-text-primary)" }}>
                             BUILT DIFFERENT.
                             <br />
-                            <span className="bg-gradient-to-r from-cyan-400 to-teal-400 bg-clip-text text-transparent">
+                            <span className="gradient-text">
                                 FOR ATHLETES WHO ARE.
                             </span>
                         </h2>
@@ -206,19 +231,19 @@ export default function AthleticLanding() {
                                 icon: "🎯",
                                 title: "PRECISION PACING",
                                 description: "Every workout calculated from your VDOT. No generic percentages. Your paces, your physiology.",
-                                gradient: "from-cyan-500 to-cyan-600",
+                                gradient: "linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 75%, var(--color-strength)), var(--color-strength))",
                             },
                             {
                                 icon: "💪",
                                 title: "STRENGTH PRESERVED",
                                 description: "Strategic 2x/week lifting with interference controls. Maintain your gains while building base.",
-                                gradient: "from-teal-500 to-teal-600",
+                                gradient: "linear-gradient(135deg, var(--color-strength), var(--color-durability))",
                             },
                             {
                                 icon: "🛡️",
                                 title: "INJURY-PROOFED",
                                 description: "Daily durability work based on 12 movement standards. Catch issues before they sideline you.",
-                                gradient: "from-emerald-500 to-emerald-600",
+                                gradient: "linear-gradient(135deg, var(--color-durability), color-mix(in srgb, var(--color-accent) 65%, var(--color-durability)))",
                             },
                         ].map((feature, i) => (
                             <div
@@ -230,7 +255,10 @@ export default function AthleticLanding() {
                                 }}
                             >
                                 {/* Hover gradient */}
-                                <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 transition-opacity`} />
+                                <div
+                                    className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity"
+                                    style={{ background: feature.gradient }}
+                                />
 
                                 <div className="relative z-10">
                                     <div className="text-4xl mb-4">{feature.icon}</div>
@@ -252,15 +280,21 @@ export default function AthleticLanding() {
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
                         <div>
-                            <div className="inline-block px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500/20 to-teal-500/20 border border-cyan-500/30 mb-6">
-                                <span className="text-sm font-bold text-cyan-400 uppercase tracking-wider">
+                            <div
+                                className="inline-block px-4 py-2 rounded-full mb-6"
+                                style={{
+                                    background: "linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 18%, transparent), color-mix(in srgb, var(--color-strength) 18%, transparent))",
+                                    border: "1px solid color-mix(in srgb, var(--color-accent) 32%, transparent)"
+                                }}
+                            >
+                                <span className="text-label text-[var(--color-accent)]">
                                     Sample Week
                                 </span>
                             </div>
                             <h2 className="text-display-md mb-6" style={{ color: "var(--color-text-primary)" }}>
                                 A WEEK IN YOUR
                                 <br />
-                                <span className="bg-gradient-to-r from-cyan-400 to-teal-400 bg-clip-text text-transparent">
+                                <span className="gradient-text">
                                     HYBRID LIFE
                                 </span>
                             </h2>
@@ -271,16 +305,16 @@ export default function AthleticLanding() {
 
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-2">
-                                    <span className="w-3 h-3 rounded-full bg-cyan-400" />
-                                    <span className="text-sm" style={{ color: "var(--color-text-secondary)" }}>Run</span>
+                                    <span className="w-3 h-3 rounded-full bg-[var(--color-running)]" />
+                                    <span className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Run</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <span className="w-3 h-3 rounded-full bg-emerald-400" />
-                                    <span className="text-sm" style={{ color: "var(--color-text-secondary)" }}>Strength</span>
+                                    <span className="w-3 h-3 rounded-full bg-[var(--color-strength)]" />
+                                    <span className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Strength</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <span className="w-3 h-3 rounded-full bg-violet-400" />
-                                    <span className="text-sm" style={{ color: "var(--color-text-secondary)" }}>Durability</span>
+                                    <span className="w-3 h-3 rounded-full bg-[var(--color-durability)]" />
+                                    <span className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Durability</span>
                                 </div>
                             </div>
                         </div>
@@ -306,18 +340,18 @@ export default function AthleticLanding() {
                                     <div className="font-black text-lg" style={{ color: "var(--color-text-primary)" }}>
                                         {row.day}
                                     </div>
-                                    <div className={`text-sm font-medium ${row.run !== "—" ? "text-cyan-400" : ""}`} style={{ color: row.run === "—" ? "var(--color-text-muted)" : undefined }}>
+                                    <div className={`text-body-sm font-medium ${row.run !== "—" ? "text-[var(--color-running)]" : ""}`} style={{ color: row.run === "—" ? "var(--color-text-muted)" : undefined }}>
                                         {row.run}
                                     </div>
-                                    <div className={`text-sm font-medium ${row.strength !== "—" ? "text-emerald-400" : ""}`} style={{ color: row.strength === "—" ? "var(--color-text-muted)" : undefined }}>
+                                    <div className={`text-body-sm font-medium ${row.strength !== "—" ? "text-[var(--color-strength)]" : ""}`} style={{ color: row.strength === "—" ? "var(--color-text-muted)" : undefined }}>
                                         {row.strength}
                                     </div>
-                                    <div className="text-sm font-medium text-violet-400">
+                                    <div className="text-body-sm font-medium text-[var(--color-durability)]">
                                         {row.durability}
                                     </div>
                                     <div>
                                         {row.rest && (
-                                            <span className="text-xs px-2 py-1 rounded-full bg-white/5" style={{ color: "var(--color-text-muted)" }}>
+                                            <span className="text-caption px-2 py-1 rounded-full bg-white/5" style={{ color: "var(--color-text-muted)" }}>
                                                 REST
                                             </span>
                                         )}
@@ -336,7 +370,7 @@ export default function AthleticLanding() {
                         <h2 className="text-display-md mb-4" style={{ color: "var(--color-text-primary)" }}>
                             ATHLETES WHO&apos;VE
                             <br />
-                            <span className="bg-gradient-to-r from-cyan-400 to-teal-400 bg-clip-text text-transparent">
+                            <span className="gradient-text">
                                 CROSSED THE LINE
                             </span>
                         </h2>
@@ -368,7 +402,7 @@ export default function AthleticLanding() {
                                     borderColor: "var(--color-border)"
                                 }}
                             >
-                                <div className="text-cyan-400 text-4xl mb-4">&quot;</div>
+                                <div className="text-[var(--color-accent)] text-4xl mb-4">&quot;</div>
                                 <p className="text-lg mb-6" style={{ color: "var(--color-text-secondary)" }}>
                                     {testimonial.quote}
                                 </p>
@@ -376,7 +410,7 @@ export default function AthleticLanding() {
                                     <div className="font-black" style={{ color: "var(--color-text-primary)" }}>
                                         {testimonial.name}
                                     </div>
-                                    <div className="text-sm text-cyan-400">
+                                    <div className="text-body-sm text-[var(--color-accent)]">
                                         {testimonial.title}
                                     </div>
                                 </div>
@@ -388,13 +422,18 @@ export default function AthleticLanding() {
 
             {/* Final CTA */}
             <section id="get-started" className="section section-contrast relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-transparent to-teal-500/10" />
+                <div
+                    className="absolute inset-0"
+                    style={{
+                        background: "linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 12%, transparent), transparent 55%, color-mix(in srgb, var(--color-strength) 12%, transparent))"
+                    }}
+                />
 
                 <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
                     <h2 className="text-display-md mb-6" style={{ color: "var(--color-text-primary)" }}>
                         YOUR MARATHON.
                         <br />
-                        <span className="bg-gradient-to-r from-cyan-400 to-teal-400 bg-clip-text text-transparent">
+                        <span className="gradient-text">
                             YOUR STRENGTH.
                         </span>
                         <br />
@@ -403,7 +442,7 @@ export default function AthleticLanding() {
                     <p className="text-body-lg mb-10" style={{ color: "var(--color-text-secondary)" }}>
                         Get your personalized hybrid training plan in minutes.
                     </p>
-                    <button className="btn btn-lg bg-gradient-to-r from-cyan-400 to-teal-500 text-white font-bold hover:shadow-xl hover:shadow-cyan-500/30 transition-all">
+                    <button className="btn btn-gradient btn-lg">
                         CREATE YOUR PLAN →
                     </button>
                 </div>
@@ -420,7 +459,7 @@ export default function AthleticLanding() {
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                         <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-teal-500 flex items-center justify-center font-bold text-white text-sm">
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white text-body-sm" style={{ background: "var(--gradient-primary)" }}>
                                 HC
                             </div>
                             <span className="font-bold" style={{ color: "var(--color-text-primary)" }}>
@@ -428,22 +467,13 @@ export default function AthleticLanding() {
                             </span>
                         </div>
 
-                        <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+                        <p className="text-caption" style={{ color: "var(--color-text-muted)" }}>
                             © 2026 HybridCoach. Train hard. Stay strong. Go far.
                         </p>
                     </div>
                 </div>
             </footer>
 
-            <style jsx>{`
-        @keyframes scroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .animate-scroll {
-          animation: scroll 30s linear infinite;
-        }
-      `}</style>
         </div>
     );
 }

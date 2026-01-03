@@ -27,8 +27,8 @@ export function TrainingInsightsCard({ insights }: TrainingInsightsCardProps) {
                         <span className="text-lg">🔥</span>
                         <span className="text-label">Streak</span>
                     </div>
-                    <p className="text-3xl font-bold data-display">{insights.currentStreak}</p>
-                    <p className="text-xs text-[var(--text-muted)]">
+                    <p className="text-heading-lg text-data">{insights.currentStreak}</p>
+                    <p className="text-caption text-[var(--text-muted)]">
                         Best: {insights.longestStreak} days
                     </p>
                 </div>
@@ -39,8 +39,8 @@ export function TrainingInsightsCard({ insights }: TrainingInsightsCardProps) {
                         <span className="text-lg">📊</span>
                         <span className="text-label">Completed</span>
                     </div>
-                    <p className="text-3xl font-bold data-display">{insights.completionRate30Days}%</p>
-                    <p className="text-xs text-[var(--text-muted)]">
+                    <p className="text-heading-lg text-data">{insights.completionRate30Days}%</p>
+                    <p className="text-caption text-[var(--text-muted)]">
                         Last 30 days
                     </p>
                 </div>
@@ -51,8 +51,8 @@ export function TrainingInsightsCard({ insights }: TrainingInsightsCardProps) {
                         <span className="text-lg">{getFeelEmoji(Math.round(insights.averageFeel30Days))}</span>
                         <span className="text-label">Avg Feel</span>
                     </div>
-                    <p className="text-3xl font-bold data-display">{insights.averageFeel30Days}</p>
-                    <p className="text-xs text-[var(--text-muted)]">
+                    <p className="text-heading-lg text-data">{insights.averageFeel30Days}</p>
+                    <p className="text-caption text-[var(--text-muted)]">
                         {insights.feelTrend === 'improving' ? '↑ Improving' :
                             insights.feelTrend === 'declining' ? '↓ Declining' : '→ Stable'}
                     </p>
@@ -64,8 +64,8 @@ export function TrainingInsightsCard({ insights }: TrainingInsightsCardProps) {
                         <span className="text-lg">📅</span>
                         <span className="text-label">Missed</span>
                     </div>
-                    <p className="text-3xl font-bold data-display">{insights.missedWorkouts30Days}</p>
-                    <p className="text-xs text-[var(--text-muted)]">
+                    <p className="text-heading-lg text-data">{insights.missedWorkouts30Days}</p>
+                    <p className="text-caption text-[var(--text-muted)]">
                         This month
                     </p>
                 </div>
@@ -76,34 +76,34 @@ export function TrainingInsightsCard({ insights }: TrainingInsightsCardProps) {
                 <p className="text-label mb-3">Effort Calibration</p>
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <p className="text-sm text-[var(--text-muted)] mb-1">Easy days</p>
+                        <p className="text-body-sm text-[var(--text-muted)] mb-1">Easy days</p>
                         <div className="flex items-center gap-2">
-                            <span className="text-xl font-bold data-display">{insights.easyDayAverageFeel}</span>
-                            <span className="text-sm text-[var(--text-muted)]">/ 5</span>
+                            <span className="text-heading-md text-data">{insights.easyDayAverageFeel}</span>
+                            <span className="text-body-sm text-[var(--text-muted)]">/ 5</span>
                             {insights.easyDayAverageFeel < 2.5 && (
-                                <span className="text-xs bg-[var(--color-warning)] text-black px-2 py-0.5 rounded-full">
+                                <span className="badge badge-warning">
                                     Too hard
                                 </span>
                             )}
                         </div>
-                        <p className="text-xs text-[var(--text-muted)]">
+                        <p className="text-caption text-[var(--text-muted)]">
                             Target: ~3 (Right)
                         </p>
                     </div>
 
                     <div>
-                        <p className="text-sm text-[var(--text-muted)] mb-1">Hard days</p>
+                        <p className="text-body-sm text-[var(--text-muted)] mb-1">Hard days</p>
                         <div className="flex items-center gap-2">
-                            <span className="text-xl font-bold data-display">{insights.hardDayAverageFeel}</span>
-                            <span className="text-sm text-[var(--text-muted)]">/ 5</span>
+                            <span className="text-heading-md text-data">{insights.hardDayAverageFeel}</span>
+                            <span className="text-body-sm text-[var(--text-muted)]">/ 5</span>
                         </div>
-                        <p className="text-xs text-[var(--text-muted)]">
+                        <p className="text-caption text-[var(--text-muted)]">
                             Target: 2-3 (Tough/Right)
                         </p>
                     </div>
                 </div>
 
-                <p className="text-xs text-[var(--text-muted)] mt-3 pt-3 border-t border-[var(--border-base)]">
+                <p className="text-caption text-[var(--text-muted)] mt-3 pt-3 border-t border-[var(--border-base)]">
                     💡 Based on Seiler's 80/20 principle: easy should feel easy
                 </p>
             </div>
@@ -119,7 +119,7 @@ export function TrainingInsightsCard({ insights }: TrainingInsightsCardProps) {
                                 : 'bg-[var(--color-warning)]/10 border-[var(--color-warning)]'
                                 }`}
                         >
-                            <p className="text-sm font-medium">{flag.message}</p>
+                            <p className="text-body-sm font-medium">{flag.message}</p>
                         </div>
                     ))}
                 </div>
@@ -137,7 +137,7 @@ export function StreakBadge({ streak }: { streak: number }) {
     return (
         <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--color-running)]/15 text-[var(--color-running)]">
             <span>🔥</span>
-            <span className="text-sm font-bold">{streak}</span>
+            <span className="text-caption font-bold">{streak}</span>
         </div>
     );
 }
@@ -157,7 +157,7 @@ export function FeelTrendIndicator({ trend }: { trend: TrainingInsights['feelTre
     return (
         <div className="flex items-center gap-1" style={{ color }}>
             <span className="font-bold">{arrow}</span>
-            <span className="text-sm">{label}</span>
+            <span className="text-caption">{label}</span>
         </div>
     );
 }

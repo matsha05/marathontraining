@@ -4,14 +4,14 @@ import Link from "next/link";
 
 export default function TechnicalLanding() {
     return (
-        <div className="min-h-screen" style={{ backgroundColor: "var(--color-bg-primary)" }}>
+        <div className="min-h-screen landing-shell" style={{ backgroundColor: "var(--color-bg-primary)" }}>
             {/* Navigation */}
-            <nav className="sticky top-0 left-0 right-0 z-40 backdrop-blur-md" style={{ background: "rgba(10, 10, 11, 0.8)" }}>
+            <nav className="sticky top-0 left-0 right-0 z-40 glass border-b border-[var(--border-muted)]">
                 <div className="max-w-7xl mx-auto px-6 h-[var(--header-height)] flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <Link
                             href="/"
-                            className="flex items-center gap-2 text-xs font-mono font-semibold transition-colors hover:text-violet-300"
+                            className="flex items-center gap-2 text-body-sm font-mono font-semibold transition-colors hover:text-[var(--color-accent)]"
                             style={{ color: "var(--color-text-muted)" }}
                         >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -19,15 +19,15 @@ export default function TechnicalLanding() {
                             </svg>
                             <span className="hidden sm:inline">Back</span>
                         </Link>
-                        <div className="hidden sm:block h-6 w-px" style={{ background: "rgba(255, 255, 255, 0.12)" }} />
+                        <div className="hidden sm:block h-6 w-px" style={{ background: "var(--color-border)" }} />
                         <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                            <div className="w-8 h-8 rounded flex items-center justify-center" style={{ background: "var(--gradient-primary)" }}>
                                 <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                 </svg>
                             </div>
                             <span className="font-mono font-semibold" style={{ color: "var(--color-text-primary)" }}>
-                                hybrid<span className="text-violet-400">coach</span>
+                                hybrid<span className="text-[var(--color-accent)]">coach</span>
                             </span>
                         </div>
                     </div>
@@ -42,7 +42,7 @@ export default function TechnicalLanding() {
                             <a
                                 key={item.label}
                                 href={item.href}
-                                className="text-sm font-mono transition-colors hover:text-violet-400"
+                                className="text-body-sm font-mono transition-colors hover:text-[var(--color-accent)]"
                                 style={{ color: "var(--color-text-muted)" }}
                             >
                                 {item.label}
@@ -56,7 +56,7 @@ export default function TechnicalLanding() {
                         >
                             Sign in
                         </button>
-                        <button className="btn btn-sm font-mono bg-gradient-to-r from-violet-500 to-purple-600 text-white hover:opacity-90">
+                        <button className="btn btn-gradient btn-sm font-mono">
                             Get Started
                         </button>
                     </div>
@@ -85,13 +85,13 @@ export default function TechnicalLanding() {
                     <div className="max-w-3xl">
                         {/* Version badge */}
                         <div
-                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md font-mono text-xs mb-8"
+                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md font-mono text-caption mb-8"
                             style={{
                                 background: "var(--color-bg-tertiary)",
                                 border: "1px solid var(--color-border)"
                             }}
                         >
-                            <span className="text-violet-400">v2.0</span>
+                            <span className="text-[var(--color-durability)]">v2.0</span>
                             <span style={{ color: "var(--color-text-muted)" }}>•</span>
                             <span style={{ color: "var(--color-text-secondary)" }}>Now with injury prevention engine</span>
                         </div>
@@ -102,7 +102,7 @@ export default function TechnicalLanding() {
                             style={{ color: "var(--color-text-primary)" }}
                         >
                             Evidence-based training plans for{" "}
-                            <span className="bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
+                            <span className="gradient-text">
                                 hybrid athletes
                             </span>
                         </h1>
@@ -119,7 +119,7 @@ export default function TechnicalLanding() {
 
                         {/* CTA */}
                         <div className="flex flex-wrap items-center gap-4 mb-12">
-                            <button className="btn btn-lg font-mono bg-gradient-to-r from-violet-500 to-purple-600 text-white hover:opacity-90">
+                            <button className="btn btn-gradient btn-lg font-mono">
                                 Calculate Your Plan
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -149,8 +149,8 @@ export default function TechnicalLanding() {
                                 { label: "Test coverage", value: "95%" },
                             ].map((stat, i) => (
                                 <div key={i} className="text-center">
-                                    <div className="text-heading-md text-data text-violet-400">{stat.value}</div>
-                                    <div className="text-xs" style={{ color: "var(--color-text-muted)" }}>{stat.label}</div>
+                                    <div className="text-heading-md text-data text-[var(--color-strength)]">{stat.value}</div>
+                                    <div className="text-caption" style={{ color: "var(--color-text-muted)" }}>{stat.label}</div>
                                 </div>
                             ))}
                         </div>
@@ -164,10 +164,13 @@ export default function TechnicalLanding() {
                     <div className="grid lg:grid-cols-2 gap-12 items-start">
                         <div>
                             <div
-                                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md font-mono text-xs mb-6"
-                                style={{ background: "rgba(139, 92, 246, 0.1)", color: "var(--color-text-muted)" }}
+                                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md font-mono text-caption mb-6"
+                                style={{
+                                    background: "color-mix(in srgb, var(--color-durability) 12%, transparent)",
+                                    color: "var(--color-text-muted)"
+                                }}
                             >
-                                <svg className="w-3 h-3 text-violet-400" fill="currentColor" viewBox="0 0 20 20">
+                                <svg className="w-3 h-3 text-[var(--color-durability)]" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
                                 </svg>
                                 VDOT Engine
@@ -188,11 +191,11 @@ export default function TechnicalLanding() {
 
                             <div className="space-y-4">
                                 {[
-                                    { zone: "E", name: "Easy", range: "59-74%", color: "bg-green-500" },
-                                    { zone: "M", name: "Marathon", range: "75-84%", color: "bg-blue-500" },
-                                    { zone: "T", name: "Threshold", range: "83-88%", color: "bg-yellow-500" },
-                                    { zone: "I", name: "Interval", range: "97-100%", color: "bg-orange-500" },
-                                    { zone: "R", name: "Repetition", range: "~mile", color: "bg-red-500" },
+                                    { zone: "E", name: "Easy", range: "59-74%", color: "bg-[var(--color-running)]" },
+                                    { zone: "M", name: "Marathon", range: "75-84%", color: "bg-[var(--color-strength)]" },
+                                    { zone: "T", name: "Threshold", range: "83-88%", color: "bg-[var(--color-warning)]" },
+                                    { zone: "I", name: "Interval", range: "97-100%", color: "bg-[var(--color-durability)]" },
+                                    { zone: "R", name: "Repetition", range: "~mile", color: "bg-[var(--color-error)]" },
                                 ].map((zone, i) => (
                                     <div
                                         key={i}
@@ -206,7 +209,7 @@ export default function TechnicalLanding() {
                                         <div style={{ color: "var(--color-text-secondary)" }}>
                                             {zone.name}
                                         </div>
-                                        <div className="ml-auto font-mono text-sm" style={{ color: "var(--color-text-muted)" }}>
+                                        <div className="ml-auto font-mono text-body-sm" style={{ color: "var(--color-text-muted)" }}>
                                             {zone.range} VO₂max
                                         </div>
                                     </div>
@@ -224,48 +227,48 @@ export default function TechnicalLanding() {
                                 style={{ borderColor: "var(--color-border)" }}
                             >
                                 <div className="flex gap-1.5">
-                                    <div className="w-3 h-3 rounded-full bg-red-500/60" />
-                                    <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-                                    <div className="w-3 h-3 rounded-full bg-green-500/60" />
+                                    <div className="w-3 h-3 rounded-full bg-[var(--color-error)]/60" />
+                                    <div className="w-3 h-3 rounded-full bg-[var(--color-warning)]/60" />
+                                    <div className="w-3 h-3 rounded-full bg-[var(--color-success)]/60" />
                                 </div>
-                                <span className="font-mono text-xs" style={{ color: "var(--color-text-muted)" }}>
+                                <span className="font-mono text-caption" style={{ color: "var(--color-text-muted)" }}>
                                     vdot/calculator.ts
                                 </span>
                             </div>
-                            <pre className="p-4 text-sm font-mono overflow-x-auto">
+                            <pre className="p-4 text-body-sm font-mono overflow-x-auto">
                                 <code>
                                     <span style={{ color: "var(--color-text-muted)" }}>// Calculate VDOT from race result</span>
                                     {"\n"}
-                                    <span className="text-violet-400">function</span>{" "}
-                                    <span className="text-cyan-400">vdotFromRace</span>
+                                    <span className="text-[var(--color-durability)]">function</span>{" "}
+                                    <span className="text-[var(--color-accent)]">vdotFromRace</span>
                                     <span style={{ color: "var(--color-text-secondary)" }}>(</span>
                                     {"\n"}
                                     {"  "}distanceM<span style={{ color: "var(--color-text-muted)" }}>:</span>{" "}
-                                    <span className="text-emerald-400">number</span>,
+                                    <span className="text-[var(--color-strength)]">number</span>,
                                     {"\n"}
                                     {"  "}timeSeconds<span style={{ color: "var(--color-text-muted)" }}>:</span>{" "}
-                                    <span className="text-emerald-400">number</span>
+                                    <span className="text-[var(--color-strength)]">number</span>
                                     {"\n"}
                                     <span style={{ color: "var(--color-text-secondary)" }}>)</span>
                                     <span style={{ color: "var(--color-text-muted)" }}>:</span>{" "}
-                                    <span className="text-emerald-400">number</span>{" "}
+                                    <span className="text-[var(--color-strength)]">number</span>{" "}
                                     <span style={{ color: "var(--color-text-secondary)" }}>{"{"}</span>
                                     {"\n"}
-                                    {"  "}<span className="text-violet-400">const</span> T = timeSeconds / <span className="text-amber-400">60</span>;
+                                    {"  "}<span className="text-[var(--color-durability)]">const</span> T = timeSeconds / <span className="text-[var(--color-warning)]">60</span>;
                                     {"\n"}
-                                    {"  "}<span className="text-violet-400">const</span> v = distanceM / T;
+                                    {"  "}<span className="text-[var(--color-durability)]">const</span> v = distanceM / T;
                                     {"\n"}
                                     {"\n"}
                                     {"  "}<span style={{ color: "var(--color-text-muted)" }}>// VO2 demand at race velocity</span>
                                     {"\n"}
-                                    {"  "}<span className="text-violet-400">const</span> VO2 = <span className="text-amber-400">-4.6</span> +
+                                    {"  "}<span className="text-[var(--color-durability)]">const</span> VO2 = <span className="text-[var(--color-warning)]">-4.6</span> +
                                     {"\n"}
-                                    {"    "}<span className="text-amber-400">0.182258</span> * v +
+                                    {"    "}<span className="text-[var(--color-warning)]">0.182258</span> * v +
                                     {"\n"}
-                                    {"    "}<span className="text-amber-400">0.000104</span> * (v ** <span className="text-amber-400">2</span>);
+                                    {"    "}<span className="text-[var(--color-warning)]">0.000104</span> * (v ** <span className="text-[var(--color-warning)]">2</span>);
                                     {"\n"}
                                     {"\n"}
-                                    {"  "}<span className="text-violet-400">return</span> VO2 / pct;
+                                    {"  "}<span className="text-[var(--color-durability)]">return</span> VO2 / pct;
                                     {"\n"}
                                     <span style={{ color: "var(--color-text-secondary)" }}>{"}"}</span>
                                 </code>
@@ -318,14 +321,14 @@ export default function TechnicalLanding() {
                                 className="p-5 rounded-lg"
                                 style={{ background: "var(--color-bg-card)", border: "1px solid var(--color-border)" }}
                             >
-                                <div className="font-mono text-sm text-violet-400 mb-2">{source.source}</div>
+                                <div className="font-mono text-body-sm text-[var(--color-durability)] mb-2">{source.source}</div>
                                 <div
                                     className="font-medium mb-2"
                                     style={{ color: "var(--color-text-primary)" }}
                                 >
                                     {source.concept}
                                 </div>
-                                <div className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+                                <div className="text-body-sm" style={{ color: "var(--color-text-muted)" }}>
                                     {source.key}
                                 </div>
                             </div>
@@ -336,9 +339,9 @@ export default function TechnicalLanding() {
                         className="mt-8 p-6 rounded-lg text-center"
                         style={{ background: "var(--color-bg-secondary)", border: "1px solid var(--color-border)" }}
                     >
-                        <p className="font-mono text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                        <p className="font-mono text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                             Full methodology documented in{" "}
-                            <a href="#" className="text-violet-400 hover:underline">COACHSPEC.md</a>
+                            <a href="#" className="text-[var(--color-accent)] hover:underline">COACHSPEC.md</a>
                             {" "}• 1,409 lines of encodable rules
                         </p>
                     </div>
@@ -362,13 +365,13 @@ export default function TechnicalLanding() {
                         <table className="w-full">
                             <thead>
                                 <tr style={{ background: "var(--color-bg-tertiary)" }}>
-                                    <th className="text-left p-4 font-mono text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                                    <th className="text-left p-4 font-mono text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                                         Module
                                     </th>
-                                    <th className="text-left p-4 font-mono text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                                    <th className="text-left p-4 font-mono text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                                         Function
                                     </th>
-                                    <th className="text-center p-4 font-mono text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                                    <th className="text-center p-4 font-mono text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                                         Status
                                     </th>
                                 </tr>
@@ -391,13 +394,13 @@ export default function TechnicalLanding() {
                                             borderTop: "1px solid var(--color-border)"
                                         }}
                                     >
-                                        <td className="p-4 font-mono text-sm" style={{ color: "var(--color-text-primary)" }}>
+                                        <td className="p-4 font-mono text-body-sm" style={{ color: "var(--color-text-primary)" }}>
                                             {row.module}
                                         </td>
-                                        <td className="p-4 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                                        <td className="p-4 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                                             {row.func}
                                         </td>
-                                        <td className="p-4 text-center text-emerald-400">
+                                        <td className="p-4 text-center text-[var(--color-accent)]">
                                             {row.status}
                                         </td>
                                     </tr>
@@ -425,7 +428,7 @@ export default function TechnicalLanding() {
                         Enter a recent race time. Get your complete training plan in minutes.
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <button className="btn btn-lg w-full sm:w-auto font-mono bg-gradient-to-r from-violet-500 to-purple-600 text-white hover:opacity-90">
+                        <button className="btn btn-gradient btn-lg w-full sm:w-auto font-mono">
                             Calculate Your Plan
                         </button>
                         <button
@@ -454,22 +457,22 @@ export default function TechnicalLanding() {
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                         <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                            <div className="w-6 h-6 rounded flex items-center justify-center" style={{ background: "var(--gradient-primary)" }}>
                                 <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2z" />
                                 </svg>
                             </div>
-                            <span className="font-mono text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                            <span className="font-mono text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                                 hybridcoach
                             </span>
                         </div>
 
-                        <div className="flex items-center gap-6 font-mono text-sm">
+                        <div className="flex items-center gap-6 font-mono text-body-sm">
                             {["Docs", "GitHub", "Discord", "Changelog"].map((link) => (
                                 <a
                                     key={link}
                                     href="#"
-                                    className="transition-colors hover:text-violet-400"
+                                    className="transition-colors hover:text-[var(--color-accent)]"
                                     style={{ color: "var(--color-text-muted)" }}
                                 >
                                     {link}
@@ -478,7 +481,7 @@ export default function TechnicalLanding() {
                         </div>
 
                         <p
-                            className="text-sm font-mono"
+                            className="text-body-sm font-mono"
                             style={{ color: "var(--color-text-muted)" }}
                         >
                             © 2026

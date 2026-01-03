@@ -19,21 +19,21 @@ We are not a generic fitness app. We are a **precision training instrument** for
 
 | Token | Value | Purpose |
 |-------|-------|---------|
-| `--color-accent` | `#10b981` (Emerald) | Primary CTA, success, running |
-| `--color-strength` | `#3b82f6` (Blue) | Strength training domain |
-| `--color-durability` | `#8b5cf6` (Violet) | Durability/mobility domain |
-| `--color-warning` | `#f59e0b` (Amber) | Caution states |
-| `--color-error` | `#ef4444` (Red) | Error states |
+| `--color-accent` | `#19e38c` (Volt Green) | Primary CTA, success, running |
+| `--color-strength` | `#3a6bff` (Strength Blue) | Strength training domain |
+| `--color-durability` | `#7a5cff` (Durability Violet) | Durability/mobility domain |
+| `--color-warning` | `#f4b740` (Amber) | Caution states |
+| `--color-error` | `#e5484d` (Red) | Error states |
 
-#### Dark Mode (Default)
+#### Dark Mode
 | Token | Value | Purpose |
 |-------|-------|---------|
-| `--bg-base` | `#09090b` | Page background |
-| `--bg-elevated` | `#18181b` | Cards, elevated surfaces |
-| `--bg-muted` | `#27272a` | Inputs, secondary surfaces |
-| `--text-base` | `#fafafa` | Primary text |
-| `--text-muted` | `#a1a1aa` | Secondary text |
-| `--text-subtle` | `#71717a` | Labels, captions |
+| `--bg-base` | `#0b0f14` | Page background |
+| `--bg-elevated` | `#121820` | Cards, elevated surfaces |
+| `--bg-muted` | `#1a222d` | Inputs, secondary surfaces |
+| `--text-base` | `#f1f5f9` | Primary text |
+| `--text-muted` | `#b0b9c5` | Secondary text |
+| `--text-subtle` | `#7d8794` | Labels, captions |
 
 **Contrast Ratios**: All text exceeds WCAG 2.1 AA (4.5:1 for body, 3:1 for large text)
 
@@ -43,25 +43,26 @@ We use a **three-font system**:
 
 | Font | Use Case |
 |------|----------|
-| **Inter** | All UI text, headings, body |
+| **Space Grotesk** | Display + headings |
+| **Instrument Sans** | Body text, UI copy |
 | **Georgia** | Editorial accents (sparingly) |
-| **JetBrains Mono** | Data, times, paces, metrics |
+| **IBM Plex Mono** | Data, times, paces, metrics |
 
 #### Type Scale
 
 | Class | Size | Weight | Use |
 |-------|------|--------|-----|
 | `.text-display-xl` | 4rem | 700 | Hero headlines |
-| `.text-display-lg` | 3rem | 700 | Page titles |
-| `.text-display-md` | 2.25rem | 700 | Section heroes |
-| `.text-heading-lg` | 1.5rem | 600 | Section titles |
-| `.text-heading-md` | 1.25rem | 600 | Card titles |
+| `.text-display-lg` | 3.25rem | 700 | Page titles |
+| `.text-display-md` | 2.5rem | 700 | Section heroes |
+| `.text-heading-lg` | 1.75rem | 600 | Section titles |
+| `.text-heading-md` | 1.375rem | 600 | Card titles |
 | `.text-heading-sm` | 1.125rem | 600 | Subsections |
 | `.text-body-lg` | 1.125rem | 400 | Feature descriptions |
 | `.text-body-md` | 1rem | 400 | Default body |
 | `.text-body-sm` | 0.875rem | 400 | Supporting text |
-| `.text-label` | 0.75rem | 600 | Uppercase labels |
-| `.text-caption` | 0.8125rem | 400 | Captions, hints |
+| `.text-label` | 0.6875rem | 600 | Uppercase labels |
+| `.text-caption` | 0.75rem | 400 | Captions, hints |
 | `.text-data` | inherit | 600 | Monospace numbers |
 
 ### Spacing
@@ -102,7 +103,8 @@ Common values: `8, 16, 24, 32, 48, 64, 96`
 
 | Class | Use |
 |-------|-----|
-| `.btn-primary` | Primary actions, CTAs |
+| `.btn-primary` | Primary actions (product UI) |
+| `.btn-gradient` | Brand CTAs (marketing) |
 | `.btn-secondary` | Secondary actions |
 | `.btn-ghost` | Tertiary, inline actions |
 | `.btn-lg` | Hero CTAs |
@@ -118,9 +120,9 @@ Common values: `8, 16, 24, 32, 48, 64, 96`
 ### Domain Colors
 
 Training types have distinct colors:
-- Running: Emerald (green)
-- Strength: Blue
-- Durability: Violet
+- Running: Volt Green
+- Strength: Strength Blue
+- Durability: Durability Violet
 
 Use classes: `.domain-running`, `.domain-strength`, `.domain-durability`
 Badge variant: `.domain-badge` (applies 15% opacity background)
@@ -140,8 +142,8 @@ Badge variant: `.domain-badge` (applies 15% opacity background)
 
 | Token | Purpose |
 |-------|---------|
-| `--bg-inset` | Deeper than base (pure black) |
-| `--bg-overlay` | Modal backdrops (80% opacity) |
+| `--bg-inset` | Deeper than base for recessed surfaces |
+| `--bg-overlay` | Modal backdrops (60-70% opacity) |
 | `--border-default` | Alias for `--border-base` |
 
 ---
@@ -150,12 +152,12 @@ Badge variant: `.domain-badge` (applies 15% opacity background)
 
 | Duration | Use |
 |----------|-----|
-| 150ms | Micro-interactions (hover, focus) |
-| 200ms | Standard transitions |
-| 300ms | Page elements appearing |
-| 500ms | Emphasis animations |
+| 120ms | Micro-interactions (hover, focus) |
+| 180ms | Standard transitions |
+| 240ms | Page elements appearing |
+| 360ms | Emphasis animations |
 
-**Easing**: `ease` or `ease-out` for most. Never linear for UI.
+**Easing**: `cubic-bezier(0.2, 0.8, 0.2, 1)` for most. Never linear for UI.
 
 **Character**: Athletic = snappy, confident. Not floaty or bouncy.
 
@@ -173,7 +175,7 @@ Badge variant: `.domain-badge` (applies 15% opacity background)
 ### Spacing Rhythm
 
 - Page padding: 24px (mobile: 16px)
-- Section gap: 48-64px
+- Section gap: 64-96px
 - Card padding: 20-24px
 - Element gap within cards: 16px
 
@@ -181,7 +183,7 @@ Badge variant: `.domain-badge` (applies 15% opacity background)
 
 ## Accessibility
 
-- Focus states: 2px green outline
+- Focus states: 2px accent outline
 - Color contrast: WCAG AA minimum
 - Touch targets: 44px minimum
 - Keyboard navigable
@@ -282,4 +284,3 @@ When building a new feature:
 - [ ] Touch-friendly on mobile (44px tap targets)
 - [ ] Keyboard accessible
 - [ ] Uses reusable components where available
-

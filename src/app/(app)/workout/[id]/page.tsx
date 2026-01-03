@@ -75,19 +75,19 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
     };
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen landing-shell">
             <AppHeader
                 backHref="/dashboard"
                 rightContent={<span className="text-label">{workout.phase} • Week {workout.weekNumber}</span>}
             />
 
-            <main className="max-w-3xl mx-auto px-6 py-8">
+            <main className="max-w-3xl mx-auto px-6 py-10">
                 {/* Workout Header */}
                 <div className="mb-8">
                     <div className="flex items-start justify-between mb-4">
                         <div>
                             <div
-                                className="inline-block px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider mb-3"
+                                className="inline-block px-3 py-1 rounded-lg text-label mb-3"
                                 style={{
                                     backgroundColor: domainTints[workout.domain],
                                     color: domainColors[workout.domain]
@@ -95,16 +95,16 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
                             >
                                 {workout.sessionType}
                             </div>
-                            <h1 className="text-3xl font-bold tracking-tight">{workout.title}</h1>
+                            <h1 className="text-display-md">{workout.title}</h1>
                         </div>
 
                         <div className="text-right">
-                            <p className="text-2xl font-bold data-display">{workout.totalDistance}</p>
-                            <p className="text-xs text-[var(--text-muted)] uppercase">miles</p>
+                            <p className="text-heading-lg text-data">{workout.totalDistance}</p>
+                            <p className="text-caption text-[var(--text-muted)] uppercase">miles</p>
                         </div>
                     </div>
 
-                    <p className="text-[var(--text-muted)]">
+                    <p className="text-body-sm text-[var(--text-muted)]">
                         ~{workout.estimatedDuration} min total
                     </p>
                 </div>
@@ -118,7 +118,7 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
                         <div className="card p-5">
                             <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-[var(--bg-muted)] flex items-center justify-center text-sm font-semibold">
+                                    <div className="w-8 h-8 rounded-lg bg-[var(--bg-muted)] flex items-center justify-center text-body-sm font-semibold">
                                         1
                                     </div>
                                     <div>
@@ -128,7 +128,7 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
                                 </div>
                                 <div className="text-right">
                                     <p className="font-mono font-semibold">{workout.prescription.warmup.paceRange}</p>
-                                    <p className="text-xs text-[var(--text-muted)]">{workout.prescription.warmup.duration}</p>
+                                    <p className="text-caption text-[var(--text-muted)]">{workout.prescription.warmup.duration}</p>
                                 </div>
                             </div>
                         </div>
@@ -141,8 +141,8 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
                             <div className="flex items-center justify-between mb-3">
                                 <div className="flex items-center gap-3">
                                     <div
-                                        className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold"
-                                        style={{ backgroundColor: domainColors.running, color: '#000' }}
+                                        className="w-8 h-8 rounded-lg flex items-center justify-center text-body-sm font-bold"
+                                        style={{ backgroundColor: domainColors.running, color: '#04110b' }}
                                     >
                                         2
                                     </div>
@@ -152,14 +152,14 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <p className="font-mono text-xl font-bold" style={{ color: domainColors.running }}>
+                                    <p className="text-heading-lg text-data" style={{ color: domainColors.running }}>
                                         {workout.prescription.mainSet.pace}/mi
                                     </p>
-                                    <p className="text-xs text-[var(--text-muted)]">{workout.prescription.mainSet.duration}</p>
+                                    <p className="text-caption text-[var(--text-muted)]">{workout.prescription.mainSet.duration}</p>
                                 </div>
                             </div>
 
-                            <p className="text-sm text-[var(--text-secondary)] bg-[var(--bg-tertiary)] rounded-lg p-3">
+                            <p className="text-body-sm text-[var(--text-muted)] bg-[var(--bg-tertiary)] rounded-lg p-3">
                                 💡 {workout.prescription.mainSet.description}
                             </p>
                         </div>
@@ -168,7 +168,7 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
                         <div className="card p-5">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-[var(--bg-tertiary)] flex items-center justify-center text-sm font-semibold">
+                                    <div className="w-8 h-8 rounded-lg bg-[var(--bg-tertiary)] flex items-center justify-center text-body-sm font-semibold">
                                         3
                                     </div>
                                     <div>
@@ -178,7 +178,7 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
                                 </div>
                                 <div className="text-right">
                                     <p className="font-mono font-semibold">{workout.prescription.cooldown.paceRange}</p>
-                                    <p className="text-xs text-[var(--text-muted)]">{workout.prescription.cooldown.duration}</p>
+                                    <p className="text-caption text-[var(--text-muted)]">{workout.prescription.cooldown.duration}</p>
                                 </div>
                             </div>
                         </div>
@@ -190,7 +190,7 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
                     <section className="mb-8">
                         <h2 className="text-label mb-4">Coach Notes</h2>
                         <div className="card p-5 bg-[var(--bg-muted)]">
-                            <p className="text-[var(--text-muted)] italic">"{workout.coachNotes}"</p>
+                            <p className="text-body-sm text-[var(--text-muted)] italic">"{workout.coachNotes}"</p>
                             <p className="text-caption mt-3">— Based on Daniels' Running Formula</p>
                         </div>
                     </section>
@@ -284,18 +284,15 @@ function WorkoutLoggingModal({
     return (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
             {/* Backdrop */}
-            <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-                onClick={onClose}
-            />
+            <div className="modal-backdrop" onClick={onClose} />
 
             {/* Modal */}
-            <div className="relative bg-[var(--bg-secondary)] rounded-t-3xl sm:rounded-3xl w-full sm:max-w-md max-h-[90vh] overflow-auto animate-slide-in-right">
+            <div className="modal-content w-full sm:max-w-md max-h-[90vh] overflow-auto rounded-t-3xl sm:rounded-3xl animate-slide-in-up">
                 <div className="p-6">
                     {/* Header */}
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-bold">Log Workout</h2>
-                        <button onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-primary)]">
+                        <h2 className="text-heading-md">Log Workout</h2>
+                        <button onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-base)]">
                             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
@@ -316,15 +313,15 @@ function WorkoutLoggingModal({
                                     onClick={() => setCompleted(opt.value as any)}
                                     className={`p-4 rounded-xl text-center transition-all ${completed === opt.value
                                         ? opt.value === 'full'
-                                            ? 'bg-[var(--color-running)] text-black'
+                                            ? 'bg-[var(--color-accent)] text-black'
                                             : opt.value === 'partial'
                                                 ? 'bg-[var(--color-warning)] text-black'
-                                                : 'bg-[var(--bg-tertiary)] border-2 border-[var(--text-muted)]'
+                                                : 'bg-[var(--color-error)]/10 text-[var(--color-error)] border border-[var(--color-error)]'
                                         : 'bg-[var(--bg-tertiary)]'
                                         }`}
                                 >
                                     <span className="text-2xl block mb-1">{opt.icon}</span>
-                                    <span className="text-sm font-medium">{opt.label}</span>
+                                    <span className="text-body-sm font-medium">{opt.label}</span>
                                 </button>
                             ))}
                         </div>
@@ -343,19 +340,19 @@ function WorkoutLoggingModal({
                                     <button
                                         key={opt.value}
                                         onClick={() => setFeelRating(opt.value)}
-                                        className={`w-full p-3 rounded-xl text-left flex items-center gap-3 transition-all ${feelRating === opt.value
-                                            ? 'bg-[var(--color-running)] text-black'
-                                            : 'bg-[var(--bg-tertiary)] hover:bg-[var(--bg-primary)]'
+                                    className={`w-full p-3 rounded-xl text-left flex items-center gap-3 transition-all ${feelRating === opt.value
+                                            ? 'bg-[var(--color-accent)] text-black'
+                                            : 'bg-[var(--bg-tertiary)] hover:bg-[var(--bg-base)]'
                                             }`}
-                                    >
-                                        <span className="text-2xl">{opt.emoji}</span>
-                                        <div className="flex-1">
-                                            <p className="font-semibold">{opt.label}</p>
-                                            <p className={`text-caption ${feelRating === opt.value ? 'text-black/70' : 'text-[var(--text-muted)]'}`}>
-                                                {opt.description}
-                                            </p>
-                                        </div>
-                                    </button>
+                                >
+                                    <span className="text-2xl">{opt.emoji}</span>
+                                    <div className="flex-1">
+                                        <p className="font-semibold">{opt.label}</p>
+                                        <p className={`text-caption ${feelRating === opt.value ? 'text-black/70' : 'text-[var(--text-muted)]'}`}>
+                                            {opt.description}
+                                        </p>
+                                    </div>
+                                </button>
                                 ))}
                             </div>
                         </div>

@@ -33,7 +33,7 @@ export function AppHeader({
 }: AppHeaderProps) {
     return (
         <header className="sticky top-0 z-50 glass border-b border-[var(--border-muted)]">
-            <div className="container-page h-16 flex items-center justify-between">
+            <div className="container-page h-[var(--header-height)] flex items-center justify-between">
                 {/* Left side - Logo/Title or Back link */}
                 <div className="flex items-center gap-3">
                     {backHref ? (
@@ -48,7 +48,10 @@ export function AppHeader({
                         </Link>
                     ) : (
                         <>
-                            <div className="w-9 h-9 rounded-xl bg-[var(--color-accent)] flex items-center justify-center">
+                            <div
+                                className="w-9 h-9 rounded-xl flex items-center justify-center"
+                                style={{ background: "var(--gradient-primary)" }}
+                            >
                                 <ActivityIcon size={20} className="text-black" />
                             </div>
                             <span className="text-heading-sm">{title || 'The Long Game'}</span>

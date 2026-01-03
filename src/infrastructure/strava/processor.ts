@@ -43,7 +43,7 @@ export async function processStravaWebhookEvent(event: StravaWebhookEvent): Prom
         activityId,
         summary.activityType ?? null,
         { ...summary, source: 'strava' },
-        activity,
+        activity as import('@/infrastructure/supabase/types').Json,
         null,
         null,
         'strava'

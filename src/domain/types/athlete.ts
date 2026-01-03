@@ -81,6 +81,7 @@ export interface OnboardingProfile {
     goalDistance: string;
     goalDate: string;
     goalTerrain: 'road' | 'trail';
+    raceName?: string;  // e.g. "Atlanta Rock n Roll Marathon"
 
     // Calculated
     estimatedVdot?: number;

@@ -28,7 +28,7 @@ export default function PlanPage() {
     const [selectedWeek, setSelectedWeek] = useState(8);
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen landing-shell">
             <AppHeader
                 backHref="/dashboard"
                 title="Training Plan"
@@ -36,12 +36,12 @@ export default function PlanPage() {
                     <div className="flex items-center gap-2">
                         <span className="text-label">Chicago Marathon</span>
                         <span className="text-[var(--text-subtle)]">•</span>
-                        <span className="text-body-sm text-[var(--color-running)]">8 weeks away</span>
+                        <span className="text-body-sm text-[var(--color-accent)]">8 weeks away</span>
                     </div>
                 }
             />
 
-            <main className="container-page py-8">
+            <main className="container-page py-10">
                 {/* Phase Timeline */}
                 <section className="mb-10">
                     <h2 className="text-heading-md mb-4">Training Phases</h2>
@@ -51,7 +51,7 @@ export default function PlanPage() {
                             <div
                                 key={phase.name}
                                 className={`flex-1 p-4 rounded-xl border transition-all ${phase.status === 'current'
-                                        ? 'bg-[var(--color-running)] text-black border-transparent'
+                                        ? 'bg-[var(--color-accent)] text-black border-transparent'
                                         : phase.status === 'completed'
                                             ? 'bg-[var(--bg-muted)] border-transparent opacity-60'
                                             : 'bg-[var(--bg-elevated)] border-[var(--border-base)]'
@@ -75,8 +75,8 @@ export default function PlanPage() {
                             <div
                                 key={week.number}
                                 onClick={() => setSelectedWeek(week.number)}
-                                className={`card p-5 cursor-pointer transition-all ${selectedWeek === week.number ? 'border-[var(--color-running)]' : ''
-                                    } ${week.isCurrent ? 'ring-2 ring-[var(--color-running)] ring-offset-2 ring-offset-[var(--bg-base)]' : ''}`}
+                                className={`card p-5 cursor-pointer transition-all ${selectedWeek === week.number ? 'border-[var(--color-accent)]' : ''
+                                    } ${week.isCurrent ? 'ring-2 ring-[var(--color-accent)] ring-offset-2 ring-offset-[var(--bg-base)]' : ''}`}
                             >
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-4">

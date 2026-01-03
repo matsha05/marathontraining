@@ -24,7 +24,9 @@ export async function importGarminExportZip(
     athleteId: string,
     buffer: ArrayBuffer | Buffer
 ): Promise<GarminImportResult> {
-    const zipBuffer = buffer instanceof Buffer ? buffer : Buffer.from(buffer);
+    const zipBuffer = buffer instanceof Buffer
+        ? buffer
+        : Buffer.from(new Uint8Array(buffer));
     const zip = await openZip(zipBuffer);
 
     const metricsByDate = new Map<string, GarminHealthMetrics>();
@@ -51,15 +53,16 @@ export async function importGarminExportZip(
             continue;
         }
         const readiness = calculateReadiness(metrics);
+        const readinessComponentsJson = readiness.components.reduce<Record<string, unknown>>((acc, component) => {
+            acc[component.key] = component;
+            return acc;
+        }, {});
         await upsertHealthMetrics(
             athleteId,
             null,
             metrics,
             readiness.score,
-            readiness.components.reduce<Record<string, unknown>>((acc, component) => {
-                acc[component.key] = component;
-                return acc;
-            }, {}),
+            readinessComponentsJson as import('@/infrastructure/supabase/types').Json,
             'garmin_export',
             null
         );
@@ -107,9 +110,9 @@ export async function importGarminExportZip(
                     activityId,
                     fit.summary.activityType ?? null,
                     { ...fit.summary, source: 'garmin_export' },
-                    fit.summary as Record<string, unknown>,
-                    fit.laps,
-                    fit.records,
+                    fit.summary as import('@/infrastructure/supabase/types').Json,
+                    fit.laps as import('@/infrastructure/supabase/types').Json,
+                    fit.records as import('@/infrastructure/supabase/types').Json,
                     'garmin_export'
                 );
                 activitiesImported += 1;

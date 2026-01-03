@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { AppHeader } from '@/components/ui/AppHeader';
 import { Toggle } from '@/components/ui/Toggle';
+import { createSupabaseBrowserClient } from '@/infrastructure/supabase';
 
 /**
  * Settings Page
@@ -11,6 +13,7 @@ import { Toggle } from '@/components/ui/Toggle';
  */
 
 export default function SettingsPage() {
+    const router = useRouter();
     const [darkMode, setDarkMode] = useState(true);
     const [garminStatus, setGarminStatus] = useState<{
         connected: boolean;
@@ -38,6 +41,7 @@ export default function SettingsPage() {
     const hasHealthData = Boolean(garminStatus?.lastHealthDate);
     const setupComplete = stravaConnected && hasHealthData;
     const garminApiConnected = Boolean(garminStatus?.connected);
+    const [signOutBusy, setSignOutBusy] = useState(false);
 
     useEffect(() => {
         setWebhookUrl(`${window.location.origin}/api/garmin/webhook`);
@@ -199,6 +203,19 @@ export default function SettingsPage() {
         }
     };
 
+    const handleSignOut = async () => {
+        setSignOutBusy(true);
+        try {
+            const supabase = createSupabaseBrowserClient();
+            await supabase.auth.signOut();
+            router.push('/login');
+        } catch (error) {
+            setGarminMessage(error instanceof Error ? error.message : 'Sign out failed');
+        } finally {
+            setSignOutBusy(false);
+        }
+    };
+
     const handleStravaSyncNow = async () => {
         setStravaBusy(true);
         setStravaMessage(null);
@@ -227,10 +244,10 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen landing-shell">
             <AppHeader backHref="/dashboard" title="Settings" />
 
-            <main className="container-narrow py-8">
+            <main className="container-narrow py-10">
                 {/* Profile */}
                 <section className="mb-10">
                     <h2 className="text-heading-md mb-4">Profile</h2>
@@ -265,7 +282,7 @@ export default function SettingsPage() {
                                 <p className="font-semibold">Current VDOT</p>
                                 <p className="text-body-sm text-[var(--text-muted)]">Based on your 10K time trial</p>
                             </div>
-                            <p className="text-display-md text-data text-[var(--color-running)]">48</p>
+                            <p className="text-display-md text-data text-[var(--color-accent)]">48</p>
                         </div>
 
                         <button className="btn btn-secondary w-full">
@@ -559,6 +576,23 @@ export default function SettingsPage() {
                                 + Add
                             </button>
                         </div>
+                    </div>
+                </section>
+
+                {/* Account */}
+                <section className="mb-10">
+                    <h2 className="text-heading-md mb-4">Account</h2>
+                    <div className="card p-6 space-y-3">
+                        <p className="text-body-sm text-[var(--text-muted)]">
+                            Sign out on this device if you are done with setup.
+                        </p>
+                        <button
+                            className={`btn btn-secondary w-full ${signOutBusy ? 'btn-loading' : ''}`}
+                            onClick={handleSignOut}
+                            disabled={signOutBusy}
+                        >
+                            {signOutBusy ? 'Signing out...' : 'Sign out'}
+                        </button>
                     </div>
                 </section>
 

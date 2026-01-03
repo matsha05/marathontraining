@@ -44,17 +44,18 @@ export async function processGarminWebhookEvent(event: GarminWebhookEvent): Prom
     const healthMetrics = extractHealthMetrics(event.payload);
     if (healthMetrics) {
         const readiness = calculateReadiness(healthMetrics);
+        const readinessComponentsJson = readiness.components.reduce<Record<string, unknown>>((acc, component) => {
+            acc[component.key] = component;
+            return acc;
+        }, {});
         await upsertHealthMetrics(
             tokenRow?.athlete_id ?? null,
             garminUserId ?? null,
             healthMetrics,
             readiness.score,
-            readiness.components.reduce<Record<string, unknown>>((acc, component) => {
-                acc[component.key] = component;
-                return acc;
-            }, {}),
+            readinessComponentsJson as import('@/infrastructure/supabase/types').Json,
             'webhook',
-            event.payload
+            event.payload as import('@/infrastructure/supabase/types').Json
         );
     }
 
@@ -75,9 +76,9 @@ export async function processGarminWebhookEvent(event: GarminWebhookEvent): Prom
             activityId,
             event.activityType ?? activitySummary?.activityType ?? null,
             { ...fit.summary, source: 'garmin' },
-            fit.summary as Record<string, unknown>,
-            fit.laps,
-            fit.records,
+            fit.summary as import('@/infrastructure/supabase/types').Json,
+            fit.laps as import('@/infrastructure/supabase/types').Json,
+            fit.records as import('@/infrastructure/supabase/types').Json,
             'garmin'
         );
         await logCompletedWorkoutFromActivity(tokenRow.athlete_id, fit.summary, { allowUnmatched: false });
@@ -87,13 +88,16 @@ export async function processGarminWebhookEvent(event: GarminWebhookEvent): Prom
 
     if (activitySummary) {
         const activityId = event.summaryId ?? event.activityId ?? null;
+        if (!activityId) {
+            return { status: 'ignored', message: 'Missing activity id' };
+        }
         await insertGarminActivity(
             tokenRow?.athlete_id ?? null,
             garminUserId ?? null,
             activityId,
             event.activityType ?? activitySummary.activityType ?? null,
             { ...activitySummary, source: 'garmin' },
-            activitySummary as Record<string, unknown>,
+            activitySummary as import('@/infrastructure/supabase/types').Json,
             null,
             null,
             'garmin'

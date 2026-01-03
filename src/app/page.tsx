@@ -60,7 +60,7 @@ export default function LandingPage() {
             <Link href="/login" className="btn btn-ghost">
               Log in
             </Link>
-            <Link href="/onboarding" className="btn btn-primary">
+            <Link href="/onboarding" className="btn btn-gradient">
               Get Started
             </Link>
           </div>
@@ -78,7 +78,7 @@ export default function LandingPage() {
 
           <h1 className="text-display-xl mb-6">
             A daily plan you can<br />
-            <span className="text-[var(--color-accent)]">actually trust.</span>
+            <span className="gradient-text">actually trust.</span>
           </h1>
 
           <p className="text-body-lg text-[var(--text-muted)] mb-10 max-w-2xl">
@@ -87,7 +87,7 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-wrap items-center gap-4">
-            <Link href="/onboarding" className="btn btn-primary btn-lg group">
+            <Link href="/onboarding" className="btn btn-gradient btn-lg group">
               Build Your Plan
               <ArrowRightIcon size={18} className="group-hover:translate-x-1 transition-transform" />
             </Link>
@@ -202,7 +202,7 @@ export default function LandingPage() {
             <p className="text-body-lg text-[var(--text-muted)] mb-10 max-w-lg mx-auto">
               Get your personalized plan in 2 minutes. See your paces. Start training.
             </p>
-            <Link href="/onboarding" className="btn btn-primary btn-lg group">
+            <Link href="/onboarding" className="btn btn-gradient btn-lg group">
               Build Your Plan
               <ArrowRightIcon size={18} className="group-hover:translate-x-1 transition-transform" />
             </Link>

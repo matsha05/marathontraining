@@ -4,7 +4,7 @@
 
 import { getSupabaseServerClient } from '@/infrastructure/supabase/server';
 import type { GarminHealthMetrics, GarminActivitySummary } from '@/domain/garmin/types';
-import type { Database } from '@/infrastructure/supabase/types';
+import type { Database, Json } from '@/infrastructure/supabase/types';
 
 export interface GarminTokenRecord {
     athleteId: string;
@@ -132,9 +132,9 @@ export async function upsertHealthMetrics(
     garminUserId: string | null,
     metrics: GarminHealthMetrics,
     readinessScore: number | null,
-    readinessComponents: Record<string, unknown> | null,
+    readinessComponents: Json | null,
     source: string,
-    rawPayload: Record<string, unknown> | null
+    rawPayload: Json | null
 ) {
     const supabase = getSupabaseServerClient();
     const { error } = await supabase
@@ -165,9 +165,9 @@ export async function insertGarminActivity(
     activityId: string | null,
     activityType: string | null,
     summary: GarminActivitySummary,
-    fitSummary: Record<string, unknown> | null,
-    fitLaps: Record<string, unknown>[] | null,
-    fitRecords: Record<string, unknown>[] | null,
+    fitSummary: Json | null,
+    fitLaps: Json | null,
+    fitRecords: Json | null,
     source: string
 ) {
     const supabase = getSupabaseServerClient();

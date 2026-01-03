@@ -21,11 +21,13 @@ export function parseFitFile(buffer: ArrayBuffer | Buffer): FitParseResult {
     }
 
     const { messages, errors } = decoder.read();
-    const records = asArray(
-        messages.recordMesgs || messages.recordMesg || messages.record || messages.recordMesgs
+    // The SDK uses various property names depending on version and message types
+    const msgs = messages as Record<string, Record<string, unknown>[] | undefined>;
+    const records = asArray<Record<string, unknown>>(
+        msgs.recordMesgs || msgs.recordMesg || msgs.record
     );
-    const laps = asArray(messages.lapMesgs || messages.lapMesg || messages.lap);
-    const sessions = asArray(messages.sessionMesgs || messages.sessionMesg || messages.session);
+    const laps = asArray<Record<string, unknown>>(msgs.lapMesgs || msgs.lapMesg || msgs.lap);
+    const sessions = asArray<Record<string, unknown>>(msgs.sessionMesgs || msgs.sessionMesg || msgs.session);
     const session = sessions[0] as Record<string, unknown> | undefined;
 
     const summary = summarizeFit(session, records, laps);
@@ -39,10 +41,10 @@ export function parseFitFile(buffer: ArrayBuffer | Buffer): FitParseResult {
     };
 }
 
-function createStream(buffer: ArrayBuffer | Buffer) {
+function createStream(buffer: ArrayBuffer | Buffer): Stream {
     const streamFactory = Stream as unknown as {
-        fromArrayBuffer?: (buf: ArrayBuffer) => unknown;
-        fromBuffer?: (buf: Buffer) => unknown;
+        fromArrayBuffer?: (buf: ArrayBuffer) => Stream;
+        fromBuffer?: (buf: Buffer) => Stream;
     };
 
     if (buffer instanceof Buffer && streamFactory.fromBuffer) {
@@ -71,9 +73,9 @@ function summarizeFit(
         ?? computeDurationSeconds(records);
 
     const avgSpeedMetersPerSecond = pickNumber(session?.avgSpeed)
-        ?? (distanceMeters && durationSeconds ? distanceMeters / durationSeconds : undefined);
+        ?? (distanceMeters && durationSeconds ? distanceMeters / durationSeconds : null);
 
-    const avgPaceSecPerMile = avgSpeedMetersPerSecond !== null
+    const avgPaceSecPerMile = avgSpeedMetersPerSecond != null
         ? paceFromSpeed(avgSpeedMetersPerSecond)
         : (distanceMeters && durationSeconds ? paceFromDistance(distanceMeters, durationSeconds) : undefined);
 

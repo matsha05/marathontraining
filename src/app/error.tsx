@@ -14,13 +14,18 @@ export default function Error({
     }, [error]);
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-6">
-            <div className="text-center max-w-md">
-                <h2 className="text-2xl font-bold mb-4">Something went wrong</h2>
-                <p className="text-gray-600 mb-6">{error.message || 'An unexpected error occurred'}</p>
+        <div className="min-h-screen landing-shell flex items-center justify-center px-6 py-12">
+            <div className="card p-8 text-center max-w-md w-full">
+                <div className="w-14 h-14 rounded-2xl bg-[var(--color-accent)]/15 flex items-center justify-center mx-auto mb-5">
+                    <span className="text-2xl">⚠️</span>
+                </div>
+                <h2 className="text-display-sm mb-3">Something went wrong.</h2>
+                <p className="text-body-md text-[var(--text-muted)] mb-8">
+                    {error.message || 'An unexpected error occurred. Please try again.'}
+                </p>
                 <button
                     onClick={() => reset()}
-                    className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600"
+                    className="btn btn-gradient btn-lg w-full"
                 >
                     Try again
                 </button>

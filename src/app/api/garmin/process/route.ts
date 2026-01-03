@@ -59,6 +59,9 @@ export async function GET(request: NextRequest) {
 }
 
 function isAuthorized(request: NextRequest) {
+    if (process.env.VERCEL === '1' && request.headers.get('x-vercel-cron') === '1') {
+        return true;
+    }
     const secret = garminConfig.processingSecret;
     if (!secret) {
         return process.env.NODE_ENV !== 'production';

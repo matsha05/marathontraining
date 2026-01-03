@@ -231,6 +231,7 @@ Garmin records: "5.8 mi in 42:30 (7:19/mi avg)"
 **Supabase tables**
 - `garmin_oauth_states`, `garmin_tokens`, `garmin_webhook_events`
 - `garmin_health_metrics`, `garmin_activities`
+- `strava_oauth_states`, `strava_tokens`, `strava_webhook_events`
 
 **Security notes**
 - Do not accept `athleteId` from clients; derive it from the authenticated session.
@@ -255,11 +256,17 @@ Garmin records: "5.8 mi in 42:30 (7:19/mi avg)"
 - `GARMIN_PROCESSING_SECRET` (recommended for `/api/garmin/process`)
 - `GARMIN_SINGLE_USER_MODE` + `GARMIN_OWNER_ATHLETE_ID` (optional dev-only bypass)
 - `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
+- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` (for browser auth + settings UI)
 - `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `STRAVA_REDIRECT_URI`
 - `STRAVA_SCOPE` (optional; defaults to `activity:read_all`)
 - `STRAVA_WEBHOOK_VERIFY_TOKEN` (required in prod for Strava webhook verification)
 - `STRAVA_WEBHOOK_PROCESSING_MODE` (`queue` or `inline`, default `queue`)
 - `STRAVA_PROCESSING_SECRET` (recommended for `/api/strava/process`)
+
+**Supabase Auth setup**
+- Set Auth → URL Configuration `Site URL` to your app domain (e.g. `http://localhost:3000` for local).
+- Add redirect URLs for `/auth/callback` (local + prod) so OAuth and magic link flows return correctly.
+- Enable Email + OAuth providers in Supabase; Google can be added later once credentials are available.
 
 ---
 

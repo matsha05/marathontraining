@@ -1,17 +1,26 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Space_Grotesk, Instrument_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-space",
 });
 
-const jetbrainsMono = JetBrains_Mono({
+const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-jetbrains",
+  weight: ["400", "500", "600"],
+  variable: "--font-instrument",
+});
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600"],
+  variable: "--font-plex-mono",
 });
 
 export const metadata: Metadata = {
@@ -47,7 +56,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={`${spaceGrotesk.variable} ${instrumentSans.variable} ${plexMono.variable}`}>
       <body>{children}</body>
     </html>
   );
