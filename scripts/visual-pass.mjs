@@ -10,6 +10,7 @@ const shots = [
   { name: 'athletic-mobile', path: '/landing/athletic', viewport: { width: 430, height: 932 }, isMobile: true },
   { name: 'editorial-desktop', path: '/landing/editorial', viewport: { width: 1400, height: 900 } },
   { name: 'technical-desktop', path: '/landing/technical', viewport: { width: 1400, height: 900 } },
+  { name: 'methodology-desktop', path: '/methodology', viewport: { width: 1400, height: 900 } },
   { name: 'login-desktop', path: '/login', viewport: { width: 1200, height: 900 } },
   { name: 'signup-desktop', path: '/signup', viewport: { width: 1200, height: 900 } },
   { name: 'onboarding-desktop', path: '/onboarding', viewport: { width: 1200, height: 900 } },
