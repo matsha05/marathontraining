@@ -21,7 +21,7 @@ import { MoonIcon } from '@/components/ui/moon';
 
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -35,10 +35,10 @@ export default function LandingPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen landing-shell">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-[var(--border-muted)]">
-        <div className="container-page h-16 flex items-center justify-between">
+      <header className="sticky top-0 left-0 right-0 z-50 glass border-b border-[var(--border-muted)]">
+        <div className="container-page h-[var(--header-height)] flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-[var(--color-accent)] flex items-center justify-center">
               <ActivityIcon size={20} className="text-black" />
@@ -68,24 +68,25 @@ export default function LandingPage() {
       </header>
 
       {/* Hero */}
-      <section className="pt-32 pb-24 container-page">
-        <div className="max-w-3xl">
+      <section className="hero-section hero-surface">
+        <div className="container-page">
+          <div className="max-w-3xl">
           <p className="text-label text-[var(--color-accent)] mb-4 flex items-center gap-2">
             <ActivityIcon size={14} />
             PRECISION TRAINING
           </p>
 
-          <h1 className="text-display-lg mb-6">
+          <h1 className="text-display-xl mb-6">
             A daily plan you can<br />
             <span className="text-[var(--color-accent)]">actually trust.</span>
           </h1>
 
-          <p className="text-body-lg text-[var(--text-muted)] mb-10 max-w-xl">
+          <p className="text-body-lg text-[var(--text-muted)] mb-10 max-w-2xl">
             Running, strength, mobility—all in one place. Every pace calculated from your race time.
             Every workout based on science from coaches who've trained world-class athletes.
           </p>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <Link href="/onboarding" className="btn btn-primary btn-lg group">
               Build Your Plan
               <ArrowRightIcon size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -94,21 +95,22 @@ export default function LandingPage() {
               See the Science
             </Link>
           </div>
+          </div>
         </div>
       </section>
 
       {/* What You Get */}
-      <section className="py-16 border-y border-[var(--border-base)] bg-[var(--bg-elevated)]">
+      <section className="section-tight section-contrast">
         <div className="container-page">
-          <div className="grid md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-6">
             {[
               { icon: CalendarDaysIcon, label: 'Daily Plan', desc: 'Know exactly what to do' },
               { icon: ChartLineIcon, label: 'VDOT Paces', desc: 'Calculated from your race' },
               { icon: HeartIcon, label: 'Garmin Sync', desc: 'Adapts to your recovery' },
               { icon: FlameIcon, label: 'Stay Strong', desc: 'Strength training built in' },
             ].map((item, i) => (
-              <div key={item.label} className="text-center animate-fade-in" style={{ animationDelay: `${i * 100}ms` }}>
-                <div className="w-14 h-14 rounded-2xl bg-[var(--color-accent)]/10 flex items-center justify-center mx-auto mb-4">
+              <div key={item.label} className="text-center md:text-left animate-fade-in" style={{ animationDelay: `${i * 100}ms` }}>
+                <div className="w-14 h-14 rounded-2xl bg-[var(--color-accent)]/10 flex items-center justify-center mx-auto md:mx-0 mb-4">
                   <item.icon size={24} className="text-[var(--color-accent)]" />
                 </div>
                 <p className="text-heading-sm mb-1">{item.label}</p>
@@ -120,8 +122,9 @@ export default function LandingPage() {
       </section>
 
       {/* Problem/Solution */}
-      <section className="py-24 container-page">
-        <div className="grid md:grid-cols-2 gap-16">
+      <section className="section">
+        <div className="container-page">
+          <div className="grid md:grid-cols-2 gap-12">
           <div>
             <p className="text-label mb-3 text-[var(--text-subtle)]">THE PROBLEM</p>
             <h2 className="text-display-md mb-6">
@@ -157,10 +160,11 @@ export default function LandingPage() {
             </ul>
           </div>
         </div>
+        </div>
       </section>
 
       {/* Methodology */}
-      <section id="methodology" className="py-24 bg-[var(--bg-elevated)] border-y border-[var(--border-base)]">
+      <section id="methodology" className="section section-contrast">
         <div className="container-page">
           <p className="text-label mb-3">BUILT ON SCIENCE</p>
           <h2 className="text-display-md mb-4">
@@ -189,17 +193,21 @@ export default function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-24 container-page text-center">
-        <h2 className="text-display-md mb-6">
-          What do you do today?
-        </h2>
-        <p className="text-body-lg text-[var(--text-muted)] mb-10 max-w-lg mx-auto">
-          Get your personalized plan in 2 minutes. See your paces. Start training.
-        </p>
-        <Link href="/onboarding" className="btn btn-primary btn-lg group">
-          Build Your Plan
-          <ArrowRightIcon size={18} className="group-hover:translate-x-1 transition-transform" />
-        </Link>
+      <section className="section">
+        <div className="container-page">
+          <div className="cta-panel text-center">
+            <h2 className="text-display-md mb-6">
+              What do you do today?
+            </h2>
+            <p className="text-body-lg text-[var(--text-muted)] mb-10 max-w-lg mx-auto">
+              Get your personalized plan in 2 minutes. See your paces. Start training.
+            </p>
+            <Link href="/onboarding" className="btn btn-primary btn-lg group">
+              Build Your Plan
+              <ArrowRightIcon size={18} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+        </div>
       </section>
 
       {/* Footer */}

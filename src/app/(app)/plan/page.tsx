@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { AppHeader } from '@/components/ui/AppHeader';
 
 /**
  * Training Plan View
+ * 
+ * Uses standardized components and design tokens
  */
 
 const MOCK_PHASES = [
@@ -26,43 +28,37 @@ export default function PlanPage() {
     const [selectedWeek, setSelectedWeek] = useState(8);
 
     return (
-        <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]">
-            {/* Header */}
-            <header className="sticky top-0 z-50 glass border-b border-[var(--border-default)]">
-                <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <Link href="/dashboard" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
-                            ← Back
-                        </Link>
-                        <h1 className="font-bold">Training Plan</h1>
-                    </div>
-
+        <div className="min-h-screen">
+            <AppHeader
+                backHref="/dashboard"
+                title="Training Plan"
+                rightContent={
                     <div className="flex items-center gap-2">
-                        <span className="label">Chicago Marathon</span>
-                        <span className="text-[var(--text-secondary)]">•</span>
-                        <span className="text-sm text-[var(--color-running)]">8 weeks away</span>
+                        <span className="text-label">Chicago Marathon</span>
+                        <span className="text-[var(--text-subtle)]">•</span>
+                        <span className="text-body-sm text-[var(--color-running)]">8 weeks away</span>
                     </div>
-                </div>
-            </header>
+                }
+            />
 
-            <main className="max-w-6xl mx-auto px-6 py-8">
+            <main className="container-page py-8">
                 {/* Phase Timeline */}
                 <section className="mb-10">
-                    <h2 className="text-lg font-semibold mb-4">Training Phases</h2>
+                    <h2 className="text-heading-md mb-4">Training Phases</h2>
 
                     <div className="flex gap-2">
-                        {MOCK_PHASES.map((phase, i) => (
+                        {MOCK_PHASES.map((phase) => (
                             <div
                                 key={phase.name}
                                 className={`flex-1 p-4 rounded-xl border transition-all ${phase.status === 'current'
                                         ? 'bg-[var(--color-running)] text-black border-transparent'
                                         : phase.status === 'completed'
-                                            ? 'bg-[var(--bg-tertiary)] border-transparent opacity-60'
-                                            : 'bg-[var(--bg-secondary)] border-[var(--border-default)]'
+                                            ? 'bg-[var(--bg-muted)] border-transparent opacity-60'
+                                            : 'bg-[var(--bg-elevated)] border-[var(--border-base)]'
                                     }`}
                             >
                                 <p className="font-semibold">{phase.name}</p>
-                                <p className={`text-sm ${phase.status === 'current' ? 'text-black/70' : 'text-[var(--text-secondary)]'}`}>
+                                <p className={`text-body-sm ${phase.status === 'current' ? 'text-black/70' : 'text-[var(--text-muted)]'}`}>
                                     Weeks {phase.weeks}
                                 </p>
                             </div>
@@ -72,7 +68,7 @@ export default function PlanPage() {
 
                 {/* Weekly Overview */}
                 <section className="mb-10">
-                    <h2 className="text-lg font-semibold mb-4">Weekly Plan</h2>
+                    <h2 className="text-heading-md mb-4">Weekly Plan</h2>
 
                     <div className="space-y-3">
                         {MOCK_WEEKS.map((week) => (
@@ -80,33 +76,33 @@ export default function PlanPage() {
                                 key={week.number}
                                 onClick={() => setSelectedWeek(week.number)}
                                 className={`card p-5 cursor-pointer transition-all ${selectedWeek === week.number ? 'border-[var(--color-running)]' : ''
-                                    } ${week.isCurrent ? 'ring-2 ring-[var(--color-running)] ring-offset-2 ring-offset-[var(--bg-primary)]' : ''}`}
+                                    } ${week.isCurrent ? 'ring-2 ring-[var(--color-running)] ring-offset-2 ring-offset-[var(--bg-base)]' : ''}`}
                             >
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-xl bg-[var(--bg-tertiary)] flex items-center justify-center font-bold">
+                                        <div className="w-12 h-12 rounded-xl bg-[var(--bg-muted)] flex items-center justify-center font-bold">
                                             W{week.number}
                                         </div>
                                         <div>
                                             <p className="font-semibold">
                                                 Week {week.number}
-                                                {week.isCurrent && <span className="ml-2 text-xs bg-[var(--color-running)] text-black px-2 py-0.5 rounded-full">Current</span>}
-                                                {week.cutback && <span className="ml-2 text-xs bg-[var(--color-warning)] text-black px-2 py-0.5 rounded-full">Cutback</span>}
+                                                {week.isCurrent && <span className="ml-2 badge badge-accent">Current</span>}
+                                                {week.cutback && <span className="ml-2 badge badge-warning">Cutback</span>}
                                             </p>
-                                            <p className="text-sm text-[var(--text-secondary)]">{week.phase} Phase</p>
+                                            <p className="text-body-sm text-[var(--text-muted)]">{week.phase} Phase</p>
                                         </div>
                                     </div>
 
                                     <div className="flex items-center gap-8 text-center">
                                         <div>
-                                            <p className="text-xl font-bold data-display">{week.mileage}</p>
-                                            <p className="text-xs text-[var(--text-muted)]">miles</p>
+                                            <p className="text-heading-lg text-data">{week.mileage}</p>
+                                            <p className="text-caption text-[var(--text-muted)]">miles</p>
                                         </div>
                                         <div>
-                                            <p className="text-xl font-bold data-display">{week.quality}</p>
-                                            <p className="text-xs text-[var(--text-muted)]">quality</p>
+                                            <p className="text-heading-lg text-data">{week.quality}</p>
+                                            <p className="text-caption text-[var(--text-muted)]">quality</p>
                                         </div>
-                                        <svg className="w-5 h-5 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg className="w-5 h-5 text-[var(--text-subtle)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                         </svg>
                                     </div>
@@ -118,7 +114,7 @@ export default function PlanPage() {
 
                 {/* Plan Stats */}
                 <section>
-                    <h2 className="text-lg font-semibold mb-4">Plan Overview</h2>
+                    <h2 className="text-heading-md mb-4">Plan Overview</h2>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {[
@@ -128,9 +124,9 @@ export default function PlanPage() {
                             { value: '28', label: 'Strength', sub: 'Total sessions' },
                         ].map((stat) => (
                             <div key={stat.label} className="card p-5">
-                                <p className="text-3xl font-bold data-display mb-1">{stat.value}</p>
-                                <p className="label mb-1">{stat.label}</p>
-                                <p className="text-xs text-[var(--text-secondary)]">{stat.sub}</p>
+                                <p className="text-display-md text-data mb-1">{stat.value}</p>
+                                <p className="text-label mb-1">{stat.label}</p>
+                                <p className="text-caption text-[var(--text-muted)]">{stat.sub}</p>
                             </div>
                         ))}
                     </div>

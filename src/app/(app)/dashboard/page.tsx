@@ -3,11 +3,11 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { COACHES } from '@/config/coach-spec/methodology';
+import { AppHeader } from '@/components/ui/AppHeader';
 import { FlameIcon } from '@/components/ui/flame';
 import { ActivityIcon } from '@/components/ui/activity';
 import { ChartBarIncreasingIcon } from '@/components/ui/chart-bar-increasing';
 import { CalendarDaysIcon } from '@/components/ui/calendar-days';
-import { SettingsIcon } from '@/components/ui/settings';
 import { CheckIcon } from '@/components/ui/check';
 import { PlayIcon } from '@/components/ui/play';
 
@@ -89,31 +89,15 @@ export default function DashboardPage() {
         durability: 'var(--color-durability)',
     };
 
+    const domainTints: Record<string, string> = {
+        running: 'var(--domain-running-tint)',
+        strength: 'var(--domain-strength-tint)',
+        durability: 'var(--domain-durability-tint)',
+    };
+
     return (
         <div className="min-h-screen">
-            {/* Header */}
-            <header className="sticky top-0 z-50 glass border-b border-[var(--border-muted)]">
-                <div className="container-page h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-[var(--color-accent)] flex items-center justify-center">
-                            <ActivityIcon size={20} className="text-black" />
-                        </div>
-                        <span className="text-heading-sm">The Long Game</span>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                        {/* Streak Badge with animated flame */}
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--color-accent)]/15">
-                            <FlameIcon size={18} className="text-[var(--color-accent)]" />
-                            <span className="text-body-sm font-bold text-[var(--color-accent)]">{MOCK_INSIGHTS.currentStreak}</span>
-                        </div>
-
-                        <Link href="/settings">
-                            <SettingsIcon size={22} className="text-[var(--text-muted)] hover:text-[var(--text-base)]" />
-                        </Link>
-                    </div>
-                </div>
-            </header>
+            <AppHeader streak={MOCK_INSIGHTS.currentStreak} />
 
             <main className="container-page py-8">
                 {/* Greeting + Readiness */}
@@ -165,7 +149,7 @@ export default function DashboardPage() {
                                 <div
                                     className="w-12 h-12 rounded-xl flex items-center justify-center"
                                     style={{
-                                        backgroundColor: `color-mix(in srgb, ${domainColors[workout.domain]} 15%, transparent)`,
+                                        backgroundColor: domainTints[workout.domain],
                                         color: domainColors[workout.domain]
                                     }}
                                 >
@@ -205,10 +189,10 @@ export default function DashboardPage() {
                                 <div
                                     key={day.day}
                                     className={`text-center py-3 rounded-xl transition-all ${day.today
-                                            ? 'bg-[var(--color-accent)] text-black'
-                                            : day.done
-                                                ? 'bg-[var(--bg-muted)]'
-                                                : ''
+                                        ? 'bg-[var(--color-accent)] text-black'
+                                        : day.done
+                                            ? 'bg-[var(--bg-muted)]'
+                                            : ''
                                         }`}
                                 >
                                     <p className="text-label mb-1">{day.day}</p>

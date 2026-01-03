@@ -12,6 +12,7 @@ export type RunSessionType =
     | 'tempo'
     | 'intervals'
     | 'long_run'
+    | 'medium_long'  // Pfitz-style mid-week aerobic
     | 'recovery'
     | 'progression';
 

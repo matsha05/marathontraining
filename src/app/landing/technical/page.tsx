@@ -4,54 +4,59 @@ import Link from "next/link";
 
 export default function TechnicalLanding() {
     return (
-        <div className="min-h-screen" style={{ background: "var(--color-bg-primary)" }}>
-            {/* Back Button */}
-            <Link
-                href="/"
-                className="fixed top-6 left-6 z-50 flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all glass hover:bg-white/10"
-                style={{ color: "var(--color-text-secondary)" }}
-            >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Back to Showcase
-            </Link>
-
+        <div className="min-h-screen" style={{ backgroundColor: "var(--color-bg-primary)" }}>
             {/* Navigation */}
-            <nav className="fixed top-0 left-0 right-0 z-40 backdrop-blur-md" style={{ background: "rgba(10, 10, 11, 0.8)" }}>
-                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-                            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            <nav className="sticky top-0 left-0 right-0 z-40 backdrop-blur-md" style={{ background: "rgba(10, 10, 11, 0.8)" }}>
+                <div className="max-w-7xl mx-auto px-6 h-[var(--header-height)] flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <Link
+                            href="/"
+                            className="flex items-center gap-2 text-xs font-mono font-semibold transition-colors hover:text-violet-300"
+                            style={{ color: "var(--color-text-muted)" }}
+                        >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                             </svg>
+                            <span className="hidden sm:inline">Back</span>
+                        </Link>
+                        <div className="hidden sm:block h-6 w-px" style={{ background: "rgba(255, 255, 255, 0.12)" }} />
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
+                            </div>
+                            <span className="font-mono font-semibold" style={{ color: "var(--color-text-primary)" }}>
+                                hybrid<span className="text-violet-400">coach</span>
+                            </span>
                         </div>
-                        <span className="font-mono font-semibold" style={{ color: "var(--color-text-primary)" }}>
-                            hybrid<span className="text-violet-400">coach</span>
-                        </span>
                     </div>
 
                     <div className="hidden md:flex items-center gap-6">
-                        {["Methodology", "Calculator", "Docs", "Changelog"].map((item) => (
+                        {[
+                            { label: "Methodology", href: "#methodology" },
+                            { label: "Calculator", href: "#calculator" },
+                            { label: "Matrix", href: "#matrix" },
+                            { label: "Get Started", href: "#cta" },
+                        ].map((item) => (
                             <a
-                                key={item}
-                                href={`#${item.toLowerCase()}`}
+                                key={item.label}
+                                href={item.href}
                                 className="text-sm font-mono transition-colors hover:text-violet-400"
                                 style={{ color: "var(--color-text-muted)" }}
                             >
-                                {item}
+                                {item.label}
                             </a>
                         ))}
                     </div>
 
                     <div className="flex items-center gap-3">
                         <button
-                            className="font-mono text-sm py-2 px-4 rounded-lg transition-colors hover:text-white"
-                            style={{ color: "var(--color-text-secondary)" }}
+                            className="btn btn-ghost btn-sm font-mono text-[var(--color-text-secondary)]"
                         >
                             Sign in
                         </button>
-                        <button className="font-mono text-sm py-2 px-4 rounded-lg bg-gradient-to-r from-violet-500 to-purple-600 text-white hover:opacity-90 transition-opacity">
+                        <button className="btn btn-sm font-mono bg-gradient-to-r from-violet-500 to-purple-600 text-white hover:opacity-90">
                             Get Started
                         </button>
                     </div>
@@ -59,7 +64,13 @@ export default function TechnicalLanding() {
             </nav>
 
             {/* Hero Section - Technical & Clean */}
-            <section className="relative pt-32 pb-20">
+            <section
+                className="relative hero-section"
+                style={{
+                    backgroundImage: "radial-gradient(1000px circle at 20% 0%, color-mix(in srgb, var(--color-durability) 18%, transparent), transparent 60%)",
+                    backgroundRepeat: "no-repeat"
+                }}
+            >
                 {/* Subtle grid background */}
                 <div
                     className="absolute inset-0 opacity-[0.02]"
@@ -87,7 +98,7 @@ export default function TechnicalLanding() {
 
                         {/* Headline */}
                         <h1
-                            className="text-4xl md:text-5xl lg:text-6xl font-semibold mb-6 leading-tight"
+                            className="text-display-lg mb-6 leading-tight"
                             style={{ color: "var(--color-text-primary)" }}
                         >
                             Evidence-based training plans for{" "}
@@ -98,7 +109,7 @@ export default function TechnicalLanding() {
 
                         {/* Description */}
                         <p
-                            className="text-lg mb-8 leading-relaxed"
+                            className="text-body-lg mb-8 leading-relaxed"
                             style={{ color: "var(--color-text-secondary)" }}
                         >
                             A deterministic plan generator built on peer-reviewed science.
@@ -108,7 +119,7 @@ export default function TechnicalLanding() {
 
                         {/* CTA */}
                         <div className="flex flex-wrap items-center gap-4 mb-12">
-                            <button className="flex items-center gap-2 font-medium py-3 px-6 rounded-lg bg-gradient-to-r from-violet-500 to-purple-600 text-white hover:opacity-90 transition-opacity">
+                            <button className="btn btn-lg font-mono bg-gradient-to-r from-violet-500 to-purple-600 text-white hover:opacity-90">
                                 Calculate Your Plan
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -116,7 +127,7 @@ export default function TechnicalLanding() {
                             </button>
                             <a
                                 href="#methodology"
-                                className="font-medium py-3 px-6 rounded-lg transition-colors hover:bg-white/5"
+                                className="btn btn-secondary btn-lg font-mono"
                                 style={{ color: "var(--color-text-secondary)" }}
                             >
                                 Read the docs →
@@ -125,7 +136,7 @@ export default function TechnicalLanding() {
 
                         {/* Quick stats */}
                         <div
-                            className="grid grid-cols-4 gap-4 p-4 rounded-lg font-mono"
+                            className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-lg font-mono"
                             style={{
                                 background: "var(--color-bg-secondary)",
                                 border: "1px solid var(--color-border)"
@@ -138,7 +149,7 @@ export default function TechnicalLanding() {
                                 { label: "Test coverage", value: "95%" },
                             ].map((stat, i) => (
                                 <div key={i} className="text-center">
-                                    <div className="text-xl font-semibold text-violet-400">{stat.value}</div>
+                                    <div className="text-heading-md text-data text-violet-400">{stat.value}</div>
                                     <div className="text-xs" style={{ color: "var(--color-text-muted)" }}>{stat.label}</div>
                                 </div>
                             ))}
@@ -148,7 +159,7 @@ export default function TechnicalLanding() {
             </section>
 
             {/* VDOT Calculator Preview */}
-            <section id="calculator" className="py-20" style={{ background: "var(--color-bg-secondary)" }}>
+            <section id="calculator" className="section section-contrast">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="grid lg:grid-cols-2 gap-12 items-start">
                         <div>
@@ -162,13 +173,13 @@ export default function TechnicalLanding() {
                                 VDOT Engine
                             </div>
                             <h2
-                                className="text-3xl font-semibold mb-4"
+                                className="text-display-md mb-4"
                                 style={{ color: "var(--color-text-primary)" }}
                             >
                                 Precision pacing from first principles
                             </h2>
                             <p
-                                className="mb-8"
+                                className="text-body-lg mb-8"
                                 style={{ color: "var(--color-text-secondary)" }}
                             >
                                 Enter any race result (800m+) and we&apos;ll derive your training paces
@@ -265,16 +276,16 @@ export default function TechnicalLanding() {
             </section>
 
             {/* Methodology Section */}
-            <section id="methodology" className="py-20">
+            <section id="methodology" className="section">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="text-center mb-16">
                         <h2
-                            className="text-3xl font-semibold mb-4"
+                            className="text-display-md mb-4"
                             style={{ color: "var(--color-text-primary)" }}
                         >
                             Built on research, not opinions
                         </h2>
-                        <p style={{ color: "var(--color-text-secondary)" }}>
+                        <p className="text-body-lg" style={{ color: "var(--color-text-secondary)" }}>
                             Every rule is traceable to peer-reviewed sources
                         </p>
                     </div>
@@ -335,10 +346,10 @@ export default function TechnicalLanding() {
             </section>
 
             {/* Feature Matrix */}
-            <section className="py-20" style={{ background: "var(--color-bg-secondary)" }}>
+            <section id="matrix" className="section section-contrast">
                 <div className="max-w-5xl mx-auto px-6">
                     <h2
-                        className="text-2xl font-semibold mb-8 text-center"
+                        className="text-heading-lg mb-8 text-center"
                         style={{ color: "var(--color-text-primary)" }}
                     >
                         What&apos;s included
@@ -398,26 +409,27 @@ export default function TechnicalLanding() {
             </section>
 
             {/* CTA Section */}
-            <section className="py-20">
+            <section id="cta" className="section">
                 <div className="max-w-3xl mx-auto px-6 text-center">
+                    <div className="cta-panel">
                     <h2
-                        className="text-3xl font-semibold mb-4"
+                        className="text-display-md mb-4"
                         style={{ color: "var(--color-text-primary)" }}
                     >
                         Ready to train with precision?
                     </h2>
                     <p
-                        className="mb-8"
+                        className="text-body-lg mb-8"
                         style={{ color: "var(--color-text-secondary)" }}
                     >
                         Enter a recent race time. Get your complete training plan in minutes.
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <button className="w-full sm:w-auto font-medium py-3 px-8 rounded-lg bg-gradient-to-r from-violet-500 to-purple-600 text-white hover:opacity-90 transition-opacity">
+                        <button className="btn btn-lg w-full sm:w-auto font-mono bg-gradient-to-r from-violet-500 to-purple-600 text-white hover:opacity-90">
                             Calculate Your Plan
                         </button>
                         <button
-                            className="w-full sm:w-auto font-medium py-3 px-8 rounded-lg transition-colors"
+                            className="btn btn-secondary btn-lg w-full sm:w-auto font-mono"
                             style={{
                                 background: "var(--color-bg-card)",
                                 color: "var(--color-text-secondary)",
@@ -426,6 +438,7 @@ export default function TechnicalLanding() {
                         >
                             View Changelog
                         </button>
+                    </div>
                     </div>
                 </div>
             </section>

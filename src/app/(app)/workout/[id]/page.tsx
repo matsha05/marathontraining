@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { AppHeader } from '@/components/ui/AppHeader';
+import { handleMissedWorkout, MissedWorkoutDecision } from '@/domain/plan-generator/missed-workout-handler';
 
 /**
  * Workout Detail Page
@@ -67,21 +68,18 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
         durability: 'var(--color-durability)',
     };
 
-    return (
-        <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]">
-            {/* Header */}
-            <header className="sticky top-0 z-50 glass border-b border-[var(--border-default)]">
-                <div className="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
-                    <Link href="/dashboard" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-2">
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                        Back
-                    </Link>
+    const domainTints: Record<string, string> = {
+        running: 'var(--domain-running-tint)',
+        strength: 'var(--domain-strength-tint)',
+        durability: 'var(--domain-durability-tint)',
+    };
 
-                    <span className="label">{workout.phase} • Week {workout.weekNumber}</span>
-                </div>
-            </header>
+    return (
+        <div className="min-h-screen">
+            <AppHeader
+                backHref="/dashboard"
+                rightContent={<span className="text-label">{workout.phase} • Week {workout.weekNumber}</span>}
+            />
 
             <main className="max-w-3xl mx-auto px-6 py-8">
                 {/* Workout Header */}
@@ -91,7 +89,7 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
                             <div
                                 className="inline-block px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider mb-3"
                                 style={{
-                                    backgroundColor: `color-mix(in srgb, ${domainColors[workout.domain]} 15%, transparent)`,
+                                    backgroundColor: domainTints[workout.domain],
                                     color: domainColors[workout.domain]
                                 }}
                             >
@@ -106,26 +104,26 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
                         </div>
                     </div>
 
-                    <p className="text-[var(--text-secondary)]">
+                    <p className="text-[var(--text-muted)]">
                         ~{workout.estimatedDuration} min total
                     </p>
                 </div>
 
                 {/* Workout Structure */}
                 <section className="mb-8">
-                    <h2 className="label mb-4">Workout Structure</h2>
+                    <h2 className="text-label mb-4">Workout Structure</h2>
 
                     <div className="space-y-3">
                         {/* Warmup */}
                         <div className="card p-5">
                             <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-[var(--bg-tertiary)] flex items-center justify-center text-sm font-semibold">
+                                    <div className="w-8 h-8 rounded-lg bg-[var(--bg-muted)] flex items-center justify-center text-sm font-semibold">
                                         1
                                     </div>
                                     <div>
                                         <p className="font-semibold">Warmup</p>
-                                        <p className="text-sm text-[var(--text-secondary)]">{workout.prescription.warmup.distanceMiles} mi easy</p>
+                                        <p className="text-body-sm text-[var(--text-muted)]">{workout.prescription.warmup.distanceMiles} mi easy</p>
                                     </div>
                                 </div>
                                 <div className="text-right">
@@ -150,7 +148,7 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
                                     </div>
                                     <div>
                                         <p className="font-semibold">Main Set</p>
-                                        <p className="text-sm text-[var(--text-secondary)]">{workout.prescription.mainSet.distanceMiles} mi @ T-pace</p>
+                                        <p className="text-body-sm text-[var(--text-muted)]">{workout.prescription.mainSet.distanceMiles} mi @ T-pace</p>
                                     </div>
                                 </div>
                                 <div className="text-right">
@@ -175,7 +173,7 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
                                     </div>
                                     <div>
                                         <p className="font-semibold">Cooldown</p>
-                                        <p className="text-sm text-[var(--text-secondary)]">{workout.prescription.cooldown.distanceMiles} mi easy</p>
+                                        <p className="text-body-sm text-[var(--text-muted)]">{workout.prescription.cooldown.distanceMiles} mi easy</p>
                                     </div>
                                 </div>
                                 <div className="text-right">
@@ -190,10 +188,10 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
                 {/* Coach Notes */}
                 {workout.coachNotes && (
                     <section className="mb-8">
-                        <h2 className="label mb-4">Coach Notes</h2>
-                        <div className="card p-5 bg-[var(--bg-tertiary)]">
-                            <p className="text-[var(--text-secondary)] italic">"{workout.coachNotes}"</p>
-                            <p className="text-xs text-[var(--text-muted)] mt-3">— Based on Daniels' Running Formula</p>
+                        <h2 className="text-label mb-4">Coach Notes</h2>
+                        <div className="card p-5 bg-[var(--bg-muted)]">
+                            <p className="text-[var(--text-muted)] italic">"{workout.coachNotes}"</p>
+                            <p className="text-caption mt-3">— Based on Daniels' Running Formula</p>
                         </div>
                     </section>
                 )}
@@ -201,7 +199,7 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
                 {/* Durability Work */}
                 {workout.durability && (
                     <section className="mb-8">
-                        <h2 className="label mb-4">Post-Run Durability</h2>
+                        <h2 className="text-label mb-4">Post-Run Durability</h2>
                         <div
                             className="card p-5 border-l-4"
                             style={{ borderLeftColor: domainColors.durability }}
@@ -209,7 +207,7 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="font-semibold">Movement Work</p>
-                                    <p className="text-sm text-[var(--text-secondary)]">
+                                    <p className="text-body-sm text-[var(--text-muted)]">
                                         Hip Stability + Core Stability circuits
                                     </p>
                                 </div>
@@ -306,7 +304,7 @@ function WorkoutLoggingModal({
 
                     {/* Completion Status */}
                     <div className="mb-6">
-                        <p className="label mb-3">Did you complete it?</p>
+                        <p className="text-label mb-3">Did you complete it?</p>
                         <div className="grid grid-cols-3 gap-2">
                             {[
                                 { value: 'full', label: 'Yes', icon: '✓' },
@@ -317,12 +315,12 @@ function WorkoutLoggingModal({
                                     key={opt.value}
                                     onClick={() => setCompleted(opt.value as any)}
                                     className={`p-4 rounded-xl text-center transition-all ${completed === opt.value
-                                            ? opt.value === 'full'
-                                                ? 'bg-[var(--color-running)] text-black'
-                                                : opt.value === 'partial'
-                                                    ? 'bg-[var(--color-warning)] text-black'
-                                                    : 'bg-[var(--bg-tertiary)] border-2 border-[var(--text-muted)]'
-                                            : 'bg-[var(--bg-tertiary)]'
+                                        ? opt.value === 'full'
+                                            ? 'bg-[var(--color-running)] text-black'
+                                            : opt.value === 'partial'
+                                                ? 'bg-[var(--color-warning)] text-black'
+                                                : 'bg-[var(--bg-tertiary)] border-2 border-[var(--text-muted)]'
+                                        : 'bg-[var(--bg-tertiary)]'
                                         }`}
                                 >
                                     <span className="text-2xl block mb-1">{opt.icon}</span>
@@ -335,8 +333,8 @@ function WorkoutLoggingModal({
                     {/* Feel Rating - Only show if completed or partial */}
                     {(completed === 'full' || completed === 'partial') && (
                         <div className="mb-6 animate-fade-in">
-                            <p className="label mb-3">How did it feel?</p>
-                            <p className="text-xs text-[var(--text-muted)] mb-3">
+                            <p className="text-label mb-3">How did it feel?</p>
+                            <p className="text-caption mb-3">
                                 This helps calibrate your training load over time
                             </p>
 
@@ -346,14 +344,14 @@ function WorkoutLoggingModal({
                                         key={opt.value}
                                         onClick={() => setFeelRating(opt.value)}
                                         className={`w-full p-3 rounded-xl text-left flex items-center gap-3 transition-all ${feelRating === opt.value
-                                                ? 'bg-[var(--color-running)] text-black'
-                                                : 'bg-[var(--bg-tertiary)] hover:bg-[var(--bg-primary)]'
+                                            ? 'bg-[var(--color-running)] text-black'
+                                            : 'bg-[var(--bg-tertiary)] hover:bg-[var(--bg-primary)]'
                                             }`}
                                     >
                                         <span className="text-2xl">{opt.emoji}</span>
                                         <div className="flex-1">
                                             <p className="font-semibold">{opt.label}</p>
-                                            <p className={`text-xs ${feelRating === opt.value ? 'text-black/70' : 'text-[var(--text-secondary)]'}`}>
+                                            <p className={`text-caption ${feelRating === opt.value ? 'text-black/70' : 'text-[var(--text-muted)]'}`}>
                                                 {opt.description}
                                             </p>
                                         </div>
@@ -366,7 +364,7 @@ function WorkoutLoggingModal({
                     {/* Notes */}
                     {completed && (
                         <div className="mb-6 animate-fade-in">
-                            <p className="label mb-3">Notes (optional)</p>
+                            <p className="text-label mb-3">Notes (optional)</p>
                             <textarea
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}

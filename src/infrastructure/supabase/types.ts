@@ -137,6 +137,143 @@ export interface Database {
                 Insert: Omit<Database['public']['Tables']['durability_assessments']['Row'], 'id' | 'created_at'>;
                 Update: Partial<Database['public']['Tables']['durability_assessments']['Insert']>;
             };
+
+            garmin_oauth_states: {
+                Row: {
+                    state: string;
+                    athlete_id: string;
+                    code_verifier: string;
+                    created_at: string;
+                    expires_at: string;
+                };
+                Insert: Omit<Database['public']['Tables']['garmin_oauth_states']['Row'], 'created_at'>;
+                Update: Partial<Database['public']['Tables']['garmin_oauth_states']['Insert']>;
+            };
+
+            garmin_tokens: {
+                Row: {
+                    id: string;
+                    athlete_id: string;
+                    garmin_user_id: string;
+                    access_token: string;
+                    refresh_token: string;
+                    access_token_expires_at: string;
+                    refresh_token_expires_at: string | null;
+                    token_type: string;
+                    scopes: string[];
+                    created_at: string;
+                    updated_at: string;
+                };
+                Insert: Omit<Database['public']['Tables']['garmin_tokens']['Row'], 'id' | 'created_at' | 'updated_at'>;
+                Update: Partial<Database['public']['Tables']['garmin_tokens']['Insert']>;
+            };
+
+            garmin_webhook_events: {
+                Row: {
+                    id: string;
+                    garmin_user_id: string | null;
+                    event_type: string;
+                    payload: Record<string, unknown>;
+                    received_at: string;
+                    processed_at: string | null;
+                    status: string;
+                    error: string | null;
+                };
+                Insert: Omit<Database['public']['Tables']['garmin_webhook_events']['Row'], 'id' | 'received_at'>;
+                Update: Partial<Database['public']['Tables']['garmin_webhook_events']['Insert']>;
+            };
+
+            garmin_health_metrics: {
+                Row: {
+                    id: string;
+                    athlete_id: string | null;
+                    garmin_user_id: string | null;
+                    summary_date: string;
+                    sleep_duration_seconds: number | null;
+                    sleep_score: number | null;
+                    hrv_status: number | null;
+                    resting_heart_rate: number | null;
+                    body_battery: number | null;
+                    stress_avg: number | null;
+                    readiness_score: number | null;
+                    readiness_components: Record<string, unknown> | null;
+                    source: string | null;
+                    raw_payload: Record<string, unknown> | null;
+                    created_at: string;
+                    updated_at: string;
+                };
+                Insert: Omit<Database['public']['Tables']['garmin_health_metrics']['Row'], 'id' | 'created_at' | 'updated_at'>;
+                Update: Partial<Database['public']['Tables']['garmin_health_metrics']['Insert']>;
+            };
+
+            garmin_activities: {
+                Row: {
+                    id: string;
+                    athlete_id: string | null;
+                    garmin_user_id: string | null;
+                    garmin_activity_id: string | null;
+                    start_time: string | null;
+                    activity_type: string | null;
+                    distance_m: number | null;
+                    duration_s: number | null;
+                    avg_pace_sec_per_mile: number | null;
+                    avg_hr: number | null;
+                    max_hr: number | null;
+                    cadence_avg: number | null;
+                    device_name: string | null;
+                    fit_summary: Record<string, unknown> | null;
+                    fit_laps: Record<string, unknown>[] | null;
+                    fit_records: Record<string, unknown>[] | null;
+                    source: string | null;
+                    created_at: string;
+                    updated_at: string;
+                };
+                Insert: Omit<Database['public']['Tables']['garmin_activities']['Row'], 'id' | 'created_at' | 'updated_at'>;
+                Update: Partial<Database['public']['Tables']['garmin_activities']['Insert']>;
+            };
+
+            strava_oauth_states: {
+                Row: {
+                    state: string;
+                    athlete_id: string;
+                    created_at: string;
+                    expires_at: string;
+                };
+                Insert: Omit<Database['public']['Tables']['strava_oauth_states']['Row'], 'created_at'>;
+                Update: Partial<Database['public']['Tables']['strava_oauth_states']['Insert']>;
+            };
+
+            strava_tokens: {
+                Row: {
+                    id: string;
+                    athlete_id: string;
+                    strava_athlete_id: number;
+                    access_token: string;
+                    refresh_token: string;
+                    access_token_expires_at: string;
+                    scopes: string[];
+                    created_at: string;
+                    updated_at: string;
+                };
+                Insert: Omit<Database['public']['Tables']['strava_tokens']['Row'], 'id' | 'created_at' | 'updated_at'>;
+                Update: Partial<Database['public']['Tables']['strava_tokens']['Insert']>;
+            };
+
+            strava_webhook_events: {
+                Row: {
+                    id: string;
+                    strava_athlete_id: number | null;
+                    object_id: number | null;
+                    event_type: string;
+                    payload: Record<string, unknown>;
+                    received_at: string;
+                    processed_at: string | null;
+                    status: string;
+                    error: string | null;
+                };
+                Insert: Omit<Database['public']['Tables']['strava_webhook_events']['Row'], 'id' | 'received_at'>;
+                Update: Partial<Database['public']['Tables']['strava_webhook_events']['Insert']>;
+            };
         };
         Views: Record<string, never>;
         Functions: Record<string, never>;

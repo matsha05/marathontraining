@@ -44,8 +44,61 @@ export interface AthleteInput {
     equipment?: Equipment[];
 }
 
-// VDOT History
-export type VdotSource = 'race' | 'time_trial' | 'manual';
+// ============================================================================
+// ONBOARDING PROFILE - Coach-backed assessment data
+// ============================================================================
+
+export interface OnboardingProfile {
+    // Phase 1: Safety
+    currentPainAffectsGait: boolean;
+    painLocation?: string;
+    injuryLast12Months: boolean;
+    injuryDetails?: string;
+    medicalConditions: string[];
+
+    // Phase 2: Training Load (last 4 weeks)
+    runsPerWeek: number;
+    weeklyMiles: number;
+    longestRunMiles: number;
+    hardSessionsPerWeek: number;
+
+    // Phase 2: Background
+    runningBackground: 'new' | 'some' | 'veteran';
+    priorMarathons: 0 | 1 | 2 | 3;  // 3 = 3+
+    strengthTraining: 'none' | 'some' | 'regular';
+
+    // Phase 3: Fitness Calibration
+    calibrationSource: 'garmin' | 'race' | 'time_trial' | 'estimated';
+    garminVO2max?: number;
+    raceDistance?: string;
+    raceTime?: string;
+    raceDate?: string;
+    ttDistance?: string;
+    ttTime?: string;
+    ttEffortRPE?: number;
+
+    // Phase 4: Goal
+    goalDistance: string;
+    goalDate: string;
+    goalTerrain: 'road' | 'trail';
+
+    // Calculated
+    estimatedVdot?: number;
+    vdotConfidence?: 'high' | 'medium' | 'low';
+    injuryRiskScore?: number;
+}
+
+export interface OnboardingProfileInput extends Partial<OnboardingProfile> {
+    name: string;
+    age: number;
+    sex: Sex;
+}
+
+// ============================================================================
+// VDOT HISTORY
+// ============================================================================
+
+export type VdotSource = 'race' | 'time_trial' | 'garmin' | 'estimated';
 
 export interface VdotEntry {
     id: string;
@@ -58,7 +111,10 @@ export interface VdotEntry {
     isCurrent: boolean;
 }
 
-// Goal Race
+// ============================================================================
+// GOAL RACE
+// ============================================================================
+
 export type RaceDistance =
     | '5k'
     | '10k'
@@ -82,7 +138,10 @@ export interface GoalRace {
     createdAt: Date;
 }
 
-// Injury
+// ============================================================================
+// INJURY
+// ============================================================================
+
 export type InjuryType = 'pfp' | 'achilles' | 'shin' | 'plantar' | 'itbs' | 'other';
 export type InjurySeverity = 'mild' | 'moderate' | 'severe';
 
@@ -96,3 +155,4 @@ export interface InjuryRecord {
     notes?: string;
     createdAt: Date;
 }
+

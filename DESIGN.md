@@ -125,6 +125,25 @@ Training types have distinct colors:
 Use classes: `.domain-running`, `.domain-strength`, `.domain-durability`
 Badge variant: `.domain-badge` (applies 15% opacity background)
 
+#### Domain Tint Tokens (for backgrounds)
+
+| Token | Purpose |
+|-------|---------|
+| `--domain-running-tint` | 15% opacity running background |
+| `--domain-running-border` | 30% opacity running border |
+| `--domain-strength-tint` | 15% opacity strength background |
+| `--domain-strength-border` | 30% opacity strength border |
+| `--domain-durability-tint` | 15% opacity durability background |
+| `--domain-durability-border` | 30% opacity durability border |
+
+### Additional Surface Tokens
+
+| Token | Purpose |
+|-------|---------|
+| `--bg-inset` | Deeper than base (pure black) |
+| `--bg-overlay` | Modal backdrops (80% opacity) |
+| `--border-default` | Alias for `--border-base` |
+
 ---
 
 ## Motion Principles
@@ -178,6 +197,76 @@ Badge variant: `.domain-badge` (applies 15% opacity background)
 
 ---
 
+## Component Library
+
+### UI Primitives (`src/components/ui/`)
+
+| Component | Purpose | Key Props |
+|-----------|---------|-----------|
+| `AppHeader` | Shared navigation header | `title`, `backHref`, `streak`, `rightContent` |
+| `Toggle` | Accessible switch | `checked`, `onChange`, `size`, `disabled` |
+| `SelectionCard` | Option selection | `selected`, `domain`, `disabled` |
+| `SelectionGrid` | Grid container | `columns` |
+| `MetricCard` | Metric display | `value`, `unit`, `label`, `delta`, `icon` |
+| `MetricGrid` | Grid container | `columns` |
+| `WeeklyCalendar` | Week-at-a-glance | `days`, `weekLabel`, `onDayClick` |
+
+### Badge Variants
+
+| Class | Use |
+|-------|-----|
+| `.badge` | Base badge (neutral) |
+| `.badge-accent` | Success/active states |
+| `.badge-warning` | Caution states |
+| `.badge-error` | Error states |
+| `.badge-running` | Running domain |
+| `.badge-strength` | Strength domain |
+| `.badge-durability` | Durability domain |
+
+### Icon Sizing
+
+| Class | Size |
+|-------|------|
+| `.icon-xs` | 12px |
+| `.icon-sm` | 16px |
+| `.icon-md` | 20px |
+| `.icon-lg` | 24px |
+| `.icon-xl` | 32px |
+
+Icon color classes: `.icon-accent`, `.icon-running`, `.icon-strength`, `.icon-durability`, `.icon-muted`, `.icon-subtle`, `.icon-error`, `.icon-warning`
+
+---
+
+## Loading & Empty States
+
+### Skeleton Loading
+
+```html
+<div class="skeleton skeleton-text"></div>
+<div class="skeleton skeleton-text skeleton-text-sm"></div>
+<div class="skeleton skeleton-card"></div>
+```
+
+### Empty States
+
+```html
+<div class="empty-state">
+  <div class="empty-state-icon">📭</div>
+  <h3 class="empty-state-title">No workouts yet</h3>
+  <p class="empty-state-description">Complete your first workout to see it here</p>
+  <button class="btn btn-primary">Start Training</button>
+</div>
+```
+
+### Status Feedback
+
+Use `.status-dot` with `data-status` attribute for color-blind accessible indicators:
+```html
+<span class="status-dot status-dot-success" data-status="success"></span>
+```
+
+---
+
 ## Implementation Checklist
 
 When building a new feature:
@@ -185,8 +274,12 @@ When building a new feature:
 - [ ] Uses typography classes (not arbitrary font sizes)
 - [ ] Uses spacing scale (multiples of 8)
 - [ ] Uses semantic color tokens (not hex values)
+- [ ] Uses domain tint tokens (not inline `color-mix`)
+- [ ] Uses `container-page` or `container-narrow`
 - [ ] Proper dark mode support
 - [ ] Meets contrast requirements
-- [ ] Has appropriate motion
-- [ ] Touch-friendly on mobile
+- [ ] Has appropriate motion (respects reduced-motion)
+- [ ] Touch-friendly on mobile (44px tap targets)
 - [ ] Keyboard accessible
+- [ ] Uses reusable components where available
+

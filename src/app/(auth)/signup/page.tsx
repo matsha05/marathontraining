@@ -29,12 +29,12 @@ export default function SignupPage() {
                     <div className="w-8 h-8 border-3 border-white rounded-full" />
                 </div>
                 <h1 className="text-2xl font-bold tracking-tight">Create your account</h1>
-                <p className="text-[var(--text-secondary)] mt-2">Start training with precision</p>
+                <p className="text-[var(--text-muted)] mt-2">Start training with precision</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label className="label block mb-2">Email</label>
+                    <label className="text-label block mb-2">Email</label>
                     <input
                         type="email"
                         value={email}
@@ -46,7 +46,7 @@ export default function SignupPage() {
                 </div>
 
                 <div>
-                    <label className="label block mb-2">Password</label>
+                    <label className="text-label block mb-2">Password</label>
                     <input
                         type="password"
                         value={password}
@@ -62,13 +62,13 @@ export default function SignupPage() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="btn btn-primary btn-lg w-full mt-6 disabled:opacity-50"
+                    className={`btn btn-primary btn-lg w-full mt-6 ${loading ? 'btn-loading' : ''}`}
                 >
                     {loading ? 'Creating account...' : 'Create Account'}
                 </button>
             </form>
 
-            <p className="text-center text-sm text-[var(--text-secondary)] mt-8">
+            <p className="text-center text-body-sm text-[var(--text-muted)] mt-8">
                 Already have an account?{' '}
                 <Link href="/login" className="text-[var(--color-running)] font-semibold hover:underline">
                     Sign in

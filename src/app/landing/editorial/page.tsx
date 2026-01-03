@@ -4,52 +4,58 @@ import Link from "next/link";
 
 export default function EditorialLanding() {
     return (
-        <div className="min-h-screen" style={{ background: "var(--color-bg-primary)" }}>
-            {/* Back Button */}
-            <Link
-                href="/"
-                className="fixed top-6 left-6 z-50 flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all glass hover:bg-white/10"
-                style={{ color: "var(--color-text-secondary)" }}
-            >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Back to Showcase
-            </Link>
-
+        <div className="min-h-screen landing-shell" style={{ backgroundColor: "var(--color-bg-primary)" }}>
             {/* Navigation */}
-            <nav className="fixed top-0 left-0 right-0 z-40 glass">
-                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div
-                            className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white"
-                            style={{ background: "var(--gradient-primary)" }}
+            <nav className="sticky top-0 left-0 right-0 z-40 glass">
+                <div className="max-w-7xl mx-auto px-6 h-[var(--header-height)] flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <Link
+                            href="/"
+                            className="flex items-center gap-2 text-xs font-medium transition-colors hover:text-[var(--color-accent)]"
+                            style={{ color: "var(--color-text-secondary)" }}
                         >
-                            HC
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                            <span className="hidden sm:inline">Back to Showcase</span>
+                        </Link>
+                        <div className="hidden sm:block h-6 w-px" style={{ background: "var(--color-border)" }} />
+                        <div className="flex items-center gap-3">
+                            <div
+                                className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white"
+                                style={{ background: "var(--gradient-primary)" }}
+                            >
+                                HC
+                            </div>
+                            <span className="font-semibold text-lg" style={{ color: "var(--color-text-primary)" }}>
+                                HybridCoach
+                            </span>
                         </div>
-                        <span className="font-semibold text-lg" style={{ color: "var(--color-text-primary)" }}>
-                            HybridCoach
-                        </span>
                     </div>
 
                     <div className="hidden md:flex items-center gap-8">
-                        {["Method", "Features", "Pricing", "About"].map((item) => (
+                        {[
+                            { label: "Problem", href: "#problem" },
+                            { label: "Method", href: "#method" },
+                            { label: "Hierarchy", href: "#hierarchy" },
+                            { label: "Distances", href: "#distances" },
+                        ].map((item) => (
                             <a
-                                key={item}
-                                href={`#${item.toLowerCase()}`}
-                                className="text-sm font-medium transition-colors hover:text-white"
+                                key={item.label}
+                                href={item.href}
+                                className="text-sm font-medium transition-colors hover:text-[var(--color-accent)]"
                                 style={{ color: "var(--color-text-secondary)" }}
                             >
-                                {item}
+                                {item.label}
                             </a>
                         ))}
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <button className="btn-secondary text-sm py-2 px-4">
+                        <button className="btn btn-secondary btn-sm">
                             Log In
                         </button>
-                        <button className="btn-primary text-sm py-2 px-4">
+                        <button className="btn btn-primary btn-sm">
                             Start Training
                         </button>
                     </div>
@@ -57,7 +63,7 @@ export default function EditorialLanding() {
             </nav>
 
             {/* Hero Section */}
-            <section className="relative min-h-screen flex items-center pt-20">
+            <section className="relative hero-full flex items-start hero-section">
                 {/* Background gradient */}
                 <div
                     className="absolute inset-0"
@@ -68,25 +74,25 @@ export default function EditorialLanding() {
                     style={{ background: "var(--gradient-radial)" }}
                 />
 
-                <div className="relative z-10 max-w-7xl mx-auto px-6 py-24">
+                <div className="relative z-10 max-w-7xl mx-auto px-6">
                     <div className="max-w-4xl">
                         {/* Eyebrow */}
                         <div
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 animate-fade-in-up"
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 animate-slide-up"
                             style={{
-                                background: "rgba(255, 107, 53, 0.1)",
-                                border: "1px solid rgba(255, 107, 53, 0.2)"
+                                background: "color-mix(in srgb, var(--color-accent) 12%, transparent)",
+                                border: "1px solid color-mix(in srgb, var(--color-accent) 28%, transparent)"
                             }}
                         >
-                            <span className="w-2 h-2 rounded-full bg-[#ff6b35]" />
-                            <span className="text-sm font-medium" style={{ color: "var(--color-primary)" }}>
+                            <span className="w-2 h-2 rounded-full bg-[var(--color-accent)]" />
+                            <span className="text-sm font-medium" style={{ color: "var(--color-accent)" }}>
                                 Built for former strength athletes
                             </span>
                         </div>
 
                         {/* Headline */}
                         <h1
-                            className="headline-xl mb-6 animate-fade-in-up animate-delay-100"
+                            className="text-display-xl mb-6 animate-slide-up animate-delay-100"
                             style={{ color: "var(--color-text-primary)" }}
                         >
                             Run your first marathon
@@ -96,18 +102,18 @@ export default function EditorialLanding() {
 
                         {/* Subheadline */}
                         <p
-                            className="body-lg max-w-2xl mb-10 animate-fade-in-up animate-delay-200"
+                            className="text-body-lg text-[var(--color-text-secondary)] max-w-2xl mb-10 animate-slide-up animate-delay-200"
                         >
                             Evidence-based training plans designed specifically for CrossFitters, lifters,
                             and hybrid athletes. Build endurance your way—with the strength work built in.
                         </p>
 
                         {/* CTA */}
-                        <div className="flex flex-wrap items-center gap-4 animate-fade-in-up animate-delay-300">
-                            <button className="btn-primary text-lg py-4 px-8">
+                        <div className="flex flex-wrap items-center gap-4 animate-slide-up animate-delay-300">
+                            <button className="btn btn-primary btn-lg">
                                 Create Your Plan
                             </button>
-                            <button className="btn-secondary text-lg py-4 px-8 flex items-center gap-2">
+                            <button className="btn btn-secondary btn-lg flex items-center gap-2">
                                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
                                 </svg>
@@ -117,7 +123,7 @@ export default function EditorialLanding() {
 
                         {/* Social Proof */}
                         <div
-                            className="mt-16 flex items-center gap-8 animate-fade-in-up animate-delay-400"
+                            className="mt-16 flex items-center gap-8 animate-slide-up animate-delay-400"
                         >
                             <div className="flex -space-x-3">
                                 {[1, 2, 3, 4, 5].map((i) => (
@@ -148,23 +154,23 @@ export default function EditorialLanding() {
             </section>
 
             {/* The Problem Section */}
-            <section id="method" className="section">
+            <section id="problem" className="section">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="grid lg:grid-cols-2 gap-16 items-center">
                         <div>
                             <p
-                                className="text-sm font-semibold uppercase tracking-wider mb-4"
-                                style={{ color: "var(--color-primary)" }}
+                                className="text-label mb-4"
+                                style={{ color: "var(--color-accent)" }}
                             >
                                 The Problem
                             </p>
                             <h2
-                                className="headline-lg mb-6"
+                                className="text-display-md mb-6"
                                 style={{ color: "var(--color-text-primary)" }}
                             >
                                 Marathon plans weren't designed for you.
                             </h2>
-                            <p className="body-lg mb-8">
+                            <p className="text-body-lg text-[var(--color-text-secondary)] mb-8">
                                 Traditional training programs assume you're starting from scratch. They ignore
                                 your strength base, your work capacity, and what you've spent years building.
                             </p>
@@ -179,9 +185,9 @@ export default function EditorialLanding() {
                                     <div key={i} className="flex items-start gap-3">
                                         <div
                                             className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 shrink-0"
-                                            style={{ background: "rgba(255, 107, 53, 0.2)" }}
+                                            style={{ background: "color-mix(in srgb, var(--color-accent) 20%, transparent)" }}
                                         >
-                                            <svg className="w-3 h-3" fill="#ff6b35" viewBox="0 0 20 20">
+                                            <svg className="w-3 h-3 text-[var(--color-accent)]" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                                             </svg>
                                         </div>
@@ -197,7 +203,7 @@ export default function EditorialLanding() {
                                 style={{ background: "var(--color-bg-card)" }}
                             >
                                 <div className="text-center">
-                                    <div className="stat-value mb-2">87%</div>
+                                    <div className="text-display-md text-data mb-2">87%</div>
                                     <p className="text-sm mb-6" style={{ color: "var(--color-text-muted)" }}>
                                         of runners get injured during marathon training
                                     </p>
@@ -222,25 +228,22 @@ export default function EditorialLanding() {
             </section>
 
             {/* The Solution Section */}
-            <section
-                className="section"
-                style={{ background: "var(--color-bg-secondary)" }}
-            >
+            <section id="method" className="section section-contrast">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="text-center mb-16">
                         <p
-                            className="text-sm font-semibold uppercase tracking-wider mb-4"
-                            style={{ color: "var(--color-primary)" }}
+                            className="text-label mb-4"
+                            style={{ color: "var(--color-accent)" }}
                         >
                             Our Method
                         </p>
                         <h2
-                            className="headline-lg mb-4"
+                            className="text-display-md mb-4"
                             style={{ color: "var(--color-text-primary)" }}
                         >
                             Built on science. Designed for hybrids.
                         </h2>
-                        <p className="body-lg max-w-2xl mx-auto">
+                        <p className="text-body-lg text-[var(--color-text-secondary)] max-w-2xl mx-auto">
                             We synthesized the best of Hansons, Daniels, Seiler, and Starrett into a
                             system that respects your strength background.
                         </p>
@@ -271,7 +274,7 @@ export default function EditorialLanding() {
                         ].map((feature, i) => (
                             <div
                                 key={i}
-                                className="card p-6 hover-lift"
+                                className="card card-interactive p-6"
                             >
                                 <div className="text-3xl mb-4">{feature.icon}</div>
                                 <h3
@@ -290,16 +293,16 @@ export default function EditorialLanding() {
             </section>
 
             {/* Priority Hierarchy */}
-            <section id="features" className="section">
+            <section id="hierarchy" className="section">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="text-center mb-16">
                         <h2
-                            className="headline-lg mb-4"
+                            className="text-display-md mb-4"
                             style={{ color: "var(--color-text-primary)" }}
                         >
                             Our priority hierarchy
                         </h2>
-                        <p className="body-lg max-w-2xl mx-auto">
+                        <p className="text-body-lg text-[var(--color-text-secondary)] max-w-2xl mx-auto">
                             When decisions conflict, we always protect what matters most.
                         </p>
                     </div>
@@ -315,8 +318,8 @@ export default function EditorialLanding() {
                                 key={i}
                                 className="flex items-center gap-6 p-6 rounded-xl transition-all"
                                 style={{
-                                    background: item.active ? "rgba(255, 107, 53, 0.1)" : "var(--color-bg-card)",
-                                    border: item.active ? "1px solid rgba(255, 107, 53, 0.3)" : "1px solid var(--color-border)"
+                                    background: item.active ? "color-mix(in srgb, var(--color-accent) 12%, transparent)" : "var(--color-bg-card)",
+                                    border: item.active ? "1px solid color-mix(in srgb, var(--color-accent) 30%, transparent)" : "1px solid var(--color-border)"
                                 }}
                             >
                                 <div
@@ -346,19 +349,16 @@ export default function EditorialLanding() {
             </section>
 
             {/* Race Distances */}
-            <section
-                className="section"
-                style={{ background: "var(--color-bg-secondary)" }}
-            >
+            <section id="distances" className="section section-contrast">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="text-center mb-16">
                         <h2
-                            className="headline-lg mb-4"
+                            className="text-display-md mb-4"
                             style={{ color: "var(--color-text-primary)" }}
                         >
                             From 5K to Ultramarathon
                         </h2>
-                        <p className="body-lg max-w-2xl mx-auto">
+                        <p className="text-body-lg text-[var(--color-text-secondary)] max-w-2xl mx-auto">
                             Every distance has different demands. Our engine adapts the entire training
                             structure to match your goal.
                         </p>
@@ -375,7 +375,7 @@ export default function EditorialLanding() {
                         ].map((race, i) => (
                             <div
                                 key={i}
-                                className="card p-4 text-center hover-lift cursor-pointer"
+                                className="card card-interactive p-4 text-center"
                             >
                                 <div
                                     className="text-2xl font-bold mb-1"
@@ -385,7 +385,7 @@ export default function EditorialLanding() {
                                 </div>
                                 <div
                                     className="text-xs mb-2"
-                                    style={{ color: "var(--color-primary)" }}
+                                    style={{ color: "var(--color-accent)" }}
                                 >
                                     {race.focus}
                                 </div>
@@ -404,17 +404,18 @@ export default function EditorialLanding() {
             {/* CTA Section */}
             <section className="section">
                 <div className="max-w-4xl mx-auto px-6 text-center">
+                    <div className="cta-panel">
                     <h2
-                        className="headline-lg mb-6"
+                        className="text-display-md mb-6"
                         style={{ color: "var(--color-text-primary)" }}
                     >
                         Ready to train smarter?
                     </h2>
-                    <p className="body-lg mb-10">
+                    <p className="text-body-lg text-[var(--color-text-secondary)] mb-10">
                         Get your personalized training plan in under 5 minutes.
                         Just enter a recent race time and your goal.
                     </p>
-                    <button className="btn-primary text-lg py-4 px-10">
+                    <button className="btn btn-primary btn-lg">
                         Create Your Free Plan
                     </button>
                     <p
@@ -423,6 +424,7 @@ export default function EditorialLanding() {
                     >
                         No credit card required. Start training today.
                     </p>
+                    </div>
                 </div>
             </section>
 
