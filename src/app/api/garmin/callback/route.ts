@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { exchangeGarminToken, fetchGarminUserId } from '@/infrastructure/garmin/api';
 import { consumeOauthState, upsertGarminTokens } from '@/infrastructure/garmin/store';
+import type { GarminOauthState } from '@/infrastructure/garmin/store';
 import { garminConfig } from '@/infrastructure/garmin/config';
 import { resolveAthleteId } from '@/infrastructure/garmin/auth';
 
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest) {
             return NextResponse.redirect(garminConfig.failureRedirect);
         }
 
-        const oauthState = await consumeOauthState(state);
+        const oauthState: GarminOauthState | null = await consumeOauthState(state);
         if (!oauthState) {
             return NextResponse.redirect(garminConfig.failureRedirect);
         }
