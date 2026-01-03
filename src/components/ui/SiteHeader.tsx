@@ -98,15 +98,10 @@ export function SiteHeader({ isDark, onToggleTheme, hideAuth = false }: SiteHead
                                     Dashboard
                                 </Link>
                             ) : (
-                                // Not logged in - show login/signup
-                                <>
-                                    <Link href="/login" className="btn btn-ghost">
-                                        Log in
-                                    </Link>
-                                    <Link href="/onboarding" className="btn btn-gradient">
-                                        Get Started
-                                    </Link>
-                                </>
+                                // Not logged in - single entry point
+                                <Link href="/auth" className="btn btn-gradient">
+                                    Get Started
+                                </Link>
                             )}
                         </div>
                     )}

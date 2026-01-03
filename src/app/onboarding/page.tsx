@@ -40,7 +40,7 @@ import {
 } from '@/domain/onboarding/types';
 
 import { EXPERIENCE_LEVELS, RACE_RECENCY_OPTIONS } from '@/domain/onboarding/constants';
-import { calculateVdotFromRace } from '@/domain/vdot/vdot-estimator';
+import { calculateVdotFromRace, vdotFromVO2max } from '@/domain/vdot/vdot-estimator';
 
 // Screen components
 import { WelcomeScreen, NameScreen, DemographicsScreen } from '@/components/onboarding/screens/identity';
@@ -81,7 +81,7 @@ import {
 // =============================================================================
 
 function calculateVdotFromData(data: OnboardingData): { vdot: number; confidence: 'high' | 'medium' | 'low' } {
-    // From race result
+    // From race result (gold standard)
     if (data.calibrationMethod === 'race' && data.raceDistance && data.raceTimeMinutes !== null) {
         const totalSeconds = (data.raceTimeMinutes * 60) + (data.raceTimeSeconds ?? 0);
         const result = calculateVdotFromRace(data.raceDistance, totalSeconds);
@@ -121,10 +121,16 @@ function calculateVdotFromData(data: OnboardingData): { vdot: number; confidence
         return { vdot: 38, confidence: 'low' };
     }
 
-    // From experience level estimate
+    // From experience level estimate (when user picks "I have no idea")
     if (data.calibrationMethod === 'estimate' && data.experienceLevel) {
         const level = EXPERIENCE_LEVELS.find(l => l.value === data.experienceLevel);
         return { vdot: level?.baseVdot ?? 35, confidence: 'low' };
+    }
+
+    // From VO2max with flat 10% conservative discount
+    if (data.calibrationMethod === 'vo2max' && data.garminVO2max !== null) {
+        const result = vdotFromVO2max(data.garminVO2max);
+        return { vdot: result.vdot, confidence: result.confidence };
     }
 
     // Default fallback
@@ -186,12 +192,18 @@ function calculateReadiness(data: OnboardingData): { status: ReadinessStatus; ba
 
 function formatConnectError(provider: string | null, error: string | null): string | null {
     if (!provider || !error) return null;
-    const label = provider === 'garmin' ? 'Garmin' : provider === 'strava' ? 'Strava' : 'Device';
+    const label = provider === 'strava' ? 'Strava' : 'Device';
     if (error === 'missing_config') {
         return `${label} isn’t configured yet. Add the ${label.toUpperCase()} client ID, secret, and redirect URL, then try again.`;
     }
+    if (error === 'unauthorized') {
+        return `Sign in to connect ${label}, then try again.`;
+    }
+    if (error === 'invalid_state' || error === 'expired_state') {
+        return `${label} connection expired. Try connecting again.`;
+    }
     if (error === 'connect_failed') {
-        return `We couldn’t start the ${label} connection. Try again, or enter VO2max manually.`;
+        return `We couldn’t start the ${label} connection. Try again, or continue without syncing.`;
     }
     return `We couldn’t start the ${label} connection.`;
 }
@@ -400,28 +412,12 @@ export default function OnboardingPage() {
 
                 {step === 'device-import' && (
                     <DeviceImportScreen
-                        onGarminConnect={() => {
-                            if (typeof window !== 'undefined') {
-                                window.open('/api/garmin/connect?from=onboarding', '_blank', 'noopener,noreferrer');
-                            }
-                        }}
                         onStravaConnect={() => {
                             if (typeof window !== 'undefined') {
                                 window.open('/api/strava/connect?from=onboarding', '_blank', 'noopener,noreferrer');
                             }
                         }}
-                        onManualEntry={() => {
-                            setData(prev => ({ ...prev, calibrationMethod: 'device' }));
-                            setStep('manual-vo2max');
-                        }}
-                        onContinue={() => {
-                            if (data.vdot === null) {
-                                setData(prev => ({ ...prev, calibrationMethod: 'estimate' }));
-                                setStep('estimation-flow');
-                                return;
-                            }
-                            goToNext();
-                        }}
+                        onContinue={goToNext}
                         connectError={connectErrorMessage}
                         onBack={goBack}
                     />
@@ -429,11 +425,11 @@ export default function OnboardingPage() {
 
                 {step === 'manual-vo2max' && (
                     <ManualVo2maxInputScreen
-                        value={data.vdot}
-                        onChange={(vdot) => setData(prev => ({
+                        value={data.garminVO2max}
+                        onChange={(vo2max) => setData(prev => ({
                             ...prev,
-                            vdot,
-                            vdotConfidence: vdot !== null ? 'high' : prev.vdotConfidence,
+                            garminVO2max: vo2max,
+                            // Note: VDOT will be calculated in calculateVdotFromData using experience adjustment
                         }))}
                         onContinue={goToNext}
                         onBack={goBack}

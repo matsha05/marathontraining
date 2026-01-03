@@ -23,7 +23,6 @@ export default function SettingsPage() {
     } | null>(null);
     const [garminBusy, setGarminBusy] = useState(false);
     const [garminMessage, setGarminMessage] = useState<string | null>(null);
-    const [webhookUrl, setWebhookUrl] = useState('');
     const [importBusy, setImportBusy] = useState(false);
     const [importMessage, setImportMessage] = useState<string | null>(null);
     const [stravaStatus, setStravaStatus] = useState<{
@@ -33,29 +32,27 @@ export default function SettingsPage() {
     } | null>(null);
     const [stravaBusy, setStravaBusy] = useState(false);
     const [stravaMessage, setStravaMessage] = useState<string | null>(null);
-    const [stravaWebhookUrl, setStravaWebhookUrl] = useState('');
     const [garminAuthRequired, setGarminAuthRequired] = useState(false);
     const [stravaAuthRequired, setStravaAuthRequired] = useState(false);
     const authRequired = garminAuthRequired || stravaAuthRequired;
     const stravaConnected = Boolean(stravaStatus?.connected);
     const hasHealthData = Boolean(garminStatus?.lastHealthDate);
     const setupComplete = stravaConnected && hasHealthData;
-    const garminApiConnected = Boolean(garminStatus?.connected);
     const [signOutBusy, setSignOutBusy] = useState(false);
 
     useEffect(() => {
-        setWebhookUrl(`${window.location.origin}/api/garmin/webhook`);
-        setStravaWebhookUrl(`${window.location.origin}/api/strava/webhook`);
         const params = new URLSearchParams(window.location.search);
         const connect = params.get('connect');
         const error = params.get('error');
+        const status = params.get('status');
         if (connect && error) {
             const message = formatConnectError(connect, error);
-            if (connect === 'garmin') {
-                setGarminMessage(message);
-            } else if (connect === 'strava') {
+            if (connect === 'strava') {
                 setStravaMessage(message);
             }
+        }
+        if (connect === 'strava' && status === 'connected') {
+            setStravaMessage('Strava connected.');
         }
         void refreshGarminStatus();
         void refreshStravaStatus();
@@ -75,35 +72,6 @@ export default function SettingsPage() {
             setGarminStatus(data);
         } catch (error) {
             setGarminMessage(error instanceof Error ? error.message : 'Garmin status failed');
-        }
-    };
-
-    const handleGarminConnect = () => {
-        window.location.href = '/api/garmin/connect?from=settings';
-    };
-
-    const handleGarminDisconnect = async () => {
-        setGarminBusy(true);
-        setGarminMessage(null);
-        try {
-            const response = await fetch('/api/garmin/disconnect', {
-                method: 'POST',
-            });
-            if (response.status === 401) {
-                setGarminAuthRequired(true);
-                setGarminStatus(null);
-                return;
-            }
-            if (!response.ok) throw new Error('Disconnect failed');
-            const payload = await response.json().catch(() => null) as { warning?: string | null } | null;
-            if (payload?.warning) {
-                setGarminMessage(`Disconnected locally. Garmin deregistration warning: ${payload.warning}`);
-            }
-            await refreshGarminStatus();
-        } catch (error) {
-            setGarminMessage(error instanceof Error ? error.message : 'Disconnect failed');
-        } finally {
-            setGarminBusy(false);
         }
     };
 
@@ -290,14 +258,18 @@ export default function SettingsPage() {
                     <div className="card p-6">
                         <div className="flex items-center justify-between mb-6">
                             <div>
-                                <p className="font-semibold">Current VDOT</p>
-                                <p className="text-body-sm text-[var(--text-muted)]">Based on your 10K time trial</p>
+                                <p className="font-semibold">Current VO2max (VDOT)</p>
+                                <p className="text-body-sm text-[var(--text-muted)]">Update every 4-6 weeks or after a race.</p>
+                                <p className="text-body-sm text-[var(--text-muted)]">Recalibrating rebuilds your plan with new paces.</p>
                             </div>
                             <p className="text-display-md text-data text-[var(--color-accent)]">48</p>
                         </div>
 
-                        <button className="btn btn-secondary w-full">
-                            Update VDOT from Race
+                        <button
+                            className="btn btn-secondary w-full"
+                            onClick={() => router.push('/onboarding')}
+                        >
+                            Recalibrate VO2max (rebuild plan)
                         </button>
                     </div>
                 </section>
@@ -309,13 +281,13 @@ export default function SettingsPage() {
                         <div className="card p-6 space-y-6">
                             <div className="flex flex-wrap items-start justify-between gap-4">
                                 <div className="space-y-2">
-                                    <p className="text-heading-sm">Garmin data setup</p>
+                                    <p className="text-heading-sm">Recommended data setup</p>
                                     <p className="text-body-sm text-[var(--text-muted)]">
-                                        Activities sync automatically via Strava. Health metrics come from a Garmin export until Garmin API access is approved.
+                                        Activities sync automatically via Strava. Health metrics come from a Garmin export ZIP.
                                     </p>
                                 </div>
                                 <span className={`badge ${setupComplete ? 'badge-accent' : 'badge-warning'}`}>
-                                    {authRequired ? 'Sign in required' : setupComplete ? 'Ready' : 'Finish setup'}
+                                    {authRequired ? 'Sign in required' : setupComplete ? 'Ready' : 'Recommended'}
                                 </span>
                             </div>
 
@@ -427,16 +399,11 @@ export default function SettingsPage() {
                                             }}
                                         />
                                         <p className="text-caption">
-                                            Garmin Connect web → Account Settings → Export Data.
+                                            Garmin Connect web → Account Settings → Export Data. Re-export weekly for fresh readiness.
                                         </p>
                                         {garminStatus?.lastHealthDate && (
                                             <p className="text-body-sm text-[var(--text-muted)]">
                                                 Last health import: {garminStatus.lastHealthDate}
-                                            </p>
-                                        )}
-                                        {garminStatus?.lastActivityAt && (
-                                            <p className="text-body-sm text-[var(--text-muted)]">
-                                                Last Garmin activity: {new Date(garminStatus.lastActivityAt).toLocaleString()}
                                             </p>
                                         )}
                                         {importMessage && (
@@ -474,44 +441,8 @@ export default function SettingsPage() {
                             </div>
 
                             <details className="rounded-xl border border-[var(--border-base)] p-4">
-                                <summary className="font-semibold cursor-pointer">Advanced & troubleshooting</summary>
-                                <div className="mt-4 space-y-4">
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <p className="font-semibold">Garmin API (official)</p>
-                                                <p className="text-body-sm text-[var(--text-muted)]">If Garmin approves full API access.</p>
-                                            </div>
-                                            <span className={`badge ${garminApiConnected ? 'badge-accent' : 'badge-error'}`}>
-                                                {garminAuthRequired ? 'Sign in required' : garminApiConnected ? 'Connected' : 'Not connected'}
-                                            </span>
-                                        </div>
-                                        <div className="text-body-sm text-[var(--text-muted)]">
-                                            {garminApiConnected
-                                                ? `Garmin user: ${garminStatus?.garminUserId ?? 'linked'}`
-                                                : 'Optional. Most users will rely on Strava + Garmin export instead.'}
-                                        </div>
-                                        <div className="flex flex-wrap gap-3">
-                                            <button
-                                                className="btn btn-secondary"
-                                                onClick={handleGarminConnect}
-                                                disabled={garminBusy || authRequired || garminApiConnected}
-                                            >
-                                                Connect Garmin API
-                                            </button>
-                                            <button
-                                                className="btn btn-ghost"
-                                                onClick={handleGarminDisconnect}
-                                                disabled={garminBusy || authRequired || !garminApiConnected}
-                                            >
-                                                Disconnect
-                                            </button>
-                                        </div>
-                                        {garminMessage && (
-                                            <p className="text-body-sm text-[var(--text-muted)]">{garminMessage}</p>
-                                        )}
-                                    </div>
-
+                                <summary className="font-semibold cursor-pointer">Troubleshooting</summary>
+                                <div className="mt-4 space-y-3">
                                     <div className="space-y-2">
                                         <label className="text-label block mb-2">Manual FIT upload</label>
                                         <input
@@ -527,22 +458,10 @@ export default function SettingsPage() {
                                                 }
                                             }}
                                         />
-                                        <p className="text-caption">Use this if an activity doesn’t show up automatically.</p>
-                                    </div>
-
-                                    <div className="grid gap-4 sm:grid-cols-2">
-                                        <div>
-                                            <p className="text-label mb-2">Garmin webhook URL</p>
-                                            <div className="text-body-sm font-mono bg-[var(--bg-muted)] rounded-lg px-3 py-2">
-                                                {webhookUrl || '...'}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <p className="text-label mb-2">Strava webhook URL</p>
-                                            <div className="text-body-sm font-mono bg-[var(--bg-muted)] rounded-lg px-3 py-2">
-                                                {stravaWebhookUrl || '...'}
-                                            </div>
-                                        </div>
+                                        <p className="text-caption">Use this if a run doesn’t show up automatically.</p>
+                                        {garminMessage && (
+                                            <p className="text-body-sm text-[var(--text-muted)]">{garminMessage}</p>
+                                        )}
                                     </div>
                                 </div>
                             </details>
@@ -628,9 +547,15 @@ export default function SettingsPage() {
 }
 
 function formatConnectError(provider: string, error: string) {
-    const label = provider === 'garmin' ? 'Garmin' : provider === 'strava' ? 'Strava' : 'Device';
+    const label = provider === 'strava' ? 'Strava' : 'Device';
     if (error === 'missing_config') {
         return `${label} isn’t configured yet. Add the ${label.toUpperCase()} client ID, secret, and redirect URL, then try again.`;
+    }
+    if (error === 'unauthorized') {
+        return `Sign in to connect ${label}, then try again.`;
+    }
+    if (error === 'invalid_state' || error === 'expired_state') {
+        return `${label} connection expired. Try connecting again.`;
     }
     if (error === 'connect_failed') {
         return `We couldn’t start the ${label} connection. Try again in a moment.`;

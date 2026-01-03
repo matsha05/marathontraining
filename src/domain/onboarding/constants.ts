@@ -97,30 +97,61 @@ export const RACE_RECENCY_OPTIONS = [
 // EXPERIENCE LEVELS
 // =============================================================================
 
+/**
+ * Running experience levels with VO2max discount factors
+ * 
+ * Used to convert VO2max → VDOT more accurately by accounting for
+ * running economy, which varies significantly by experience level.
+ */
 export const EXPERIENCE_LEVELS = [
     {
-        value: 'new',
+        value: 'newer',
         label: 'New to running',
-        description: 'Less than 1 year, still building',
+        description: 'Less than 1 year of consistent running',
         baseVdot: 30,
+        vo2maxDiscount: 0.84,
     },
     {
         value: 'recreational',
         label: 'Recreational runner',
-        description: '1-3 years, running casually',
+        description: '1-3 years, running for fitness',
         baseVdot: 38,
+        vo2maxDiscount: 0.87,
     },
     {
         value: 'experienced',
         label: 'Experienced runner',
-        description: '3+ years, consistent training',
+        description: '3+ years, consistent training history',
         baseVdot: 45,
+        vo2maxDiscount: 0.90,
+    },
+    {
+        value: 'competitive',
+        label: 'Competitive runner',
+        description: 'Regular racer, structured training',
+        baseVdot: 50,
+        vo2maxDiscount: 0.93,
+    },
+    {
+        value: 'elite',
+        label: 'Elite / Sub-elite',
+        description: 'High-level competitor, optimized economy',
+        baseVdot: 55,
+        vo2maxDiscount: 0.95,
     },
     {
         value: 'returning',
-        label: 'Returning after break',
-        description: 'Was experienced, took time off',
+        label: 'Returning after time off',
+        description: 'Was experienced, rebuilding fitness',
         baseVdot: 40,
+        vo2maxDiscount: 0.88,
+    },
+    {
+        value: 'crossfit_athlete',
+        label: 'CrossFit / Hybrid athlete',
+        description: 'High fitness, less running-specific volume',
+        baseVdot: 38,
+        vo2maxDiscount: 0.85,
     },
 ] as const;
 
@@ -142,31 +173,31 @@ export const CALIBRATION_METHODS = [
     {
         value: 'race',
         label: 'I have a recent race time',
-        description: 'Best option — actual performance data',
+        description: 'Best option - we calculate VO2max from real results',
         icon: Timer,
     },
     {
         value: 'easy_pace',
         label: 'I know my comfortable easy pace',
-        description: 'Good fallback — we can estimate from this',
+        description: 'We estimate VO2max from your easy pace',
         icon: Footprints,
     },
     {
-        value: 'device',
-        label: 'Import from Garmin or Strava',
-        description: 'Import training history and optionally enter VO2max',
+        value: 'vo2max',
+        label: 'I know my VO2max',
+        description: 'Enter it now and update anytime',
         icon: Heart,
     },
     {
         value: 'effort',
         label: 'I did a hard effort recently',
-        description: 'Parkrun, tempo run, time trial',
+        description: 'We estimate VO2max from a recent hard effort',
         icon: Zap,
     },
     {
         value: 'estimate',
         label: 'I have no idea — estimate for me',
-        description: 'We\'ll use training data + calibration run in Week 1',
+        description: 'We estimate VO2max and refine in Week 1',
         icon: Mountain,
     },
 ] as const;

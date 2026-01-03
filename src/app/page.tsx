@@ -60,7 +60,7 @@ export default function LandingPage() {
               </p>
 
               <div className="flex flex-wrap items-center gap-4">
-                <Link href="/onboarding" className="btn btn-gradient btn-lg group">
+                <Link href="/auth" className="btn btn-gradient btn-lg group">
                   Build Your Plan
                   <ArrowRightIcon size={18} className="group-hover:translate-x-1 transition-transform" />
                 </Link>
@@ -118,7 +118,7 @@ export default function LandingPage() {
             {[
               { icon: CalendarDaysIcon, label: 'Daily Plan', desc: 'Know exactly what to do' },
               { icon: ChartLineIcon, label: 'VDOT Paces', desc: 'Calculated from your race' },
-              { icon: HeartIcon, label: 'Garmin Sync', desc: 'Adapts to your recovery' },
+              { icon: HeartIcon, label: 'Device Data', desc: 'Strava + Garmin export' },
               { icon: FlameIcon, label: 'Stay Strong', desc: 'Strength training built in' },
             ].map((item, i) => (
               <div key={item.label} className="card p-5 text-center md:text-left animate-fade-in" style={{ animationDelay: `${i * 100}ms` }}>
@@ -162,7 +162,7 @@ export default function LandingPage() {
                   'Strength keeps you healthy (and not skinny)',
                   'Every workout is prescribed—no guessing',
                   'Every pace is calculated from YOUR race time',
-                  'Syncs with Garmin to adjust for recovery',
+                  'Uses Garmin exports to adjust for recovery',
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3">
                     <CheckIcon size={20} className="text-[var(--color-accent)] mt-0.5 flex-shrink-0" />
@@ -214,7 +214,7 @@ export default function LandingPage() {
             <p className="text-body-lg text-[var(--text-muted)] mb-10 max-w-lg mx-auto">
               Get your personalized plan in 2 minutes. See your paces. Start training.
             </p>
-            <Link href="/onboarding" className="btn btn-gradient btn-lg group">
+            <Link href="/auth" className="btn btn-gradient btn-lg group">
               Build Your Plan
               <ArrowRightIcon size={18} className="group-hover:translate-x-1 transition-transform" />
             </Link>
@@ -229,4 +229,3 @@ export default function LandingPage() {
     </div>
   );
 }
-

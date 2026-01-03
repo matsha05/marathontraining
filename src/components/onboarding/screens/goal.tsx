@@ -125,10 +125,13 @@ export function RaceDetailsScreen({
             } else {
                 setDateError(null);
             }
+        } else {
+            setDateError(null);
         }
     };
 
-    const canContinue = data.raceDate !== '' && !dateError;
+    // Can continue with or without date (date is now optional)
+    const canContinue = !dateError;
 
     useKeyboardNavigation({
         onEnter: canContinue ? onContinue : undefined,
@@ -141,6 +144,7 @@ export function RaceDetailsScreen({
         <QuestionScreen onBack={onBack}>
             <QuestionHeader
                 title={`Tell us about your ${goalLabel.toLowerCase()}.`}
+                subtitle="Don't have a race yet? No problem — you can skip this."
             />
 
             <div className="space-y-6">
@@ -157,9 +161,9 @@ export function RaceDetailsScreen({
                     </p>
                 </div>
 
-                {/* Race date */}
+                {/* Race date (optional) */}
                 <div>
-                    <label className="text-label block mb-2">Race date</label>
+                    <label className="text-label block mb-2">Race date (optional)</label>
                     <input
                         type="date"
                         value={data.raceDate}
@@ -170,6 +174,11 @@ export function RaceDetailsScreen({
                     />
                     {dateError && (
                         <p className="text-body-sm text-[var(--color-error)] mt-2">{dateError}</p>
+                    )}
+                    {!data.raceDate && (
+                        <p className="text-caption text-[var(--text-subtle)] mt-2">
+                            We&apos;ll build a flexible plan without a specific target date
+                        </p>
                     )}
                 </div>
 
@@ -193,6 +202,7 @@ export function RaceDetailsScreen({
             <ContinueButton
                 onClick={onContinue}
                 disabled={!canContinue}
+                label={data.raceDate ? 'Continue' : 'Continue without a race date'}
             />
         </QuestionScreen>
     );

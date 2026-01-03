@@ -7,6 +7,9 @@ import { resolveAthleteId } from '@/infrastructure/garmin/auth';
 export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
+    const successRedirect = buildRedirectUrl(request, stravaConfig.successRedirect, '/settings');
+    const failureRedirect = buildRedirectUrl(request, stravaConfig.failureRedirect, '/settings');
+
     try {
         const { searchParams } = new URL(request.url);
         const code = searchParams.get('code');
@@ -14,29 +17,29 @@ export async function GET(request: NextRequest) {
         const error = searchParams.get('error');
 
         if (error) {
-            return NextResponse.redirect(`${stravaConfig.failureRedirect}&error=${encodeURIComponent(error)}`);
+            return redirectWithParams(failureRedirect, { connect: 'strava', error });
         }
 
         if (!code || !state) {
-            return NextResponse.redirect(stravaConfig.failureRedirect);
+            return redirectWithParams(failureRedirect, { connect: 'strava', error: 'missing_code' });
         }
 
         const { athleteId } = await resolveAthleteId(request);
         if (!athleteId) {
-            return NextResponse.redirect(stravaConfig.failureRedirect);
+            return redirectWithParams(failureRedirect, { connect: 'strava', error: 'unauthorized' });
         }
 
         const oauthState = await consumeStravaOauthState(state);
         if (!oauthState) {
-            return NextResponse.redirect(stravaConfig.failureRedirect);
+            return redirectWithParams(failureRedirect, { connect: 'strava', error: 'invalid_state' });
         }
 
         if (new Date(oauthState.expires_at).getTime() < Date.now()) {
-            return NextResponse.redirect(stravaConfig.failureRedirect);
+            return redirectWithParams(failureRedirect, { connect: 'strava', error: 'expired_state' });
         }
 
         if (oauthState.athlete_id !== athleteId) {
-            return NextResponse.redirect(stravaConfig.failureRedirect);
+            return redirectWithParams(failureRedirect, { connect: 'strava', error: 'state_mismatch' });
         }
 
         const tokens = await exchangeStravaToken(code);
@@ -55,10 +58,25 @@ export async function GET(request: NextRequest) {
             scopes: tokens.scope ? tokens.scope.split(',') : [],
         });
 
-        return NextResponse.redirect(stravaConfig.successRedirect);
+        return redirectWithParams(successRedirect, { connect: 'strava', status: 'connected' });
     } catch (error) {
         const message = error instanceof Error ? error.message : 'Strava OAuth failed';
-        const redirect = `${stravaConfig.failureRedirect}&error=${encodeURIComponent(message)}`;
-        return NextResponse.redirect(redirect);
+        return redirectWithParams(failureRedirect, { connect: 'strava', error: message });
     }
+}
+
+function buildRedirectUrl(request: NextRequest, target: string, fallbackPath: string) {
+    try {
+        return new URL(target, request.url).toString();
+    } catch {
+        return new URL(fallbackPath, request.url).toString();
+    }
+}
+
+function redirectWithParams(baseUrl: string, params: Record<string, string>) {
+    const url = new URL(baseUrl);
+    Object.entries(params).forEach(([key, value]) => {
+        url.searchParams.set(key, value);
+    });
+    return NextResponse.redirect(url.toString());
 }

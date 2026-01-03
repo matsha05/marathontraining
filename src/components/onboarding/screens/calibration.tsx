@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Heart, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import {
     QuestionScreen,
     QuestionHeader,
@@ -73,8 +73,8 @@ export function CalibrationMethodScreen({
     return (
         <QuestionScreen onBack={onBack}>
             <QuestionHeader
-                title="How should we determine your training paces?"
-                subtitle="This is the most important input for your plan."
+                title="Set your VO2max (required)"
+                subtitle="We use this to set every training pace. Choose the most accurate way to calculate it."
                 tooltip={STEP_TOOLTIPS['calibration-method']}
             />
 
@@ -274,33 +274,29 @@ export function EasyPaceInputScreen({
 // =============================================================================
 
 interface DeviceImportScreenProps {
-    onGarminConnect: () => void;
     onStravaConnect: () => void;
-    onManualEntry: () => void;
     onContinue: () => void;
     onBack: () => void;
     connectError?: string | null;
 }
 
 export function DeviceImportScreen({
-    onGarminConnect,
     onStravaConnect,
-    onManualEntry,
     onContinue,
     onBack,
     connectError,
 }: DeviceImportScreenProps) {
     const [garminStatus, setGarminStatus] = useState<{
-        connected: boolean;
-        lastActivityAt?: string | null;
         lastHealthDate?: string | null;
-    }>({ connected: false });
+    }>({});
     const [stravaStatus, setStravaStatus] = useState<{
         connected: boolean;
         lastActivityAt?: string | null;
     }>({ connected: false });
     const [statusLoading, setStatusLoading] = useState(true);
     const [authRequired, setAuthRequired] = useState(false);
+    const [importBusy, setImportBusy] = useState(false);
+    const [importMessage, setImportMessage] = useState<string | null>(null);
 
     const refreshStatus = useCallback(async () => {
         setStatusLoading(true);
@@ -315,13 +311,11 @@ export function DeviceImportScreen({
             if (garminRes.status === 'fulfilled') {
                 if (garminRes.value.status === 401) {
                     sawUnauthorized = true;
-                    setGarminStatus({ connected: false });
+                    setGarminStatus({});
                 } else if (garminRes.value.ok) {
                     sawAuthed = true;
                     const garminJson = await garminRes.value.json();
                     setGarminStatus({
-                        connected: Boolean(garminJson.connected),
-                        lastActivityAt: garminJson.lastActivityAt ?? null,
                         lastHealthDate: garminJson.lastHealthDate ?? null,
                     });
                 } else {
@@ -359,8 +353,9 @@ export function DeviceImportScreen({
         };
     }, [refreshStatus]);
 
-    const anyConnected = garminStatus.connected || stravaStatus.connected;
-    const continueLabel = anyConnected ? 'Continue' : 'Continue without import';
+    const hasHealthData = Boolean(garminStatus.lastHealthDate);
+    const anyConnected = stravaStatus.connected || hasHealthData;
+    const continueLabel = anyConnected ? 'Continue' : 'Continue without syncing';
 
     const formatDate = (value?: string | null) => {
         if (!value) return null;
@@ -369,7 +364,7 @@ export function DeviceImportScreen({
         return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     };
 
-    const garminLast = formatDate(garminStatus.lastActivityAt) || formatDate(garminStatus.lastHealthDate);
+    const garminLast = formatDate(garminStatus.lastHealthDate);
     const stravaLast = formatDate(stravaStatus.lastActivityAt);
     const connectState = authRequired ? 'auth' : statusLoading ? 'loading' : 'ready';
     const connectDisabled = connectState !== 'ready';
@@ -377,80 +372,142 @@ export function DeviceImportScreen({
         window.location.href = '/login?next=/onboarding';
     };
 
+    const handleGarminExportImport = async (file: File) => {
+        setImportBusy(true);
+        setImportMessage(null);
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const response = await fetch('/api/garmin/import', {
+                method: 'POST',
+                body: formData,
+            });
+            if (response.status === 401) {
+                setAuthRequired(true);
+                setImportMessage('Sign in to import Garmin health data.');
+                return;
+            }
+            if (!response.ok) throw new Error('Garmin export import failed');
+            const payload = await response.json().catch(() => null) as { result?: { activitiesImported?: number; healthDaysImported?: number } } | null;
+            if (payload?.result) {
+                setImportMessage(`Imported ${payload.result.activitiesImported ?? 0} activities and ${payload.result.healthDaysImported ?? 0} health days.`);
+            } else {
+                setImportMessage('Garmin export imported.');
+            }
+            await refreshStatus();
+        } catch (error) {
+            setImportMessage(error instanceof Error ? error.message : 'Garmin export import failed');
+        } finally {
+            setImportBusy(false);
+        }
+    };
+
     useKeyboardNavigation({
         onBack,
-        onNumber: (num) => {
-            if (num === 1 && !connectDisabled) onGarminConnect();
-            if (num === 2 && !connectDisabled) onStravaConnect();
-            if (num === 3) onManualEntry();
-        },
         onEnter: onContinue,
     });
 
     return (
         <QuestionScreen onBack={onBack}>
             <QuestionHeader
-                title="Connect your device to import fitness data."
-                subtitle="We'll pull recent training history. If you know your VO2max, you can enter it now."
+                title="Connect Strava + import Garmin health metrics"
+                subtitle="Activities sync via Strava. Health metrics come from Garmin exports. Recommended but optional."
+                tooltip={STEP_TOOLTIPS['device-import']}
             />
 
             {authRequired && !statusLoading && (
                 <div className="mb-6 rounded-xl border border-[var(--border-base)] bg-[var(--bg-elevated)] p-4">
                     <p className="text-body-sm text-[var(--text-muted)]">
-                        Sign in to connect Garmin or Strava and keep your training data synced. You can continue without connecting and link devices later.
+                        Sign in to connect Strava or import Garmin health data. You can continue without syncing and link everything later.
                     </p>
                     <button
                         type="button"
                         onClick={handleSignIn}
                         className="btn btn-secondary w-full mt-3"
                     >
-                        Sign in to connect devices
+                        Sign in to connect data
                     </button>
                 </div>
             )}
 
-            <OptionGrid>
-                <OptionButton
-                    label={garminStatus.connected ? 'Garmin connected' : 'Connect Garmin'}
-                    description={
-                        garminStatus.connected
-                            ? `Connected${garminLast ? ` · Last sync ${garminLast}` : ''}`
-                            : connectState === 'auth'
-                                ? 'Sign in to connect and import activities'
-                                : connectState === 'loading'
-                                    ? 'Checking connection status...'
-                                    : 'Import activities + recovery signals'
-                    }
-                    shortcut="1"
-                    icon={<Heart className="w-5 h-5" />}
-                    selected={garminStatus.connected}
-                    onClick={onGarminConnect}
-                    disabled={connectDisabled}
-                />
-                <OptionButton
-                    label={stravaStatus.connected ? 'Strava connected' : 'Connect Strava'}
-                    description={
-                        stravaStatus.connected
+            <div className="space-y-4">
+                <div className="rounded-xl border border-[var(--border-base)] bg-[var(--bg-elevated)] p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <p className="text-label">Connect Strava (recommended)</p>
+                            <p className="text-body-sm text-[var(--text-muted)]">
+                                Runs will appear automatically after each sync from Garmin.
+                            </p>
+                        </div>
+                        <span className={`badge ${stravaStatus.connected ? 'badge-accent' : 'badge-warning'}`}>
+                            {stravaStatus.connected ? 'Connected' : 'Not connected'}
+                        </span>
+                    </div>
+                    <div className="mt-3 text-body-sm text-[var(--text-muted)]">
+                        {stravaStatus.connected
                             ? `Connected${stravaLast ? ` · Last activity ${stravaLast}` : ''}`
                             : connectState === 'auth'
-                                ? 'Sign in to connect and import activities'
+                                ? 'Sign in to connect Strava.'
                                 : connectState === 'loading'
                                     ? 'Checking connection status...'
-                                    : 'Import activities + fitness trends'
-                    }
-                    shortcut="2"
-                    icon={<Heart className="w-5 h-5" />}
-                    selected={stravaStatus.connected}
-                    onClick={onStravaConnect}
-                    disabled={connectDisabled}
-                />
-                <OptionButton
-                    label="Enter VO2max manually"
-                    description="If you know your number from your watch"
-                    shortcut="3"
-                    onClick={onManualEntry}
-                />
-            </OptionGrid>
+                                    : 'Connect Strava to enable automatic activity sync.'}
+                    </div>
+                    <p className="text-caption mt-2">
+                        Garmin Connect → Settings → Connected Apps → Strava.
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-3">
+                        <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={onStravaConnect}
+                            disabled={connectDisabled || stravaStatus.connected}
+                        >
+                            Connect Strava
+                        </button>
+                    </div>
+                </div>
+
+                <div className="rounded-xl border border-[var(--border-base)] p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <p className="text-label">Import Garmin health metrics (recommended)</p>
+                            <p className="text-body-sm text-[var(--text-muted)]">
+                                Sleep, HRV, stress, and Body Battery history.
+                            </p>
+                        </div>
+                        <span className={`badge ${hasHealthData ? 'badge-accent' : 'badge-warning'}`}>
+                            {hasHealthData ? 'Imported' : 'Upload ZIP'}
+                        </span>
+                    </div>
+                    <input
+                        type="file"
+                        accept=".zip,application/zip"
+                        className="input mt-3"
+                        disabled={connectDisabled || importBusy}
+                        onChange={(event) => {
+                            const file = event.target.files?.[0];
+                            if (file) {
+                                void handleGarminExportImport(file);
+                                event.currentTarget.value = '';
+                            }
+                        }}
+                    />
+                    <p className="text-caption mt-2">
+                        Garmin Connect web → Account Settings → Export Data.
+                    </p>
+                    <p className="text-caption">
+                        Re-export weekly if you want readiness to stay current.
+                    </p>
+                    {garminLast && (
+                        <p className="text-body-sm text-[var(--text-muted)] mt-2">
+                            Last health import: {garminLast}
+                        </p>
+                    )}
+                    {importMessage && (
+                        <p className="text-body-sm text-[var(--text-muted)] mt-2">{importMessage}</p>
+                    )}
+                </div>
+            </div>
 
             {connectError && (
                 <div className="mt-6 rounded-xl border border-[var(--color-error)]/30 bg-[var(--bg-elevated)] px-4 py-3 text-body-sm text-[var(--color-error)]">
@@ -460,6 +517,7 @@ export function DeviceImportScreen({
 
             <div className="mt-6 space-y-3 text-body-sm text-[var(--text-muted)]">
                 <p>Connecting opens a new tab. Return here once you finish and this screen will refresh.</p>
+                <p>You can always connect Strava or upload a Garmin export later in Settings.</p>
                 <button
                     type="button"
                     onClick={refreshStatus}
@@ -502,7 +560,7 @@ export function ManualVo2maxInputScreen({
         <QuestionScreen onBack={onBack}>
             <QuestionHeader
                 title="Enter your VO2max"
-                subtitle="Use the number from your watch or Garmin/Strava profile."
+                subtitle="Use the number from your watch or Garmin Connect profile."
             />
 
             <TextInput
@@ -526,6 +584,9 @@ export function ManualVo2maxInputScreen({
 
             <p className="mt-4 text-body-sm text-[var(--text-muted)]">
                 Most runners fall between 30 and 70. We use this to set your training paces.
+            </p>
+            <p className="mt-2 text-body-sm text-[var(--text-muted)]">
+                Update your VO2max every 4-6 weeks or after a race in Settings.
             </p>
 
             <ContinueButton onClick={onContinue} disabled={!canContinue} />
@@ -653,14 +714,29 @@ interface EstimationFlowScreenProps {
     onSelect: (level: ExperienceLevel) => void;
     onContinue: () => void;
     onBack: () => void;
+    context?: 'estimate' | 'vo2max';
 }
 
 export function EstimationFlowScreen({
     selected,
     onSelect,
     onContinue,
-    onBack
+    onBack,
+    context = 'estimate',
 }: EstimationFlowScreenProps) {
+    const header = context === 'vo2max'
+        ? {
+            title: 'How would you describe your running background?',
+            subtitle: 'We adjust VO2max to training paces based on running economy.',
+        }
+        : {
+            title: "No problem — we'll estimate based on your training.",
+            subtitle: "We'll set conservative paces and include a calibration run in Week 1 to dial them in.",
+        };
+    const promptLabel = context === 'vo2max'
+        ? 'Running background'
+        : 'How would you describe your current running?';
+
     useKeyboardNavigation({
         onEnter: selected ? onContinue : undefined,
         onBack,
@@ -675,12 +751,12 @@ export function EstimationFlowScreen({
     return (
         <QuestionScreen onBack={onBack}>
             <QuestionHeader
-                title="No problem — we'll estimate based on your training."
-                subtitle="We'll set conservative paces and include a calibration run in Week 1 to dial them in."
+                title={header.title}
+                subtitle={header.subtitle}
             />
 
             <div>
-                <label className="text-label block mb-3">How would you describe your current running?</label>
+                <label className="text-label block mb-3">{promptLabel}</label>
                 <OptionGrid>
                     {EXPERIENCE_LEVELS.map((level, index) => (
                         <OptionButton
@@ -778,6 +854,9 @@ export function VdotRevealScreen({
             <SuccessBanner title={`Predicts a ~${marathonHours}:${marathonMins.toString().padStart(2, '0')} marathon`}>
                 This gives us the data we need to set your training zones perfectly.
             </SuccessBanner>
+            <p className="mt-4 text-body-sm text-[var(--text-muted)]">
+                You can update VO2max anytime in Settings → Fitness and we&apos;ll adjust your plan.
+            </p>
 
             <div className="mt-6 p-4 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-base)]">
                 <p className="text-label mb-3">Your training paces</p>

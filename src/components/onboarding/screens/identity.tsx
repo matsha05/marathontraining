@@ -61,7 +61,7 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
                     </div>
                     <div className="proof-chip">
                         <p className="text-label text-[var(--color-durability)]">Sync ready</p>
-                        <p className="text-body-sm">Garmin + Strava support</p>
+                        <p className="text-body-sm">Garmin export + Strava</p>
                     </div>
                 </div>
 

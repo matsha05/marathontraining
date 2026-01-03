@@ -17,10 +17,15 @@
 
 ## Proposed Solution (Short)
 
-- Official GCDP integration with OAuth 2.0 PKCE (server-side token exchange only)
-- Ingestion via Garmin push/ping webhooks into Next.js API routes, stored in Supabase
-- Fallback path if GCDP access is blocked: manual FIT upload, Garmin Connect export importer, and Strava sync
+- Current: Strava sync for activities + Garmin Connect export ZIP for health metrics
+- Optional future: GCDP OAuth 2.0 PKCE + webhooks if Garmin approves access
 - Parse FIT with `@garmin/fitsdk`, compute readiness + workout matching in-app
+
+## Current Implementation (No Garmin OAuth)
+
+- Activities: Garmin → Strava → app (webhooks + manual sync)
+- Health metrics: Garmin Connect export ZIP upload
+- VO2max: manual entry or race/effort estimation during onboarding
 
 ---
 
@@ -50,7 +55,7 @@
 
 ### 1. API Access Path
 
-**Primary:** Garmin Connect Developer Program (GCDP)
+**Primary (future, if approved):** Garmin Connect Developer Program (GCDP)
 - Requires application approval
 - OAuth 2.0 with PKCE
 - Cloud-to-cloud (needs backend)
@@ -61,11 +66,12 @@
 - Does Garmin rate-limit or throttle new developer accounts?
 
 **Answer:**
-- Approval is typically 2–4 weeks (can be longer for non-enterprise apps).
+- We are not pursuing GCDP for v1. Use Strava sync + Garmin export importer for full coverage.
+- Approval is typically 2-4 weeks (can be longer for non-enterprise apps).
 - Build fallback paths: manual FIT upload, Garmin Connect export importer, Strava sync; HealthKit/Health Connect bridge if we ship a mobile companion.
 - Yes, Garmin throttles evaluation accounts; avoid polling and prefer push/ping.
 
-### 2. Authentication Flow
+### 2. Authentication Flow (future, if approved)
 
 ```
 User clicks "Connect Garmin"

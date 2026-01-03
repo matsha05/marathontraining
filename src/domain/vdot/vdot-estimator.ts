@@ -18,6 +18,113 @@ export interface VdotEstimate {
     notes?: string;
 }
 
+// =============================================================================
+// VO2MAX → VDOT CONVERSION
+// =============================================================================
+
+/**
+ * Conservative discount factor for VO2max → VDOT conversion.
+ * 
+ * Watches/devices often overestimate VO2max relative to actual racing ability.
+ * VDOT accounts for running economy, which VO2max doesn't fully capture.
+ * 
+ * A flat 10% discount is conservative and honest — we'll refine based on
+ * actual performance in Week 1 rather than pretending we can guess economy.
+ */
+const VO2MAX_TO_VDOT_DISCOUNT = 0.90; // 10% conservative adjustment
+
+/**
+ * Convert VO2max to VDOT with conservative adjustment
+ * 
+ * Uses a flat 10% discount because:
+ * - Watches overestimate VO2max vs actual racing ability
+ * - VDOT accounts for running economy, VO2max doesn't
+ * - Better to start conservative and adjust up based on real data
+ */
+export function vdotFromVO2max(vo2max: number): VdotEstimate {
+    const vdot = Math.round(vo2max * VO2MAX_TO_VDOT_DISCOUNT);
+
+    return {
+        vdot: Math.max(20, Math.min(85, vdot)),
+        confidence: 'medium',
+        source: 'garmin',
+        notes: `Conservative estimate from VO2max ${vo2max} — will refine based on your runs`
+    };
+}
+
+// =============================================================================
+// MULTI-SIGNAL VDOT ESTIMATION
+// =============================================================================
+
+/**
+ * A single VDOT data point from any source
+ */
+export interface VdotSignal {
+    vdot: number;
+    confidence: VdotConfidence;
+    source: VdotEstimate['source'];
+    weight?: number; // Optional override, otherwise use confidence-based weight
+}
+
+const CONFIDENCE_WEIGHTS: Record<VdotConfidence, number> = {
+    high: 1.0,
+    medium: 0.7,
+    low: 0.4
+};
+
+/**
+ * Calculate VDOT from multiple signals using weighted averaging
+ * 
+ * Uses a conservative approach: takes the lower of:
+ * - Weighted average across all signals
+ * - Minimum high-confidence signal (if any)
+ * 
+ * This prevents overestimation and aligns with coaching best practice:
+ * "Start conservative, adjust up based on actual performance"
+ */
+export function calculateWeightedVdot(signals: VdotSignal[]): VdotEstimate {
+    if (signals.length === 0) {
+        return { vdot: 35, confidence: 'low', source: 'estimated', notes: 'No calibration signals provided' };
+    }
+
+    if (signals.length === 1) {
+        const s = signals[0];
+        return { vdot: s.vdot, confidence: s.confidence, source: s.source };
+    }
+
+    // Calculate weighted average
+    let totalWeight = 0;
+    let weightedSum = 0;
+
+    for (const signal of signals) {
+        const weight = signal.weight ?? CONFIDENCE_WEIGHTS[signal.confidence];
+        totalWeight += weight;
+        weightedSum += signal.vdot * weight;
+    }
+
+    const avgVdot = Math.round(weightedSum / totalWeight);
+
+    // Conservative approach: prefer lower estimate from high-confidence sources
+    const highConfSignals = signals.filter(s => s.confidence === 'high');
+    const minHighConf = highConfSignals.length > 0
+        ? Math.min(...highConfSignals.map(s => s.vdot))
+        : avgVdot;
+
+    const finalVdot = Math.min(avgVdot, minHighConf);
+
+    // Determine primary source (highest confidence)
+    const sortedByConf = [...signals].sort((a, b) =>
+        CONFIDENCE_WEIGHTS[b.confidence] - CONFIDENCE_WEIGHTS[a.confidence]
+    );
+
+    return {
+        vdot: finalVdot,
+        confidence: highConfSignals.length > 0 ? 'high' : 'medium',
+        source: sortedByConf[0].source,
+        notes: `Triangulated from ${signals.length} sources (${signals.map(s => s.source).join(', ')})`
+    };
+}
+
 // Race distance in meters
 const RACE_DISTANCES: Record<string, number> = {
     '5k': 5000,

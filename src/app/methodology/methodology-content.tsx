@@ -191,7 +191,7 @@ export function MethodologyContent() {
                         <ArrowLeft className="w-4 h-4" />
                         Back
                     </Link>
-                    <Link href="/onboarding" className="btn btn-gradient btn-sm">
+                    <Link href="/auth" className="btn btn-gradient btn-sm">
                         Build Your Plan
                     </Link>
                 </div>
@@ -285,7 +285,7 @@ export function MethodologyContent() {
                             Get a personalized plan built on these proven methodologies.
                         </p>
                         <Link
-                            href="/onboarding"
+                            href="/auth"
                             className="btn btn-gradient btn-lg inline-flex"
                         >
                             Build Your Plan

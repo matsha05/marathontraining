@@ -69,7 +69,7 @@ export type FitnessDuration = '8weeks' | '12weeks' | 'ongoing';
 export type CalibrationMethod =
     | 'race'
     | 'easy_pace'
-    | 'device'
+    | 'vo2max'
     | 'effort'
     | 'estimate';
 
@@ -77,7 +77,7 @@ export type RaceDistance = 'mile' | '5k' | '10k' | 'half' | 'marathon';
 
 export type RaceRecency = 'recent' | 'moderate' | 'old' | 'very_old';
 
-export type ExperienceLevel = 'new' | 'recreational' | 'experienced';
+export type ExperienceLevel = 'newer' | 'recreational' | 'experienced' | 'competitive' | 'elite' | 'returning' | 'crossfit_athlete';
 
 export type EffortType = 'parkrun' | 'tempo' | 'time_trial' | 'race_sim';
 
@@ -135,10 +135,13 @@ export interface OnboardingData {
     effortLevel: number | null;  // 1-10
     effortRecency: 'last_2_weeks' | 'last_month' | '1_3_months' | null;
 
-    // Estimation flow
+    // Estimation flow / Experience level
     experienceLevel: ExperienceLevel | null;
 
-    // Computed VDOT
+    // Raw VO2max input (from device or manual entry)
+    garminVO2max: number | null;
+
+    // Computed VDOT (calculated from race, VO2max with adjustment, etc.)
     vdot: number | null;
     vdotConfidence: VdotConfidence | null;
 
@@ -198,6 +201,7 @@ export const INITIAL_ONBOARDING_DATA: OnboardingData = {
     effortLevel: null,
     effortRecency: null,
     experienceLevel: null,
+    garminVO2max: null,
     vdot: null,
     vdotConfidence: null,
 
@@ -263,7 +267,7 @@ export function getNextStep(
             switch (data.calibrationMethod) {
                 case 'race': return 'race-input';
                 case 'easy_pace': return 'easy-pace-input';
-                case 'device': return 'device-import';
+                case 'vo2max': return 'manual-vo2max';
                 case 'effort': return 'hard-effort-input';
                 case 'estimate': return 'estimation-flow';
                 default: return 'race-input';
@@ -271,13 +275,15 @@ export function getNextStep(
 
         case 'race-input':
         case 'easy-pace-input':
-        case 'device-import':
         case 'hard-effort-input':
         case 'estimation-flow':
         case 'manual-vo2max':
             return 'vdot-reveal';
 
         case 'vdot-reveal':
+            return 'device-import';
+
+        case 'device-import':
             return 'weekly-mileage';
 
         case 'weekly-mileage':
@@ -358,26 +364,28 @@ export function getPreviousStep(
 
         case 'race-input':
         case 'easy-pace-input':
-        case 'device-import':
         case 'hard-effort-input':
         case 'estimation-flow':
             return 'calibration-method';
 
         case 'manual-vo2max':
-            return 'device-import';
+            return 'calibration-method';
+
+        case 'device-import':
+            return 'vdot-reveal';
 
         case 'vdot-reveal':
             switch (data.calibrationMethod) {
                 case 'race': return 'race-input';
                 case 'easy_pace': return 'easy-pace-input';
-                case 'device': return 'device-import';
+                case 'vo2max': return 'manual-vo2max';
                 case 'effort': return 'hard-effort-input';
                 case 'estimate': return 'estimation-flow';
                 default: return 'calibration-method';
             }
 
         case 'weekly-mileage':
-            return 'vdot-reveal';
+            return 'device-import';
 
         case 'runs-per-week':
             return 'weekly-mileage';
@@ -437,11 +445,11 @@ const STEP_PROGRESS: Record<OnboardingStep, number> = {
     'calibration-method': 25,
     'race-input': 30,
     'easy-pace-input': 30,
-    'device-import': 30,
     'manual-vo2max': 30,
     'hard-effort-input': 30,
     'estimation-flow': 30,
     'vdot-reveal': 40,
+    'device-import': 45,
     'weekly-mileage': 50,
     'runs-per-week': 55,
     'longest-run': 60,
@@ -486,9 +494,13 @@ export const STEP_TOOLTIPS: Partial<Record<OnboardingStep, CoachTooltip>> = {
     },
     'calibration-method': {
         title: 'Why this matters so much',
-        content: 'Jack Daniels spent his career proving that training at the RIGHT pace is everything. Too fast on easy days = injury. Too slow on hard days = no adaptation. We need accurate data to set your zones correctly.',
+        content: 'Your VO2max/VDOT sets every training pace. Too fast on easy days = injury. Too slow on hard days = no adaptation. Choose the most accurate option you have.',
         coach: 'Jack Daniels',
         coachLink: '/methodology#daniels',
+    },
+    'device-import': {
+        title: 'Why connect data',
+        content: 'Strava brings in your completed runs automatically. Garmin exports fill your sleep/HRV history so readiness insights stay accurate.',
     },
     'weekly-mileage': {
         title: 'Why we ask',
@@ -570,7 +582,7 @@ export function isStepComplete(step: OnboardingStep, data: OnboardingData): bool
             return data.experienceLevel !== null;
 
         case 'manual-vo2max':
-            return data.vdot !== null;
+            return data.garminVO2max !== null;
 
         case 'vdot-reveal':
             return data.vdot !== null;
