@@ -7,7 +7,7 @@
  * Implements Typeform-style one-question-per-screen with full state machine.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { Suspense, useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -212,7 +212,7 @@ function formatConnectError(provider: string | null, error: string | null): stri
 // MAIN ONBOARDING PAGE
 // =============================================================================
 
-export default function OnboardingPage() {
+function OnboardingContent() {
     const searchParams = useSearchParams();
     const [step, setStep] = useState<OnboardingStep>('welcome');
     const [data, setData] = useState<OnboardingData>(INITIAL_ONBOARDING_DATA);
@@ -621,5 +621,26 @@ export default function OnboardingPage() {
                 )}
             </AnimatePresence>
         </>
+    );
+}
+
+// Loading fallback for Suspense
+function OnboardingLoading() {
+    return (
+        <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center">
+                <div className="w-12 h-12 border-2 border-[var(--color-accent)] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-body-sm text-[var(--text-muted)]">Loading...</p>
+            </div>
+        </div>
+    );
+}
+
+// Wrap in Suspense for useSearchParams
+export default function OnboardingPage() {
+    return (
+        <Suspense fallback={<OnboardingLoading />}>
+            <OnboardingContent />
+        </Suspense>
     );
 }
