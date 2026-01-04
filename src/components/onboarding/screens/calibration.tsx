@@ -838,8 +838,8 @@ export function VdotRevealScreen({
 
     return (
         <QuestionScreen onBack={onBack}>
-            <div className="text-center mb-8">
-                <p className="text-label text-[var(--color-accent)] mb-2">Your estimated VDOT</p>
+            <div className="text-center mb-6">
+                <p className="text-label text-[var(--color-accent)] mb-2">Your VDOT</p>
                 <div className="text-display-xl text-data mb-2">{data.vdot}</div>
                 <p className="text-[var(--text-muted)]">
                     {percentileInfo.label} • Top {100 - percentileInfo.percentile}% of recreational runners
@@ -851,6 +851,17 @@ export function VdotRevealScreen({
                 )}
             </div>
 
+            {/* What is VDOT? Explainer */}
+            <div className="p-4 rounded-xl bg-[var(--bg-inset)] mb-4">
+                <p className="text-label text-[var(--text-muted)] mb-2">What is VDOT?</p>
+                <p className="text-body-sm text-[var(--text-base)] leading-relaxed">
+                    VDOT is your &quot;running fitness score&quot; developed by legendary coach Jack Daniels.
+                    It&apos;s calculated from your race performance and accounts for both your aerobic capacity
+                    and running efficiency. Higher number = fitter. This single number determines all your
+                    training paces — so every run is at the right intensity for YOUR current fitness.
+                </p>
+            </div>
+
             <SuccessBanner title={`Predicts a ~${marathonHours}:${marathonMins.toString().padStart(2, '0')} marathon`}>
                 This gives us the data we need to set your training zones perfectly.
             </SuccessBanner>
@@ -858,24 +869,56 @@ export function VdotRevealScreen({
                 You can update VO2max anytime in Settings → Fitness and we&apos;ll adjust your plan.
             </p>
 
+            {/* Training Paces with Explanations */}
             <div className="mt-6 p-4 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-base)]">
-                <p className="text-label mb-3">Your training paces</p>
-                <div className="space-y-2 text-body-sm">
-                    <div className="flex justify-between">
-                        <span className="text-[var(--text-muted)]">Easy</span>
-                        <span>{formatPace(paces.easy.min)} - {formatPace(paces.easy.max)}/mi</span>
+                <p className="text-label mb-4">Your training paces</p>
+                <div className="space-y-4 text-body-sm">
+                    {/* Easy Pace */}
+                    <div>
+                        <div className="flex justify-between mb-1">
+                            <span className="font-medium">Easy</span>
+                            <span className="text-data">{formatPace(paces.easy.min)} - {formatPace(paces.easy.max)}/mi</span>
+                        </div>
+                        <p className="text-caption text-[var(--text-subtle)]">
+                            Recovery runs, warm-ups, cool-downs. You should be able to hold a conversation comfortably.
+                            This builds your aerobic base without taxing your body.
+                        </p>
                     </div>
-                    <div className="flex justify-between">
-                        <span className="text-[var(--text-muted)]">Marathon</span>
-                        <span>{formatPace(paces.marathon)}/mi</span>
+
+                    {/* Marathon Pace */}
+                    <div>
+                        <div className="flex justify-between mb-1">
+                            <span className="font-medium">Marathon Pace</span>
+                            <span className="text-data">{formatPace(paces.marathon)}/mi</span>
+                        </div>
+                        <p className="text-caption text-[var(--text-subtle)]">
+                            Your predicted race-day pace. Feels &quot;comfortably hard&quot; — sustainable for 26.2 miles but
+                            requires focus. Tempo blocks at this pace teach your body to hold it.
+                        </p>
                     </div>
-                    <div className="flex justify-between">
-                        <span className="text-[var(--text-muted)]">Threshold</span>
-                        <span>{formatPace(paces.threshold)}/mi</span>
+
+                    {/* Tempo/Threshold Pace */}
+                    <div>
+                        <div className="flex justify-between mb-1">
+                            <span className="font-medium">Tempo (Threshold)</span>
+                            <span className="text-data">{formatPace(paces.threshold)}/mi</span>
+                        </div>
+                        <p className="text-caption text-[var(--text-subtle)]">
+                            &quot;Comfortably hard&quot; — you can hold this for 20-40 minutes. Trains your body to clear
+                            lactate efficiently, raising the pace you can sustain before your legs give out.
+                        </p>
                     </div>
-                    <div className="flex justify-between">
-                        <span className="text-[var(--text-muted)]">Interval</span>
-                        <span>{formatPace(paces.interval)}/mi</span>
+
+                    {/* Interval Pace */}
+                    <div>
+                        <div className="flex justify-between mb-1">
+                            <span className="font-medium">Interval</span>
+                            <span className="text-data">{formatPace(paces.interval)}/mi</span>
+                        </div>
+                        <p className="text-caption text-[var(--text-subtle)]">
+                            Hard, short repeats (400m–1 mile). Builds VO2max — your maximum aerobic capacity.
+                            These are the workouts that genuinely hurt, but they make you faster.
+                        </p>
                     </div>
                 </div>
             </div>

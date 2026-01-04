@@ -183,8 +183,12 @@ export default function LandingPage() {
             Coaches who've trained<br />
             world-class athletes.
           </h2>
-          <p className="text-body-lg text-[var(--text-muted)] mb-12 max-w-xl">
+          <p className="text-body-lg text-[var(--text-muted)] mb-4 max-w-xl">
             We don't make this up. Every workout is rooted in proven methodologies.
+          </p>
+          <p className="text-body-md text-[var(--text-subtle)] mb-12 max-w-xl">
+            These coaches have trained Olympic athletes, written definitive books on running science,
+            and developed the systems elite runners use. We encode their methods directly into your plan.
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -192,11 +196,16 @@ export default function LandingPage() {
               const coach = COACHES[id];
               return (
                 <div key={id} className="card p-6 hover:border-[var(--color-accent)] transition-colors">
-                  <p className="text-label text-[var(--color-accent)] mb-3">
+                  <p className="text-label text-[var(--color-accent)] mb-1">
                     {coach?.name.toUpperCase()}
                   </p>
+                  <p className="text-caption text-[var(--text-subtle)] mb-3">
+                    {coach?.title}
+                  </p>
                   <p className="text-heading-sm mb-2">{coach?.keyConceptShort}</p>
-                  <p className="text-caption">{coach?.keyConceptFull?.split('—')[0]}</p>
+                  <p className="text-body-sm text-[var(--text-muted)]">
+                    {coach?.keyConceptFull}
+                  </p>
                 </div>
               );
             })}

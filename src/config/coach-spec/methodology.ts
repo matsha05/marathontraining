@@ -13,6 +13,8 @@ export interface Coach {
     protocol: string;
     keyConceptShort: string;
     keyConceptFull: string;
+    /** Plain-language explanation of why this methodology matters for your training */
+    whatThisMeans: string;
     source: string;
     website?: string;
 }
@@ -39,6 +41,7 @@ export const COACHES: Record<string, Coach> = {
         protocol: 'Cumulative Fatigue Training',
         keyConceptShort: 'Cumulative fatigue',
         keyConceptFull: '6 runs/week, 16-mile long run cap, train on tired legs to simulate race conditions',
+        whatThisMeans: 'Your plan has you running 6 days per week. Long runs are capped at 16 miles (not 20+) because by that point you\'re already running on tired legs from the week\'s training. This simulates how your legs will feel at mile 20 of the actual marathon. The goal is "cumulative fatigue" — teaching your body to perform when not fully fresh.',
         source: 'Hansons Marathon Method',
         website: 'https://hansons-running.com',
     },
@@ -51,6 +54,7 @@ export const COACHES: Record<string, Coach> = {
         protocol: 'VDOT Training System',
         keyConceptShort: 'Pacing precision',
         keyConceptFull: 'Every pace calculated from your VDOT—E, M, T, I, R zones scientifically derived from race performance',
+        whatThisMeans: 'VDOT is your "running fitness score" based on a recent race. Once we know your VDOT, we calculate exact paces for every type of run: Easy (recovery), Marathon (race pace), Tempo/Threshold (comfortably hard), Interval (short, fast), and Repetition (speed work). No guessing — every pace has a scientific basis tied to YOUR current fitness.',
         source: "Daniels' Running Formula",
         website: 'https://runsmartproject.com',
     },
@@ -63,6 +67,7 @@ export const COACHES: Record<string, Coach> = {
         protocol: '80/20 Polarized Training',
         keyConceptShort: 'Polarized training',
         keyConceptFull: '80% easy, 20% hard—avoid the "moderate zone" that leads to fatigue without adaptation',
+        whatThisMeans: 'About 80% of your training should feel genuinely easy — you could hold a conversation. The other 20% should be genuinely hard — tempo runs, intervals, races. The mistake most runners make is running too hard on easy days, which means they\'re too tired to go hard enough on quality days. The "gray zone" (moderate effort) just makes you tired without making you faster.',
         source: 'Research on elite endurance athletes',
         website: 'https://www.researchgate.net/profile/Stephen-Seiler',
     },
@@ -75,6 +80,7 @@ export const COACHES: Record<string, Coach> = {
         protocol: 'Running Rewired Protocol',
         keyConceptShort: 'Movement quality',
         keyConceptFull: '12 durability assessments that identify weaknesses before they become injuries',
+        whatThisMeans: 'We check your movement quality — can you balance on one leg? Do your hips drop when you run? Is your calf strength asymmetrical? These "durability" screens catch problems before they become injuries. If your hips are weak, we add hip strengthening. If your ankle mobility is limited, we add mobility work. The goal is to fix the cause, not just treat symptoms.',
         source: 'Running Rewired',
         website: 'https://www.rerunlab.com',
     },
@@ -87,6 +93,7 @@ export const COACHES: Record<string, Coach> = {
         protocol: 'Ready State Mobility System',
         keyConceptShort: 'Position & mobility',
         keyConceptFull: 'Daily maintenance work to restore range of motion and bulletproof your body',
+        whatThisMeans: 'Running tightens certain muscles (hip flexors, calves, hamstrings). Daily mobility work — just 10-15 minutes — restores your range of motion and prevents the stiffness that leads to injury. Think of it like flossing for your body: small daily habit, huge long-term payoff.',
         source: 'Ready to Run, Becoming a Supple Leopard',
         website: 'https://thereadystate.com',
     },
@@ -99,6 +106,7 @@ export const COACHES: Record<string, Coach> = {
         protocol: 'Max Strength for Running Economy',
         keyConceptShort: 'Heavy lifting for economy',
         keyConceptFull: '4x4 heavy squats improve running economy 5% without adding body mass',
+        whatThisMeans: 'Heavy strength training (think: 4 sets of 4 back squats at near-max weight) makes you a more efficient runner without adding bulk. The research shows a 5% improvement in "running economy" — meaning you use less energy at the same pace. That\'s free speed.',
         source: 'Støren et al. 2008 Research',
     },
 
@@ -110,6 +118,7 @@ export const COACHES: Record<string, Coach> = {
         protocol: '80/20 Running',
         keyConceptShort: '80/20 implementation',
         keyConceptFull: 'Practical application of polarized training for recreational runners',
+        whatThisMeans: 'Takes Seiler\'s research on elite athletes and makes it practical for everyday runners. The core principle: run really easy most of the time, then go hard when it counts. Your watch will tell you if you\'re doing it right.',
         source: '80/20 Running',
         website: 'https://www.8020endurance.com',
     },
@@ -122,6 +131,7 @@ export const COACHES: Record<string, Coach> = {
         protocol: 'Advanced Marathoning',
         keyConceptShort: 'Elite marathon prep',
         keyConceptFull: '12-18 week progressive plans with medium-long runs and lactate threshold focus',
+        whatThisMeans: 'The marathon isn\'t just about the long run. Pfitzinger emphasizes "medium-long" runs (12-15 miles) during the week to build endurance volume, plus lactate threshold work to raise the pace you can hold without blowing up. This is advanced programming for serious marathoners.',
         source: 'Advanced Marathoning',
     },
 
@@ -133,6 +143,7 @@ export const COACHES: Record<string, Coach> = {
         protocol: 'Science of Running',
         keyConceptShort: 'Modern running science',
         keyConceptFull: 'Evidence-based approach combining traditional methods with current research',
+        whatThisMeans: 'Bridges the gap between what coaches have known works and what scientists have proven in labs. Uses the latest research to validate (or update) traditional training wisdom.',
         source: 'The Science of Running',
         website: 'https://www.scienceofrunning.com',
     },
@@ -145,6 +156,7 @@ export const COACHES: Record<string, Coach> = {
         protocol: 'Norwegian Threshold Method',
         keyConceptShort: 'Threshold volume',
         keyConceptFull: 'Double threshold days, high aerobic volume, lactate-guided intensity',
+        whatThisMeans: 'The method behind the Ingebrigtsen brothers (world champion runners). Key innovation: two threshold workouts in one day with several hours rest between. They also use lactate testing to dial in exact intensities. Elite-level methods for those ready for high volume.',
         source: 'Norwegian Athletics Model',
     },
 };

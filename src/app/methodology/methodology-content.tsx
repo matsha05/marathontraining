@@ -79,10 +79,19 @@ function CoachCard({ coach }: { coach: Coach }) {
                         exit={{ height: 0, opacity: 0 }}
                         className="overflow-hidden"
                     >
+                        {/* What This Means - the main explanation */}
                         <div className="mt-4 pt-4 border-t border-[var(--border-muted)]">
+                            <p className="text-label text-[var(--text-muted)] mb-2">What this means for your training</p>
+                            <p className="text-body-sm text-[var(--text-base)] leading-relaxed">
+                                {coach.whatThisMeans}
+                            </p>
+                        </div>
+
+                        {/* Source attribution */}
+                        <div className="mt-4 pt-3 border-t border-[var(--border-muted)]">
                             <div className="flex items-center gap-2 text-body-sm text-[var(--text-muted)]">
                                 <BookOpen className="w-4 h-4" />
-                                <span>{coach.source}</span>
+                                <span>Source: {coach.source}</span>
                             </div>
                             {coach.website && (
                                 <a
