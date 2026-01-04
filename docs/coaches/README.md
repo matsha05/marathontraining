@@ -22,6 +22,40 @@ These documents serve as the authoritative reference for:
 - **Pete Pfitzinger** - Advanced marathoning, lactate threshold
 - **Matt Fitzgerald** - 80/20 practical implementation
 - **Steve Magness** - Modern running science synthesis
+- **Gjert Ingebrigtsen** - Norwegian double-threshold method
+
+## Coach Bio Standards
+
+When adding a new coach to `methodology.ts`, ensure the following:
+
+### Required Fields
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| `credentials` | Formal titles, degrees, honors (max 30 chars) | "PhD, 2x Olympic Medalist" |
+| `bio` | 3-5 sentence narrative: background → achievements → philosophy | See existing coaches |
+| `achievements` | 3-5 verifiable accomplishments as bullet points | ["Won 1984 Olympic Trials", "2:11:43 marathon PR"] |
+
+### Optional Fields
+
+| Field | When to Include |
+|-------|-----------------|
+| `publications` | If coach has authored notable books |
+| `notableAthletes` | If coach has trained recognizable athletes |
+| `photoUrl` | Reserved for future use (not currently displayed) |
+
+### Quality Bar
+
+1. **Verifiability**: Every claim must be traceable to an official source
+2. **Tone**: Third person, professional, factual (not promotional)
+3. **Coach-Approvable**: Content should pass review by the coach themselves
+4. **Source Integrity**: `source` field links to primary reference (book, official website, research paper)
+
+### Bio Structure
+
+1. **Opening**: Who they are + primary credential
+2. **Middle**: Key achievements + coaching philosophy
+3. **Closing**: Why their methodology is credible for our app
 
 ## Additional Resources
 

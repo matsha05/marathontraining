@@ -28,6 +28,31 @@ export function calculateRecommendation(answers: QuizAnswers): PhilosophyRecomme
     const warnings: string[] = [];
 
     // ==========================================================================
+    // BASE BUILDING SHORT-CIRCUIT
+    // If no race target, always recommend Higdon Base Training
+    // ==========================================================================
+    if (answers.targetDistance === 'base') {
+        // Determine tier based on experience and mileage
+        let tierLabel = 'Novice';
+        if (answers.experience === 'advanced' && answers.currentMileage === 'over_40') {
+            tierLabel = 'Advanced';
+        } else if (answers.experience === 'intermediate' || answers.currentMileage === '20_40') {
+            tierLabel = 'Intermediate';
+        }
+
+        reasoning.push('Building general fitness without a race target — Higdon Base Training is the perfect foundation.');
+        reasoning.push(`Based on your experience and current mileage, we recommend the ${tierLabel} Base Training program.`);
+        reasoning.push('This 12-week program builds your aerobic engine so you are ready for any race-specific plan afterward.');
+
+        return {
+            primary: 'higdon',
+            scores: { hansons: 0, higdon: 10, pfitzinger: 0 },
+            reasoning,
+            warnings: [],
+        };
+    }
+
+    // ==========================================================================
     // TARGET DISTANCE (Context for subsequent scoring)
     // ==========================================================================
     const distanceLabel = getDistanceLabel(answers.targetDistance);
@@ -217,6 +242,7 @@ function getDistanceLabel(distance: TargetDistance | null): string {
         'half': 'half marathon',
         'marathon': 'marathon',
         'ultra': 'ultra',
+        'base': 'general fitness',
     };
     return labels[distance];
 }

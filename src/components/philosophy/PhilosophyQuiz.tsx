@@ -87,18 +87,19 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
             )}
 
             <AnimatePresence mode="wait">
-                {/* Question 1: Target Distance */}
+                {/* Question 1: Goal */}
                 {step === 'distance' && (
                     <QuestionScreen
                         key="distance"
-                        question="What distance are you training for?"
-                        subtitle="This shapes how we structure your plan."
+                        question="What's your goal right now?"
+                        subtitle="This shapes how we structure your training."
                         options={[
                             { value: '5k' as TargetDistance, label: '5K', description: 'Speed and sharpness' },
                             { value: '10k' as TargetDistance, label: '10K', description: 'The balanced race' },
                             { value: 'half' as TargetDistance, label: 'Half Marathon', description: 'The sweet spot' },
                             { value: 'marathon' as TargetDistance, label: 'Marathon', description: 'The classic 26.2' },
                             { value: 'ultra' as TargetDistance, label: 'Ultra', description: 'Beyond the marathon' },
+                            { value: 'base' as TargetDistance, label: 'Build general fitness', description: 'No race — just getting stronger' },
                         ]}
                         onSelect={handleDistanceSelect}
                         onBack={onSkip}
@@ -128,22 +129,22 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                     <QuestionScreen
                         key="experience"
                         question="What's your experience level?"
-                        subtitle="Your background shapes the approach."
+                        subtitle="At your current fitness level."
                         options={[
                             {
                                 value: 'beginner' as Experience,
-                                label: 'Beginner',
-                                description: 'New to this distance or returning'
+                                label: 'New to this',
+                                description: 'First time or coming back'
                             },
                             {
                                 value: 'intermediate' as Experience,
-                                label: 'Intermediate',
-                                description: 'Some races under my belt'
+                                label: 'Some experience',
+                                description: 'A few races under my belt'
                             },
                             {
                                 value: 'advanced' as Experience,
-                                label: 'Advanced',
-                                description: 'Experienced, chasing PRs'
+                                label: 'Experienced & chasing PRs',
+                                description: 'Ready to push for faster'
                             },
                         ]}
                         onSelect={handleExperienceSelect}

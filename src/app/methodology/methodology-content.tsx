@@ -9,7 +9,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, BookOpen, ExternalLink, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
+import { ArrowLeft, BookOpen, ExternalLink, ChevronDown, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     COACHES,
@@ -24,30 +24,49 @@ import {
 
 function CoachCard({ coach }: { coach: Coach }) {
     const [expanded, setExpanded] = useState(false);
+    const achievementCount = coach.achievements?.length ?? 0;
 
     return (
         <motion.div
             layout
-            className="card card-interactive p-6 hover:border-[var(--color-accent)] transition-colors"
+            layoutId={`coach-${coach.id}`}
+            onClick={() => setExpanded(!expanded)}
+            className="card card-interactive p-6 hover:border-[var(--color-accent)] transition-colors cursor-pointer select-none"
+            role="button"
+            tabIndex={0}
+            aria-expanded={expanded}
+            aria-label={`${coach.name} - ${expanded ? 'click to collapse' : 'click to expand'}`}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setExpanded(!expanded);
+                }
+            }}
         >
+            {/* Header: Name + Credentials + Toggle Indicator */}
             <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                     <h3 className="text-heading-sm mb-1">{coach.name}</h3>
-                    <p className="text-body-sm text-[var(--text-muted)]">{coach.title}</p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-body-sm text-[var(--text-muted)]">{coach.title}</span>
+                        {coach.credentials && (
+                            <span className="px-2 py-0.5 text-caption rounded-full bg-[var(--color-accent)]/15 text-[var(--color-accent)] border border-[var(--color-accent)]/30">
+                                {coach.credentials}
+                            </span>
+                        )}
+                    </div>
                 </div>
-                <button
-                    onClick={() => setExpanded(!expanded)}
-                    className="p-2 rounded-lg hover:bg-[var(--bg-muted)] transition-colors"
-                    aria-label={expanded ? 'Collapse' : 'Expand'}
+                <motion.div
+                    animate={{ rotate: expanded ? 180 : 0 }}
+                    transition={{ duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
+                    className="p-2 rounded-lg"
                 >
-                    {expanded ? (
-                        <ChevronUp className="w-5 h-5 text-[var(--text-muted)]" />
-                    ) : (
-                        <ChevronDown className="w-5 h-5 text-[var(--text-muted)]" />
-                    )}
-                </button>
+                    <ChevronDown className="w-5 h-5 text-[var(--text-muted)]" />
+                </motion.div>
             </div>
 
+
+            {/* Expertise Tags */}
             <div className="mt-4">
                 <div className="flex flex-wrap gap-2">
                     {coach.expertise.map((tag) => (
@@ -61,6 +80,7 @@ function CoachCard({ coach }: { coach: Coach }) {
                 </div>
             </div>
 
+            {/* Key Concept Box */}
             <div className="mt-4 p-3 rounded-xl bg-[var(--bg-inset)]">
                 <div className="flex items-center gap-2 mb-2">
                     <Sparkles className="w-4 h-4 text-[var(--color-accent)]" />
@@ -71,24 +91,112 @@ function CoachCard({ coach }: { coach: Coach }) {
                 </p>
             </div>
 
+            {/* At-a-glance credibility signal (collapsed state only) */}
+            {!expanded && achievementCount > 0 && (
+                <p className="mt-3 text-caption text-[var(--text-subtle)]">
+                    {achievementCount} notable achievement{achievementCount > 1 ? 's' : ''} · Click to expand
+                </p>
+            )}
+
+            {/* Expanded Content */}
             <AnimatePresence>
                 {expanded && (
                     <motion.div
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.24, ease: [0.2, 0.8, 0.2, 1] }}
                         className="overflow-hidden"
                     >
+                        {/* Bio Section */}
+                        {coach.bio && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.08 }}
+                                className="mt-4 pt-4 border-t border-[var(--border-muted)]"
+                            >
+                                <p className="text-label text-[var(--text-muted)] mb-2">Background</p>
+                                <p className="text-body-sm text-[var(--text-base)] leading-relaxed">
+                                    {coach.bio}
+                                </p>
+                            </motion.div>
+                        )}
+
+                        {/* Achievements Section */}
+                        {coach.achievements && coach.achievements.length > 0 && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.12 }}
+                                className="mt-4 pt-4 border-t border-[var(--border-muted)]"
+                            >
+                                <p className="text-label text-[var(--text-muted)] mb-2">Key Achievements</p>
+                                <ul className="space-y-1.5">
+                                    {coach.achievements.map((achievement, i) => (
+                                        <li key={i} className="text-body-sm text-[var(--text-base)] flex items-start gap-2">
+                                            <span className="text-[var(--color-accent)] mt-0.5">•</span>
+                                            {achievement}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </motion.div>
+                        )}
+
+                        {/* Publications & Notable Athletes (grid) */}
+                        {((coach.publications && coach.publications.length > 0) || (coach.notableAthletes && coach.notableAthletes.length > 0)) && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.16 }}
+                                className="mt-4 pt-4 border-t border-[var(--border-muted)] grid sm:grid-cols-2 gap-4"
+                            >
+                                {coach.publications && coach.publications.length > 0 && (
+                                    <div>
+                                        <p className="text-label text-[var(--text-muted)] mb-2">Publications</p>
+                                        <ul className="space-y-1">
+                                            {coach.publications.map((pub, i) => (
+                                                <li key={i} className="text-body-sm text-[var(--text-base)] flex items-start gap-2">
+                                                    <BookOpen className="w-3.5 h-3.5 text-[var(--text-subtle)] mt-0.5 flex-shrink-0" />
+                                                    {pub}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                                {coach.notableAthletes && coach.notableAthletes.length > 0 && (
+                                    <div>
+                                        <p className="text-label text-[var(--text-muted)] mb-2">Notable Athletes</p>
+                                        <ul className="space-y-1">
+                                            {coach.notableAthletes.map((athlete, i) => (
+                                                <li key={i} className="text-body-sm text-[var(--text-base)]">{athlete}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </motion.div>
+                        )}
+
                         {/* What This Means - the main explanation */}
-                        <div className="mt-4 pt-4 border-t border-[var(--border-muted)]">
+                        <motion.div
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.20 }}
+                            className="mt-4 pt-4 border-t border-[var(--border-muted)]"
+                        >
                             <p className="text-label text-[var(--text-muted)] mb-2">What this means for your training</p>
                             <p className="text-body-sm text-[var(--text-base)] leading-relaxed">
                                 {coach.whatThisMeans}
                             </p>
-                        </div>
+                        </motion.div>
 
                         {/* Source attribution */}
-                        <div className="mt-4 pt-3 border-t border-[var(--border-muted)]">
+                        <motion.div
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.24 }}
+                            className="mt-4 pt-3 border-t border-[var(--border-muted)]"
+                        >
                             <div className="flex items-center gap-2 text-body-sm text-[var(--text-muted)]">
                                 <BookOpen className="w-4 h-4" />
                                 <span>Source: {coach.source}</span>
@@ -104,13 +212,14 @@ function CoachCard({ coach }: { coach: Coach }) {
                                     Learn more
                                 </a>
                             )}
-                        </div>
+                        </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>
         </motion.div>
     );
 }
+
 
 // =============================================================================
 // CATEGORY SECTION
