@@ -30,13 +30,21 @@ function AuthForm() {
 
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
     const [resendCooldown, setResendCooldown] = useState(0);
-    const defaultNextPath = (() => {
-        try {
-            return hasPlan() ? '/dashboard' : '/onboarding';
-        } catch {
-            return '/onboarding';
-        }
-    })();
+    const [defaultNextPath, setDefaultNextPath] = useState('/onboarding');
+
+    // Determine redirect path based on whether user has a plan
+    useEffect(() => {
+        const checkPlan = async () => {
+            try {
+                const hasExistingPlan = await hasPlan();
+                setDefaultNextPath(hasExistingPlan ? '/dashboard' : '/onboarding');
+            } catch {
+                setDefaultNextPath('/onboarding');
+            }
+        };
+        checkPlan();
+    }, []);
+
     const nextPath = getSafeRedirectPath(searchParams.get('next'), defaultNextPath, { allowApi: true });
     const isLoading = Boolean(loadingAction);
     const errorParam = searchParams.get('error');

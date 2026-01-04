@@ -1,26 +1,46 @@
 /**
  * THE LONG GAME - Plan Service Layer
- * 
+ *
  * Clean architecture for plan management:
  * - Type-safe transformation from onboarding → plan generation
- * - CRUD operations for plan persistence
+ * - CRUD operations for plan persistence (now via Supabase)
  * - Error handling and validation
- * 
+ *
  * This is the bridge between the onboarding UI and the plan generation engine.
+ *
+ * V2 MIGRATION:
+ * - savePlan/loadPlan now use Supabase with localStorage cache
+ * - Old localStorage-only functions deprecated but kept for migration
  */
 
 import { OnboardingData } from '@/domain/onboarding/types';
 import { PlanGenerationInput, TrainingPlan } from '@/domain/plan/types';
 import { generatePlan } from '@/domain/plan/generator';
 
-// =============================================================================
-// STORAGE KEYS
-// =============================================================================
+// V2 Repository - Supabase + localStorage hybrid
+import {
+    savePlanV2,
+    loadPlanV2,
+    hasPlanV2,
+    clearPlanV2,
+    getTodaysWorkoutV2,
+    getWorkoutById,
+    getWeekWorkouts,
+} from './repository';
 
-const STORAGE_KEYS = {
-    CURRENT_PLAN: 'long-game-plan',
-    PLAN_HISTORY: 'long-game-plan-history',
-} as const;
+// Re-export V2 functions as primary API
+export {
+    savePlanV2 as savePlan,
+    loadPlanV2 as loadPlan,
+    hasPlanV2 as hasPlan,
+    clearPlanV2 as clearPlan,
+    getTodaysWorkoutV2 as getTodaysWorkout,
+    getWorkoutById,
+    getWeekWorkouts,
+};
+
+// Legacy exports (deprecated but kept for compatibility)
+export { savePlanV2, loadPlanV2, hasPlanV2, clearPlanV2 };
 
 // =============================================================================
 // SERVICE RESULT TYPES
@@ -195,111 +215,11 @@ export function createPlanFromOnboarding(
     }
 }
 
-// =============================================================================
-// PLAN PERSISTENCE
-// =============================================================================
-
-/**
- * Save the current training plan to localStorage.
- */
-export function savePlan(plan: TrainingPlan): ServiceResult<void> {
-    if (typeof window === 'undefined') {
-        return {
-            success: false,
-            error: { code: 'STORAGE_ERROR', message: 'Cannot access storage on server' },
-        };
-    }
-
-    try {
-        const stored = {
-            plan,
-            savedAt: new Date().toISOString(),
-            version: 1,
-        };
-        localStorage.setItem(STORAGE_KEYS.CURRENT_PLAN, JSON.stringify(stored));
-        return { success: true, data: undefined };
-    } catch (error) {
-        return {
-            success: false,
-            error: {
-                code: 'STORAGE_ERROR',
-                message: 'Failed to save plan',
-                details: { error },
-            },
-        };
-    }
-}
-
-/**
- * Load the current training plan from localStorage.
- */
-export function loadPlan(): ServiceResult<TrainingPlan> {
-    if (typeof window === 'undefined') {
-        return {
-            success: false,
-            error: { code: 'STORAGE_ERROR', message: 'Cannot access storage on server' },
-        };
-    }
-
-    try {
-        const stored = localStorage.getItem(STORAGE_KEYS.CURRENT_PLAN);
-        if (!stored) {
-            return {
-                success: false,
-                error: { code: 'PLAN_NOT_FOUND', message: 'No plan found in storage' },
-            };
-        }
-
-        const parsed = JSON.parse(stored);
-        return { success: true, data: parsed.plan as TrainingPlan };
-    } catch (error) {
-        return {
-            success: false,
-            error: {
-                code: 'STORAGE_ERROR',
-                message: 'Failed to load plan',
-                details: { error },
-            },
-        };
-    }
-}
-
-/**
- * Clear the current plan from storage.
- */
-export function clearPlan(): ServiceResult<void> {
-    if (typeof window === 'undefined') {
-        return {
-            success: false,
-            error: { code: 'STORAGE_ERROR', message: 'Cannot access storage on server' },
-        };
-    }
-
-    try {
-        localStorage.removeItem(STORAGE_KEYS.CURRENT_PLAN);
-        return { success: true, data: undefined };
-    } catch (error) {
-        return {
-            success: false,
-            error: {
-                code: 'STORAGE_ERROR',
-                message: 'Failed to clear plan',
-                details: { error },
-            },
-        };
-    }
-}
-
-/**
- * Check if a plan exists in storage.
- */
-export function hasPlan(): boolean {
-    if (typeof window === 'undefined') return false;
-    return localStorage.getItem(STORAGE_KEYS.CURRENT_PLAN) !== null;
-}
+// NOTE: Legacy localStorage-only functions removed in cleanup.
+// All persistence now handled by repository.ts (Supabase + localStorage hybrid).
 
 // =============================================================================
-// PLAN QUERY HELPERS
+// PLAN QUERY HELPERS (still used - not deprecated)
 // =============================================================================
 
 /**
@@ -319,9 +239,10 @@ export function getCurrentWeek(plan: TrainingPlan): number {
 }
 
 /**
- * Get today's workout from a plan.
+ * Get today's workout from a local plan object.
+ * For fetching from Supabase, use getTodaysWorkout (re-exported from repository).
  */
-export function getTodaysWorkout(plan: TrainingPlan): {
+export function getTodaysWorkoutFromPlan(plan: TrainingPlan): {
     week: number;
     day: number;
     workout: TrainingPlan['weeks'][0]['days'][0] | null;

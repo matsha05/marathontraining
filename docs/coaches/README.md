@@ -14,6 +14,7 @@ These documents serve as the authoritative reference for:
 
 - **Jack Daniels** - VDOT system, training zones (E/M/T/I/R), interval science
 - **Hansons** - Cumulative fatigue, 16-mile cap, 6-day structure
+- **Hal Higdon** - Novice-friendly plans, long-run progression, simplicity
 - **Stephen Seiler** - Polarized training, 80/20, interference effect
 - **Jay Dicharry** - Movement quality, durability, injury prevention
 - **Kelly Starrett** - Mobility, position, daily maintenance

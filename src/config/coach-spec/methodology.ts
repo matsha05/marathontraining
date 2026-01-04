@@ -46,6 +46,19 @@ export const COACHES: Record<string, Coach> = {
         website: 'https://hansons-running.com',
     },
 
+    higdon: {
+        id: 'higdon',
+        name: 'Hal Higdon',
+        title: 'Hal Higdon',
+        expertise: ['novice plans', 'long run progression', 'consistency', 'marathon training'],
+        protocol: 'Simplicity-First Marathon Plans',
+        keyConceptShort: 'Simplicity + consistency',
+        keyConceptFull: 'Long-run-centered plans, stepback weeks, conservative pacing, and clear weekly rhythm for beginners',
+        whatThisMeans: 'Higdon’s approach is built for adherence: a simple weekly rhythm, gradual long-run progression, and conservative pacing that keeps you healthy. We use it as a benchmark for novice-friendly structure and messaging, alongside our more technical systems.',
+        source: 'Hal Higdon Training Plans',
+        website: 'https://www.halhigdon.com',
+    },
+
     daniels: {
         id: 'daniels',
         name: 'Jack Daniels',
@@ -217,7 +230,7 @@ export const RESEARCH_SOURCES: ResearchSource[] = [
 export const METHODOLOGY_CATEGORIES = {
     running: {
         title: 'Running Science',
-        coaches: ['daniels', 'hansons', 'seiler', 'pfitzinger', 'fitzgerald', 'magness'],
+        coaches: ['daniels', 'hansons', 'higdon', 'seiler', 'pfitzinger', 'fitzgerald', 'magness'],
         description: 'Evidence-based pacing, periodization, and training structure',
     },
     strength: {

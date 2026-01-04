@@ -56,6 +56,28 @@ Higdon: Every 3rd week is a stepback (reduced mileage).
 
 **Our approach:** We use 4-week blocks (3 build + 1 deload), which aligns with Daniels. Slightly different rhythm, both valid.
 
+### 5. Conservative, Easy-First Pacing Rules
+Higdon emphasizes conversational effort for most runs and explicitly warns against racing long runs.
+
+**Notes from the sweep:**
+- Long runs are commonly prescribed **30–90 seconds slower** than goal race pace.
+- Pace guidance is intentionally simple and qualitative (effort-first).
+- Marathon plans add some pace work later, but still protect the long run.
+
+**What we lack:** We’re precise, but we don’t always translate it into “easy enough to talk” language that novices trust.
+
+**Fix:** Add effort-based copy alongside VDOT paces for novice plans.
+
+### 6. Distance-Specific Programming Clarity
+Higdon’s plans change meaningfully by distance and experience:
+- **5K/10K**: Shorter cycles (8 weeks), earlier speedwork in intermediate/advanced tiers.
+- **Half**: 12 weeks; longer aerobic progression and brief taper; two intermediate variants (endurance vs speed).
+- **Marathon**: 18 weeks; “long run ladder” to 20; stepbacks; explicit taper.
+- **50K**: 26 weeks; time-on-feet focus, no speedwork, walking breaks allowed.
+
+**What we lack:** This kind of “what changes by distance” story in our public explanations.
+
+**Fix:** Add a distance-comparison explainer in onboarding and docs.
 ---
 
 ## Where We're Ahead of Higdon
@@ -100,6 +122,8 @@ Higdon: Minimal mention of mobility work.
 | "3/1 Run" | Easy first 75%, faster last 25% | Add as advanced long run option |
 | Cross-training alternatives | Swim/bike on rest days | Better cross-training suggestions |
 | 30-week base plan | Novice Supreme | "Base building" add-on for deconditioned users |
+| Clear pace messaging | Conversational pace + 30–90s offsets | Effort cues alongside VDOT paces |
+| Distance explainers | 5K/10K/HM/Marathon differences | Public-facing distance comparison |
 
 ---
 
@@ -112,6 +136,42 @@ Higdon: Minimal mention of mobility work.
 **Are we credible?** Yes — our methodology is anchored to Daniels, Hansons, Seiler, and Pfitzinger, which are more rigorous than Higdon's approach.
 
 **Are we as helpful as Higdon?** Not yet for pure novices. His simplicity is a feature. We need a "novice mode" that matches his clarity while preserving our depth for advanced users.
+
+---
+
+## 2026-01-04 Sweep Additions (Source Summary)
+
+### Core Beliefs
+- Simplicity you can stick with
+- Consistency over hero workouts
+- Long run as backbone
+- Gradual progression with stepbacks
+- Rest and cross-training are core
+
+### Structure Patterns (Representative)
+- **Novice**: lower run frequency, more off/cross days, long run builds weekly
+- **Intermediate**: more run days, longer midweek runs, some pace work
+- **Advanced**: higher frequency + quality sessions, still long-run centered
+
+### Pace Guidance
+- Most running at conversational effort
+- Long runs intentionally slower than race pace
+- Pace runs / MP work appear at higher tiers
+
+### Distance-Specific Notes
+- **5K/10K**: short cycles (8 weeks) + speedwork emphasis as you advance
+- **Half**: 12 weeks + endurance focus with brief taper
+- **Marathon**: 18 weeks + 20-mile peak + taper
+- **50K**: 26 weeks, time-on-feet focus, no speedwork
+
+### Trademarks
+- “Novice 1” as default beginner plan
+- Stepback + taper rhythm
+- 3/1 long run finish (for experienced runners)
+
+### Uncertainties
+- Multiple plan variants exist; not every rule applies to every variant
+- Stepback emphasis is clearest in marathon/50K plans, less explicit for 5K/10K
 
 ---
 

@@ -587,19 +587,53 @@ function OnboardingContent() {
                 {step === 'generating' && (
                     <GeneratingScreen
                         onComplete={async () => {
-                            // Actually generate the plan here
+                            // Generate the plan
                             const result = createPlanFromOnboarding(data);
-                            if (result.success) {
-                                const saveResult = savePlan(result.data);
-                                if (saveResult.success) {
-                                    setPlanGenerated(true);
-                                    goToNext();
-                                } else {
-                                    setGenerationError('Failed to save your plan. Please try again.');
-                                    setStep('readiness-check');
-                                }
-                            } else {
+                            if (!result.success) {
                                 setGenerationError(result.error.message);
+                                setStep('readiness-check');
+                                return;
+                            }
+
+                            // Save athlete profile and goal race to Supabase
+                            try {
+                                const supabase = (await import('@/infrastructure/supabase')).createSupabaseBrowserClient();
+                                const { data: { user } } = await supabase.auth.getUser();
+
+                                if (user) {
+                                    // 1. Save athlete profile (name is required)
+                                    await supabase.from('athletes').upsert({
+                                        id: user.id,
+                                        name: data.name || 'Athlete', // Default if empty
+                                        age: data.age || null,
+                                        sex: data.sex || null,
+                                    }, { onConflict: 'id' });
+
+                                    // 2. Save goal race if we have race details
+                                    if (data.raceDate) {
+                                        const goalRaceId = `${user.id}-${data.raceDate}`;
+                                        await supabase.from('goal_races').upsert({
+                                            id: goalRaceId,
+                                            athlete_id: user.id,
+                                            race_name: data.raceName || `${data.trainingGoal?.toUpperCase() || 'Marathon'} Race`,
+                                            race_date: data.raceDate,
+                                            distance: data.trainingGoal || 'marathon',
+                                            is_active: true,
+                                        }, { onConflict: 'id' });
+                                    }
+                                }
+                            } catch (error) {
+                                console.warn('Failed to save athlete/goal data:', error);
+                                // Continue anyway - plan is more important
+                            }
+
+                            // 3. Save the training plan
+                            const saveResult = await savePlan(result.data);
+                            if (saveResult.success) {
+                                setPlanGenerated(true);
+                                goToNext();
+                            } else {
+                                setGenerationError('Failed to save your plan. Please try again.');
                                 setStep('readiness-check');
                             }
                         }}

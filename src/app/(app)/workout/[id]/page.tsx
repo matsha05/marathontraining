@@ -1,66 +1,101 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppHeader } from '@/components/ui/AppHeader';
 import { handleMissedWorkout, MissedWorkoutDecision } from '@/domain/plan-generator/missed-workout-handler';
+import { usePlan } from '@/domain/plan/context';
+import { useAuth } from '@/domain/auth/context';
+import { DayPlan, Workout, TrainingZone } from '@/domain/plan/types';
+import { WorkoutSkeleton } from '@/components/ui/Skeleton';
+import { formatPace, formatPaceRange, getPaceForZone, formatDuration } from '@/lib/format';
 
 /**
  * Workout Detail Page
- * 
+ *
+ * V2: Fetches real workout data from plan context
  * Shows the full workout prescription with pace targets,
  * clear structure, and one-tap logging.
  */
 
-// Mock data - would come from API
-const MOCK_WORKOUT = {
-    id: '1',
-    date: new Date(),
-    sessionType: 'tempo',
-    domain: 'running',
-    title: 'Tempo Run',
-    phase: 'BUILD',
-    weekNumber: 8,
+// formatPace, formatPaceRange, getPaceForZone imported from @/lib/format
 
-    prescription: {
-        warmup: {
-            distanceMiles: 2,
-            paceZone: 'E',
-            paceRange: '8:12 - 9:00',
-            duration: '~18 min',
-        },
-        mainSet: {
-            type: 'continuous',
-            distanceMiles: 5,
-            paceZone: 'T',
-            pace: '7:04',
-            duration: '~35 min',
-            description: 'Comfortably hard. You should be able to speak in short sentences.',
-        },
-        cooldown: {
-            distanceMiles: 1,
-            paceZone: 'E',
-            paceRange: '8:12 - 9:00',
-            duration: '~9 min',
-        },
-    },
+function getZonePace(
+    zone: TrainingZone,
+    paces: { easy: { min: number; max: number }; marathon: number; threshold: number; interval: number; repetition: number }
+): string {
+    return getPaceForZone(zone, paces);
+}
 
-    totalDistance: 8,
-    estimatedDuration: 62,
+function estimateDuration(distanceMiles: number, paceSecondsPerMile: number): string {
+    const totalSeconds = distanceMiles * paceSecondsPerMile;
+    const minutes = Math.round(totalSeconds / 60);
+    return `~${minutes} min`;
+}
 
-    coachNotes: 'Tempo runs build your lactate threshold. Focus on staying relaxed at T-pace—if you\'re straining, you\'re going too fast.',
+// =============================================================================
+// WORKOUT DETAIL PAGE
+// =============================================================================
 
-    strength: null,
-    durability: {
-        modules: ['hip_stability', 'core_stability'],
-        estimatedDuration: 25,
-    },
-};
-
-export default function WorkoutDetailPage({ params }: { params: { id: string } }) {
+export default function WorkoutDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const resolvedParams = use(params);
     const router = useRouter();
+    const { plan, currentWeek, currentWeekPlan, todayWorkout } = usePlan();
     const [showLogging, setShowLogging] = useState(false);
-    const workout = MOCK_WORKOUT;
+    const [workout, setWorkout] = useState<DayPlan | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    // Find the workout from the plan
+    useEffect(() => {
+        const findWorkout = () => {
+            if (!plan) {
+                setLoading(false);
+                return;
+            }
+
+            // Parse the workout ID
+            // Expected formats: "2026-01-15-run", "w8-d2-run", or just use today's workout
+            const idParts = resolvedParams.id.split('-');
+
+            // Try to find by date first
+            if (idParts.length >= 3 && !isNaN(parseInt(idParts[0]))) {
+                const dateStr = `${idParts[0]}-${idParts[1]}-${idParts[2]}`;
+                for (const week of plan.weeks) {
+                    const day = week.days.find(d => d.date === dateStr);
+                    if (day) {
+                        setWorkout(day);
+                        setLoading(false);
+                        return;
+                    }
+                }
+            }
+
+            // Try week-day format (w8-d2)
+            if (resolvedParams.id.startsWith('w')) {
+                const match = resolvedParams.id.match(/w(\d+)-d(\d+)/);
+                if (match) {
+                    const weekNum = parseInt(match[1]);
+                    const dayNum = parseInt(match[2]);
+                    const week = plan.weeks.find(w => w.weekNumber === weekNum);
+                    const day = week?.days.find(d => d.dayOfWeek === dayNum);
+                    if (day) {
+                        setWorkout(day);
+                        setLoading(false);
+                        return;
+                    }
+                }
+            }
+
+            // Fall back to today's workout
+            if (todayWorkout) {
+                setWorkout(todayWorkout);
+            }
+
+            setLoading(false);
+        };
+
+        findWorkout();
+    }, [plan, resolvedParams.id, todayWorkout]);
 
     const domainColors: Record<string, string> = {
         running: 'var(--color-running)',
@@ -74,11 +109,66 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
         durability: 'var(--domain-durability-tint)',
     };
 
+    // Loading state
+    if (loading) {
+        return (
+            <div className="min-h-screen landing-shell">
+                <AppHeader backHref="/dashboard" />
+                <main className="max-w-3xl mx-auto px-6 py-10">
+                    <div className="animate-pulse space-y-6">
+                        <div className="h-24 bg-[var(--bg-muted)] rounded-xl" />
+                        <div className="h-48 bg-[var(--bg-muted)] rounded-xl" />
+                        <div className="h-24 bg-[var(--bg-muted)] rounded-xl" />
+                    </div>
+                </main>
+            </div>
+        );
+    }
+
+    // No workout found
+    if (!workout || !workout.runWorkout) {
+        return (
+            <div className="min-h-screen landing-shell">
+                <AppHeader backHref="/dashboard" />
+                <main className="max-w-3xl mx-auto px-6 py-10">
+                    <div className="card p-10 text-center">
+                        <h2 className="text-heading-md mb-4">Rest Day</h2>
+                        <p className="text-body-sm text-[var(--text-muted)] mb-6">
+                            No workout scheduled. Enjoy your recovery!
+                        </p>
+                        <button
+                            onClick={() => router.push('/dashboard')}
+                            className="btn btn-secondary"
+                        >
+                            Back to Dashboard
+                        </button>
+                    </div>
+                </main>
+            </div>
+        );
+    }
+
+    const run = workout.runWorkout;
+    const paces = plan?.paces || {
+        easy: { min: 480, max: 540 },
+        marathon: 420,
+        threshold: 390,
+        interval: 360,
+        repetition: 330,
+    };
+
+    // Find phase and week info
+    const weekPlan = plan?.weeks.find(w =>
+        w.days.some(d => d.date === workout.date)
+    );
+    const phase = weekPlan?.phase?.toUpperCase() || 'BUILD';
+    const weekNumber = weekPlan?.weekNumber || currentWeek || 1;
+
     return (
         <div className="min-h-screen landing-shell">
             <AppHeader
                 backHref="/dashboard"
-                rightContent={<span className="text-label">{workout.phase} • Week {workout.weekNumber}</span>}
+                rightContent={<span className="text-label">{phase} • Week {weekNumber}</span>}
             />
 
             <main className="max-w-3xl mx-auto px-6 py-10">
@@ -89,23 +179,23 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
                             <div
                                 className="inline-block px-3 py-1 rounded-lg text-label mb-3"
                                 style={{
-                                    backgroundColor: domainTints[workout.domain],
-                                    color: domainColors[workout.domain]
+                                    backgroundColor: domainTints.running,
+                                    color: domainColors.running
                                 }}
                             >
-                                {workout.sessionType}
+                                {run.type.replace(/_/g, ' ')}
                             </div>
-                            <h1 className="text-display-md">{workout.title}</h1>
+                            <h1 className="text-display-md">{run.name}</h1>
                         </div>
 
                         <div className="text-right">
-                            <p className="text-heading-lg text-data">{workout.totalDistance}</p>
+                            <p className="text-heading-lg text-data">{run.totalDistance}</p>
                             <p className="text-caption text-[var(--text-muted)] uppercase">miles</p>
                         </div>
                     </div>
 
                     <p className="text-body-sm text-[var(--text-muted)]">
-                        ~{workout.estimatedDuration} min total
+                        ~{run.estimatedDuration} min total
                     </p>
                 </div>
 
@@ -114,106 +204,105 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
                     <h2 className="text-label mb-4">Workout Structure</h2>
 
                     <div className="space-y-3">
-                        {/* Warmup */}
-                        <div className="card p-5">
-                            <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-[var(--bg-muted)] flex items-center justify-center text-body-sm font-semibold">
-                                        1
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold">Warmup</p>
-                                        <p className="text-body-sm text-[var(--text-muted)]">{workout.prescription.warmup.distanceMiles} mi easy</p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <p className="font-mono font-semibold">{workout.prescription.warmup.paceRange}</p>
-                                    <p className="text-caption text-[var(--text-muted)]">{workout.prescription.warmup.duration}</p>
-                                </div>
-                            </div>
-                        </div>
+                        {run.segments.map((segment, index) => {
+                            const isMain = segment.type === 'main';
+                            const pace = segment.pace ? getZonePace(segment.pace, paces) : '';
+                            const avgPace = segment.pace === 'E'
+                                ? (paces.easy.min + paces.easy.max) / 2
+                                : segment.pace === 'T' ? paces.threshold
+                                    : segment.pace === 'I' ? paces.interval
+                                        : segment.pace === 'M' ? paces.marathon
+                                            : paces.easy.max;
+                            const duration = segment.distance
+                                ? estimateDuration(segment.distance, avgPace)
+                                : `~${segment.duration || 10} min`;
 
-                        {/* Main Set - Highlighted */}
-                        <div
-                            className="card p-5 border-l-4"
-                            style={{ borderLeftColor: domainColors.running }}
-                        >
-                            <div className="flex items-center justify-between mb-3">
-                                <div className="flex items-center gap-3">
-                                    <div
-                                        className="w-8 h-8 rounded-lg flex items-center justify-center text-body-sm font-bold"
-                                        style={{ backgroundColor: domainColors.running, color: '#04110b' }}
-                                    >
-                                        2
+                            return (
+                                <div
+                                    key={index}
+                                    className={`card p-5 ${isMain ? 'border-l-4' : ''}`}
+                                    style={isMain ? { borderLeftColor: domainColors.running } : {}}
+                                >
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div className="flex items-center gap-3">
+                                            <div
+                                                className={`w-8 h-8 rounded-lg flex items-center justify-center text-body-sm font-semibold ${isMain ? '' : 'bg-[var(--bg-muted)]'
+                                                    }`}
+                                                style={isMain ? { backgroundColor: domainColors.running, color: '#04110b' } : {}}
+                                            >
+                                                {index + 1}
+                                            </div>
+                                            <div>
+                                                <p className="font-semibold capitalize">{segment.type}</p>
+                                                <p className="text-body-sm text-[var(--text-muted)]">
+                                                    {segment.description || `${segment.distance || ''} mi`}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className={`font-mono font-semibold ${isMain ? 'text-heading-lg text-data' : ''}`}
+                                                style={isMain ? { color: domainColors.running } : {}}
+                                            >
+                                                {pace}{segment.pace !== 'E' ? '/mi' : ''}
+                                            </p>
+                                            <p className="text-caption text-[var(--text-muted)]">{duration}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="font-semibold">Main Set</p>
-                                        <p className="text-body-sm text-[var(--text-muted)]">{workout.prescription.mainSet.distanceMiles} mi @ T-pace</p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-heading-lg text-data" style={{ color: domainColors.running }}>
-                                        {workout.prescription.mainSet.pace}/mi
-                                    </p>
-                                    <p className="text-caption text-[var(--text-muted)]">{workout.prescription.mainSet.duration}</p>
-                                </div>
-                            </div>
 
-                            <p className="text-body-sm text-[var(--text-muted)] bg-[var(--bg-tertiary)] rounded-lg p-3">
-                                💡 {workout.prescription.mainSet.description}
-                            </p>
-                        </div>
-
-                        {/* Cooldown */}
-                        <div className="card p-5">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-[var(--bg-tertiary)] flex items-center justify-center text-body-sm font-semibold">
-                                        3
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold">Cooldown</p>
-                                        <p className="text-body-sm text-[var(--text-muted)]">{workout.prescription.cooldown.distanceMiles} mi easy</p>
-                                    </div>
+                                    {isMain && run.purpose && (
+                                        <p className="text-body-sm text-[var(--text-muted)] bg-[var(--bg-tertiary)] rounded-lg p-3">
+                                            💡 {run.purpose}
+                                        </p>
+                                    )}
                                 </div>
-                                <div className="text-right">
-                                    <p className="font-mono font-semibold">{workout.prescription.cooldown.paceRange}</p>
-                                    <p className="text-caption text-[var(--text-muted)]">{workout.prescription.cooldown.duration}</p>
-                                </div>
-                            </div>
-                        </div>
+                            );
+                        })}
                     </div>
                 </section>
 
                 {/* Coach Notes */}
-                {workout.coachNotes && (
+                {run.notes && (
                     <section className="mb-8">
                         <h2 className="text-label mb-4">Coach Notes</h2>
                         <div className="card p-5 bg-[var(--bg-muted)]">
-                            <p className="text-body-sm text-[var(--text-muted)] italic">"{workout.coachNotes}"</p>
-                            <p className="text-caption mt-3">— Based on Daniels' Running Formula</p>
+                            <p className="text-body-sm text-[var(--text-muted)] italic">"{run.notes}"</p>
+                            <p className="text-caption mt-3">— Based on {run.coachSource}</p>
                         </div>
                     </section>
                 )}
 
-                {/* Durability Work */}
-                {workout.durability && (
+                {/* Strength Work */}
+                {workout.strengthWorkout && (
                     <section className="mb-8">
-                        <h2 className="text-label mb-4">Post-Run Durability</h2>
+                        <h2 className="text-label mb-4">Strength Training</h2>
                         <div
                             className="card p-5 border-l-4"
-                            style={{ borderLeftColor: domainColors.durability }}
+                            style={{ borderLeftColor: domainColors.strength }}
                         >
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between mb-4">
                                 <div>
-                                    <p className="font-semibold">Movement Work</p>
+                                    <p className="font-semibold">{workout.strengthWorkout.name}</p>
                                     <p className="text-body-sm text-[var(--text-muted)]">
-                                        Hip Stability + Core Stability circuits
+                                        {workout.strengthWorkout.focus.join(' + ')}
                                     </p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="font-semibold">{workout.durability.estimatedDuration} min</p>
+                                    <p className="font-semibold">{workout.strengthWorkout.duration} min</p>
                                 </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                {workout.strengthWorkout.exercises.slice(0, 4).map((ex, i) => (
+                                    <div key={i} className="flex justify-between text-body-sm">
+                                        <span>{ex.name}</span>
+                                        <span className="text-[var(--text-muted)]">{ex.sets}×{ex.reps}</span>
+                                    </div>
+                                ))}
+                                {workout.strengthWorkout.exercises.length > 4 && (
+                                    <p className="text-caption text-[var(--text-muted)]">
+                                        + {workout.strengthWorkout.exercises.length - 4} more exercises
+                                    </p>
+                                )}
                             </div>
                         </div>
                     </section>
@@ -235,7 +324,8 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
                 <WorkoutLoggingModal
                     workout={workout}
                     onClose={() => setShowLogging(false)}
-                    onComplete={() => {
+                    onComplete={async () => {
+                        // TODO: Save completed workout to Supabase
                         setShowLogging(false);
                         router.push('/dashboard');
                     }}
@@ -247,7 +337,7 @@ export default function WorkoutDetailPage({ params }: { params: { id: string } }
 
 /**
  * Workout Logging Modal
- * 
+ *
  * Simple, coach-rooted logging:
  * 1. Did you complete it?
  * 2. How did it feel? (1-5 scale with meaning)
@@ -258,13 +348,14 @@ function WorkoutLoggingModal({
     onClose,
     onComplete
 }: {
-    workout: typeof MOCK_WORKOUT;
+    workout: DayPlan;
     onClose: () => void;
     onComplete: () => void;
 }) {
     const [completed, setCompleted] = useState<'full' | 'partial' | 'skipped' | null>(null);
     const [feelRating, setFeelRating] = useState<number | null>(null);
     const [notes, setNotes] = useState('');
+    const [saving, setSaving] = useState(false);
 
     // Coach-rooted feel scale
     const feelOptions = [
@@ -275,10 +366,55 @@ function WorkoutLoggingModal({
         { value: 5, label: 'Crushing', emoji: '🔥', description: 'Could\'ve done more' },
     ];
 
-    const handleSubmit = () => {
-        // TODO: Save to database
-        console.log({ completed, feelRating, notes });
-        onComplete();
+    const handleSubmit = async () => {
+        setSaving(true);
+        try {
+            const { createSupabaseBrowserClient } = await import('@/infrastructure/supabase');
+            const supabase = createSupabaseBrowserClient();
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (user) {
+                // Find the planned_workout_id by looking up the workout for this date
+                let plannedWorkoutId: string | null = null;
+
+                // Try to find the planned workout
+                const { data: plannedWorkout } = await supabase
+                    .from('planned_workouts')
+                    .select('id')
+                    .eq('athlete_id', user.id)
+                    .eq('scheduled_date', workout.date)
+                    .single();
+
+                if (plannedWorkout) {
+                    plannedWorkoutId = plannedWorkout.id;
+
+                    // Also update the planned workout status
+                    await supabase
+                        .from('planned_workouts')
+                        .update({ status: completed === 'full' ? 'completed' : completed === 'partial' ? 'partial' : 'skipped' })
+                        .eq('id', plannedWorkoutId);
+                }
+
+                // Save to completed_workouts table
+                await supabase.from('completed_workouts').insert({
+                    athlete_id: user.id,
+                    completed_date: workout.date,
+                    planned_workout_id: plannedWorkoutId,
+                    actual_session: JSON.parse(JSON.stringify({
+                        completed,
+                        feelRating,
+                        notes,
+                        runWorkout: workout.runWorkout,
+                        strengthWorkout: workout.strengthWorkout,
+                    })),
+                });
+            }
+
+            onComplete();
+        } catch (error) {
+            console.error('Failed to log workout:', error);
+            onComplete(); // Still close modal
+        }
     };
 
     return (
@@ -299,74 +435,64 @@ function WorkoutLoggingModal({
                         </button>
                     </div>
 
-                    {/* Completion Status */}
+                    {/* Step 1: Completion */}
                     <div className="mb-6">
                         <p className="text-label mb-3">Did you complete it?</p>
                         <div className="grid grid-cols-3 gap-2">
                             {[
-                                { value: 'full', label: 'Yes', icon: '✓' },
-                                { value: 'partial', label: 'Partial', icon: '½' },
-                                { value: 'skipped', label: 'Skipped', icon: '✗' },
-                            ].map((opt) => (
+                                { value: 'full', label: 'Full', emoji: '✅' },
+                                { value: 'partial', label: 'Partial', emoji: '🔶' },
+                                { value: 'skipped', label: 'Skipped', emoji: '⏭️' },
+                            ].map((option) => (
                                 <button
-                                    key={opt.value}
-                                    onClick={() => setCompleted(opt.value as any)}
-                                    className={`p-4 rounded-xl text-center transition-all ${completed === opt.value
-                                        ? opt.value === 'full'
-                                            ? 'bg-[var(--color-accent)] text-black'
-                                            : opt.value === 'partial'
-                                                ? 'bg-[var(--color-warning)] text-black'
-                                                : 'bg-[var(--color-error)]/10 text-[var(--color-error)] border border-[var(--color-error)]'
-                                        : 'bg-[var(--bg-tertiary)]'
+                                    key={option.value}
+                                    onClick={() => setCompleted(option.value as typeof completed)}
+                                    className={`p-4 rounded-xl border transition-all ${completed === option.value
+                                        ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/10'
+                                        : 'border-[var(--border-base)]'
                                         }`}
                                 >
-                                    <span className="text-2xl block mb-1">{opt.icon}</span>
-                                    <span className="text-body-sm font-medium">{opt.label}</span>
+                                    <span className="text-2xl block mb-1">{option.emoji}</span>
+                                    <span className="text-body-sm">{option.label}</span>
                                 </button>
                             ))}
                         </div>
                     </div>
 
-                    {/* Feel Rating - Only show if completed or partial */}
-                    {(completed === 'full' || completed === 'partial') && (
-                        <div className="mb-6 animate-fade-in">
+                    {/* Step 2: Feel Rating */}
+                    {completed && completed !== 'skipped' && (
+                        <div className="mb-6">
                             <p className="text-label mb-3">How did it feel?</p>
-                            <p className="text-caption mb-3">
-                                This helps calibrate your training load over time
-                            </p>
-
                             <div className="space-y-2">
-                                {feelOptions.map((opt) => (
+                                {feelOptions.map((option) => (
                                     <button
-                                        key={opt.value}
-                                        onClick={() => setFeelRating(opt.value)}
-                                    className={`w-full p-3 rounded-xl text-left flex items-center gap-3 transition-all ${feelRating === opt.value
-                                            ? 'bg-[var(--color-accent)] text-black'
-                                            : 'bg-[var(--bg-tertiary)] hover:bg-[var(--bg-base)]'
+                                        key={option.value}
+                                        onClick={() => setFeelRating(option.value)}
+                                        className={`w-full p-4 rounded-xl border text-left transition-all flex items-center gap-4 ${feelRating === option.value
+                                            ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/10'
+                                            : 'border-[var(--border-base)]'
                                             }`}
-                                >
-                                    <span className="text-2xl">{opt.emoji}</span>
-                                    <div className="flex-1">
-                                        <p className="font-semibold">{opt.label}</p>
-                                        <p className={`text-caption ${feelRating === opt.value ? 'text-black/70' : 'text-[var(--text-muted)]'}`}>
-                                            {opt.description}
-                                        </p>
-                                    </div>
-                                </button>
+                                    >
+                                        <span className="text-2xl">{option.emoji}</span>
+                                        <div>
+                                            <p className="font-semibold">{option.label}</p>
+                                            <p className="text-body-sm text-[var(--text-muted)]">{option.description}</p>
+                                        </div>
+                                    </button>
                                 ))}
                             </div>
                         </div>
                     )}
 
-                    {/* Notes */}
+                    {/* Step 3: Notes */}
                     {completed && (
-                        <div className="mb-6 animate-fade-in">
+                        <div className="mb-6">
                             <p className="text-label mb-3">Notes (optional)</p>
                             <textarea
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
-                                placeholder="Anything notable? Weather, how legs felt, etc."
-                                className="input h-20 resize-none py-3"
+                                placeholder="How your body felt, weather conditions, etc..."
+                                className="input w-full min-h-[100px] resize-none"
                             />
                         </div>
                     )}
@@ -374,10 +500,10 @@ function WorkoutLoggingModal({
                     {/* Submit */}
                     <button
                         onClick={handleSubmit}
-                        disabled={!completed || (completed !== 'skipped' && !feelRating)}
-                        className="btn btn-primary btn-lg w-full disabled:opacity-40"
+                        disabled={!completed || saving}
+                        className="btn btn-primary w-full"
                     >
-                        Save Workout
+                        {saving ? 'Saving...' : 'Save'}
                     </button>
                 </div>
             </div>

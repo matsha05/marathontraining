@@ -218,6 +218,108 @@ vdot_update:
     block_further_bumps_until: "4 weeks OR new race"
 ```
 
+### 3.6 VDOT Calibration for Beginners (Oracle Research)
+
+Athletic beginners (CrossFit converts, etc.) often have high VO2max but poor running economy. Their lab/Garmin VO2max overestimates running performance.
+
+```yaml
+vdot_calibration:
+  # Three distinct VDOT types
+  vdot_types:
+    seedVDOT: "Initial estimate from VO2max, Garmin, or Strava"
+    rVDOT: "Race VDOT - validated by actual race performance"
+    tVDOT: "Training VDOT - what we use for daily paces"
+  
+  # Relationship: tVDOT <= rVDOT <= seedVDOT always
+  
+  # Experience-based multipliers (running_experience_months)
+  experience_multipliers:
+    months_0_6: 0.80    # New runners
+    months_6_12: 0.85
+    months_12_24: 0.90
+    months_24_plus: 1.00
+  
+  # Volume-based penalty (current_weekly_volume_minutes)
+  volume_multipliers:
+    under_90: 0.85      # Very low volume
+    90_to_180: 0.92
+    180_to_300: 0.97
+    over_300: 1.00
+  
+  # CrossFit convert gap rule
+  crossfit_convert_rule:
+    if_strength_background: "advanced"
+    and_running_experience_months: "< 12"
+    then:
+      apply_additional_penalty: 0.05  # Extra 5% reduction
+      reason: "High power but poor running economy"
+  
+  # tVDOT calculation
+  training_vdot_formula:
+    tVDOT = seedVDOT * experience_multiplier * volume_multiplier
+    tVDOT = tVDOT - crossfit_penalty_if_applicable
+    tVDOT = max(tVDOT, seedVDOT * 0.70)  # Floor at 70% of seed
+```
+
+### 3.7 VDOT Estimation Methods (Accuracy Ranking)
+
+```yaml
+vdot_estimation_accuracy:
+  tier_1_gold:
+    - "Race result (5K-half marathon, maximal effort)"
+    - "Time trial (controlled conditions, maximal effort)"
+  
+  tier_2_silver:
+    - "Workout data (consistent threshold/interval times)"
+    - "Strava Relative Effort trends (trained users)"
+  
+  tier_3_bronze:
+    - "Garmin VO2max (running-derived)"
+    - "WHOOP Cardiovascular Score"
+  
+  tier_4_noisy:
+    - "Lab VO2max test"  # No running economy factor
+    - "Garmin VO2max from non-running"
+    - "Self-reported"
+```
+
+### 3.8 Auto-Calibration Algorithm
+
+```yaml
+auto_calibration:
+  principle: "Fast downward corrections, slow upward updates"
+  
+  # Failure signals (adjust down immediately)
+  failure_signals:
+    rep_3_failure:
+      trigger: "Cannot complete rep 3+ of interval set at prescribed pace"
+      action: "tVDOT -= 1 to 2"
+    
+    talk_test_failure:
+      trigger: "Cannot hold conversation during easy runs"
+      action: "Widen easy pace range by 10-15 sec/mile on slow end"
+    
+    hr_mismatch:
+      trigger: "Easy run HR consistently > VT1 threshold"
+      action: "tVDOT -= 1"
+  
+  # Success signals (adjust up slowly)
+  success_signals:
+    consistent_threshold:
+      trigger: "4+ weeks of threshold work at prescribed pace without struggle"
+      action: "tVDOT += 0.5"
+      frequency: "max every 4 weeks"
+    
+    race_validation:
+      trigger: "Race result implies higher VDOT"
+      action: "Update rVDOT, then tVDOT = min(rVDOT, tVDOT + 1)"
+  
+  # Convergence
+  convergence_rule:
+    over_months: 6
+    target: "tVDOT approaches rVDOT as running economy develops"
+```
+
 ---
 
 ## 4. Weekly Structure Engine
@@ -317,11 +419,38 @@ quality_weights_by_distance:
     race_pace: 0.55
     strides: 0.05
     
-  ultra:
+  # Ultra distances - emphasis shifts to hills + volume + fueling
+  ultra_50k:
+    vo2: 0.00
+    threshold: 0.20       # T-lite, controlled
+    hills: 0.35           # Uphill tempo, grade work
+    volume: 0.40          # Time-on-feet
+    strides: 0.05
+    quality_minutes_cap_pct: 0.18
+    
+  ultra_50m:
     vo2: 0.00
     threshold: 0.15
-    race_pace: 0.05
-    volume: 0.80
+    hills: 0.40
+    volume: 0.40
+    strides: 0.05
+    quality_minutes_cap_pct: 0.15
+    
+  ultra_100k:
+    vo2: 0.00
+    threshold: 0.10
+    hills: 0.35
+    volume: 0.50
+    strides: 0.05
+    quality_minutes_cap_pct: 0.12
+    
+  ultra_100m:
+    vo2: 0.00
+    threshold: 0.05
+    hills: 0.30
+    volume: 0.60
+    strides: 0.05
+    quality_minutes_cap_pct: 0.10
 ```
 
 ### 5.2 Hard Quality Sessions Per Week
@@ -537,6 +666,215 @@ alternating_pattern:
     typical: "~10 miles when LONG is 16"
   
   peak_long_runs_count: 3  # Only 3 runs hit 16 miles
+```
+
+---
+
+### 7.4 Ultra Engine Configuration (Oracle Research)
+
+```yaml
+ultra_engine:
+
+  # 1) Volume unit selection
+  volume_units:
+    if_terrain_in: ["trail","mountain"]
+      primary_unit: "minutes"   # Time-based for trail
+    if_terrain_eq: "road"
+      primary_unit: "miles"
+    long_run_always_time_based: true
+
+  # 2) Long run caps (hours) by race and terrain
+  long_run_caps_hours_by_race:
+    ultra_50k:
+      road:    [2.5, 3.5]
+      trail:   [3.0, 4.0]
+      mountain:[3.0, 4.0]
+    ultra_50m:
+      road:    [3.0, 4.0]
+      trail:   [4.0, 5.0]
+      mountain:[4.0, 5.5]
+    ultra_100k:
+      road:    [3.5, 4.5]
+      trail:   [4.0, 5.5]
+      mountain:[4.5, 6.0]
+    ultra_100m:
+      road:    [4.0, 5.5]
+      trail:   [5.0, 6.0]
+      mountain:[5.0, 7.0]
+
+  # 3) Weekend total caps (B2B weeks)
+  long_weekend_total_caps_hours:
+    ultra_50k:  [4.0, 6.0]
+    ultra_50m:  [6.0, 8.0]
+    ultra_100k: [7.0, 10.0]
+    ultra_100m: [8.0, 12.0]
+
+  # 4) Percent-of-week safety rails
+  weekend_percent_of_weekly_time_max:
+    ultra_50k: 0.50
+    ultra_50m: 0.55
+    ultra_100k: 0.55
+    ultra_100m: 0.60
+  single_long_run_percent_of_weekly_time_max:
+    ultra_50k: 0.40
+    ultra_50m: 0.38
+    ultra_100k: 0.35
+    ultra_100m: 0.33
+```
+
+### 7.5 Back-to-Back (B2B) Rules
+
+```yaml
+b2b_rules:
+  enabled_for: ["ultra_50m","ultra_100k","ultra_100m"]
+  optional_for: ["ultra_50k"]   # Only if mountain or slow finish
+  
+  ratio_defaults:
+    ultra_50k:  [0.65, 0.35]    # Day1 / Day2
+    ultra_50m:  [0.60, 0.40]
+    ultra_100k: [0.60, 0.40]
+    ultra_100m: [0.55, 0.45]
+  
+  second_day_reduction_rule: "day2 = 0.50 to 0.75 * day1"
+  
+  frequency:
+    BASE:  "every_3_weeks"
+    BUILD: "every_2_weeks"
+    PEAK:
+      ultra_50m:  "every_2_weeks"
+      ultra_100k: "every_2_weeks"
+      ultra_100m: "every_1_to_2_weeks"
+  
+  gates_to_introduce:
+    require_injury_status: "green"
+    require_no_amber_last_days: 14
+    require_long_run_minutes_gte:
+      ultra_50k:  135
+      ultra_50m:  150
+      ultra_100k: 165
+      ultra_100m: 180
+    require_weekly_minutes_gte:
+      ultra_50k:  300
+      ultra_50m:  360
+      ultra_100k: 420
+      ultra_100m: 450
+  
+  progression_guardrail:
+    duration_spike_max_percent: 10
+    duration_spike_max_minutes: 30
+    use_strictest: true
+```
+
+### 7.6 Vertical Training Targets
+
+```yaml
+vertical_training:
+  mode:
+    if_goal_race_vertical_gain_present: "vert_gain"
+    else: "uphill_minutes"
+  
+  uphill_minutes_targets_by_phase:
+    ultra_50k:
+      BASE:  [20, 45]
+      BUILD: [40, 75]
+      PEAK:  [60, 120]
+    ultra_50m:
+      BASE:  [30, 60]
+      BUILD: [60, 120]
+      PEAK:  [90, 180]
+    ultra_100k:
+      BASE:  [40, 75]
+      BUILD: [75, 150]
+      PEAK:  [120, 240]
+    ultra_100m:
+      BASE:  [45, 90]
+      BUILD: [90, 180]
+      PEAK:  [150, 300]
+  
+  weekly_peak_vert_ranges_ft:
+    ultra_50k:  [4000, 8000]
+    ultra_50m:  [6000, 12000]
+    ultra_100k: [8000, 16000]
+    ultra_100m: [10000, 20000]
+  
+  phase_multipliers:
+    BASE: 0.50
+    BUILD: 0.75
+    PEAK: 1.00
+    TAPER: "reduce with volume, keep 1 hill exposure"
+  
+  downhill_exposure:
+    target_as_fraction_of_uphill: [0.6, 1.0]
+    if_downhill_access_low: "use_eccentric_strength_module"
+```
+
+### 7.7 Fueling Skill Progression
+
+```yaml
+fueling_training:
+  start_practice_if_session_minutes_gte: 90
+  
+  carb_targets_g_per_hour_by_phase:
+    BASE:  [30, 60]
+    BUILD: [60, 75]
+    PEAK:  [75, 90]
+  
+  distance_targets_g_per_hour:
+    ultra_50k:  [60, 75]
+    ultra_50m:  [75, 90]
+    ultra_100k: [75, 90]
+    ultra_100m: [75, 90]
+  
+  gut_training_ramp:
+    start: 45
+    increase_per_period: 10
+    period_days: [7, 14]
+    regress_if_gi_issues_2x_in_14d: true
+    regress_amount: -10
+    regress_hold_days: 14
+  
+  hydration:
+    fluid_ml_per_hour: [400, 800]
+    sodium_mg_per_hour: [300, 600]
+    salty_sweater_sodium_max: 900
+  
+  long_run_requires_fueling_if_minutes_gte: 120
+```
+
+### 7.8 Night Running & Walking Skills (100K/100M)
+
+```yaml
+night_training:
+  enabled_for: ["ultra_100k","ultra_100m"]
+  sessions_total:
+    ultra_100k: [1, 2]
+    ultra_100m: [2, 4]
+  schedule_weeks_out: [14, 4]
+  session_duration_minutes: [45, 120]
+  rules:
+    - "no_night_session_within_7d_of_b2b"
+    - "night_sessions_are_zone_1_only"
+    - "next_day_is_easy_or_rest"
+  preferred_type:
+    - "finish_long_run_in_dark"
+    - "easy_night_run_with_headlamp"
+  max_overnight_simulations: 1
+
+walking_skill:
+  enable_if:
+    - goal_race.distance_in: ["ultra_100k","ultra_100m"]
+    - goal_race.terrain == "mountain"
+  power_hike_trigger_grade_degrees: 15
+  micro_walks:
+    protocol: "30-45 sec walk every 20-30 min for fueling"
+    enable_if_run_minutes_gte: 120
+  structured_run_walk:
+    ultra_100k_flat: "run 25 / walk 5"
+    ultra_100m_flat: "run 20 / walk 5 (early), run 15 / walk 5 (late)"
+    climbs: "power hike early and often"
+  power_hike_training:
+    weekly_session_in_build: "6-10 x 3 min power hike uphill, easy down"
+    long_run_hike_blocks: "10 min every 45-60 min"
 ```
 
 ---
@@ -969,34 +1307,130 @@ movement_classification:
       unless: "very light and controlled"
 ```
 
-### 8.5.3 Interference Guardrails
+### 8.5.3 Movement Interference Matrix (Oracle Research)
 
 ```yaml
-wod_guardrails:
-  cap_hard_sessions:
-    if_marathon_week_includes: ["tempo", "interval", "long_run"]
-    then:
-      WOD_THRESHOLD_MACHINE_max: 1
-      WOD_GLYCOLYTIC_METCON_max: 0
-      WOD_STRENGTH_LOW_VOL_max: 2
-      
-  protect_long_run:
-    no_high_eccentric_lower_body_within_hours: [36, 48]
-    high_eccentric_movements:
-      - high_rep_squats
-      - lunges
-      - wall_balls
-      - thrusters
-      - box_jumps
-      - burpees
-      
-  separate_intensity:
-    no_WOD_THRESHOLD_within_hours_of_RUN_INTERVAL: 24
-    exception: "advanced athletes deliberately stacking hard days"
-    
-  doms_minimization:
-    prioritize_concentric_dominant_when: "mileage_high"
-    preferred: ["sled_push", "sled_pull", "bike_erg", "ski_erg", "rowing"]
+# Green movements (fatigue 1-3): Best ROI during high mileage
+green_movements:
+  bike_erg: { doms_peak_h: [8,24], quality_run_normal_h: [6,12], leg_fatigue: 1 }
+  ski_erg: { doms_peak_h: [8,24], quality_run_normal_h: [6,12], leg_fatigue: 1 }
+  assault_bike: { doms_peak_h: [8,24], quality_run_normal_h: [8,16], leg_fatigue: 2 }
+  row_erg: { doms_peak_h: [12,24], quality_run_normal_h: [12,24], leg_fatigue: 2 }
+  sled_push: { doms_peak_h: [12,24], quality_run_normal_h: [12,24], leg_fatigue: 2 }
+  sled_pull: { doms_peak_h: [12,24], quality_run_normal_h: [12,24], leg_fatigue: 2 }
+  farmer_carry: { doms_peak_h: [12,24], quality_run_normal_h: [12,24], leg_fatigue: 2 }
+  suitcase_carry: { doms_peak_h: [12,24], quality_run_normal_h: [12,24], leg_fatigue: 2 }
+  sandbag_carry: { doms_peak_h: [12,24], quality_run_normal_h: [12,24], leg_fatigue: 3 }
+
+# Yellow movements (fatigue 4-7): Dose matters
+yellow_movements:
+  hip_thrust: { leg_fatigue: 4 }
+  hang_power_clean: { leg_fatigue: 4 }
+  goblet_squat: { leg_fatigue: 5 }
+  kettlebell_swing: { leg_fatigue: 5 }
+  power_clean: { leg_fatigue: 5 }
+  front_squat: { leg_fatigue: 5 }
+  deadlift: { leg_fatigue: 5 }
+  back_squat: { doms_peak_h: [24,48], quality_run_normal_h: [24,48], leg_fatigue: 6 }
+  calf_raise_heavy: { quality_run_normal_h: [48,72], leg_fatigue: 6 }
+  box_jump_low_rep: { quality_run_normal_h: [48,72], leg_fatigue: 7 }
+  double_unders: { quality_run_normal_h: [48,72], leg_fatigue: 7 }
+
+# Red movements (fatigue 8-10): Avoid BUILD/PEAK
+red_movements:
+  box_step_up: { quality_run_normal_h: [60,96], leg_fatigue: 7 }
+  burpee_high_rep: { quality_run_normal_h: [48,96], leg_fatigue: 8 }
+  single_leg_rdl: { quality_run_normal_h: [72,120], leg_fatigue: 8 }
+  romanian_deadlift: { quality_run_normal_h: [60,96], leg_fatigue: 8 }
+  bulgarian_split_squat: { quality_run_normal_h: [96,144], leg_fatigue: 8 }
+  reverse_lunge: { quality_run_normal_h: [72,120], leg_fatigue: 8 }
+  pistol_squat: { quality_run_normal_h: [72,120], leg_fatigue: 8 }
+  bounds: { quality_run_normal_h: [72,120], leg_fatigue: 9 }
+  box_jump_high_rep: { quality_run_normal_h: [72,120], leg_fatigue: 9 }
+  nordic_curl: { quality_run_normal_h: [96,144], leg_fatigue: 9 }
+  walking_lunge: { quality_run_normal_h: [96,144], leg_fatigue: 9 }
+  wall_ball: { quality_run_normal_h: [72,120], leg_fatigue: 9 }
+  thruster: { quality_run_normal_h: [72,120], leg_fatigue: 9 }
+  jump_lunge: { quality_run_normal_h: [96,144], leg_fatigue: 10 }
+  depth_jump: { quality_run_normal_h: [96,144], leg_fatigue: 10 }
+```
+
+### 8.5.3b Hard Scheduling Rules
+
+```yaml
+protect_long_run:
+  do_not_schedule_within_72h:
+    - depth_jump
+    - jump_lunge
+    - box_jump_high_rep
+    - walking_lunge
+    - bulgarian_split_squat
+    - nordic_curl
+    - wall_ball
+    - thruster  # unless microdosed
+  
+  do_not_schedule_within_48h:
+    - romanian_deadlift
+    - single_leg_rdl
+    - box_step_up
+    - burpee_high_rep
+    - double_unders  # calf/Achilles risk
+  
+  do_not_schedule_within_24h:
+    - heavy_back_squat
+    - heavy_front_squat
+    - heavy_deadlift
+
+protect_intervals_tempo:
+  within_48h: "no movement with leg_fatigue >= 8"
+  within_24h: "no movement with leg_fatigue 6-7"
+
+same_day_doubles:
+  if_run_is_quality: "run first, strength second"
+  preferred_separation_hours: 6
+  if_under_6h: "green movements only OR microdose strength"
+
+dose_multipliers:
+  microdose: 0.50   # Ex: depth jumps 3x4 with full rest
+  normal: 1.00
+  high: 1.30        # Ex: high-rep box jumps for-time
+
+exposure_multipliers:
+  last_exposure_lte_7d: 0.85   # Repeated bout protection
+  last_exposure_8_21d: 1.00
+  last_exposure_gt_21d: 1.20   # DOMS risk increased
+```
+
+### 8.5.3c WOD Selection Algorithm
+
+```yaml
+wod_selection:
+  # Phase hard filters
+  BASE:
+    allow: all
+    cap_glycolytic_frequency: true
+  BUILD:
+    disallow: WOD_GLYCOLYTIC_METCON
+    limit_WOD_THRESHOLD_MACHINE: 1_per_week
+  PEAK:
+    allow_only: [WOD_STRENGTH_LOW_VOL, WOD_ALACTIC_POWER]
+    conditioning_is_flush_only: true
+  TAPER:
+    allow_only: taper_safe_neural
+    zero_doms_risk: true
+  
+  # Scoring function for candidate selection
+  scoring:
+    base: 100
+    penalties:
+      lower_eccentric_rating: -10_per_point
+      impact_rating: -10_per_point
+      glycolytic_rating: -8_per_point
+    bonuses:
+      pattern_not_hit_in_72h: +5
+      phase_appropriate: +10
+  
+  selection: argmax(score)
 ```
 
 ### 8.5.4 Weekly WOD Templates by Phase

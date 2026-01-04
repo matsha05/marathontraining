@@ -1,31 +1,195 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { AppHeader } from '@/components/ui/AppHeader';
+import { usePlan } from '@/domain/plan/context';
+import { TrainingPlan, WeekPlan, TrainingPhase } from '@/domain/plan/types';
 
 /**
  * Training Plan View
- * 
- * Uses standardized components and design tokens
+ *
+ * V2: Wired to real plan data from usePlan() hook
+ * No more mock data!
  */
 
-const MOCK_PHASES = [
-    { name: 'Base 1', weeks: '1-3', status: 'completed' },
-    { name: 'Base 2', weeks: '4-6', status: 'completed' },
-    { name: 'Build', weeks: '7-10', status: 'current' },
-    { name: 'Peak', weeks: '11-12', status: 'upcoming' },
-    { name: 'Taper', weeks: '13-14', status: 'upcoming' },
-];
+// =============================================================================
+// TYPES
+// =============================================================================
 
-const MOCK_WEEKS = [
-    { number: 7, mileage: 42, quality: 3, phase: 'Build', isCurrent: false },
-    { number: 8, mileage: 45, quality: 3, phase: 'Build', isCurrent: true },
-    { number: 9, mileage: 40, quality: 2, phase: 'Build', cutback: true },
-    { number: 10, mileage: 48, quality: 3, phase: 'Build' },
-];
+interface PhaseDisplay {
+    name: string;
+    weeks: string;
+    status: 'completed' | 'current' | 'upcoming';
+}
+
+interface WeekDisplay {
+    number: number;
+    mileage: number;
+    quality: number;
+    phase: string;
+    isCurrent: boolean;
+    cutback?: boolean;
+}
+
+// =============================================================================
+// HELPER FUNCTIONS
+// =============================================================================
+
+function formatPhaseDisplay(plan: TrainingPlan, currentWeekNum: number): PhaseDisplay[] {
+    if (!plan.phases || plan.phases.length === 0) {
+        // Generate phases from weeks if not available
+        const phaseMap = new Map<TrainingPhase, { start: number; end: number }>();
+
+        for (const week of plan.weeks) {
+            const existing = phaseMap.get(week.phase);
+            if (existing) {
+                existing.end = week.weekNumber;
+            } else {
+                phaseMap.set(week.phase, { start: week.weekNumber, end: week.weekNumber });
+            }
+        }
+
+        return Array.from(phaseMap.entries()).map(([phase, range]) => {
+            const status: PhaseDisplay['status'] =
+                currentWeekNum > range.end ? 'completed' :
+                    currentWeekNum >= range.start && currentWeekNum <= range.end ? 'current' :
+                        'upcoming';
+
+            const phaseNames: Record<TrainingPhase, string> = {
+                base: 'Base',
+                build: 'Build',
+                peak: 'Peak',
+                taper: 'Taper',
+            };
+
+            return {
+                name: phaseNames[phase] || phase,
+                weeks: range.start === range.end
+                    ? `${range.start}`
+                    : `${range.start}-${range.end}`,
+                status,
+            };
+        });
+    }
+
+    return plan.phases.map(phase => {
+        const status: PhaseDisplay['status'] =
+            currentWeekNum > phase.endWeek ? 'completed' :
+                currentWeekNum >= phase.startWeek && currentWeekNum <= phase.endWeek ? 'current' :
+                    'upcoming';
+
+        const phaseNames: Record<TrainingPhase, string> = {
+            base: 'Base',
+            build: 'Build',
+            peak: 'Peak',
+            taper: 'Taper',
+        };
+
+        return {
+            name: phaseNames[phase.phase] || phase.phase,
+            weeks: phase.startWeek === phase.endWeek
+                ? `${phase.startWeek}`
+                : `${phase.startWeek}-${phase.endWeek}`,
+            status,
+        };
+    });
+}
+
+function formatWeekDisplay(weeks: WeekPlan[], currentWeekNum: number): WeekDisplay[] {
+    // Show a window of weeks around current (±3)
+    const startWeek = Math.max(1, currentWeekNum - 2);
+    const endWeek = Math.min(weeks.length, currentWeekNum + 5);
+
+    return weeks
+        .filter(w => w.weekNumber >= startWeek && w.weekNumber <= endWeek)
+        .map(week => ({
+            number: week.weekNumber,
+            mileage: Math.round(week.totalMiles),
+            quality: week.keyWorkouts,
+            phase: week.phase.charAt(0).toUpperCase() + week.phase.slice(1),
+            isCurrent: week.weekNumber === currentWeekNum,
+            cutback: week.isRecoveryWeek,
+        }));
+}
+
+function getWeeksUntilRace(raceDate: string | undefined): number | null {
+    if (!raceDate) return null;
+    const today = new Date();
+    const race = new Date(raceDate);
+    const diffMs = race.getTime() - today.getTime();
+    return Math.ceil(diffMs / (1000 * 60 * 60 * 24 * 7));
+}
+
+// =============================================================================
+// PLAN PAGE
+// =============================================================================
 
 export default function PlanPage() {
-    const [selectedWeek, setSelectedWeek] = useState(8);
+    const router = useRouter();
+    const { status, plan, currentWeek } = usePlan();
+    const [selectedWeek, setSelectedWeek] = useState<number | null>(null);
+
+    // Compute derived data
+    const phases = useMemo(() => {
+        if (!plan) return [];
+        return formatPhaseDisplay(plan, currentWeek || 1);
+    }, [plan, currentWeek]);
+
+    const weeks = useMemo(() => {
+        if (!plan) return [];
+        return formatWeekDisplay(plan.weeks, currentWeek || 1);
+    }, [plan, currentWeek]);
+
+    const weeksUntilRace = plan?.raceDate ? getWeeksUntilRace(plan.raceDate) : null;
+
+    // Set initial selected week
+    if (selectedWeek === null && currentWeek) {
+        setSelectedWeek(currentWeek);
+    }
+
+    // Loading state
+    if (status === 'loading') {
+        return (
+            <div className="min-h-screen landing-shell">
+                <AppHeader backHref="/dashboard" title="Training Plan" />
+                <main className="container-page py-10">
+                    <div className="animate-pulse space-y-6">
+                        <div className="h-20 bg-[var(--bg-muted)] rounded-xl" />
+                        <div className="h-60 bg-[var(--bg-muted)] rounded-xl" />
+                        <div className="h-40 bg-[var(--bg-muted)] rounded-xl" />
+                    </div>
+                </main>
+            </div>
+        );
+    }
+
+    // No plan state
+    if (!plan) {
+        return (
+            <div className="min-h-screen landing-shell">
+                <AppHeader backHref="/dashboard" title="Training Plan" />
+                <main className="container-page py-10">
+                    <div className="card p-10 text-center">
+                        <h2 className="text-heading-md mb-4">No Training Plan</h2>
+                        <p className="text-body-sm text-[var(--text-muted)] mb-6">
+                            Complete onboarding to generate your personalized training plan.
+                        </p>
+                        <Link href="/onboarding" className="btn btn-gradient">
+                            Get Started
+                        </Link>
+                    </div>
+                </main>
+            </div>
+        );
+    }
+
+    // Calculate plan stats
+    const totalQualitySessions = plan.weeks.reduce((sum, w) => sum + w.keyWorkouts, 0);
+    const totalStrengthSessions = plan.weeks.reduce((sum, w) =>
+        sum + w.days.filter(d => d.strengthWorkout).length, 0
+    );
 
     return (
         <div className="min-h-screen landing-shell">
@@ -34,9 +198,17 @@ export default function PlanPage() {
                 title="Training Plan"
                 rightContent={
                     <div className="flex items-center gap-2">
-                        <span className="text-label">Chicago Marathon</span>
-                        <span className="text-[var(--text-subtle)]">•</span>
-                        <span className="text-body-sm text-[var(--color-accent)]">8 weeks away</span>
+                        <span className="text-label">
+                            {plan.raceName || `${plan.goalDistance.toUpperCase()} Training`}
+                        </span>
+                        {weeksUntilRace !== null && weeksUntilRace > 0 && (
+                            <>
+                                <span className="text-[var(--text-subtle)]">•</span>
+                                <span className="text-body-sm text-[var(--color-accent)]">
+                                    {weeksUntilRace} weeks away
+                                </span>
+                            </>
+                        )}
                     </div>
                 }
             />
@@ -46,20 +218,20 @@ export default function PlanPage() {
                 <section className="mb-10">
                     <h2 className="text-heading-md mb-4">Training Phases</h2>
 
-                    <div className="flex gap-2">
-                        {MOCK_PHASES.map((phase) => (
+                    <div className="flex gap-2 overflow-x-auto pb-2">
+                        {phases.map((phase) => (
                             <div
                                 key={phase.name}
-                                className={`flex-1 p-4 rounded-xl border transition-all ${phase.status === 'current'
-                                        ? 'bg-[var(--color-accent)] text-black border-transparent'
-                                        : phase.status === 'completed'
-                                            ? 'bg-[var(--bg-muted)] border-transparent opacity-60'
-                                            : 'bg-[var(--bg-elevated)] border-[var(--border-base)]'
+                                className={`flex-1 min-w-[100px] p-4 rounded-xl border transition-all ${phase.status === 'current'
+                                    ? 'bg-[var(--color-accent)] text-black border-transparent'
+                                    : phase.status === 'completed'
+                                        ? 'bg-[var(--bg-muted)] border-transparent opacity-60'
+                                        : 'bg-[var(--bg-elevated)] border-[var(--border-base)]'
                                     }`}
                             >
                                 <p className="font-semibold">{phase.name}</p>
                                 <p className={`text-body-sm ${phase.status === 'current' ? 'text-black/70' : 'text-[var(--text-muted)]'}`}>
-                                    Weeks {phase.weeks}
+                                    {phase.weeks.includes('-') ? `Weeks ${phase.weeks}` : `Week ${phase.weeks}`}
                                 </p>
                             </div>
                         ))}
@@ -71,11 +243,15 @@ export default function PlanPage() {
                     <h2 className="text-heading-md mb-4">Weekly Plan</h2>
 
                     <div className="space-y-3">
-                        {MOCK_WEEKS.map((week) => (
-                            <div
+                        {weeks.map((week) => (
+                            <Link
                                 key={week.number}
-                                onClick={() => setSelectedWeek(week.number)}
-                                className={`card p-5 cursor-pointer transition-all ${selectedWeek === week.number ? 'border-[var(--color-accent)]' : ''
+                                href={`/plan/week/${week.number}`}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setSelectedWeek(week.number);
+                                }}
+                                className={`card p-5 block cursor-pointer transition-all ${selectedWeek === week.number ? 'border-[var(--color-accent)]' : ''
                                     } ${week.isCurrent ? 'ring-2 ring-[var(--color-accent)] ring-offset-2 ring-offset-[var(--bg-base)]' : ''}`}
                             >
                                 <div className="flex items-center justify-between">
@@ -107,7 +283,7 @@ export default function PlanPage() {
                                         </svg>
                                     </div>
                                 </div>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 </section>
@@ -117,18 +293,26 @@ export default function PlanPage() {
                     <h2 className="text-heading-md mb-4">Plan Overview</h2>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {[
-                            { value: '14', label: 'Weeks', sub: 'Total plan length' },
-                            { value: '48', label: 'Peak Mi', sub: 'Highest week' },
-                            { value: '42', label: 'Quality', sub: 'Total sessions' },
-                            { value: '28', label: 'Strength', sub: 'Total sessions' },
-                        ].map((stat) => (
-                            <div key={stat.label} className="card p-5">
-                                <p className="text-display-md text-data mb-1">{stat.value}</p>
-                                <p className="text-label mb-1">{stat.label}</p>
-                                <p className="text-caption text-[var(--text-muted)]">{stat.sub}</p>
-                            </div>
-                        ))}
+                        <div className="card p-5">
+                            <p className="text-display-md text-data mb-1">{plan.totalWeeks}</p>
+                            <p className="text-label mb-1">Weeks</p>
+                            <p className="text-caption text-[var(--text-muted)]">Total plan length</p>
+                        </div>
+                        <div className="card p-5">
+                            <p className="text-display-md text-data mb-1">{plan.peakMileage}</p>
+                            <p className="text-label mb-1">Peak Mi</p>
+                            <p className="text-caption text-[var(--text-muted)]">Week {plan.peakWeek}</p>
+                        </div>
+                        <div className="card p-5">
+                            <p className="text-display-md text-data mb-1">{totalQualitySessions}</p>
+                            <p className="text-label mb-1">Quality</p>
+                            <p className="text-caption text-[var(--text-muted)]">Total sessions</p>
+                        </div>
+                        <div className="card p-5">
+                            <p className="text-display-md text-data mb-1">{totalStrengthSessions}</p>
+                            <p className="text-label mb-1">Strength</p>
+                            <p className="text-caption text-[var(--text-muted)]">Total sessions</p>
+                        </div>
                     </div>
                 </section>
             </main>

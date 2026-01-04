@@ -5,16 +5,38 @@ import { useRouter } from 'next/navigation';
 import { AppHeader } from '@/components/ui/AppHeader';
 import { Toggle } from '@/components/ui/Toggle';
 import { createSupabaseBrowserClient } from '@/infrastructure/supabase';
+import { usePlan } from '@/domain/plan/context';
 
 /**
  * Settings Page
- * 
- * Uses standardized components and design tokens
+ *
+ * V2: Fetches real profile data from Supabase
  */
+
+// Profile state type
+interface ProfileData {
+    name: string;
+    email: string;
+    weight: number | null;
+    age: number | null;
+}
 
 export default function SettingsPage() {
     const router = useRouter();
+    const { plan } = usePlan();
     const [darkMode, setDarkMode] = useState(true);
+
+    // Profile state
+    const [profile, setProfile] = useState<ProfileData>({
+        name: '',
+        email: '',
+        weight: null,
+        age: null,
+    });
+    const [profileLoading, setProfileLoading] = useState(true);
+    const [profileSaving, setProfileSaving] = useState(false);
+    const [profileMessage, setProfileMessage] = useState<string | null>(null);
+
     const [garminStatus, setGarminStatus] = useState<{
         connected: boolean;
         garminUserId?: string | null;
@@ -40,6 +62,85 @@ export default function SettingsPage() {
     const hasHealthData = Boolean(garminStatus?.lastHealthDate);
     const setupComplete = stravaConnected && hasHealthData;
     const [signOutBusy, setSignOutBusy] = useState(false);
+
+    // Current VDOT from plan
+    const currentVdot = plan?.vdot || null;
+
+    // Fetch profile data on mount
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const supabase = createSupabaseBrowserClient();
+                const { data: { user } } = await supabase.auth.getUser();
+
+                if (!user) {
+                    setProfileLoading(false);
+                    return;
+                }
+
+                // Get email from auth
+                const email = user.email || '';
+
+                // Try to get athlete data
+                const { data: athlete } = await supabase
+                    .from('athletes')
+                    .select('name, age')
+                    .eq('id', user.id)
+                    .single();
+
+                setProfile({
+                    name: athlete?.name || user.user_metadata?.name || email.split('@')[0] || '',
+                    email,
+                    weight: null, // Could add to athletes table if needed
+                    age: athlete?.age || null,
+                });
+            } catch (error) {
+                console.warn('Failed to load profile:', error);
+            } finally {
+                setProfileLoading(false);
+            }
+        };
+
+        fetchProfile();
+    }, []);
+
+    // Save profile changes
+    const handleSaveProfile = async () => {
+        setProfileSaving(true);
+        setProfileMessage(null);
+
+        try {
+            const supabase = createSupabaseBrowserClient();
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (!user) {
+                setProfileMessage('Not signed in');
+                return;
+            }
+
+            // Update athlete record
+            const { error } = await supabase
+                .from('athletes')
+                .upsert({
+                    id: user.id,
+                    name: profile.name,
+                    age: profile.age,
+                }, { onConflict: 'id' });
+
+            if (error) {
+                setProfileMessage('Failed to save profile');
+                console.error('Profile save error:', error);
+            } else {
+                setProfileMessage('Profile saved!');
+                setTimeout(() => setProfileMessage(null), 3000);
+            }
+        } catch (error) {
+            setProfileMessage('Failed to save profile');
+            console.error('Profile save error:', error);
+        } finally {
+            setProfileSaving(false);
+        }
+    };
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
@@ -233,25 +334,77 @@ export default function SettingsPage() {
                 {/* Profile */}
                 <section className="mb-10">
                     <h2 className="text-heading-md mb-4">Profile</h2>
-                    <div className="card p-6 space-y-8">
-                        <div>
-                            <label className="text-label block mb-2">Name</label>
-                            <input type="text" defaultValue="Matt" className="input" />
-                        </div>
-                        <div>
-                            <label className="text-label block mb-2">Email</label>
-                            <input type="email" defaultValue="matt@example.com" className="input" />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="text-label block mb-2">Weight (kg)</label>
-                                <input type="number" defaultValue="75" className="input" />
+                    <div className="card p-6 space-y-6">
+                        {profileLoading ? (
+                            <div className="animate-pulse space-y-4">
+                                <div className="h-10 bg-[var(--bg-muted)] rounded-lg" />
+                                <div className="h-10 bg-[var(--bg-muted)] rounded-lg" />
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="h-10 bg-[var(--bg-muted)] rounded-lg" />
+                                    <div className="h-10 bg-[var(--bg-muted)] rounded-lg" />
+                                </div>
                             </div>
-                            <div>
-                                <label className="text-label block mb-2">Age</label>
-                                <input type="number" defaultValue="35" className="input" />
-                            </div>
-                        </div>
+                        ) : (
+                            <>
+                                <div>
+                                    <label className="text-label block mb-2">Name</label>
+                                    <input
+                                        type="text"
+                                        value={profile.name}
+                                        onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                                        className="input"
+                                        placeholder="Your name"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-label block mb-2">Email</label>
+                                    <input
+                                        type="email"
+                                        value={profile.email}
+                                        disabled
+                                        className="input opacity-60"
+                                    />
+                                    <p className="text-caption text-[var(--text-muted)] mt-1">Email cannot be changed here</p>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-label block mb-2">Weight (kg)</label>
+                                        <input
+                                            type="number"
+                                            value={profile.weight || ''}
+                                            onChange={(e) => setProfile({ ...profile, weight: e.target.value ? Number(e.target.value) : null })}
+                                            className="input"
+                                            placeholder="—"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-label block mb-2">Age</label>
+                                        <input
+                                            type="number"
+                                            value={profile.age || ''}
+                                            onChange={(e) => setProfile({ ...profile, age: e.target.value ? Number(e.target.value) : null })}
+                                            className="input"
+                                            placeholder="—"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="pt-2">
+                                    <button
+                                        onClick={handleSaveProfile}
+                                        disabled={profileSaving}
+                                        className="btn btn-secondary w-full"
+                                    >
+                                        {profileSaving ? 'Saving...' : 'Save Profile'}
+                                    </button>
+                                    {profileMessage && (
+                                        <p className={`text-body-sm mt-2 text-center ${profileMessage.includes('saved') ? 'text-[var(--color-accent)]' : 'text-[var(--color-error)]'}`}>
+                                            {profileMessage}
+                                        </p>
+                                    )}
+                                </div>
+                            </>
+                        )}
                     </div>
                 </section>
 
@@ -265,7 +418,9 @@ export default function SettingsPage() {
                                 <p className="text-body-sm text-[var(--text-muted)]">Update every 4-6 weeks or after a race.</p>
                                 <p className="text-body-sm text-[var(--text-muted)]">Recalibrating rebuilds your plan with new paces.</p>
                             </div>
-                            <p className="text-display-md text-data text-[var(--color-accent)]">48</p>
+                            <p className="text-display-md text-data text-[var(--color-accent)]">
+                                {currentVdot || '—'}
+                            </p>
                         </div>
 
                         <button
@@ -340,22 +495,22 @@ export default function SettingsPage() {
                                                 Last activity sync: {new Date(stravaStatus.lastActivityAt).toLocaleString()}
                                             </p>
                                         )}
-                                            <p className="text-caption">
-                                                Missing runs? Use “Sync now” to pull the last 90 days from Strava.
+                                        <p className="text-caption">
+                                            Missing runs? Use “Sync now” to pull the last 90 days from Strava.
+                                        </p>
+                                        {isLocalhost && (
+                                            <p className="text-caption text-[var(--text-muted)]">
+                                                Strava OAuth only works on the production domain. Open the production site to connect.
                                             </p>
-                                            {isLocalhost && (
-                                                <p className="text-caption text-[var(--text-muted)]">
-                                                    Strava OAuth only works on the production domain. Open the production site to connect.
-                                                </p>
-                                            )}
-                                            <div className="flex flex-wrap gap-3">
-                                                <button
-                                                    className="btn btn-primary"
-                                                    onClick={handleStravaConnect}
-                                                    disabled={stravaBusy || authRequired || stravaConnected || isLocalhost}
-                                                >
-                                                    Connect Strava
-                                                </button>
+                                        )}
+                                        <div className="flex flex-wrap gap-3">
+                                            <button
+                                                className="btn btn-primary"
+                                                onClick={handleStravaConnect}
+                                                disabled={stravaBusy || authRequired || stravaConnected || isLocalhost}
+                                            >
+                                                Connect Strava
+                                            </button>
                                             <button
                                                 className="btn btn-secondary"
                                                 onClick={handleStravaSyncNow}

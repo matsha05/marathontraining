@@ -2,13 +2,15 @@
 
 /**
  * THE LONG GAME - Plan Context Provider
- * 
+ *
  * React Context for global plan state management.
  * Provides:
  * - Current plan access across components
  * - Loading/error states
  * - Plan creation and refresh actions
- * - Automatic persistence sync
+ * - Automatic persistence sync (Supabase + localStorage)
+ *
+ * V2: Updated to use async Supabase repository
  */
 
 import {
@@ -26,7 +28,7 @@ import {
     clearPlan,
     createPlanFromOnboarding,
     getCurrentWeek,
-    getTodaysWorkout,
+    getTodaysWorkoutFromPlan,
     getUpcomingKeyWorkouts,
     PlanServiceError,
 } from '@/domain/plan/service';
@@ -59,12 +61,12 @@ export interface PlanActions {
     /**
      * Reload the plan from storage.
      */
-    refreshPlan: () => void;
+    refreshPlan: () => Promise<void>;
 
     /**
      * Clear the current plan.
      */
-    deletePlan: () => void;
+    deletePlan: () => Promise<void>;
 
     /**
      * Check if user has a plan.
@@ -112,7 +114,7 @@ export function PlanProvider({ children }: PlanProviderProps) {
         }
 
         const week = getCurrentWeek(planData);
-        const { workout } = getTodaysWorkout(planData);
+        const { workout } = getTodaysWorkoutFromPlan(planData);
         const weekPlan = planData.weeks[week - 1] || null;
 
         setCurrentWeek(week);
@@ -125,21 +127,36 @@ export function PlanProvider({ children }: PlanProviderProps) {
     // ==========================================================================
 
     useEffect(() => {
-        setStatus('loading');
+        let cancelled = false;
 
-        const result = loadPlan();
+        const loadPlanAsync = async () => {
+            setStatus('loading');
 
-        if (result.success) {
-            setPlan(result.data);
-            computeDerivedState(result.data);
-            setStatus('ready');
-        } else if (result.error.code === 'PLAN_NOT_FOUND') {
-            // Not an error, just no plan yet
-            setStatus('idle');
-        } else {
-            setError(result.error);
-            setStatus('error');
-        }
+            const result = await loadPlan();
+
+            if (cancelled) return;
+
+            if (result.success && result.data) {
+                setPlan(result.data);
+                computeDerivedState(result.data);
+                setStatus('ready');
+            } else if (result.success && !result.data) {
+                // No plan found
+                setStatus('idle');
+            } else if (!result.success) {
+                setError({
+                    code: result.error.code as PlanServiceError['code'],
+                    message: result.error.message,
+                });
+                setStatus('error');
+            }
+        };
+
+        loadPlanAsync();
+
+        return () => {
+            cancelled = true;
+        };
     }, [computeDerivedState]);
 
     // ==========================================================================
@@ -159,8 +176,8 @@ export function PlanProvider({ children }: PlanProviderProps) {
             setPlan(result.data);
             computeDerivedState(result.data);
 
-            // Persist
-            const saveResult = savePlan(result.data);
+            // Persist (async - don't block)
+            const saveResult = await savePlan(result.data);
             if (!saveResult.success) {
                 console.warn('Failed to persist plan:', saveResult.error);
             }
@@ -174,12 +191,12 @@ export function PlanProvider({ children }: PlanProviderProps) {
         }
     }, [computeDerivedState]);
 
-    const refreshPlanAction = useCallback(() => {
+    const refreshPlanAction = useCallback(async () => {
         setStatus('loading');
 
-        const result = loadPlan();
+        const result = await loadPlan();
 
-        if (result.success) {
+        if (result.success && result.data) {
             setPlan(result.data);
             computeDerivedState(result.data);
             setStatus('ready');
@@ -188,8 +205,8 @@ export function PlanProvider({ children }: PlanProviderProps) {
         }
     }, [computeDerivedState]);
 
-    const deletePlanAction = useCallback(() => {
-        clearPlan();
+    const deletePlanAction = useCallback(async () => {
+        await clearPlan();
         setPlan(null);
         computeDerivedState(null);
         setStatus('idle');
