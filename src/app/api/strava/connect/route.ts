@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { buildAuthorizationUrl, generateState } from '@/infrastructure/strava/oauth';
+import { buildAuthorizationUrl, generateState, withStateContext } from '@/infrastructure/strava/oauth';
 import { saveStravaOauthState } from '@/infrastructure/strava/store';
 import { resolveAthleteId } from '@/infrastructure/garmin/auth';
 import { stravaConfig } from '@/infrastructure/strava/config';
+import { getSafeRedirectPath } from '@/lib/redirects';
 
 export const runtime = 'nodejs';
 
@@ -13,17 +14,22 @@ export async function GET(request: NextRequest) {
         return redirectToLogin(request);
     }
 
-    if (!stravaConfig.clientId || !stravaConfig.clientSecret || !stravaConfig.redirectUri) {
+    if (!stravaConfig.clientId || !stravaConfig.clientSecret) {
         return redirectToError(request, 'missing_config');
     }
 
     try {
-        const state = generateState();
+        const url = new URL(request.url);
+        const from = url.searchParams.get('from');
+        const fallbackReturn = from === 'settings' ? '/settings' : '/onboarding';
+        const returnPath = getSafeRedirectPath(url.searchParams.get('next'), fallbackReturn);
+        const state = withStateContext(generateState(), { from, next: returnPath });
         const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
 
         await saveStravaOauthState(state, athleteId, expiresAt);
 
-        const authUrl = buildAuthorizationUrl(state);
+        const redirectUri = resolveRedirectUri(request);
+        const authUrl = buildAuthorizationUrl(state, redirectUri);
         return NextResponse.redirect(authUrl);
     } catch (error) {
         return redirectToError(request, error instanceof Error && /missing/i.test(error.message) ? 'missing_config' : 'connect_failed');
@@ -31,20 +37,12 @@ export async function GET(request: NextRequest) {
 }
 
 function redirectToLogin(request: NextRequest) {
-    const nextPath = getSafeNextPath(request, '/onboarding');
-    const loginUrl = new URL('/login', request.url);
+    const url = new URL(request.url);
+    const selfPath = `${url.pathname}${url.search}`;
+    const nextPath = getSafeRedirectPath(selfPath, '/onboarding', { allowApi: true, blockedPrefixes: [] });
+    const loginUrl = new URL('/auth', request.url);
     loginUrl.searchParams.set('next', nextPath);
     return NextResponse.redirect(loginUrl);
-}
-
-function getSafeNextPath(request: NextRequest, fallback: string) {
-    const { searchParams, pathname, search } = new URL(request.url);
-    const explicitNext = searchParams.get('next');
-    if (explicitNext && explicitNext.startsWith('/')) {
-        return explicitNext;
-    }
-    const selfPath = `${pathname}${search}`;
-    return selfPath || fallback;
 }
 
 function redirectToError(request: NextRequest, code: 'missing_config' | 'connect_failed') {
@@ -55,4 +53,19 @@ function redirectToError(request: NextRequest, code: 'missing_config' | 'connect
     redirectUrl.searchParams.set('connect', 'strava');
     redirectUrl.searchParams.set('error', code);
     return NextResponse.redirect(redirectUrl);
+}
+
+function resolveRedirectUri(request: NextRequest) {
+    const { hostname, origin } = request.nextUrl;
+    if (isLocalhost(hostname)) {
+        return `${origin}/api/strava/callback`;
+    }
+    if (stravaConfig.redirectUri) {
+        return stravaConfig.redirectUri;
+    }
+    return `${origin}/api/strava/callback`;
+}
+
+function isLocalhost(hostname: string) {
+    return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0' || hostname.endsWith('.local');
 }

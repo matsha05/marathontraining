@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import type { Database } from '@/infrastructure/supabase/types';
+import { getSafeRedirectPath } from '@/lib/redirects';
 
 export const runtime = 'nodejs';
 
@@ -9,22 +10,23 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const code = searchParams.get('code');
     const error = searchParams.get('error');
+    const errorDescription = searchParams.get('error_description');
     const nextParam = searchParams.get('next');
-    const nextPath = nextParam && nextParam.startsWith('/') ? nextParam : '/dashboard';
+    const nextPath = getSafeRedirectPath(nextParam, '/dashboard', { allowApi: true });
 
     if (error) {
-        return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(error)}`, request.url));
+        return redirectToAuth(request, errorDescription ?? error, nextPath);
     }
 
     if (!code) {
-        return NextResponse.redirect(new URL('/login', request.url));
+        return redirectToAuth(request, 'missing_code', nextPath);
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
     if (!supabaseUrl || !supabaseAnonKey) {
-        return NextResponse.redirect(new URL('/login?error=missing_supabase_env', request.url));
+        return redirectToAuth(request, 'missing_supabase_env', nextPath);
     }
 
     const cookieStore = await cookies();
@@ -45,8 +47,17 @@ export async function GET(request: NextRequest) {
 
     const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
     if (exchangeError) {
-        return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(exchangeError.message)}`, request.url));
+        return redirectToAuth(request, exchangeError.message, nextPath);
     }
 
     return NextResponse.redirect(new URL(nextPath, request.url));
+}
+
+function redirectToAuth(request: NextRequest, errorMessage: string, nextPath: string) {
+    const url = new URL('/auth', request.url);
+    url.searchParams.set('error', errorMessage);
+    if (nextPath) {
+        url.searchParams.set('next', nextPath);
+    }
+    return NextResponse.redirect(url);
 }

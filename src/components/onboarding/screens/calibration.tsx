@@ -286,6 +286,7 @@ export function DeviceImportScreen({
     onBack,
     connectError,
 }: DeviceImportScreenProps) {
+    const [isLocalhost, setIsLocalhost] = useState(false);
     const [garminStatus, setGarminStatus] = useState<{
         lastHealthDate?: string | null;
     }>({});
@@ -297,6 +298,14 @@ export function DeviceImportScreen({
     const [authRequired, setAuthRequired] = useState(false);
     const [importBusy, setImportBusy] = useState(false);
     const [importMessage, setImportMessage] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const host = window.location.hostname;
+            const local = host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || host.endsWith('.local');
+            setIsLocalhost(local);
+        }
+    }, []);
 
     const refreshStatus = useCallback(async () => {
         setStatusLoading(true);
@@ -368,8 +377,9 @@ export function DeviceImportScreen({
     const stravaLast = formatDate(stravaStatus.lastActivityAt);
     const connectState = authRequired ? 'auth' : statusLoading ? 'loading' : 'ready';
     const connectDisabled = connectState !== 'ready';
+    const stravaConnectDisabled = connectDisabled || stravaStatus.connected || isLocalhost;
     const handleSignIn = () => {
-        window.location.href = '/login?next=/onboarding';
+        window.location.href = '/auth?next=/onboarding';
     };
 
     const handleGarminExportImport = async (file: File) => {
@@ -455,12 +465,17 @@ export function DeviceImportScreen({
                     <p className="text-caption mt-2">
                         Garmin Connect → Settings → Connected Apps → Strava.
                     </p>
+                    {isLocalhost && (
+                        <p className="text-caption mt-2 text-[var(--text-muted)]">
+                            Strava OAuth only works on the production domain. Open the production site to connect.
+                        </p>
+                    )}
                     <div className="mt-3 flex flex-wrap gap-3">
                         <button
                             type="button"
                             className="btn btn-primary"
                             onClick={onStravaConnect}
-                            disabled={connectDisabled || stravaStatus.connected}
+                            disabled={stravaConnectDisabled}
                         >
                             Connect Strava
                         </button>

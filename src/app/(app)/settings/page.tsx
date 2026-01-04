@@ -34,6 +34,7 @@ export default function SettingsPage() {
     const [stravaMessage, setStravaMessage] = useState<string | null>(null);
     const [garminAuthRequired, setGarminAuthRequired] = useState(false);
     const [stravaAuthRequired, setStravaAuthRequired] = useState(false);
+    const [isLocalhost, setIsLocalhost] = useState(false);
     const authRequired = garminAuthRequired || stravaAuthRequired;
     const stravaConnected = Boolean(stravaStatus?.connected);
     const hasHealthData = Boolean(garminStatus?.lastHealthDate);
@@ -45,6 +46,8 @@ export default function SettingsPage() {
         const connect = params.get('connect');
         const error = params.get('error');
         const status = params.get('status');
+        const host = window.location.hostname;
+        setIsLocalhost(host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || host.endsWith('.local'));
         if (connect && error) {
             const message = formatConnectError(connect, error);
             if (connect === 'strava') {
@@ -187,7 +190,7 @@ export default function SettingsPage() {
         try {
             const supabase = createSupabaseBrowserClient();
             await supabase.auth.signOut();
-            router.push('/login');
+            router.push('/auth');
         } catch (error) {
             setGarminMessage(error instanceof Error ? error.message : 'Sign out failed');
         } finally {
@@ -337,17 +340,22 @@ export default function SettingsPage() {
                                                 Last activity sync: {new Date(stravaStatus.lastActivityAt).toLocaleString()}
                                             </p>
                                         )}
-                                        <p className="text-caption">
-                                            Missing runs? Use “Sync now” to pull the last 90 days from Strava.
-                                        </p>
-                                        <div className="flex flex-wrap gap-3">
-                                            <button
-                                                className="btn btn-primary"
-                                                onClick={handleStravaConnect}
-                                                disabled={stravaBusy || authRequired || stravaConnected}
-                                            >
-                                                Connect Strava
-                                            </button>
+                                            <p className="text-caption">
+                                                Missing runs? Use “Sync now” to pull the last 90 days from Strava.
+                                            </p>
+                                            {isLocalhost && (
+                                                <p className="text-caption text-[var(--text-muted)]">
+                                                    Strava OAuth only works on the production domain. Open the production site to connect.
+                                                </p>
+                                            )}
+                                            <div className="flex flex-wrap gap-3">
+                                                <button
+                                                    className="btn btn-primary"
+                                                    onClick={handleStravaConnect}
+                                                    disabled={stravaBusy || authRequired || stravaConnected || isLocalhost}
+                                                >
+                                                    Connect Strava
+                                                </button>
                                             <button
                                                 className="btn btn-secondary"
                                                 onClick={handleStravaSyncNow}

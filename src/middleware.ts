@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import { getSafeRedirectPath } from '@/lib/redirects';
 
 const protectedPaths = ['/dashboard', '/plan', '/settings', '/workout'];
 
@@ -35,25 +36,24 @@ export async function middleware(request: NextRequest) {
 
     const pathname = request.nextUrl.pathname;
     const isProtected = protectedPaths.some(path => pathname.startsWith(path));
-    const isAuthRoute = pathname === '/login' || pathname === '/signup';
+    const isAuthRoute = pathname === '/auth' || pathname === '/login' || pathname === '/signup';
 
     if (!user && isProtected) {
         const redirectUrl = request.nextUrl.clone();
-        redirectUrl.pathname = '/login';
-        redirectUrl.searchParams.set('next', pathname);
+        redirectUrl.pathname = '/auth';
+        redirectUrl.searchParams.set('next', `${pathname}${request.nextUrl.search}`);
         return NextResponse.redirect(redirectUrl);
     }
 
     if (user && isAuthRoute) {
-        const redirectUrl = request.nextUrl.clone();
-        redirectUrl.pathname = '/dashboard';
-        redirectUrl.searchParams.delete('next');
-        return NextResponse.redirect(redirectUrl);
+        const nextParam = request.nextUrl.searchParams.get('next');
+        const safeNext = getSafeRedirectPath(nextParam, '/dashboard', { allowApi: true });
+        return NextResponse.redirect(new URL(safeNext, request.url));
     }
 
     return response;
 }
 
 export const config = {
-    matcher: ['/dashboard/:path*', '/plan/:path*', '/settings/:path*', '/workout/:path*', '/login', '/signup'],
+    matcher: ['/dashboard/:path*', '/plan/:path*', '/settings/:path*', '/workout/:path*', '/auth', '/login', '/signup'],
 };

@@ -5,12 +5,24 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createSupabaseBrowserClient } from '@/infrastructure/supabase';
+import { getSafeRedirectPath } from '@/lib/redirects';
+import { hasPlan } from '@/domain/plan/service';
+
+const OTP_LENGTH = 8;
+
+function formatAuthError(code: string, description?: string | null) {
+    if (description) return description;
+    if (code === 'missing_code') return 'Missing sign-in code. Try again.';
+    if (code === 'missing_supabase_env') return 'Auth is not configured yet. Add the Supabase env vars and retry.';
+    if (code === 'access_denied') return 'Sign-in was canceled.';
+    return code.replace(/_/g, ' ');
+}
 
 function AuthForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [email, setEmail] = useState('');
-    const [otp, setOtp] = useState(['', '', '', '', '', '', '', '']);
+    const [otp, setOtp] = useState(() => Array.from({ length: OTP_LENGTH }, () => ''));
     const [step, setStep] = useState<'email' | 'otp'>('email');
     const [loadingAction, setLoadingAction] = useState<'otp' | 'google' | 'verify' | null>(null);
     const [message, setMessage] = useState<string | null>(null);
@@ -18,13 +30,28 @@ function AuthForm() {
 
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
     const [resendCooldown, setResendCooldown] = useState(0);
-    const nextPath = searchParams.get('next') || '/onboarding';
+    const defaultNextPath = (() => {
+        try {
+            return hasPlan() ? '/dashboard' : '/onboarding';
+        } catch {
+            return '/onboarding';
+        }
+    })();
+    const nextPath = getSafeRedirectPath(searchParams.get('next'), defaultNextPath, { allowApi: true });
     const isLoading = Boolean(loadingAction);
+    const errorParam = searchParams.get('error');
+    const errorDescription = searchParams.get('error_description');
+
+    useEffect(() => {
+        if (errorParam || errorDescription) {
+            setErrorMessage(formatAuthError(errorParam ?? 'auth_error', errorDescription));
+        }
+    }, [errorParam, errorDescription]);
 
     // Auto-submit when all 8 digits are entered
     useEffect(() => {
         const code = otp.join('');
-        if (code.length === 8 && !otp.includes('') && loadingAction === null) {
+        if (code.length === OTP_LENGTH && !otp.includes('') && loadingAction === null) {
             handleVerifyOtp(code);
         }
     }, [otp, loadingAction]);
@@ -39,15 +66,19 @@ function AuthForm() {
 
     const sendOtpEmail = useCallback(async () => {
         const supabase = createSupabaseBrowserClient();
+        const emailRedirectTo = typeof window !== 'undefined'
+            ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`
+            : null;
         // shouldCreateUser: true handles both login AND signup
         const { error } = await supabase.auth.signInWithOtp({
             email: email.toLowerCase().trim(),
             options: {
                 shouldCreateUser: true,
+                ...(emailRedirectTo ? { emailRedirectTo } : {}),
             },
         });
         return { error };
-    }, [email]);
+    }, [email, nextPath]);
 
     const handleSendOtp = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -65,7 +96,7 @@ function AuthForm() {
 
             setStep('otp');
             setResendCooldown(30);
-            setMessage('Check your email for an 8-digit code.');
+            setMessage(`Check your email for a ${OTP_LENGTH}-digit code.`);
         } catch (error) {
             setErrorMessage(error instanceof Error ? error.message : 'Failed to send code');
         } finally {
@@ -115,7 +146,7 @@ function AuthForm() {
 
             if (error) {
                 setErrorMessage(error.message);
-                setOtp(['', '', '', '', '', '', '', '']);
+                setOtp(Array.from({ length: OTP_LENGTH }, () => ''));
                 inputRefs.current[0]?.focus();
                 return;
             }
@@ -123,10 +154,14 @@ function AuthForm() {
             // Check if user has a plan to determine routing
             // For now, route to nextPath (which defaults to /onboarding)
             // The onboarding page will handle checking if user already has a plan
-            router.push(nextPath);
+            if (nextPath.startsWith('/api')) {
+                window.location.assign(nextPath);
+            } else {
+                router.push(nextPath);
+            }
         } catch (error) {
             setErrorMessage(error instanceof Error ? error.message : 'Verification failed');
-            setOtp(['', '', '', '', '', '', '', '']);
+            setOtp(Array.from({ length: OTP_LENGTH }, () => ''));
             inputRefs.current[0]?.focus();
         } finally {
             setLoadingAction(null);
@@ -142,7 +177,7 @@ function AuthForm() {
         setOtp(newOtp);
 
         // Move to next input
-        if (value && index < 7) {
+        if (value && index < OTP_LENGTH - 1) {
             inputRefs.current[index + 1]?.focus();
         }
     };
@@ -155,8 +190,8 @@ function AuthForm() {
 
     const handleOtpPaste = (e: React.ClipboardEvent) => {
         e.preventDefault();
-        const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 8);
-        if (pastedData.length === 8) {
+        const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, OTP_LENGTH);
+        if (pastedData.length === OTP_LENGTH) {
             const newOtp = pastedData.split('');
             setOtp(newOtp);
         }
@@ -301,7 +336,7 @@ function AuthForm() {
                         type="button"
                         onClick={() => {
                             setStep('email');
-                            setOtp(['', '', '', '', '', '', '', '']);
+                            setOtp(Array.from({ length: OTP_LENGTH }, () => ''));
                             setMessage(null);
                             setErrorMessage(null);
                             setResendCooldown(0);

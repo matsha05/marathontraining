@@ -3,18 +3,33 @@ import { exchangeStravaToken } from '@/infrastructure/strava/api';
 import { consumeStravaOauthState, upsertStravaTokens } from '@/infrastructure/strava/store';
 import { stravaConfig } from '@/infrastructure/strava/config';
 import { resolveAthleteId } from '@/infrastructure/garmin/auth';
+import { parseStateContext } from '@/infrastructure/strava/oauth';
+import { isSafeRedirectPath } from '@/lib/redirects';
 
 export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
-    const successRedirect = buildRedirectUrl(request, stravaConfig.successRedirect, '/settings');
-    const failureRedirect = buildRedirectUrl(request, stravaConfig.failureRedirect, '/settings');
+    let successRedirect = buildRedirectUrl(request, stravaConfig.successRedirect, '/settings');
+    let failureRedirect = buildRedirectUrl(request, stravaConfig.failureRedirect, '/settings');
 
     try {
         const { searchParams } = new URL(request.url);
         const code = searchParams.get('code');
         const state = searchParams.get('state');
         const error = searchParams.get('error');
+        const stateContext = state ? parseStateContext(state) : null;
+        successRedirect = resolveRedirectBase(
+            request,
+            stateContext?.next,
+            stateContext?.from,
+            successRedirect
+        );
+        failureRedirect = resolveRedirectBase(
+            request,
+            stateContext?.next,
+            stateContext?.from,
+            failureRedirect
+        );
 
         if (error) {
             return redirectWithParams(failureRedirect, { connect: 'strava', error });
@@ -44,7 +59,7 @@ export async function GET(request: NextRequest) {
 
         const tokens = await exchangeStravaToken(code);
         if (!tokens.athlete?.id) {
-            return NextResponse.redirect(stravaConfig.failureRedirect);
+            return NextResponse.redirect(failureRedirect);
         }
 
         const accessTokenExpiresAt = new Date(tokens.expires_at * 1000).toISOString();
@@ -79,4 +94,18 @@ function redirectWithParams(baseUrl: string, params: Record<string, string>) {
         url.searchParams.set(key, value);
     });
     return NextResponse.redirect(url.toString());
+}
+
+function resolveRedirectBase(
+    request: NextRequest,
+    returnPath: string | undefined,
+    from: string | undefined,
+    fallbackUrl: string
+) {
+    const fromPath = from === 'onboarding' ? '/onboarding' : from === 'settings' ? '/settings' : null;
+    const candidate = isSafeRedirectPath(returnPath, { allowApi: false }) ? returnPath : fromPath;
+    if (candidate && isSafeRedirectPath(candidate, { allowApi: false })) {
+        return new URL(candidate, request.url).toString();
+    }
+    return fallbackUrl;
 }

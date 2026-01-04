@@ -3,6 +3,7 @@ import { buildAuthorizationUrl, generateCodeChallenge, generateCodeVerifier, gen
 import { saveOauthState } from '@/infrastructure/garmin/store';
 import { resolveAthleteId } from '@/infrastructure/garmin/auth';
 import { garminConfig } from '@/infrastructure/garmin/config';
+import { getSafeRedirectPath } from '@/lib/redirects';
 
 export const runtime = 'nodejs';
 
@@ -33,20 +34,12 @@ export async function GET(request: NextRequest) {
 }
 
 function redirectToLogin(request: NextRequest) {
-    const nextPath = getSafeNextPath(request, '/onboarding');
-    const loginUrl = new URL('/login', request.url);
+    const url = new URL(request.url);
+    const selfPath = `${url.pathname}${url.search}`;
+    const nextPath = getSafeRedirectPath(selfPath, '/onboarding', { allowApi: true, blockedPrefixes: [] });
+    const loginUrl = new URL('/auth', request.url);
     loginUrl.searchParams.set('next', nextPath);
     return NextResponse.redirect(loginUrl);
-}
-
-function getSafeNextPath(request: NextRequest, fallback: string) {
-    const { searchParams, pathname, search } = new URL(request.url);
-    const explicitNext = searchParams.get('next');
-    if (explicitNext && explicitNext.startsWith('/')) {
-        return explicitNext;
-    }
-    const selfPath = `${pathname}${search}`;
-    return selfPath || fallback;
 }
 
 function redirectToError(request: NextRequest, code: 'missing_config' | 'connect_failed') {

@@ -562,3 +562,59 @@ If you want, I can turn this into:
         "
 [4]: https://www.stablebookgroup.com/products/running-rewired-1?utm_source=chatgpt.com "Running Rewired"
 
+---
+
+## 7. VDOT Precision: The Daniels System Deep Dive
+
+> See full reference: `research/02-daniels-vdot.md`
+
+### Key Concepts for Implementation
+
+**VDOT is not VO2max.** VDOT is a "pseudo VO2max" derived from race performance. Two runners with identical lab VO2max can have different VDOTs based on running economy and sustainable fraction.
+
+**The Daniels-Gilbert Equations:**
+```
+f(t) = 0.8 + 0.1894393 × e^(-0.012778 × t) + 0.2989558 × e^(-0.1932605 × t)
+VO2(v) = -4.6 + 0.182258 × v + 0.000104 × v²
+VDOT = VO2(v) / f(t)
+```
+
+**Training Zones (% of VDOT):**
+| Zone | %VDOT | Duration | Purpose |
+|------|-------|----------|---------|
+| E (Easy) | 59–74% | 30+ min | Aerobic base, recovery |
+| M (Marathon) | 75–84% | 20–150 min | Marathon-specific economy |
+| T (Threshold) | 83–88% | 10–60 min | Lactate clearance |
+| I (Interval) | 95–100% | 5–12 min | VO2max development |
+| R (Repetition) | 105–110% | 1–5 min | Speed, mechanics |
+
+**2Q Marathon Plan VDOT Selection (Critical):**
+- Weeks 1–6: Conservative VDOT (current OR "marathon VDOT minus 2")
+- Weeks 7–12: Midway between early-plan and current VDOT
+- Weeks 13–18: Current VDOT
+
+**Adaptation Principle:** Stay at a stress level for ~4 weeks before increasing. Don't auto-raise paces weekly.
+
+---
+
+## 8. Research Document Index
+
+All methodology research is stored in `research/`:
+
+| File | Topic |
+|------|-------|
+| 01-hansons-method.md | Cumulative fatigue, 16-mile cap, 6-day structure |
+| 02-daniels-vdot.md | VDOT system, training zones, periodization, 2Q plans |
+| 03-seiler-intensity.md | Polarized 80/20, intensity distribution |
+| 04-starrett-dicharry-durability.md | Mobility, durability, movement quality |
+| 05-acsm-strength.md | ACSM strength guidelines for runners |
+| 06-nutrition-fueling.md | Race-day fueling, carb loading |
+| 07-race-distance-differences.md | 5K to marathon specificity |
+| 08-injury-prevention.md | Common injuries, prevention protocols |
+| 09-strength-protocols-for-runners.md | Heavy lifting for running economy |
+| 10-garmin-api-integration.md | Garmin Connect integration |
+| 11-crossfit-running-hybrid-programming.md | Hybrid athlete programming |
+
+---
+
+*Last updated: January 2026*

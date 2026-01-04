@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
             return NextResponse.redirect(garminConfig.failureRedirect);
         }
 
-        const oauthState: GarminOauthState | null = await consumeOauthState(state);
+        const oauthState = (await consumeOauthState(state)) as GarminOauthState | null;
         if (!oauthState) {
             return NextResponse.redirect(garminConfig.failureRedirect);
         }
