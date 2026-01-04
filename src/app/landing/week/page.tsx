@@ -7,15 +7,15 @@ import { useLandingNav } from "../useLandingNav";
 /**
  * Week Landing Page
  * 
- * Just shows what a training week looks like.
- * No explanation needed. The product speaks.
+ * Hero: Just "The Long Game" + the week preview
+ * Scroll: Detailed methodology sections for each coach
  */
 
 export default function WeekLanding() {
     useLandingNav("/landing/week");
 
     return (
-        <div className="min-h-screen bg-[#08080a] text-white flex flex-col">
+        <div className="min-h-screen bg-[#08080a] text-white">
             {/* Title Badge */}
             <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[60] px-3 py-1 bg-white/5 border border-white/10 rounded-full">
                 <span className="text-[10px] text-white/40 uppercase tracking-widest font-mono">Week</span>
@@ -40,60 +40,323 @@ export default function WeekLanding() {
                 </div>
             </nav>
 
-            {/* Main - Just the week */}
-            <main className="flex-1 flex items-center justify-center px-6 py-24">
-                <div className="w-full max-w-4xl">
-                    {/* Label */}
-                    <p className="text-xs text-white/20 mb-6 text-center font-mono">
-                        Week 8 · Build Phase · 42 miles
+            {/* Hero - Big text + Week preview */}
+            <section className="min-h-screen flex flex-col items-center justify-center px-6 relative">
+                <div className="text-center w-full max-w-4xl">
+                    {/* Big title */}
+                    <h1 className="text-5xl md:text-7xl font-light text-white/90 mb-4 tracking-tight">
+                        The Long Game
+                    </h1>
+                    <p className="text-lg text-white/30 mb-12">
+                        Training, structured.
                     </p>
 
-                    {/* Week Grid */}
-                    <div className="grid grid-cols-7 gap-1 mb-12">
+                    {/* Week Grid - exact same as before */}
+                    <div className="max-w-3xl mx-auto mb-12">
+                        <p className="text-xs text-white/20 mb-4 font-mono">
+                            Week 8 · Build Phase · 42 miles
+                        </p>
+                        <div className="grid grid-cols-7 gap-1">
+                            {[
+                                { day: "M", type: "run", label: "5mi Easy", sub: "8:32/mi", strength: true },
+                                { day: "T", type: "run", label: "6×800m", sub: "VO2", strength: false },
+                                { day: "W", type: "rest", label: "Rest", sub: "", strength: false },
+                                { day: "T", type: "run", label: "6mi Tempo", sub: "7:15/mi", strength: true },
+                                { day: "F", type: "run", label: "4mi Easy", sub: "8:45/mi", strength: false },
+                                { day: "S", type: "run", label: "5mi Easy", sub: "8:32/mi", strength: false },
+                                { day: "S", type: "long", label: "14mi Long", sub: "8:45/mi", strength: false },
+                            ].map((d, i) => (
+                                <div
+                                    key={i}
+                                    className={`
+                                        p-4 rounded-lg text-center
+                                        ${d.type === "rest" ? "bg-white/[0.02]" : "bg-white/[0.04]"}
+                                        ${d.type === "long" ? "bg-[#19e38c]/10" : ""}
+                                    `}
+                                >
+                                    <p className="text-[10px] text-white/30 mb-3">{d.day}</p>
+                                    <p className={`text-sm mb-1 ${d.type === "rest" ? "text-white/20" : "text-white/70"}`}>
+                                        {d.label}
+                                    </p>
+                                    {d.sub && (
+                                        <p className="text-[10px] text-white/30 font-mono">{d.sub}</p>
+                                    )}
+                                    {d.strength && (
+                                        <div className="mt-2 pt-2 border-t border-white/5">
+                                            <p className="text-[10px] text-[#3a6bff]">+ Strength</p>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* CTA */}
+                    <Link
+                        href="/auth"
+                        className="inline-block px-6 py-3 bg-white text-black text-sm font-medium rounded-lg hover:bg-white/90 transition-colors"
+                    >
+                        Build yours
+                    </Link>
+                </div>
+
+                {/* Scroll indicator */}
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
+                    <p className="text-[10px] text-white/20 uppercase tracking-widest">Scroll</p>
+                </div>
+            </section>
+
+            {/* === PLAN STRUCTURE — YOU CHOOSE === (FIRST, right after hero) */}
+            <section className="px-6 py-24 bg-white/[0.01]">
+                <div className="max-w-3xl mx-auto text-center">
+                    <p className="text-xs text-white/40 uppercase tracking-widest mb-4">Plan Structure</p>
+                    <h2 className="text-4xl md:text-5xl font-light text-white/80 mb-4">You choose your approach</h2>
+                    <p className="text-lg text-white/40">Different philosophies. We'll help you pick the right one.</p>
+                </div>
+            </section>
+
+            {/* Hansons */}
+            <section className="px-6 py-20 border-t border-white/5">
+                <div className="max-w-3xl mx-auto">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-2 h-2 rounded-full bg-[#3a6bff]" />
+                        <h2 className="text-2xl font-light text-white/80">Hansons</h2>
+                        <span className="text-xs text-white/30 uppercase tracking-wider">Cumulative Fatigue</span>
+                    </div>
+                    <p className="text-white/50 mb-6 leading-relaxed">
+                        Six days a week. Train on tired legs, race on fresh ones. 16-mile long run cap —
+                        because the cumulative week matters more than any single run.
+                    </p>
+                    <div className="p-4 rounded-lg bg-white/[0.02] border border-white/5">
+                        <div className="grid grid-cols-7 gap-2 text-center">
+                            {["Easy", "Speed", "Rest", "Tempo", "Easy", "Easy", "Long"].map((day, i) => (
+                                <div key={i}>
+                                    <p className="text-[10px] text-white/30 mb-1">{["M", "T", "W", "T", "F", "S", "S"][i]}</p>
+                                    <p className={`text-xs ${day === "Rest" ? "text-white/20" : day === "Long" ? "text-[#3a6bff]" : "text-white/50"}`}>
+                                        {day}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <p className="text-xs text-white/20 mt-3">Best for: Experienced runners, 6 days available, high mileage tolerance</p>
+                </div>
+            </section>
+
+            {/* Higdon */}
+            <section className="px-6 py-20 border-t border-white/5">
+                <div className="max-w-3xl mx-auto">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-2 h-2 rounded-full bg-[#ec4899]" />
+                        <h2 className="text-2xl font-light text-white/80">Hal Higdon</h2>
+                        <span className="text-xs text-white/30 uppercase tracking-wider">Accessibility</span>
+                    </div>
+                    <p className="text-white/50 mb-6 leading-relaxed">
+                        The most trusted name in marathon training. Gradual progression, more rest days,
+                        longer long runs (20+ miles). Programs for every level, from first-timer to PR-chaser.
+                    </p>
+                    <div className="grid grid-cols-3 gap-3">
+                        <div className="p-4 rounded-lg bg-white/[0.02] border border-white/5 text-center">
+                            <p className="text-lg font-light text-white/60">Novice</p>
+                            <p className="text-[10px] text-white/30 mt-1">First marathon</p>
+                        </div>
+                        <div className="p-4 rounded-lg bg-white/[0.02] border border-white/5 text-center">
+                            <p className="text-lg font-light text-white/60">Intermediate</p>
+                            <p className="text-[10px] text-white/30 mt-1">Building fitness</p>
+                        </div>
+                        <div className="p-4 rounded-lg bg-white/[0.02] border border-white/5 text-center">
+                            <p className="text-lg font-light text-white/60">Advanced</p>
+                            <p className="text-[10px] text-white/30 mt-1">Chasing PRs</p>
+                        </div>
+                    </div>
+                    <p className="text-xs text-white/20 mt-3">Best for: First-timers, 4-5 days available, gradual build</p>
+                </div>
+            </section>
+
+            {/* Pfitzinger */}
+            <section className="px-6 py-20 border-t border-white/5">
+                <div className="max-w-3xl mx-auto">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-2 h-2 rounded-full bg-[#06b6d4]" />
+                        <h2 className="text-2xl font-light text-white/80">Pete Pfitzinger</h2>
+                        <span className="text-xs text-white/30 uppercase tracking-wider">Advanced Marathoning</span>
+                    </div>
+                    <p className="text-white/50 mb-6 leading-relaxed">
+                        High mileage with precision. Lactate threshold is king. Programs from 55 to 85+ miles/week
+                        for runners ready to commit. The gold standard for competitive marathoners.
+                    </p>
+                    <div className="flex gap-3">
+                        <div className="flex-1 p-4 rounded-lg bg-white/[0.02] border border-white/5 text-center">
+                            <p className="text-lg font-mono text-white/60">55-70</p>
+                            <p className="text-[10px] text-white/30 mt-1">mi/week</p>
+                        </div>
+                        <div className="flex-1 p-4 rounded-lg bg-white/[0.02] border border-white/5 text-center">
+                            <p className="text-lg font-mono text-white/60">70-85</p>
+                            <p className="text-[10px] text-white/30 mt-1">mi/week</p>
+                        </div>
+                        <div className="flex-1 p-4 rounded-lg bg-white/[0.02] border border-white/5 text-center">
+                            <p className="text-lg font-mono text-white/60">85+</p>
+                            <p className="text-[10px] text-white/30 mt-1">mi/week</p>
+                        </div>
+                    </div>
+                    <p className="text-xs text-white/20 mt-3">Best for: Competitive runners, high mileage history, PR-focused</p>
+                </div>
+            </section>
+
+            {/* === THE FOUNDATION === */}
+            <section className="px-6 py-24 bg-white/[0.01]">
+                <div className="max-w-3xl mx-auto text-center">
+                    <p className="text-xs text-white/40 uppercase tracking-widest mb-4">The Foundation</p>
+                    <h2 className="text-4xl md:text-5xl font-light text-white/80 mb-4">Built on every plan</h2>
+                    <p className="text-lg text-white/40">These apply to every training philosophy.</p>
+                </div>
+            </section>
+
+            {/* Daniels - Paces */}
+            <section className="px-6 py-20 border-t border-white/5">
+                <div className="max-w-3xl mx-auto">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-2 h-2 rounded-full bg-[#19e38c]" />
+                        <h2 className="text-2xl font-light text-white/80">Jack Daniels</h2>
+                        <span className="text-xs text-white/30 uppercase tracking-wider">Paces</span>
+                    </div>
+                    <p className="text-white/50 mb-6 leading-relaxed">
+                        Your paces aren't guesses. They're calculated from VDOT — a metric derived from your race performance
+                        that predicts equivalent performances across distances and prescribes training intensities.
+                    </p>
+                    <div className="grid md:grid-cols-4 gap-3">
                         {[
-                            { day: "M", type: "run", label: "5mi Easy", sub: "8:32/mi", strength: true },
-                            { day: "T", type: "run", label: "6×800m", sub: "VO2", strength: false },
-                            { day: "W", type: "rest", label: "Rest", sub: "", strength: false },
-                            { day: "T", type: "run", label: "6mi Tempo", sub: "7:15/mi", strength: true },
-                            { day: "F", type: "run", label: "4mi Easy", sub: "8:45/mi", strength: false },
-                            { day: "S", type: "run", label: "5mi Easy", sub: "8:32/mi", strength: false },
-                            { day: "S", type: "long", label: "14mi Long", sub: "8:45/mi", strength: false },
-                        ].map((d, i) => (
-                            <div
-                                key={i}
-                                className={`
-                                    p-4 rounded-lg text-center
-                                    ${d.type === "rest" ? "bg-white/[0.02]" : "bg-white/[0.04]"}
-                                    ${d.type === "long" ? "bg-[#19e38c]/10" : ""}
-                                `}
-                            >
-                                <p className="text-[10px] text-white/30 mb-3">{d.day}</p>
-                                <p className={`text-sm mb-1 ${d.type === "rest" ? "text-white/20" : "text-white/70"}`}>
-                                    {d.label}
-                                </p>
-                                {d.sub && (
-                                    <p className="text-[10px] text-white/30 font-mono">{d.sub}</p>
-                                )}
-                                {d.strength && (
-                                    <div className="mt-2 pt-2 border-t border-white/5">
-                                        <p className="text-[10px] text-[#3a6bff]">+ Strength</p>
-                                    </div>
-                                )}
+                            { zone: "Easy", pace: "8:25–8:55" },
+                            { zone: "Threshold", pace: "7:21" },
+                            { zone: "Interval", pace: "6:45" },
+                            { zone: "Marathon", pace: "8:01" },
+                        ].map((p) => (
+                            <div key={p.zone} className="p-3 rounded-lg bg-white/[0.02] border border-white/5 text-center">
+                                <p className="text-sm text-white/40 mb-1">{p.zone}</p>
+                                <p className="font-mono text-white/70">{p.pace}</p>
                             </div>
                         ))}
                     </div>
+                </div>
+            </section>
 
-                    {/* Minimal CTA */}
-                    <div className="text-center">
-                        <Link
-                            href="/auth"
-                            className="inline-block text-sm text-white/30 hover:text-white/60 transition-colors"
-                        >
-                            See your week →
-                        </Link>
+            {/* Seiler - Intensity */}
+            <section className="px-6 py-20 border-t border-white/5">
+                <div className="max-w-3xl mx-auto">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-2 h-2 rounded-full bg-[#f59e0b]" />
+                        <h2 className="text-2xl font-light text-white/80">Stephen Seiler</h2>
+                        <span className="text-xs text-white/30 uppercase tracking-wider">Intensity</span>
+                    </div>
+                    <p className="text-white/50 mb-6 leading-relaxed">
+                        80/20 polarized. Elite endurance athletes spend 80% of training at low intensity, 20% high.
+                        The "moderate" gray zone is avoided — too hard to recover from, too easy to drive adaptation.
+                    </p>
+                    <div className="flex gap-2">
+                        <div className="flex-[80] h-10 rounded-lg bg-[#19e38c]/10 flex items-center justify-center">
+                            <span className="text-sm text-[#19e38c]/80">80% Easy</span>
+                        </div>
+                        <div className="flex-[20] h-10 rounded-lg bg-[#ef4444]/10 flex items-center justify-center">
+                            <span className="text-xs text-[#ef4444]/80">20% Hard</span>
+                        </div>
                     </div>
                 </div>
-            </main>
+            </section>
+
+            {/* Dicharry - Durability */}
+            <section className="px-6 py-20 border-t border-white/5">
+                <div className="max-w-3xl mx-auto">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-2 h-2 rounded-full bg-[#8b5cf6]" />
+                        <h2 className="text-2xl font-light text-white/80">Jay Dicharry</h2>
+                        <span className="text-xs text-white/30 uppercase tracking-wider">Durability</span>
+                    </div>
+                    <p className="text-white/50 mb-6 leading-relaxed">
+                        Running Rewired. 12 movement standards that address the most common limiters in runners.
+                        Pre-hab over rehab. Build a body that can handle the training load, not just survive it.
+                    </p>
+                    <div className="grid grid-cols-4 gap-2">
+                        {Array.from({ length: 12 }).map((_, i) => (
+                            <div key={i} className="h-8 rounded-lg bg-white/[0.03] flex items-center justify-center">
+                                <span className="text-[10px] text-white/30">{i + 1}</span>
+                            </div>
+                        ))}
+                    </div>
+                    <p className="text-xs text-white/20 mt-3">12 movement standards · Daily routines</p>
+                </div>
+            </section>
+
+            {/* Starrett - Mobility */}
+            <section className="px-6 py-20 border-t border-white/5">
+                <div className="max-w-3xl mx-auto">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-2 h-2 rounded-full bg-[#14b8a6]" />
+                        <h2 className="text-2xl font-light text-white/80">Kelly Starrett</h2>
+                        <span className="text-xs text-white/30 uppercase tracking-wider">Mobility</span>
+                    </div>
+                    <p className="text-white/50 mb-6 leading-relaxed">
+                        Becoming a Supple Leopard. Systematic mobility work that restores range of motion,
+                        tissue quality, and motor control. The foundation that lets you train hard without breaking down.
+                    </p>
+                    <div className="flex gap-4">
+                        <div className="flex-1 p-4 rounded-lg bg-white/[0.02] border border-white/5 text-center">
+                            <p className="text-sm text-white/40 mb-1">Before</p>
+                            <p className="text-white/60">Prep & Activation</p>
+                        </div>
+                        <div className="flex-1 p-4 rounded-lg bg-white/[0.02] border border-white/5 text-center">
+                            <p className="text-sm text-white/40 mb-1">After</p>
+                            <p className="text-white/60">Recovery & Reset</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Støren - Strength */}
+            <section className="px-6 py-20 border-t border-white/5">
+                <div className="max-w-3xl mx-auto">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-2 h-2 rounded-full bg-[#ef4444]" />
+                        <h2 className="text-2xl font-light text-white/80">Øyvind Støren</h2>
+                        <span className="text-xs text-white/30 uppercase tracking-wider">Strength</span>
+                    </div>
+                    <p className="text-white/50 mb-6 leading-relaxed">
+                        Heavy strength improves running economy. Research shows 4×4 half-squats at 4RM, 3x/week
+                        improves economy by 5%. Scheduled strategically — never before key sessions.
+                    </p>
+                    <div className="flex gap-4">
+                        <div className="flex-1 p-4 rounded-lg bg-white/[0.02] border border-white/5 text-center">
+                            <p className="text-2xl font-light text-white/60">2×</p>
+                            <p className="text-xs text-white/30 mt-1">per week</p>
+                        </div>
+                        <div className="flex-1 p-4 rounded-lg bg-white/[0.02] border border-white/5 text-center">
+                            <p className="text-2xl font-light text-white/60">5%</p>
+                            <p className="text-xs text-white/30 mt-1">economy gain</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Final CTA */}
+            <section className="px-6 py-24 bg-white/[0.01]">
+                <div className="max-w-3xl mx-auto text-center">
+                    <p className="text-xs text-white/40 uppercase tracking-widest mb-4">Any Distance</p>
+                    <h2 className="text-4xl md:text-5xl font-light text-white/80 mb-4">Base building to Ultra.</h2>
+                    <p className="text-lg text-white/40 mb-8">
+                        Race on the calendar or just building fitness. We'll meet you where you are.
+                    </p>
+                    <Link
+                        href="/auth"
+                        className="inline-block px-8 py-4 bg-white text-black font-medium rounded-lg hover:bg-white/90 transition-colors"
+                    >
+                        Start →
+                    </Link>
+                </div>
+            </section>
+
+            {/* Footer */}
+            <footer className="px-6 py-6 border-t border-white/5 text-center">
+                <p className="text-[10px] text-white/15">© 2026 The Long Game</p>
+            </footer>
         </div>
     );
 }

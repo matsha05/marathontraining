@@ -10,7 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run",
+    "test": "VITE_CJS_IGNORE_WARNING=1 vitest run",
     "visual:check": "node scripts/visual-pass.mjs"
   },
   "dependencies": {

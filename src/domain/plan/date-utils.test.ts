@@ -6,7 +6,7 @@ import {
     getDateForDay,
     getWeekStartDate,
     parseDateOnly,
-} from './generator';
+} from './date-utils';
 
 describe('plan date helpers', () => {
     it('parses date-only strings as UTC dates', () => {

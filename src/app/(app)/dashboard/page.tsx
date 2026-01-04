@@ -14,6 +14,8 @@ import { PlayIcon } from '@/components/ui/play';
 import { usePlan } from '@/domain/plan/context';
 import { useAuth } from '@/domain/auth/context';
 import { DashboardSkeleton } from '@/components/ui/Skeleton';
+import { InsightsCard } from '@/components/insights/InsightsCard';
+import { WorkoutLog } from '@/domain/insights';
 import { formatPace, getDayName, getFullDayName } from '@/lib/format';
 
 /**
@@ -75,6 +77,7 @@ export default function DashboardPage() {
     const [athlete, setAthlete] = useState<Athlete | null>(null);
     const [readinessScore, setReadinessScore] = useState<number | null>(null);
     const [streak, setStreak] = useState(0);
+    const [workoutLogs, setWorkoutLogs] = useState<WorkoutLog[]>([]);
     const [dataLoading, setDataLoading] = useState(true);
 
     // Fetch athlete data on mount (now using auth context for user)
@@ -129,6 +132,32 @@ export default function DashboardPage() {
 
                 // Simple streak - just count recent completions (could be improved)
                 setStreak(Math.min(count || 0, 30));
+
+                // Fetch workout logs for insights (last 60 days)
+                const sixtyDaysAgo = new Date();
+                sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+                const { data: completedWorkouts } = await supabase
+                    .from('completed_workouts')
+                    .select('id, completed_date, actual_session, planned_workout_id')
+                    .eq('athlete_id', athleteId)
+                    .gte('completed_date', sixtyDaysAgo.toISOString().split('T')[0])
+                    .order('completed_date', { ascending: false });
+
+                if (completedWorkouts && completedWorkouts.length > 0) {
+                    const logs: WorkoutLog[] = completedWorkouts.map(w => {
+                        const session = w.actual_session as { completed?: string; feelRating?: number } || {};
+                        return {
+                            id: w.id,
+                            date: new Date(w.completed_date),
+                            sessionType: 'run', // Default, could be improved with planned_workout lookup
+                            domain: 'running' as const,
+                            completed: (session.completed === 'full' ? 'full' : session.completed === 'partial' ? 'partial' : 'skipped') as 'full' | 'partial' | 'skipped',
+                            feelRating: session.feelRating,
+                            plannedDuration: 45, // Default
+                        };
+                    });
+                    setWorkoutLogs(logs);
+                }
             } catch (error) {
                 console.warn('Failed to fetch athlete data:', error);
             } finally {
@@ -442,6 +471,12 @@ export default function DashboardPage() {
                             <p className="text-caption text-[var(--text-muted)]">Total Weeks</p>
                         </div>
                     </div>
+                </section>
+
+                {/* Training Insights */}
+                <section className="mt-10">
+                    <h2 className="text-heading-md mb-4">Training Insights</h2>
+                    <InsightsCard workoutLogs={workoutLogs} />
                 </section>
             </main>
         </div>

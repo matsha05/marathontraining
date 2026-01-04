@@ -18,6 +18,7 @@ const LANDING_ROUTES = [
     "/landing/workout",
     "/landing/coaches",
     "/landing/complete",
+    "/landing/prime",
 ];
 
 export function useLandingNav(currentRoute: string) {

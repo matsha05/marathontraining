@@ -81,6 +81,15 @@ const LANDING_OPTIONS: LandingOption[] = [
         tags: ["combined", "complete", "paces-week"],
         gradient: "linear-gradient(135deg, #08080a 0%, #0c0c14 100%)",
     },
+    {
+        id: "prime",
+        name: "Prime",
+        description: "Curiosity-inducing hero + Week preview. Scroll reveals methodology + features.",
+        route: "/landing/prime",
+        aesthetic: "Curiosity • Scroll • Complete",
+        tags: ["curiosity", "scroll", "full"],
+        gradient: "linear-gradient(135deg, #08080a 0%, #0a0a12 100%)",
+    },
 ];
 
 export default function LandingShowcase() {

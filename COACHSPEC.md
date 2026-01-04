@@ -21,6 +21,7 @@
 12. [Progression & Periodization](#12-progression--periodization)
 13. [Taper Rules](#13-taper-rules)
 14. [Daily Plan Generator Algorithm](#14-daily-plan-generator-algorithm)
+15. [Hal Higdon Tier System](#15-hal-higdon-tier-system-oracle-research)
 
 ---
 
@@ -2402,6 +2403,183 @@ class FuelingPlan:
 
 ---
 
+## 15. Hal Higdon Tier System (Oracle Research)
+
+### 15.1 Philosophy
+
+Higdon's approach emphasizes **accessibility and simplicity**:
+- Named tiers give users identity ("I'm doing Novice 1")
+- 20-mile long run cap to reduce injury risk
+- Stepback every 3rd week
+- 3-week taper with consistent pattern
+- Effort-based pacing (conversational, 30-90 sec slower than race pace)
+
+### 15.2 Tier Comparison Table
+
+```yaml
+tier_comparison:
+  novice_1:
+    run_days: 4
+    twenty_milers: 1            # Week 15
+    peak_mileage: 40
+    quality_sessions: none
+    long_run_day: saturday
+    
+  novice_2:
+    run_days: 4
+    twenty_milers: 1
+    peak_mileage: 36
+    quality_sessions: "Wed race-pace run"
+    long_run_day: saturday
+    
+  intermediate_1:
+    run_days: 5
+    twenty_milers: 2            # Weeks 13, 15
+    peak_mileage: 44
+    quality_sessions: "Sat race-pace run"
+    special_pattern: "weekend_back_to_back"
+    long_run_day: sunday
+    
+  intermediate_2:
+    run_days: 5
+    twenty_milers: 3            # Weeks 11, 13, 15
+    peak_mileage: 50
+    quality_sessions: "Sat race-pace run"
+    special_pattern: "weekend_back_to_back"
+    long_run_day: sunday
+    
+  advanced_1:
+    run_days: 6
+    twenty_milers: 3
+    peak_mileage: 50
+    quality_sessions: "Thu speedwork + Sat race-pace"
+    special_patterns: ["weekend_back_to_back", "3_1_long_run"]
+    long_run_day: sunday
+    
+  advanced_2:
+    run_days: 6
+    twenty_milers: 3
+    peak_mileage: 45
+    quality_sessions: "Tue speedwork + Thu speedwork + Sat race-pace"
+    special_patterns: ["weekend_back_to_back", "3_1_long_run"]
+    long_run_day: sunday
+```
+
+### 15.3 Microcycle Templates
+
+```yaml
+higdon_microcycles:
+  novice_1:
+    mon: rest
+    tue: easy_run [3, 5]
+    wed: easy_run [3, 10]      # "Sorta-Long Run"
+    thu: easy_run [3, 5]
+    fri: rest
+    sat: long_run
+    sun: cross_train
+
+  intermediate_1:
+    mon: cross_train
+    tue: easy_run [3, 5]
+    wed: easy_run [5, 8]
+    thu: easy_run [3, 5]
+    fri: rest
+    sat: race_pace_run [5, 8]   # Back-to-back day 1
+    sun: long_run               # Back-to-back day 2
+    
+  advanced_1:
+    mon: easy_run [3, 5]
+    tue: easy_run [5, 10]
+    wed: easy_run [3, 5]
+    thu: speedwork              # Tempo, hills, or 800s
+    fri: rest
+    sat: race_pace_run [5, 10]
+    sun: long_run
+```
+
+### 15.4 Stepback Week Logic
+
+```yaml
+higdon_stepback:
+  cadence: "every_3rd_week"
+  long_run_reduction_pct: [20, 40]
+  weekly_mileage_reduction_pct: [5, 30]
+  exceptions:
+    - tune_up_race_week
+    - taper_phase
+```
+
+### 15.5 Taper Structure
+
+```yaml
+higdon_taper:
+  length_weeks: 3
+  long_run_pattern_mi:
+    peak_week: 20
+    taper_week_1: 12    # -40%
+    taper_week_2: 8     # -60%
+    race_week: 26.2
+  keeps:
+    - run_frequency
+    - some_race_pace_touches
+  reduces:
+    - total_mileage
+    - long_run_distance
+  no_new_stress: true
+```
+
+### 15.6 Special Patterns
+
+```yaml
+special_patterns:
+  weekend_back_to_back:
+    enabled_for: [intermediate_1, intermediate_2, advanced_1, advanced_2]
+    structure:
+      saturday: race_pace_run
+      sunday: long_run
+    intent: "Pre-fatigue with race-pace running so long run stays controlled"
+    
+  three_one_long_run:
+    enabled_for: [advanced_1, advanced_2]
+    structure:
+      easy_fraction: 0.75     # First 75% conversational
+      fast_fraction: 0.25     # Last 25% steady (not race pace)
+    frequency: "once_every_3_weekends"
+    cycle: [easy_long_run, 3_1_long_run, stepback_long_run]
+```
+
+### 15.7 Pace Guidance
+
+```yaml
+higdon_pace_guidance:
+  easy:
+    effort_cues: [conversational, relaxed]
+    hr_zone_pct_hrmax: [65, 75]
+    
+  long_run:
+    pace_offset_sec_per_mile_vs_race_pace: [30, 90]
+    fallback_effort: easy
+    
+  race_pace:
+    definition: "Goal marathon pace (GMP)"
+    when_used:
+      novice_2: "Wed pace run"
+      intermediate: "Sat pace run"
+      advanced: "Sat pace run"
+```
+
+### 15.8 What We Add Beyond Higdon
+
+| Gap in Higdon | The Long Game Solution |
+|---------------|------------------------|
+| Effort-only pacing | VDOT-based zone calculation |
+| Zero strength | Phase-appropriate strength integration |
+| "See a doctor" injury advice | Injury routing + auto-modification |
+| Minimal mobility | Dicharry durability circuits |
+| No cross-training structure | WOD engine with interference rules |
+
+---
+
 ## Appendix B: Key Formulas Reference
 
 ```python
@@ -2437,6 +2615,7 @@ rehydrate_L = body_mass_lost_kg * 1.5
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0.0 | 2026-01-02 | Initial CoachSpec synthesizing 8 research files |
+| 1.1.0 | 2026-01-04 | Added VDOT calibration (3.6-3.8), ultra engine (7.4-7.8), WOD interference matrix (8.5.3), Hal Higdon tiers (15) |
 
 ---
 

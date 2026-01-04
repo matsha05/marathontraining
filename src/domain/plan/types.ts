@@ -364,5 +364,177 @@ export const IDEAL_WEEKS: Record<string, number> = {
     '10k': 12,
     'half': 14,
     'marathon': 18,
+    'ultra_50k': 16,
+    'ultra_50m': 20,
+    'ultra_100k': 24,
+    'ultra_100m': 30,
     'general': 12,
 };
+
+// =============================================================================
+// ULTRA TRAINING TYPES (Oracle Research)
+// =============================================================================
+
+export type UltraDistance = 'ultra_50k' | 'ultra_50m' | 'ultra_100k' | 'ultra_100m';
+
+export type Terrain = 'road' | 'trail' | 'mountain';
+
+export interface UltraRaceDetails {
+    distance: UltraDistance;
+    terrain: Terrain;
+    verticalGainM?: number;
+    technicality: 'low' | 'moderate' | 'high';
+    expectedFinishHours?: number;
+    usesPoles: boolean;
+}
+
+// =============================================================================
+// HIGDON TIER SYSTEM (Oracle Research)
+// =============================================================================
+
+export type HigdonTier =
+    | 'novice_1'
+    | 'novice_2'
+    | 'novice_supreme'
+    | 'intermediate_1'
+    | 'intermediate_2'
+    | 'advanced_1'
+    | 'advanced_2';
+
+export interface HigdonTierConfig {
+    tier: HigdonTier;
+    durationWeeks: number;
+    runDays: number;
+    crossTrainDays: number;
+    restDays: number;
+    twentyMilers: number;
+    twentyMilerWeeks: number[];
+    peakMileage: number;
+    longRunDay: 'saturday' | 'sunday';
+    hasWeekendBackToBack: boolean;
+    hasThreeOneLongRun: boolean;
+    qualitySessions: string[];
+}
+
+export const HIGDON_TIER_CONFIGS: Record<HigdonTier, HigdonTierConfig> = {
+    novice_1: {
+        tier: 'novice_1',
+        durationWeeks: 18,
+        runDays: 4,
+        crossTrainDays: 1,
+        restDays: 2,
+        twentyMilers: 1,
+        twentyMilerWeeks: [15],
+        peakMileage: 40,
+        longRunDay: 'saturday',
+        hasWeekendBackToBack: false,
+        hasThreeOneLongRun: false,
+        qualitySessions: [],
+    },
+    novice_2: {
+        tier: 'novice_2',
+        durationWeeks: 18,
+        runDays: 4,
+        crossTrainDays: 1,
+        restDays: 2,
+        twentyMilers: 1,
+        twentyMilerWeeks: [15],
+        peakMileage: 36,
+        longRunDay: 'saturday',
+        hasWeekendBackToBack: false,
+        hasThreeOneLongRun: false,
+        qualitySessions: ['wed_race_pace'],
+    },
+    novice_supreme: {
+        tier: 'novice_supreme',
+        durationWeeks: 30,
+        runDays: 4,
+        crossTrainDays: 1,
+        restDays: 2,
+        twentyMilers: 1,
+        twentyMilerWeeks: [27], // Week 15 of marathon phase = week 27 overall
+        peakMileage: 40,
+        longRunDay: 'saturday',
+        hasWeekendBackToBack: false,
+        hasThreeOneLongRun: false,
+        qualitySessions: [],
+    },
+    intermediate_1: {
+        tier: 'intermediate_1',
+        durationWeeks: 18,
+        runDays: 5,
+        crossTrainDays: 1,
+        restDays: 1,
+        twentyMilers: 2,
+        twentyMilerWeeks: [13, 15],
+        peakMileage: 44,
+        longRunDay: 'sunday',
+        hasWeekendBackToBack: true,
+        hasThreeOneLongRun: false,
+        qualitySessions: ['sat_race_pace'],
+    },
+    intermediate_2: {
+        tier: 'intermediate_2',
+        durationWeeks: 18,
+        runDays: 5,
+        crossTrainDays: 1,
+        restDays: 1,
+        twentyMilers: 3,
+        twentyMilerWeeks: [11, 13, 15],
+        peakMileage: 50,
+        longRunDay: 'sunday',
+        hasWeekendBackToBack: true,
+        hasThreeOneLongRun: false,
+        qualitySessions: ['sat_race_pace'],
+    },
+    advanced_1: {
+        tier: 'advanced_1',
+        durationWeeks: 18,
+        runDays: 6,
+        crossTrainDays: 0,
+        restDays: 1,
+        twentyMilers: 3,
+        twentyMilerWeeks: [11, 13, 15],
+        peakMileage: 50,
+        longRunDay: 'sunday',
+        hasWeekendBackToBack: true,
+        hasThreeOneLongRun: true,
+        qualitySessions: ['thu_speedwork', 'sat_race_pace'],
+    },
+    advanced_2: {
+        tier: 'advanced_2',
+        durationWeeks: 18,
+        runDays: 6,
+        crossTrainDays: 0,
+        restDays: 1,
+        twentyMilers: 3,
+        twentyMilerWeeks: [11, 13, 15],
+        peakMileage: 45,
+        longRunDay: 'sunday',
+        hasWeekendBackToBack: true,
+        hasThreeOneLongRun: true,
+        qualitySessions: ['tue_speedwork', 'thu_speedwork', 'sat_race_pace'],
+    },
+};
+
+// =============================================================================
+// VDOT CALIBRATION TYPES (Oracle Research)
+// =============================================================================
+
+export type VDOTSource = 'race' | 'time_trial' | 'strava' | 'garmin' | 'vo2max' | 'estimated';
+
+export interface VDOTCalibration {
+    seedVDOT: number;      // Initial from race/Garmin/etc
+    tVDOT: number;         // Training VDOT (may be lower for beginners)
+    rVDOT: number;         // Race VDOT (validated from actual race performance)
+    source: VDOTSource;
+    confidence: 'high' | 'medium' | 'low';
+    lastUpdated: string;   // ISO date
+}
+
+export interface CalibrationFactors {
+    runningExperienceMonths: number;
+    weeklyVolumeMinutes: number;
+    strengthBackground: 'none' | 'recreational' | 'intermediate' | 'advanced';
+}
+
