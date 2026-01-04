@@ -11,14 +11,14 @@ import { useLandingNav } from "../useLandingNav";
  * Scroll: Detailed methodology sections for each coach
  */
 
-export default function WeekLanding() {
-    useLandingNav("/landing/week");
+export default function Week2Landing() {
+    useLandingNav("/landing/week2");
 
     return (
         <div className="min-h-screen bg-[#08080a] text-white">
             {/* Title Badge */}
             <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[60] px-3 py-1 bg-white/5 border border-white/10 rounded-full">
-                <span className="text-[10px] text-white/40 uppercase tracking-widest font-mono">Week</span>
+                <span className="text-[10px] text-white/40 uppercase tracking-widest font-mono">Week 2</span>
             </div>
 
             {/* Nav */}
@@ -474,7 +474,12 @@ export default function WeekLanding() {
             <section className="px-6 py-24 bg-white/[0.01]">
                 <div className="max-w-3xl mx-auto text-center">
                     <p className="text-xs text-white/40 uppercase tracking-widest mb-4">Any Distance</p>
-                    <h2 className="text-4xl md:text-5xl font-light text-white/80 mb-4">Base building to Ultra.</h2>
+
+                    {/* Race Distances - Minimalist */}
+                    <p className="text-lg md:text-xl font-mono text-white/50 mb-6 tracking-wider">
+                        5K  ·  10K  ·  Half  ·  Marathon  ·  Ultra
+                    </p>
+
                     <p className="text-lg text-white/40 mb-8">
                         Race on the calendar or just building fitness. We'll meet you where you are.
                     </p>

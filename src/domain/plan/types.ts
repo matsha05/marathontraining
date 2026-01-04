@@ -869,3 +869,120 @@ export interface CalibrationFactors {
     strengthBackground: 'none' | 'recreational' | 'intermediate' | 'advanced';
 }
 
+// =============================================================================
+// PFITZINGER FASTER ROAD RACING (Oracle Research)
+// =============================================================================
+
+/**
+ * Pfitzinger "Faster Road Racing" tiers for 5K, 10K, and Half Marathon.
+ * Source: "Faster Road Racing: 5K to Half Marathon" (2014)
+ */
+export type PfitzFRRTier =
+    // 5K (3 tiers by mileage)
+    | 'pfitz_frr_5k_sch1'  // 30-40 mpw
+    | 'pfitz_frr_5k_sch2'  // 45-55 mpw
+    | 'pfitz_frr_5k_sch3'  // 60-70 mpw
+    // 10K (3 tiers by mileage)
+    | 'pfitz_frr_10k_sch1' // 30-42 mpw
+    | 'pfitz_frr_10k_sch2' // 45-57 mpw
+    | 'pfitz_frr_10k_sch3' // 60-70 mpw
+    // Half Marathon (4 tiers by mileage)
+    | 'pfitz_frr_hm_sch1'  // 31-47 mpw
+    | 'pfitz_frr_hm_sch2'  // 46-63 mpw
+    | 'pfitz_frr_hm_sch3'  // 61-84 mpw
+    | 'pfitz_frr_hm_sch4'; // 81-100 mpw
+
+export type PfitzFRRDistance = '5k' | '10k' | 'half';
+
+export interface PfitzFRRTierConfig {
+    tier: PfitzFRRTier;
+    distance: PfitzFRRDistance;
+    durationWeeks: 12; // All FRR plans are 12 weeks
+    runDays: 5 | 6;
+    startMileage: number;
+    peakMileage: number;
+    maxLongRun: number;
+    hasDoubles: boolean;
+    tuneUpRaceWeeks: number[];
+    // Workout weeks
+    ltWeeks: number[];
+    vo2maxWeeks: number[];
+    speedWeeks?: number[];
+    // Half-marathon specific
+    mlrDistanceRange?: [number, number];
+    progressionRunWeeks?: number[];
+    // Phase breakdown
+    phases: {
+        base: number[]; // Week numbers
+        build: number[];
+        peak: number[];
+        taper: number[];
+    };
+}
+
+// =============================================================================
+// DANIELS RUNNING FORMULA (Oracle Research)
+// =============================================================================
+
+/**
+ * Daniels Running Formula tiers.
+ * Source: "Daniels' Running Formula" (3rd/4th Ed)
+ */
+export type DanielsTier =
+    // 5K/10K (24-week 4-phase plans)
+    | 'daniels_5k_24wk'
+    | 'daniels_10k_24wk'
+    // Marathon 2Q (18-week plans by mileage)
+    | 'daniels_2q_marathon_40'  // 40 mpw peak
+    | 'daniels_2q_marathon_55'  // 55 mpw peak
+    | 'daniels_2q_marathon_70'  // 70 mpw peak
+    | 'daniels_2q_marathon_85'; // 85 mpw peak
+
+/**
+ * Daniels 4-phase periodization (for 5K/10K plans)
+ */
+export type DanielsPhase = 'base' | 'repetition' | 'interval' | 'competition';
+
+/**
+ * Daniels VDOT-based intensity zones
+ */
+export type DanielsIntensity = 'E' | 'M' | 'T' | 'I' | 'R';
+
+export interface DanielsTierConfig {
+    tier: DanielsTier;
+    distance: '5k' | '10k' | 'marathon';
+    durationWeeks: 18 | 24;
+    qualityDaysPerWeek: 2 | 3;
+    peakMileage: number;
+    structure: '4phase' | '2q';
+    phases: {
+        base: number[];
+        repetition?: number[];   // Phase II for 4-phase
+        interval?: number[];     // Phase III for 4-phase
+        build?: number[];        // For 2Q marathon
+        competition?: number[];  // Phase IV for 4-phase
+        peak?: number[];         // For 2Q marathon
+        taper: number[];
+    };
+}
+
+/**
+ * Daniels workout segment (parsed from notation like "2E + 3×2T + 2E")
+ */
+export interface DanielsWorkoutSegment {
+    distance: number;      // miles
+    intensity: DanielsIntensity;
+    reps?: number;         // For intervals: 3×2T means 3 reps
+    recoveryMinutes?: number;
+}
+
+/**
+ * Complete Daniels workout definition
+ */
+export interface DanielsWorkout {
+    description: string;   // Original notation: "2E + 3×2T + 2E"
+    totalMiles: number;
+    qualityMiles: number;  // Non-E miles
+    segments: DanielsWorkoutSegment[];
+}
+

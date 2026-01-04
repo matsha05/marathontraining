@@ -13,12 +13,10 @@ import { useRouter } from "next/navigation";
 
 const LANDING_ROUTES = [
     "/landing/week",
-    "/landing/paces",
-    "/landing/phases",
-    "/landing/workout",
-    "/landing/coaches",
-    "/landing/complete",
-    "/landing/prime",
+    "/landing/week2",
+    "/landing/prime-a",
+    "/landing/prime-b",
+    "/landing/prime-c",
 ];
 
 export function useLandingNav(currentRoute: string) {
