@@ -53,103 +53,127 @@ export function calculateRecommendation(answers: QuizAnswers): PhilosophyRecomme
     }
 
     // ==========================================================================
-    // TARGET DISTANCE (Context for subsequent scoring)
+    // HARD GATES: Coach Prerequisites (Research-Grounded)
+    // These determine which coaches are AVAILABLE, not which is best
     // ==========================================================================
+
+    // Gate 1: Days per week — Hansons & Pfitz require 6 RUN days
+    const hansonsDaysOk = answers.daysPerWeek === null || answers.daysPerWeek >= 6;
+    const pfitzDaysOk = answers.daysPerWeek === null || answers.daysPerWeek >= 5;
+
+    // Gate 2: Base mileage — Pfitz requires 30-40mi, Hansons 25-30mi
+    const pfitzMileageOk = answers.currentMileage !== 'under_20';
+    const hansonsMileageOk = answers.currentMileage !== 'under_20' || answers.currentMileage === null;
+
+    // Gate 3: Experience — Pfitz is not for beginners
+    const pfitzExperienceOk = answers.experience !== 'beginner';
+
+    // Combine gates
+    const hansonsAvailable = hansonsDaysOk && hansonsMileageOk;
+    const pfitzAvailable = pfitzDaysOk && pfitzMileageOk && pfitzExperienceOk;
+    // Higdon is always available
+
+    // Add gate-based reasoning
     const distanceLabel = getDistanceLabel(answers.targetDistance);
 
+    if (!hansonsAvailable && answers.daysPerWeek !== null && answers.daysPerWeek < 6) {
+        reasoning.push(`Hansons requires 6 run days (cumulative fatigue approach). Your ${answers.daysPerWeek} days don't fit this structure.`);
+    }
+    if (!pfitzAvailable && answers.experience === 'beginner') {
+        reasoning.push(`Pfitzinger is designed for experienced runners with structured training background.`);
+    }
+    if (!pfitzAvailable && answers.currentMileage === 'under_20') {
+        reasoning.push(`Pfitzinger requires a 30-40 mile weekly base to start.`);
+    }
+
+    // ==========================================================================
+    // SOFT SCORING: Among available coaches, which fits best?
+    // ==========================================================================
+
+    // Start with base scores (0 if not available)
+    if (!hansonsAvailable) scores.hansons = -100;
+    if (!pfitzAvailable) scores.pfitzinger = -100;
+
+    // Distance modifiers
     if (answers.targetDistance !== null) {
-        // Distance-specific baseline adjustments
         if (answers.targetDistance === '5k' || answers.targetDistance === '10k') {
-            // Shorter distances: all three work, but lean toward accessible or speed-focused
-            scores.higdon += 1; // Accessible for any beginner
-            if (answers.experience === 'advanced') {
-                scores.pfitzinger += 1; // Speed focus for advanced short-distance runners
+            scores.higdon += 1;
+            if (pfitzAvailable && answers.experience === 'advanced') {
+                scores.pfitzinger += 1; // Speed focus for advanced short-distance
             }
         } else if (answers.targetDistance === 'ultra') {
-            // Ultra: time-on-feet focus
-            scores.higdon += 1; // Gradual volume build
+            scores.higdon += 2; // Gradual volume build critical for ultra
             reasoning.push(`For ultra training, gradual volume build is key.`);
         }
     }
 
-    // ==========================================================================
-    // DAYS PER WEEK (Strongest signal — structure compatibility)
-    // ==========================================================================
+    // Days modifiers (only positive scoring now, gates handled above)
     if (answers.daysPerWeek !== null) {
         if (answers.daysPerWeek <= 4) {
-            scores.higdon += 4;
-            reasoning.push(`Your schedule of ${answers.daysPerWeek} days/week fits Higdon's 4-5 day structure perfectly.`);
+            scores.higdon += 3;
+            reasoning.push(`Your ${answers.daysPerWeek} run days/week fit Higdon's accessible structure perfectly.`);
         } else if (answers.daysPerWeek === 5) {
             scores.higdon += 2;
-            scores.hansons += 1;
-            reasoning.push('5 days/week works well with Higdon Intermediate or a modified Hansons.');
+            if (pfitzAvailable) scores.pfitzinger += 1;
+            reasoning.push('5 run days/week works well with Higdon Intermediate or adapted Pfitzinger.');
         } else { // 6 days
-            scores.hansons += 4;
-            scores.pfitzinger += 3;
-            reasoning.push(`6 days/week unlocks Hansons' cumulative fatigue approach.`);
+            if (hansonsAvailable) scores.hansons += 3;
+            if (pfitzAvailable) scores.pfitzinger += 2;
+            scores.higdon += 1;
+            reasoning.push(`6 run days/week unlocks Hansons' cumulative fatigue approach.`);
         }
     }
 
-    // ==========================================================================
-    // EXPERIENCE (Automatic Higdon for beginners — safety gate)
-    // ==========================================================================
+    // Experience modifiers
     if (answers.experience !== null) {
         if (answers.experience === 'beginner') {
-            scores.higdon += 5;
-            reasoning.push(`First ${distanceLabel} — Higdon's gradual, accessible approach is the safest path to the finish line.`);
-
-            // Warning if they said 6 days
+            scores.higdon += 4;
+            reasoning.push(`First ${distanceLabel} — Higdon's gradual, accessible approach is the safest path.`);
             if (answers.daysPerWeek === 6) {
-                warnings.push('While you have time for 6 days, beginners often benefit from Higdon\'s built-in rest days. Consider starting there.');
+                warnings.push('6 run days is ambitious for beginners. We\'ll keep intensity low and build gradually.');
             }
         } else if (answers.experience === 'intermediate') {
-            scores.hansons += 2;
+            if (hansonsAvailable) scores.hansons += 2;
             scores.higdon += 1;
-            scores.pfitzinger += 1;
+            if (pfitzAvailable) scores.pfitzinger += 1;
         } else { // advanced
-            scores.hansons += 3;
-            scores.pfitzinger += 3;
-            reasoning.push('Chasing a PR — both Hansons and Pfitzinger are designed for competitive gains.');
+            if (hansonsAvailable) scores.hansons += 2;
+            if (pfitzAvailable) scores.pfitzinger += 3;
+            reasoning.push('Chasing a PR — Hansons and Pfitzinger are designed for competitive gains.');
         }
     }
 
-    // ==========================================================================
-    // CURRENT MILEAGE (Volume readiness — what can you absorb?)
-    // ==========================================================================
+    // Mileage modifiers
     if (answers.currentMileage !== null) {
         if (answers.currentMileage === 'under_20') {
             scores.higdon += 3;
             reasoning.push('Your current mileage (~<20/week) means gradual build-up is essential.');
-
-            // Warning if they're trying to do Hansons or Pfitz
             if (answers.daysPerWeek === 6) {
-                warnings.push('6 days/week at under 20 miles is a big jump. Higdon\'s gradual progression may reduce injury risk.');
+                warnings.push('With under 20 miles/week, consider Higdon Base Training to build your foundation first.');
             }
         } else if (answers.currentMileage === '20_40') {
-            scores.hansons += 3;
+            if (hansonsAvailable) scores.hansons += 3;
             scores.higdon += 1;
             reasoning.push(`Your 20-40 mile base is solid ground for Hansons' approach.`);
         } else { // over_40
-            scores.pfitzinger += 4;
-            scores.hansons += 2;
+            if (pfitzAvailable) scores.pfitzinger += 4;
+            if (hansonsAvailable) scores.hansons += 2;
             reasoning.push(`Your 40+ mile base opens up Pfitzinger's high-volume approach.`);
         }
     }
 
-    // ==========================================================================
-    // MINDSET (Psychological fit — what keeps you consistent?)
-    // ==========================================================================
+    // Mindset modifiers (tiebreakers)
     if (answers.mindset !== null) {
         if (answers.mindset === 'rest_focus') {
             scores.higdon += 2;
             reasoning.push('You value built-in rest — Higdon schedules recovery days, not optional ones.');
         } else if (answers.mindset === 'consistency') {
-            scores.hansons += 3;
-            reasoning.push(`You thrive on consistency — Hansons' 6-day rhythm is your groove.`);
+            if (hansonsAvailable) scores.hansons += 3;
+            reasoning.push(`You thrive on consistency — Hansons' 6-day rhythm fits your style.`);
         } else { // push_limits
-            scores.pfitzinger += 3;
-            scores.hansons += 1;
-            reasoning.push(`You want to push limits — Pfitzinger's high mileage demands exactly that.`);
+            if (pfitzAvailable) scores.pfitzinger += 3;
+            if (hansonsAvailable) scores.hansons += 1;
+            reasoning.push(`You want to push limits — high mileage programs demand exactly that.`);
         }
     }
 
@@ -166,12 +190,15 @@ export function calculateRecommendation(answers: QuizAnswers): PhilosophyRecomme
 
     if (topScore - secondScore >= 3) {
         // Clear winner — no additional reasoning needed
-    } else if (topScore - secondScore >= 1) {
-        // Close call
+    } else if (topScore - secondScore >= 1 && secondScore > 0) {
+        // Close call between available options
         reasoning.push(`${getPhilosophyName(primary)} edges out ${getPhilosophyName(sorted[1][0])} based on your profile.`);
+    } else if (secondScore <= 0) {
+        // Only one option available
+        reasoning.push(`Based on your profile, ${getPhilosophyName(primary)} is the right fit.`);
     } else {
         // Tie or very close
-        reasoning.push('Your profile fits multiple approaches. We recommend ' + getPhilosophyName(primary) + ', but the alternatives would also work.');
+        reasoning.push('Your profile fits multiple approaches. We recommend ' + getPhilosophyName(primary) + ', but alternatives work too.');
     }
 
     return {

@@ -306,6 +306,28 @@ export const COACHES: Record<string, Coach> = {
         whatThisMeans: 'The method behind the Ingebrigtsen brothers (world champion runners). Key innovation: two threshold workouts in one day with several hours rest between. They also use lactate testing to dial in exact intensities. Elite-level methods for those ready for high volume.',
         source: 'Norwegian Athletics Model',
     },
+
+    strengthEngine: {
+        id: 'strengthEngine',
+        name: 'The Long Game Strength Engine',
+        title: 'Integrated Strength System',
+        credentials: '24 WODs + 6 Research Sources',
+        expertise: ['strength for runners', 'WOD programming', 'phase periodization', 'interference management'],
+        protocol: 'Runner-First Strength Programming',
+        keyConceptShort: 'Lift to run faster',
+        keyConceptFull: 'Phase-appropriate strength work that enhances running without creating interference — heavy in base, maintain in peak, protect in taper',
+        bio: 'The Long Game Strength Engine synthesizes research from multiple domains: Støren\'s landmark running economy study, Paavolainen\'s explosive-strength protocols, Eleiko\'s institutional programming, Carrie Lane\'s neural day concepts, and ACSM guidelines. The result is a 24-WOD library with movement interference scoring, phase-appropriate scheduling rules, and automatic volume adjustments based on running load.',
+        achievements: [
+            '24 runner-friendly WODs with Rx/Scaled/Beginner tiers',
+            'Movement interference matrix (Green/Yellow/Red)',
+            'Phase-appropriate scheduling (Base → Build → Peak → Taper)',
+            'Hard-day stacking: strength after quality runs',
+            'Automatic volume reduction when running load increases',
+        ],
+        publications: ['WOD Engine Master', 'Strength Protocols for Runners'],
+        whatThisMeans: 'Your strength work is programmed to make you faster, not sore. In Base, you build max strength (heavy squats, deadlifts). In Build, you convert to power (jumps, cleans). In Peak, you maintain with low volume. And we never schedule leg-heavy work before your long run or intervals.',
+        source: 'Støren, Paavolainen, Eleiko, Lane, ACSM + Internal Research',
+    },
 };
 
 /**
@@ -368,9 +390,9 @@ export const METHODOLOGY_CATEGORIES = {
         description: 'Evidence-based pacing, periodization, and training structure',
     },
     strength: {
-        title: 'Strength & Power',
-        coaches: ['storen'],
-        description: 'Heavy lifting protocols proven to improve running economy',
+        title: 'Strength Training',
+        coaches: ['storen', 'strengthEngine'],
+        description: 'Runner-specific strength programming proven to improve economy and performance',
     },
     durability: {
         title: 'Durability & Movement',

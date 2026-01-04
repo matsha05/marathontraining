@@ -24,7 +24,6 @@ import {
 
 function CoachCard({ coach }: { coach: Coach }) {
     const [expanded, setExpanded] = useState(false);
-    const achievementCount = coach.achievements?.length ?? 0;
 
     return (
         <motion.div
@@ -90,13 +89,6 @@ function CoachCard({ coach }: { coach: Coach }) {
                     {expanded ? coach.keyConceptFull : coach.keyConceptFull.slice(0, 80) + (coach.keyConceptFull.length > 80 ? '...' : '')}
                 </p>
             </div>
-
-            {/* At-a-glance credibility signal (collapsed state only) */}
-            {!expanded && achievementCount > 0 && (
-                <p className="mt-3 text-caption text-[var(--text-subtle)]">
-                    {achievementCount} notable achievement{achievementCount > 1 ? 's' : ''} · Click to expand
-                </p>
-            )}
 
             {/* Expanded Content */}
             <AnimatePresence>
@@ -229,12 +221,14 @@ function CategorySection({ category }: { category: typeof METHODOLOGY_CATEGORIES
     const coaches = category.coaches.map(id => COACHES[id]).filter(Boolean);
 
     return (
-        <section className="space-y-6">
-            <div className="space-y-2">
-                <h2 className="text-display-sm mb-2">{category.title}</h2>
-                <p className="text-body-md text-[var(--text-muted)]">{category.description}</p>
+        <section className="space-y-8">
+            {/* Section Header with larger typography */}
+            <div className="space-y-3">
+                <h2 className="text-display-md">{category.title}</h2>
+                <p className="text-body-lg text-[var(--text-muted)] max-w-2xl">{category.description}</p>
             </div>
 
+            {/* Coach Cards Grid */}
             <div className="grid md:grid-cols-2 gap-4">
                 {coaches.map((coach) => (
                     <CoachCard key={coach.id} coach={coach} />
@@ -377,8 +371,8 @@ export function MethodologyContent() {
             </section>
 
             {/* Main Content */}
-            <main className="container-page pb-24">
-                <div className="space-y-16">
+            <main className="container-page pt-16 pb-24">
+                <div className="space-y-24">
                     {/* Running Science */}
                     <CategorySection category={METHODOLOGY_CATEGORIES.running} />
 
