@@ -1,6 +1,7 @@
 # Jack Daniels Running Formula - Complete Library
 
 > **Source:** Jack Daniels, "Daniels' Running Formula" (3rd/4th Edition)
+> 2Q Marathon schedule extracted from FetchEveryone.com
 > **Key Innovation:** VDOT system for individualized training paces
 
 ## Overview
@@ -12,8 +13,8 @@
 
 VDOT determines all training paces based on current fitness (from recent race or time trial):
 
-| Intensity | Abbreviation | Purpose | Effort | Example Pace |
-|-----------|--------------|---------|--------|--------------|
+| Intensity | Abbrev | Purpose | Effort | Example |
+|-----------|--------|---------|--------|---------|
 | Easy | E | Aerobic base, recovery | Conversational | 1:30-2:00/mi slower than 5K |
 | Marathon | M | Race-specific endurance | Moderate | Marathon goal pace |
 | Threshold | T | Lactate clearance | "Comfortably hard" | 15K-HM pace (~60 min race) |
@@ -22,7 +23,44 @@ VDOT determines all training paces based on current fitness (from recent race or
 
 ---
 
-## Standard 4-Phase Structure (24 weeks)
+## 2Q Marathon Plan: Complete 18-Week Schedule (41-55 mpw)
+
+> Extracted from FetchEveryone.com
+
+| Week | Q1 Workout | Q2 Workout | Target |
+|------|------------|------------|--------|
+| **1** | 14mi: 4E + 8M + 1T + 1E | 15mi: 8E + 2×2T (2') + 1T + 2E | 80% |
+| **2** | 13mi: 2E + 3T + 40'E + 2T + 1E | 13mi: 6E + 5×3'I (2') + 6×1'R (1') + 2E | 80% |
+| **3** | 15mi: 90-120 min Easy | 13mi: 6E + 2T + 2'E + 2T + 2'E + 1T + 2E | 90% |
+| **4** | 16mi: 2E + 4T + 60'E + 2T + 1E | 13mi: 2E + 4×2mi T (2') + 2E | 90% |
+| **5** | 17mi: 2E + 10M + 1T + 4E | 13mi: 6E + 4×1200m I (3') + 4×200R (200) + 2E | 100% |
+| **6** | 17mi: 2E + 2T + 1E + 2T + 1E + 2T + 1E + 2T + 1E | 13mi: 2E + 3T + 30'E + 2T + 2E | 100% |
+| **7** | 15mi: 90-120 min Easy | 13mi: 6E + 2T + 1E + 2T + 1E + 1T + 2E | 90% |
+| **8** | 17mi: 2E + 2×4mi T (2') + 1T + 2E | 14mi: 2E + 12M + 2E | 100% |
+| **9** | 16mi: 2E + 13M + 1E | 13mi: 6E + 5×1000I (3') + 4×200R (200) + 2E | 100% |
+| **10** | 17mi: 2E + 3×3mi T (2') + 2E | 13mi: 2E + 2T + 1E + 2T + 1E + 1T + 2E | 100% |
+| **11** | 15mi: 90-120 min Easy | 13mi: 6E + 2×1mi I (3') + 10×400R (400) + 2E | 90% |
+| **12** | 17mi: 2E + 12M + 1T + 2E | 13mi: 2E + 3×2mi T (2') + 2E | 100% |
+| **13** | 18mi: 2E + 4T + 60'E + 2T + 1E | 14mi: 2E + 2T + 8M + 1T + 1E | 100% |
+| **14** | 17mi: 2E + 3×3mi T (2') + 2E | 13mi: 6E + 5×3'I (2') + 4×200R (200) + 2E | 100% |
+| **15** | 17mi: 150 min Easy | 13mi: 6E + 5×3'I (2') + 4E | 90% |
+| **16** | 17mi: 1E + 8M + 1E + 6M + 1E | 13mi: 4E + 2×2T (2') + 3×1T (1') + 2E | 90% |
+| **17** | 15mi: 1E + 3×2T (2') + 60'E | 13mi: 4E + 1T + 2M + 1E + 1T + 2M + 2E | 90% |
+| **18** | 12mi: 90 min Easy | 7mi: 2E + 3×1T (2') + 2E | Taper |
+| **19** | **MARATHON (26.2 mi)** | — | Race |
+
+### 2Q Mileage Levels
+
+| Level | Peak Mileage | Weekly Range |
+|-------|--------------|--------------|
+| A | 40 mpw | 32-40 |
+| B | 55 mpw | 44-55 |
+| C | 70 mpw | 56-70 |
+| D | 85 mpw | 68-85 |
+
+---
+
+## Standard 4-Phase Structure (24 weeks for 5K/10K)
 
 ### Phase I: Base Building (6 weeks)
 - **Focus:** Aerobic foundation
@@ -34,15 +72,20 @@ VDOT determines all training paces based on current fitness (from recent race or
 - **Focus:** Speed, running economy
 - **Workouts:** R pace intervals (200m, 400m repeats)
 - **Recovery:** Equal to work duration
-- **Example:** 2 sets of 8×200m @ R pace
-- **Threshold:** Cruise intervals introduced (e.g., 3×1 mile)
+- **Examples:** 
+  - 2 sets of 8×200m @ R pace
+  - 12×400m @ R pace
+  - Cruise intervals: 3×1 mile @ T
 
 ### Phase III: Interval Phase (6 weeks)
 - **Focus:** VO2max, race-specific fitness
 - **Workouts:** I pace intervals (800m-1200m)
 - **Recovery:** 2-3 min jog
-- **Examples:** 6×1000m, 8×800m, 5×1200m @ I pace
-- **Threshold:** Extended tempo (20-40 min @ T pace)
+- **Examples:**
+  - 6×1000m @ I pace (3' rest)
+  - 8×800m @ I pace (2:30 rest)
+  - 5×1200m @ I pace (3' rest)
+  - Extended tempo: 20-40 min @ T pace
 
 ### Phase IV: Competition (6 weeks)
 - **Focus:** Race readiness, taper
@@ -52,53 +95,26 @@ VDOT determines all training paces based on current fitness (from recent race or
 
 ---
 
-## 2Q Marathon Plan (18 weeks)
+## Sample Weeks by Phase (5K Focus)
 
-The "2 Quality" marathon plan features two key workouts per week:
-
-### Structure
-- **Q1 (Sunday):** Long run with marathon/threshold work
-- **Q2 (Wednesday/Thursday):** Medium-long with tempo/intervals
-- **Other days:** Easy runs to fill mileage
-
-### Mileage Levels
-| Level | Peak Mileage | Weekly Range |
-|-------|--------------|--------------|
-| A | 40 mpw | 32-40 |
-| B | 55 mpw | 44-55 |
-| C | 70 mpw | 56-70 |
-| D | 85 mpw | 68-85 |
-
-### Sample Week (B Level, Peak Phase)
-| Day | Workout |
-|-----|---------|
-| Mon | Easy 6 mi |
-| Tue | Easy 7 mi |
-| Wed | Q2: 14 mi (2E + 3×2mi T + 3E + 6×200R) |
-| Thu | Recovery 5 mi |
-| Fri | Easy 6 mi |
-| Sat | Recovery 5 mi |
-| Sun | Q1: 18 mi (2E + 14M + 2E) |
-
----
-
-## 5K/10K Plans (24 weeks)
-
-### Phase Breakdown
-| Phase | Weeks | Focus | Key Workouts |
-|-------|-------|-------|--------------|
-| I | 1-6 | Base | E runs, strides, hills |
-| II | 7-12 | Repetition | R: 200m, 400m; T: cruise intervals |
-| III | 13-18 | Intervals | I: 800m-1200m; T: 20-40 min tempo |
-| IV | 19-24 | Competition | Races, mixed I/T/R, taper |
-
-### Sample Phase III Week (5K Focus)
+### Phase II Week (Rep Focus)
 | Day | Workout |
 |-----|---------|
 | Mon | Rest |
-| Tue | Q1: 8 mi w/ 6×1000m @ I (2:30 rest) |
+| Tue | 8 mi: 2E + 2×(8×200R w/ 200 jog) + 2E |
 | Wed | Easy 5 mi |
-| Thu | Q2: 7 mi w/ 20 min @ T |
+| Thu | 7 mi: 2E + 3×1mi T (1' rest) + 2E |
+| Fri | Easy 4 mi |
+| Sat | Rest |
+| Sun | Long run 10 mi easy |
+
+### Phase III Week (Interval Focus)
+| Day | Workout |
+|-----|---------|
+| Mon | Rest |
+| Tue | 8 mi: 2E + 6×1000m I (3' rest) + 2E |
+| Wed | Easy 5 mi |
+| Thu | 7 mi: 2E + 20 min @ T + 2E |
 | Fri | Easy 4 mi |
 | Sat | Rest |
 | Sun | Long run 10-12 mi easy |
@@ -108,40 +124,56 @@ The "2 Quality" marathon plan features two key workouts per week:
 ## Encoding Specification
 
 ```yaml
-daniels_5k_gold:
-  duration_weeks: 24
-  phases:
-    base: [1, 2, 3, 4, 5, 6]
-    repetition: [7, 8, 9, 10, 11, 12]
-    interval: [13, 14, 15, 16, 17, 18]
-    competition: [19, 20, 21, 22, 23, 24]
-  intensity_zones:
-    - E (easy)
-    - T (threshold)
-    - I (interval)
-    - R (repetition)
-  quality_days_per_week: 2-3
-  long_run_cap_percent: 30
-
-daniels_2q_marathon:
+daniels_2q_marathon_55:
   duration_weeks: 18
-  mileage_levels:
-    - { name: 'A', peak: 40 }
-    - { name: 'B', peak: 55 }
-    - { name: 'C', peak: 70 }
-    - { name: 'D', peak: 85 }
+  peak_mileage: 55
   quality_days: 2
-  structure: 'Q1 Sunday (long run), Q2 midweek (tempo/intervals)'
+  structure: 'Q1 Sunday (long run), Q2 midweek'
   phases:
     base: [1, 2, 3, 4, 5, 6]
     build: [7, 8, 9, 10, 11, 12]
     peak: [13, 14, 15, 16]
     taper: [17, 18]
+  weekly_mileage:
+    weeks_1_2: 80%  # 44 mi
+    weeks_3_7: 90%  # 49-50 mi
+    weeks_8_14: 100%  # 55 mi
+    weeks_15_18: 90->taper
+
+daniels_5k_24wk:
+  duration_weeks: 24
+  phases:
+    base: [1-6]
+    repetition: [7-12]
+    interval: [13-18]
+    competition: [19-24]
+  intensity_zones: [E, T, I, R]
+  quality_days_per_week: 2-3
+  long_run_cap_percent: 30
+
+daniels_10k_24wk:
+  duration_weeks: 24
+  phases:
+    base: [1-6]
+    repetition: [7-12]
+    interval: [13-18]
+    competition: [19-24]
 ```
+
+---
+
+## Key Principles
+
+1. **Every workout has a purpose** - No junk miles
+2. **Individualized pacing** - VDOT determines all training paces
+3. **Stress + Rest = Adaptation** - Quality requires recovery
+4. **Progressive overload** - 4-phase structure builds systematically
+5. **Flexibility** - Plan adapts to runner's schedule
 
 ---
 
 ## Sources
 - Daniels, J. (2014). Daniels' Running Formula, 3rd Edition.
 - Daniels, J. (2021). Daniels' Running Formula, 4th Edition.
+- FetchEveryone.com - 2Q Marathon 55mpw schedule
 - https://runsmartproject.com/calculator/ (VDOT calculator)

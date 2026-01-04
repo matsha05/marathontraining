@@ -94,12 +94,12 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                         question="What's your goal right now?"
                         subtitle="This shapes how we structure your training."
                         options={[
-                            { value: '5k' as TargetDistance, label: '5K', description: 'Speed and sharpness' },
-                            { value: '10k' as TargetDistance, label: '10K', description: 'The balanced race' },
+                            { value: 'base' as TargetDistance, label: 'Build general fitness', description: 'No race target — build your aerobic engine' },
+                            { value: '5k' as TargetDistance, label: '5K Race', description: 'Speed and sharpness' },
+                            { value: '10k' as TargetDistance, label: '10K Race', description: 'The balanced challenge' },
                             { value: 'half' as TargetDistance, label: 'Half Marathon', description: 'The sweet spot' },
                             { value: 'marathon' as TargetDistance, label: 'Marathon', description: 'The classic 26.2' },
-                            { value: 'ultra' as TargetDistance, label: 'Ultra', description: 'Beyond the marathon' },
-                            { value: 'base' as TargetDistance, label: 'Build general fitness', description: 'No race — just getting stronger' },
+                            { value: 'ultra' as TargetDistance, label: 'Ultra Marathon', description: 'Beyond the standard' },
                         ]}
                         onSelect={handleDistanceSelect}
                         onBack={onSkip}
@@ -111,13 +111,13 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                 {step === 'days' && (
                     <QuestionScreen
                         key="days"
-                        question="How many days can you realistically run?"
-                        subtitle="Be honest — life happens. Pick what you can consistently do."
+                        question="How many days can you RUN each week?"
+                        subtitle="Just running — strength and cross-training are separate."
                         options={[
-                            { value: 3, label: '3 days', description: 'Minimal but effective' },
-                            { value: 4, label: '4 days', description: 'Room for life' },
-                            { value: 5, label: '5 days', description: 'Balanced frequency' },
-                            { value: 6, label: '6 days', description: 'Serious commitment' },
+                            { value: 3, label: '3 days', description: 'Fits busy schedules' },
+                            { value: 4, label: '4 days', description: 'Room for life and recovery' },
+                            { value: 5, label: '5 days', description: 'Solid commitment' },
+                            { value: 6, label: '6 days', description: 'Unlocks advanced methods' },
                         ]}
                         onSelect={handleDaysSelect}
                         onBack={goBack}
