@@ -164,6 +164,7 @@ export interface OnboardingData {
     // Phase 8: Preferences
     trainingIntensity: TrainingIntensity | null;
     includeStrength: boolean | null;
+    trainingPhilosophy: 'hansons' | 'higdon' | 'pfitzinger' | null;
 
     // Phase 9: Readiness
     readinessStatus: ReadinessStatus | null;
@@ -224,6 +225,7 @@ export const INITIAL_ONBOARDING_DATA: OnboardingData = {
     // Preferences
     trainingIntensity: null,
     includeStrength: null,
+    trainingPhilosophy: null,
 
     // Readiness
     readinessStatus: null,

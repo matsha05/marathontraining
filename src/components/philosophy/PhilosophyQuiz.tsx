@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     QuizAnswers,
+    TargetDistance,
     DaysPerWeek,
     Experience,
     CurrentMileage,
@@ -14,9 +15,9 @@ import { useState, useCallback } from 'react';
 import { QuestionScreen } from './QuestionScreen';
 import { RecommendationScreen } from './RecommendationScreen';
 
-type QuestionStep = 'days' | 'experience' | 'mileage' | 'mindset' | 'result';
+type QuestionStep = 'distance' | 'days' | 'experience' | 'mileage' | 'mindset' | 'result';
 
-const STEP_ORDER: QuestionStep[] = ['days', 'experience', 'mileage', 'mindset', 'result'];
+const STEP_ORDER: QuestionStep[] = ['distance', 'days', 'experience', 'mileage', 'mindset', 'result'];
 
 interface PhilosophyQuizProps {
     onComplete: (philosophy: string) => void;
@@ -24,7 +25,7 @@ interface PhilosophyQuizProps {
 }
 
 export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
-    const [step, setStep] = useState<QuestionStep>('days');
+    const [step, setStep] = useState<QuestionStep>('distance');
     const [answers, setAnswers] = useState<QuizAnswers>(INITIAL_QUIZ_ANSWERS);
 
     const currentIndex = STEP_ORDER.indexOf(step);
@@ -43,6 +44,11 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
             setStep(STEP_ORDER[prevIndex]);
         }
     }, [currentIndex]);
+
+    const handleDistanceSelect = (value: TargetDistance) => {
+        setAnswers(prev => ({ ...prev, targetDistance: value }));
+        goNext();
+    };
 
     const handleDaysSelect = (value: DaysPerWeek) => {
         setAnswers(prev => ({ ...prev, daysPerWeek: value }));
@@ -81,7 +87,26 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
             )}
 
             <AnimatePresence mode="wait">
-                {/* Question 1: Days per week */}
+                {/* Question 1: Target Distance */}
+                {step === 'distance' && (
+                    <QuestionScreen
+                        key="distance"
+                        question="What distance are you training for?"
+                        subtitle="This shapes how we structure your plan."
+                        options={[
+                            { value: '5k' as TargetDistance, label: '5K', description: 'Speed and sharpness' },
+                            { value: '10k' as TargetDistance, label: '10K', description: 'The balanced race' },
+                            { value: 'half' as TargetDistance, label: 'Half Marathon', description: 'The sweet spot' },
+                            { value: 'marathon' as TargetDistance, label: 'Marathon', description: 'The classic 26.2' },
+                            { value: 'ultra' as TargetDistance, label: 'Ultra', description: 'Beyond the marathon' },
+                        ]}
+                        onSelect={handleDistanceSelect}
+                        onBack={onSkip}
+                        backLabel="Skip quiz"
+                    />
+                )}
+
+                {/* Question 2: Days per week */}
                 {step === 'days' && (
                     <QuestionScreen
                         key="days"
@@ -94,32 +119,31 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                             { value: 6, label: '6 days', description: 'Serious commitment' },
                         ]}
                         onSelect={handleDaysSelect}
-                        onBack={onSkip}
-                        backLabel="Skip quiz"
+                        onBack={goBack}
                     />
                 )}
 
-                {/* Question 2: Experience */}
+                {/* Question 3: Experience */}
                 {step === 'experience' && (
                     <QuestionScreen
                         key="experience"
-                        question="Which describes you best?"
-                        subtitle="Your experience shapes the approach."
+                        question="What's your experience level?"
+                        subtitle="Your background shapes the approach."
                         options={[
                             {
-                                value: 'first_marathon' as Experience,
-                                label: 'First marathon',
-                                description: 'Never finished 26.2 before'
+                                value: 'beginner' as Experience,
+                                label: 'Beginner',
+                                description: 'New to this distance or returning'
                             },
                             {
-                                value: 'some_marathons' as Experience,
-                                label: 'Done 1-2 marathons',
-                                description: 'Finished but room to improve'
+                                value: 'intermediate' as Experience,
+                                label: 'Intermediate',
+                                description: 'Some races under my belt'
                             },
                             {
-                                value: 'chasing_pr' as Experience,
-                                label: 'Chasing a PR',
-                                description: '3+ marathons, want faster'
+                                value: 'advanced' as Experience,
+                                label: 'Advanced',
+                                description: 'Experienced, chasing PRs'
                             },
                         ]}
                         onSelect={handleExperienceSelect}
@@ -127,7 +151,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                     />
                 )}
 
-                {/* Question 3: Current mileage */}
+                {/* Question 4: Current mileage */}
                 {step === 'mileage' && (
                     <QuestionScreen
                         key="mileage"
@@ -155,7 +179,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                     />
                 )}
 
-                {/* Question 4: Mindset */}
+                {/* Question 5: Mindset */}
                 {step === 'mindset' && (
                     <QuestionScreen
                         key="mindset"

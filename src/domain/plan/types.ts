@@ -389,10 +389,50 @@ export interface UltraRaceDetails {
 }
 
 // =============================================================================
-// HIGDON TIER SYSTEM (Oracle Research)
+// HIGDON TIER SYSTEM (Oracle Research - All 22 Plans)
 // =============================================================================
 
+/**
+ * Higdon distance categories
+ */
+export type HigdonDistance = 'base' | '5k' | '10k' | 'half' | 'marathon';
+
+/**
+ * All 22 Higdon training plan tiers across 5 distances
+ */
 export type HigdonTier =
+    // Base Training (4 tiers)
+    | 'base_novice'
+    | 'base_intermediate'
+    | 'base_advanced'
+    | 'base_spring'
+    // 5K (3 tiers)
+    | '5k_novice'
+    | '5k_intermediate'
+    | '5k_advanced'
+    // 10K (3 tiers)
+    | '10k_novice'
+    | '10k_intermediate'
+    | '10k_advanced'
+    // Half Marathon (5 tiers)
+    | 'half_novice_1'
+    | 'half_novice_2'
+    | 'half_intermediate_1'
+    | 'half_advanced'
+    | 'half_hm3'
+    // Marathon (7 tiers)
+    | 'marathon_novice_1'
+    | 'marathon_novice_2'
+    | 'marathon_novice_supreme'
+    | 'marathon_intermediate_1'
+    | 'marathon_intermediate_2'
+    | 'marathon_advanced_1'
+    | 'marathon_advanced_2';
+
+/**
+ * Legacy tier aliases for backward compatibility
+ */
+export type LegacyHigdonTier =
     | 'novice_1'
     | 'novice_2'
     | 'novice_supreme'
@@ -401,119 +441,410 @@ export type HigdonTier =
     | 'advanced_1'
     | 'advanced_2';
 
+/**
+ * Map legacy tier names to new namespaced names
+ */
+export const LEGACY_TIER_MAP: Record<LegacyHigdonTier, HigdonTier> = {
+    novice_1: 'marathon_novice_1',
+    novice_2: 'marathon_novice_2',
+    novice_supreme: 'marathon_novice_supreme',
+    intermediate_1: 'marathon_intermediate_1',
+    intermediate_2: 'marathon_intermediate_2',
+    advanced_1: 'marathon_advanced_1',
+    advanced_2: 'marathon_advanced_2',
+};
+
 export interface HigdonTierConfig {
     tier: HigdonTier;
+    distance: HigdonDistance;
     durationWeeks: number;
     runDays: number;
     crossTrainDays: number;
     restDays: number;
-    twentyMilers: number;
-    twentyMilerWeeks: number[];
-    peakMileage: number;
+    walkDays?: number;
+    strengthDays?: number;
+    // Marathon-specific
+    twentyMilers?: number;
+    twentyMilerWeeks?: number[];
+    // General
+    peakLongRunMiles?: number;
+    peakLongRunMinutes?: number;
     longRunDay: 'saturday' | 'sunday';
     hasWeekendBackToBack: boolean;
     hasThreeOneLongRun: boolean;
     qualitySessions: string[];
+    // Tune-up races
+    tuneUpRaceWeeks?: { week: number; distance: string }[];
+    // Stepback pattern
+    stepbackWeeks?: number[];
 }
 
 export const HIGDON_TIER_CONFIGS: Record<HigdonTier, HigdonTierConfig> = {
-    novice_1: {
-        tier: 'novice_1',
-        durationWeeks: 18,
+    // =========================================================================
+    // BASE TRAINING (4 tiers)
+    // =========================================================================
+    base_novice: {
+        tier: 'base_novice',
+        distance: 'base',
+        durationWeeks: 12,
         runDays: 4,
-        crossTrainDays: 1,
+        crossTrainDays: 0,
         restDays: 2,
-        twentyMilers: 1,
-        twentyMilerWeeks: [15],
-        peakMileage: 40,
+        walkDays: 1,
+        peakLongRunMiles: 8,
+        longRunDay: 'sunday',
+        hasWeekendBackToBack: false,
+        hasThreeOneLongRun: false,
+        qualitySessions: [],
+    },
+    base_intermediate: {
+        tier: 'base_intermediate',
+        distance: 'base',
+        durationWeeks: 12,
+        runDays: 6,
+        crossTrainDays: 0,
+        restDays: 1,
+        strengthDays: 2,
+        peakLongRunMiles: 10,
+        longRunDay: 'sunday',
+        hasWeekendBackToBack: false,
+        hasThreeOneLongRun: false,
+        qualitySessions: [],
+        stepbackWeeks: [4, 7, 11],
+    },
+    base_advanced: {
+        tier: 'base_advanced',
+        distance: 'base',
+        durationWeeks: 12,
+        runDays: 6,
+        crossTrainDays: 0,
+        restDays: 0,
+        strengthDays: 2,
+        peakLongRunMiles: 10,
+        longRunDay: 'sunday',
+        hasWeekendBackToBack: false,
+        hasThreeOneLongRun: false,
+        qualitySessions: ['tue_hills_or_intervals', 'thu_tempo_or_fartlek'],
+        tuneUpRaceWeeks: [
+            { week: 5, distance: '5k' },
+            { week: 7, distance: '8k' },
+            { week: 9, distance: '10k' },
+            { week: 11, distance: '5k' },
+            { week: 12, distance: '10k' },
+        ],
+    },
+    base_spring: {
+        tier: 'base_spring',
+        distance: 'base',
+        durationWeeks: 10,
+        runDays: 4,
+        crossTrainDays: 2,
+        restDays: 1,
+        strengthDays: 2,
+        peakLongRunMinutes: 90,
+        longRunDay: 'saturday',
+        hasWeekendBackToBack: false,
+        hasThreeOneLongRun: false,
+        qualitySessions: ['thu_intervals', 'fri_tempo'],
+    },
+
+    // =========================================================================
+    // 5K (3 tiers)
+    // =========================================================================
+    '5k_novice': {
+        tier: '5k_novice',
+        distance: '5k',
+        durationWeeks: 8,
+        runDays: 3,
+        crossTrainDays: 0,
+        restDays: 1,
+        walkDays: 1,
+        peakLongRunMiles: 3,
         longRunDay: 'saturday',
         hasWeekendBackToBack: false,
         hasThreeOneLongRun: false,
         qualitySessions: [],
     },
-    novice_2: {
-        tier: 'novice_2',
+    '5k_intermediate': {
+        tier: '5k_intermediate',
+        distance: '5k',
+        durationWeeks: 8,
+        runDays: 5,
+        crossTrainDays: 0,
+        restDays: 2,
+        peakLongRunMiles: 7,
+        longRunDay: 'sunday',
+        hasWeekendBackToBack: false,
+        hasThreeOneLongRun: false,
+        qualitySessions: ['wed_intervals_or_tempo', 'sat_fast'],
+    },
+    '5k_advanced': {
+        tier: '5k_advanced',
+        distance: '5k',
+        durationWeeks: 8,
+        runDays: 5,
+        crossTrainDays: 0,
+        restDays: 1,
+        peakLongRunMinutes: 90,
+        longRunDay: 'sunday',
+        hasWeekendBackToBack: false,
+        hasThreeOneLongRun: false,
+        qualitySessions: ['tue_intervals', 'thu_tempo', 'sat_fast'],
+        tuneUpRaceWeeks: [{ week: 4, distance: '5k' }],
+    },
+
+    // =========================================================================
+    // 10K (3 tiers)
+    // =========================================================================
+    '10k_novice': {
+        tier: '10k_novice',
+        distance: '10k',
+        durationWeeks: 8,
+        runDays: 3,
+        crossTrainDays: 2,
+        restDays: 2,
+        peakLongRunMiles: 5.5,
+        longRunDay: 'sunday',
+        hasWeekendBackToBack: false,
+        hasThreeOneLongRun: false,
+        qualitySessions: [],
+        stepbackWeeks: [6],
+    },
+    '10k_intermediate': {
+        tier: '10k_intermediate',
+        distance: '10k',
+        durationWeeks: 8,
+        runDays: 5,
+        crossTrainDays: 1,
+        restDays: 1,
+        peakLongRunMiles: 8,
+        longRunDay: 'sunday',
+        hasWeekendBackToBack: false,
+        hasThreeOneLongRun: false,
+        qualitySessions: ['wed_tempo_or_intervals'],
+        tuneUpRaceWeeks: [{ week: 4, distance: '5k' }],
+    },
+    '10k_advanced': {
+        tier: '10k_advanced',
+        distance: '10k',
+        durationWeeks: 8,
+        runDays: 6,
+        crossTrainDays: 0,
+        restDays: 1,
+        peakLongRunMiles: 10,
+        longRunDay: 'sunday',
+        hasWeekendBackToBack: false,
+        hasThreeOneLongRun: true,
+        qualitySessions: ['tue_tempo', 'wed_intervals', 'sat_pace'],
+        tuneUpRaceWeeks: [
+            { week: 4, distance: '5k' },
+            { week: 6, distance: '8k' },
+        ],
+    },
+
+    // =========================================================================
+    // HALF MARATHON (5 tiers)
+    // =========================================================================
+    half_novice_1: {
+        tier: 'half_novice_1',
+        distance: 'half',
+        durationWeeks: 12,
+        runDays: 3,
+        crossTrainDays: 2,
+        restDays: 2,
+        peakLongRunMiles: 10,
+        longRunDay: 'sunday',
+        hasWeekendBackToBack: false,
+        hasThreeOneLongRun: false,
+        qualitySessions: [],
+        tuneUpRaceWeeks: [
+            { week: 6, distance: '5k' },
+            { week: 9, distance: '10k' },
+        ],
+    },
+    half_novice_2: {
+        tier: 'half_novice_2',
+        distance: 'half',
+        durationWeeks: 12,
+        runDays: 4,
+        crossTrainDays: 1,
+        restDays: 2,
+        peakLongRunMiles: 10,
+        longRunDay: 'saturday',
+        hasWeekendBackToBack: false,
+        hasThreeOneLongRun: false,
+        qualitySessions: ['wed_pace_even_weeks'],
+        tuneUpRaceWeeks: [
+            { week: 6, distance: '5k' },
+            { week: 9, distance: '10k' },
+        ],
+    },
+    half_intermediate_1: {
+        tier: 'half_intermediate_1',
+        distance: 'half',
+        durationWeeks: 12,
+        runDays: 5,
+        crossTrainDays: 1,
+        restDays: 1,
+        peakLongRunMiles: 12,
+        longRunDay: 'sunday',
+        hasWeekendBackToBack: false,
+        hasThreeOneLongRun: false,
+        qualitySessions: ['wed_pace', 'sat_pace'],
+        tuneUpRaceWeeks: [
+            { week: 6, distance: '5k' },
+            { week: 9, distance: '10k' },
+        ],
+    },
+    half_advanced: {
+        tier: 'half_advanced',
+        distance: 'half',
+        durationWeeks: 12,
+        runDays: 6,
+        crossTrainDays: 0,
+        restDays: 1,
+        peakLongRunMinutes: 100,
+        longRunDay: 'sunday',
+        hasWeekendBackToBack: false,
+        hasThreeOneLongRun: true,
+        qualitySessions: ['tue_hills_or_intervals', 'thu_tempo', 'sat_pace'],
+        tuneUpRaceWeeks: [
+            { week: 3, distance: '5k' },
+            { week: 6, distance: '10k' },
+            { week: 9, distance: '15k' },
+        ],
+    },
+    half_hm3: {
+        tier: 'half_hm3',
+        distance: 'half',
+        durationWeeks: 12,
+        runDays: 3,
+        crossTrainDays: 2,
+        restDays: 2,
+        peakLongRunMiles: 10,
+        longRunDay: 'saturday',
+        hasWeekendBackToBack: false,
+        hasThreeOneLongRun: false,
+        qualitySessions: ['thu_rotation'],
+        tuneUpRaceWeeks: [
+            { week: 6, distance: '5k' },
+            { week: 9, distance: '10k' },
+        ],
+    },
+
+    // =========================================================================
+    // MARATHON (7 tiers)
+    // =========================================================================
+    marathon_novice_1: {
+        tier: 'marathon_novice_1',
+        distance: 'marathon',
         durationWeeks: 18,
         runDays: 4,
         crossTrainDays: 1,
         restDays: 2,
         twentyMilers: 1,
         twentyMilerWeeks: [15],
-        peakMileage: 36,
+        peakLongRunMiles: 20,
+        longRunDay: 'saturday',
+        hasWeekendBackToBack: false,
+        hasThreeOneLongRun: false,
+        qualitySessions: [],
+        tuneUpRaceWeeks: [{ week: 8, distance: 'half' }],
+    },
+    marathon_novice_2: {
+        tier: 'marathon_novice_2',
+        distance: 'marathon',
+        durationWeeks: 18,
+        runDays: 4,
+        crossTrainDays: 1,
+        restDays: 2,
+        twentyMilers: 1,
+        twentyMilerWeeks: [15],
+        peakLongRunMiles: 20,
         longRunDay: 'saturday',
         hasWeekendBackToBack: false,
         hasThreeOneLongRun: false,
         qualitySessions: ['wed_race_pace'],
+        tuneUpRaceWeeks: [{ week: 9, distance: 'half' }],
     },
-    novice_supreme: {
-        tier: 'novice_supreme',
+    marathon_novice_supreme: {
+        tier: 'marathon_novice_supreme',
+        distance: 'marathon',
         durationWeeks: 30,
         runDays: 4,
         crossTrainDays: 1,
         restDays: 2,
         twentyMilers: 1,
-        twentyMilerWeeks: [27], // Week 15 of marathon phase = week 27 overall
-        peakMileage: 40,
+        twentyMilerWeeks: [27],
+        peakLongRunMiles: 20,
         longRunDay: 'saturday',
         hasWeekendBackToBack: false,
         hasThreeOneLongRun: false,
         qualitySessions: [],
     },
-    intermediate_1: {
-        tier: 'intermediate_1',
+    marathon_intermediate_1: {
+        tier: 'marathon_intermediate_1',
+        distance: 'marathon',
         durationWeeks: 18,
         runDays: 5,
         crossTrainDays: 1,
         restDays: 1,
         twentyMilers: 2,
         twentyMilerWeeks: [13, 15],
-        peakMileage: 44,
+        peakLongRunMiles: 20,
         longRunDay: 'sunday',
         hasWeekendBackToBack: true,
         hasThreeOneLongRun: false,
         qualitySessions: ['sat_race_pace'],
+        tuneUpRaceWeeks: [{ week: 9, distance: 'half' }],
     },
-    intermediate_2: {
-        tier: 'intermediate_2',
+    marathon_intermediate_2: {
+        tier: 'marathon_intermediate_2',
+        distance: 'marathon',
         durationWeeks: 18,
         runDays: 5,
         crossTrainDays: 1,
         restDays: 1,
         twentyMilers: 3,
         twentyMilerWeeks: [11, 13, 15],
-        peakMileage: 50,
+        peakLongRunMiles: 20,
         longRunDay: 'sunday',
         hasWeekendBackToBack: true,
         hasThreeOneLongRun: false,
         qualitySessions: ['sat_race_pace'],
+        tuneUpRaceWeeks: [{ week: 9, distance: 'half' }],
     },
-    advanced_1: {
-        tier: 'advanced_1',
+    marathon_advanced_1: {
+        tier: 'marathon_advanced_1',
+        distance: 'marathon',
         durationWeeks: 18,
         runDays: 6,
         crossTrainDays: 0,
         restDays: 1,
         twentyMilers: 3,
         twentyMilerWeeks: [11, 13, 15],
-        peakMileage: 50,
+        peakLongRunMiles: 20,
         longRunDay: 'sunday',
         hasWeekendBackToBack: true,
         hasThreeOneLongRun: true,
         qualitySessions: ['thu_speedwork', 'sat_race_pace'],
+        tuneUpRaceWeeks: [{ week: 9, distance: 'half' }],
     },
-    advanced_2: {
-        tier: 'advanced_2',
+    marathon_advanced_2: {
+        tier: 'marathon_advanced_2',
+        distance: 'marathon',
         durationWeeks: 18,
         runDays: 6,
         crossTrainDays: 0,
         restDays: 1,
         twentyMilers: 3,
         twentyMilerWeeks: [11, 13, 15],
-        peakMileage: 45,
+        peakLongRunMiles: 20,
         longRunDay: 'sunday',
         hasWeekendBackToBack: true,
         hasThreeOneLongRun: true,
         qualitySessions: ['tue_speedwork', 'thu_speedwork', 'sat_race_pace'],
+        tuneUpRaceWeeks: [{ week: 9, distance: 'half' }],
     },
 };
 

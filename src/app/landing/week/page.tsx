@@ -111,7 +111,13 @@ export default function WeekLanding() {
                 <div className="max-w-3xl mx-auto text-center">
                     <p className="text-xs text-white/40 uppercase tracking-widest mb-4">Plan Structure</p>
                     <h2 className="text-4xl md:text-5xl font-light text-white/80 mb-4">You choose your approach</h2>
-                    <p className="text-lg text-white/40">Different philosophies. We'll help you pick the right one.</p>
+                    <p className="text-lg text-white/40 mb-8">Different philosophies. We'll help you pick the right one.</p>
+                    <Link
+                        href="/philosophy"
+                        className="inline-block px-6 py-3 bg-white/[0.05] border border-white/20 text-white/70 text-sm font-medium rounded-lg hover:bg-white/[0.08] hover:border-white/30 transition-all"
+                    >
+                        Take the quiz →
+                    </Link>
                 </div>
             </section>
 

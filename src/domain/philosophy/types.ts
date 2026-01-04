@@ -70,10 +70,10 @@ export const PHILOSOPHIES: Record<TrainingPhilosophy, PhilosophyMetadata> = {
                 'Sunday: Long run (capped at 16mi)',
             ],
             bestFor: [
-                'Experienced runners (1+ marathons)',
+                'Experienced runners (any distance)',
                 'Those who can commit to 6 run days',
-                'Runners who thrive on consistency',
-                'People who trust the process over feeling "ready"',
+                'Runners who thrive on daily routine',
+                'Athletes who trust the process over big single efforts',
             ],
             challenges: [
                 'Hard to fit in if you can only run 4-5 days',
@@ -114,10 +114,10 @@ export const PHILOSOPHIES: Record<TrainingPhilosophy, PhilosophyMetadata> = {
                 'Sunday: Long run (progressive)',
             ],
             bestFor: [
-                'First-time marathoners',
+                'First-time racers at any distance',
                 'Runners with limited time (4-5 days max)',
                 'Those returning from injury or long break',
-                'People who need built-in recovery',
+                'People who need built-in rest days',
             ],
             challenges: [
                 'Lower frequency may limit aerobic development for advanced runners',
@@ -158,10 +158,10 @@ export const PHILOSOPHIES: Record<TrainingPhilosophy, PhilosophyMetadata> = {
                 'Sunday: Long run (18-22 mi with MP blocks)',
             ],
             bestFor: [
-                'Experienced marathoners chasing PRs',
+                'Experienced runners chasing PRs',
                 'Runners with 40+ mile weekly base',
                 'Those who can commit to 6 high-volume days',
-                'Competitive athletes with time to recover properly',
+                'Competitive athletes across any distance',
             ],
             challenges: [
                 'Requires significant base mileage to start',
@@ -209,12 +209,14 @@ export const FOUNDATION_LAYERS = [
 // QUIZ TYPES
 // =============================================================================
 
+export type TargetDistance = '5k' | '10k' | 'half' | 'marathon' | 'ultra';
 export type DaysPerWeek = 3 | 4 | 5 | 6;
-export type Experience = 'first_marathon' | 'some_marathons' | 'chasing_pr';
+export type Experience = 'beginner' | 'intermediate' | 'advanced';
 export type CurrentMileage = 'under_20' | '20_40' | 'over_40';
 export type Mindset = 'rest_focus' | 'consistency' | 'push_limits';
 
 export interface QuizAnswers {
+    targetDistance: TargetDistance | null;
     daysPerWeek: DaysPerWeek | null;
     experience: Experience | null;
     currentMileage: CurrentMileage | null;
@@ -222,6 +224,7 @@ export interface QuizAnswers {
 }
 
 export const INITIAL_QUIZ_ANSWERS: QuizAnswers = {
+    targetDistance: null,
     daysPerWeek: null,
     experience: null,
     currentMileage: null,

@@ -229,6 +229,17 @@ function OnboardingContent() {
     // Load saved progress on mount
     useEffect(() => {
         setMounted(true);
+
+        // Check for philosophy selected from quiz (before auth)
+        const selectedPhilosophy = localStorage.getItem('selected-philosophy');
+        if (selectedPhilosophy && ['hansons', 'higdon', 'pfitzinger'].includes(selectedPhilosophy)) {
+            setData(prev => ({
+                ...prev,
+                trainingPhilosophy: selectedPhilosophy as 'hansons' | 'higdon' | 'pfitzinger'
+            }));
+            localStorage.removeItem('selected-philosophy'); // Clear after use
+        }
+
         const saved = loadOnboardingProgress();
         if (saved && saved.step !== 'welcome' && saved.step !== 'complete') {
             setSavedProgress(saved);

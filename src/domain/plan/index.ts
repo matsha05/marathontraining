@@ -36,3 +36,76 @@ export {
     getTemplate,
     buildWorkout,
 } from './workouts/templates';
+
+// =============================================================================
+// NEW: Coach-Specific Modules (Oracle Research Integration)
+// =============================================================================
+
+// Hal Higdon tier system
+export {
+    HIGDON_MICROCYCLES,
+    isHigdonStepbackWeek,
+    getStepbackReduction,
+    generateHigdonLongRunProgression,
+    getHigdonPhase,
+    shouldUseThreeOneLongRun,
+    buildThreeOneLongRun,
+    getHigdonTierConfig,
+    getMicrocycleForTier,
+} from './coaches/higdon';
+
+// Movement interference matrix
+export {
+    GREEN_MOVEMENTS,
+    YELLOW_MOVEMENTS,
+    RED_MOVEMENTS,
+    ALL_MOVEMENTS,
+    canScheduleBeforeLongRun,
+    canScheduleBeforeQualityRun,
+    getMovementsForPhase,
+} from './interference-matrix';
+
+// Ultra training engine
+export {
+    LONG_RUN_CAPS_HOURS,
+    WEEKEND_TOTAL_CAPS_HOURS,
+    getB2BConfig,
+    getB2BFrequency,
+    meetsB2BGates,
+    calculateB2BSplit,
+    getUphillMinutesTarget,
+    getWeeklyVertTarget,
+    getFuelingTargets,
+    getGutTrainingRamp,
+    getNightTrainingConfig,
+    getWalkingStrategy,
+    getUltraPhaseWeeks,
+    isDurationIncreaseAllowed,
+} from './ultra-engine';
+
+// Strength training engine
+export {
+    getStrengthPhaseConfig,
+    RUNNER_EXERCISES,
+    generateStrengthWorkout,
+    getDownhillEccentricModule,
+    getPoleHikingModule,
+    getFootAnkleDurabilityModule,
+    isStrengthTimingSafe,
+} from './strength-engine';
+
+// Enhanced verification
+export {
+    verifyPlanEnhanced,
+    checkPolarization,
+    checkLongRunCap,
+    checkProgressionRate,
+    checkRecoveryFrequency,
+    checkSOSDistribution,
+    checkHigdon20MileCap,
+    checkHigdonStepbackPattern,
+    checkHigdonTaper,
+    checkUltraB2BFrequency,
+    checkUltraDurationProgression,
+} from './verification';
+export type { VerificationCheck, EnhancedVerification } from './verification';
