@@ -21,10 +21,10 @@ import { RecommendationScreen } from './RecommendationScreen';
  * 100% token usage, zero hardcoded colors
  */
 
-type QuestionStep = 'distance' | 'timing' | 'date_input' | 'days' | 'experience' | 'mileage' | 'mindset' | 'result';
+type QuestionStep = 'beginner_gate' | 'distance' | 'timing' | 'date_input' | 'days' | 'experience' | 'mileage' | 'mindset' | 'result';
 
 // Base step order (date_input is conditionally inserted)
-const BASE_STEP_ORDER: QuestionStep[] = ['distance', 'timing', 'days', 'experience', 'mileage', 'mindset', 'result'];
+const BASE_STEP_ORDER: QuestionStep[] = ['beginner_gate', 'distance', 'timing', 'days', 'experience', 'mileage', 'mindset', 'result'];
 
 interface PhilosophyQuizProps {
     onComplete: (philosophy: string) => void;
@@ -32,8 +32,9 @@ interface PhilosophyQuizProps {
 }
 
 export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
-    const [step, setStep] = useState<QuestionStep>('distance');
+    const [step, setStep] = useState<QuestionStep>('beginner_gate');
     const [answers, setAnswers] = useState<QuizAnswers>(INITIAL_QUIZ_ANSWERS);
+    const [canRunMile, setCanRunMile] = useState<boolean | null>(null);
 
     // Dynamic step order based on timing selection
     const STEP_ORDER = answers.raceTiming === 'specific'
@@ -101,8 +102,8 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
 
     return (
         <div className="v2-root min-h-screen" style={{ background: 'var(--v2-bg-deep)', color: 'var(--v2-text-primary)' }}>
-            {/* Progress bar */}
-            {step !== 'result' && (
+            {/* Progress bar - hide on beginner gate and result */}
+            {step !== 'result' && step !== 'beginner_gate' && (
                 <div className="fixed top-0 left-0 right-0 z-50">
                     <div className="h-1" style={{ background: 'var(--v2-border)' }}>
                         <motion.div
@@ -122,6 +123,109 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
             )}
 
             <AnimatePresence mode="wait">
+                {/* Beginner Gate: Can you run 1 mile? */}
+                {step === 'beginner_gate' && canRunMile === null && (
+                    <motion.div
+                        key="beginner_gate"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.24, ease: [0.2, 0.8, 0.2, 1] }}
+                        className="min-h-screen flex flex-col items-center justify-center px-6 py-16"
+                    >
+                        <div className="max-w-xl w-full text-center">
+                            <h1
+                                className="text-3xl md:text-4xl font-light mb-4"
+                                style={{ color: 'var(--v2-text-primary)' }}
+                            >
+                                Quick check first
+                            </h1>
+                            <p
+                                className="text-lg mb-8"
+                                style={{ color: 'var(--v2-text-muted)' }}
+                            >
+                                Can you run 1 mile without stopping?
+                            </p>
+                            <div className="space-y-3">
+                                <button
+                                    onClick={() => {
+                                        setCanRunMile(true);
+                                        setStep('distance');
+                                    }}
+                                    className="w-full v2-card v2-card-interactive p-5 text-left"
+                                >
+                                    <p className="v2-heading-sm">Yes, I can run a mile</p>
+                                    <p className="v2-body-sm mt-1" style={{ color: 'var(--v2-text-muted)' }}>
+                                        Great! Let&apos;s find your training approach.
+                                    </p>
+                                </button>
+                                <button
+                                    onClick={() => setCanRunMile(false)}
+                                    className="w-full v2-card v2-card-interactive p-5 text-left"
+                                >
+                                    <p className="v2-heading-sm">Not yet</p>
+                                    <p className="v2-body-sm mt-1" style={{ color: 'var(--v2-text-muted)' }}>
+                                        That&apos;s okay — we&apos;ll point you in the right direction.
+                                    </p>
+                                </button>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* Beginner Gate: Not ready message */}
+                {step === 'beginner_gate' && canRunMile === false && (
+                    <motion.div
+                        key="not_ready"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="min-h-screen flex flex-col items-center justify-center px-6 py-16"
+                    >
+                        <div className="max-w-xl w-full text-center">
+                            <div className="text-5xl mb-6">🏃‍♂️</div>
+                            <h1
+                                className="text-3xl md:text-4xl font-light mb-4"
+                                style={{ color: 'var(--v2-text-primary)' }}
+                            >
+                                Build your foundation first
+                            </h1>
+                            <p
+                                className="text-lg mb-6"
+                                style={{ color: 'var(--v2-text-muted)' }}
+                            >
+                                Our training plans assume you can run continuously.
+                                The Couch to 5K program is perfect for building up to that point.
+                            </p>
+                            <div className="v2-card p-6 mb-8 text-left">
+                                <p className="v2-label mb-2">Recommended: Couch to 5K (C25K)</p>
+                                <p className="v2-body-sm mb-4" style={{ color: 'var(--v2-text-muted)' }}>
+                                    A proven 8-week walk/run program that gradually builds you up to running 3 miles without stopping.
+                                </p>
+                                <a
+                                    href="https://www.nhs.uk/live-well/exercise/couch-to-5k-week-by-week/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="v2-btn v2-btn-primary"
+                                >
+                                    Start C25K (NHS Guide) →
+                                </a>
+                            </div>
+                            <button
+                                onClick={() => setCanRunMile(null)}
+                                className="v2-btn v2-btn-ghost"
+                            >
+                                ← Go back
+                            </button>
+                            <p
+                                className="text-sm mt-6"
+                                style={{ color: 'var(--v2-text-subtle)' }}
+                            >
+                                Once you can run 1 mile, come back and we&apos;ll build your training plan!
+                            </p>
+                        </div>
+                    </motion.div>
+                )}
+
                 {/* Question 1: Goal */}
                 {step === 'distance' && (
                     <QuestionScreen
@@ -136,8 +240,11 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                             { value: 'marathon' as TargetDistance, label: 'Marathon', description: 'The classic 26.2' },
                         ]}
                         onSelect={handleDistanceSelect}
-                        onBack={onSkip}
-                        backLabel="Skip quiz"
+                        onBack={() => {
+                            setCanRunMile(null);
+                            setStep('beginner_gate');
+                        }}
+                        backLabel="Back"
                     />
                 )}
 
@@ -158,55 +265,116 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                 )}
 
                 {/* Question 2b: Date Input (only when specific timing selected) */}
-                {step === 'date_input' && (
-                    <motion.div
-                        key="date_input"
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        transition={{ duration: 0.24, ease: [0.2, 0.8, 0.2, 1] }}
-                        className="min-h-screen flex flex-col items-center justify-center px-6 py-16"
-                    >
-                        <button
-                            onClick={goBack}
-                            className="fixed top-8 left-6 text-sm transition-colors"
-                            style={{ color: 'var(--v2-text-subtle)' }}
+                {step === 'date_input' && (() => {
+                    // Calculate weeks to race when date is selected
+                    const selectedDate = answers.raceDate;
+                    const weeksToRace = selectedDate
+                        ? Math.floor((new Date(selectedDate).getTime() - Date.now()) / (7 * 24 * 60 * 60 * 1000))
+                        : null;
+
+                    // Minimum weeks based on distance
+                    const minWeeks: Record<string, number> = {
+                        '5k': 6, '10k': 8, 'half': 10, 'marathon': 14, 'base': 4
+                    };
+                    const requiredWeeks = answers.targetDistance ? (minWeeks[answers.targetDistance] || 8) : 8;
+                    const isTooSoon = weeksToRace !== null && weeksToRace < requiredWeeks;
+
+                    return (
+                        <motion.div
+                            key="date_input"
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{ duration: 0.24, ease: [0.2, 0.8, 0.2, 1] }}
+                            className="min-h-screen flex flex-col items-center justify-center px-6 py-16"
                         >
-                            ← Back
-                        </button>
-                        <div className="max-w-xl w-full text-center">
-                            <h1
-                                className="text-3xl md:text-4xl font-light mb-4"
-                                style={{ color: 'var(--v2-text-primary)' }}
-                            >
-                                When is race day?
-                            </h1>
-                            <p
-                                className="text-lg mb-8"
-                                style={{ color: 'var(--v2-text-muted)' }}
-                            >
-                                We&apos;ll calculate how many weeks you have to train.
-                            </p>
-                            <input
-                                type="date"
-                                className="v2-input text-center text-lg py-4 px-6 w-full max-w-xs mx-auto"
-                                style={{ background: 'var(--v2-bg-elevated)', border: '1px solid var(--v2-border)' }}
-                                min={new Date().toISOString().split('T')[0]}
-                                onChange={(e) => {
-                                    if (e.target.value) {
-                                        handleDateSelect(e.target.value);
-                                    }
-                                }}
-                            />
-                            <p
-                                className="text-sm mt-4"
+                            <button
+                                onClick={goBack}
+                                className="fixed top-8 left-6 text-sm transition-colors"
                                 style={{ color: 'var(--v2-text-subtle)' }}
                             >
-                                Pick your target race date
-                            </p>
-                        </div>
-                    </motion.div>
-                )}
+                                ← Back
+                            </button>
+                            <div className="max-w-xl w-full text-center">
+                                <h1
+                                    className="text-3xl md:text-4xl font-light mb-4"
+                                    style={{ color: 'var(--v2-text-primary)' }}
+                                >
+                                    When is your {answers.targetDistance === 'half' ? 'half marathon' : answers.targetDistance}?
+                                </h1>
+                                <p
+                                    className="text-lg mb-8"
+                                    style={{ color: 'var(--v2-text-muted)' }}
+                                >
+                                    We&apos;ll calculate how many weeks you have to prepare.
+                                </p>
+                                <input
+                                    type="date"
+                                    value={answers.raceDate || ''}
+                                    className="v2-input text-center text-lg py-4 px-6 w-full max-w-xs mx-auto"
+                                    style={{ background: 'var(--v2-bg-elevated)', border: '1px solid var(--v2-border)' }}
+                                    min={new Date().toISOString().split('T')[0]}
+                                    onChange={(e) => {
+                                        if (e.target.value) {
+                                            setAnswers(prev => ({ ...prev, raceDate: e.target.value }));
+                                        }
+                                    }}
+                                />
+
+                                {/* Week countdown preview */}
+                                {weeksToRace !== null && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="mt-6"
+                                    >
+                                        <p className="v2-heading-md v2-mono" style={{ color: 'var(--v2-accent)' }}>
+                                            {weeksToRace} weeks
+                                        </p>
+                                        <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                            until race day
+                                        </p>
+
+                                        {/* Warning if too short */}
+                                        {isTooSoon && (
+                                            <motion.div
+                                                initial={{ opacity: 0, scale: 0.95 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                className="mt-4 p-4 rounded-lg border"
+                                                style={{
+                                                    background: 'var(--v2-warning-subtle)',
+                                                    borderColor: 'var(--v2-warning)'
+                                                }}
+                                            >
+                                                <p className="v2-body-sm" style={{ color: 'var(--v2-warning)' }}>
+                                                    ⚠️ We recommend at least {requiredWeeks} weeks for a {answers.targetDistance === 'half' ? 'half marathon' : answers.targetDistance}.
+                                                    You can still proceed, but we&apos;ll adjust expectations.
+                                                </p>
+                                            </motion.div>
+                                        )}
+
+                                        {/* Continue button */}
+                                        <button
+                                            onClick={() => handleDateSelect(answers.raceDate!)}
+                                            className="v2-btn v2-btn-primary v2-btn-lg mt-6"
+                                        >
+                                            Continue
+                                        </button>
+                                    </motion.div>
+                                )}
+
+                                {!selectedDate && (
+                                    <p
+                                        className="text-sm mt-4"
+                                        style={{ color: 'var(--v2-text-subtle)' }}
+                                    >
+                                        Pick your target race date
+                                    </p>
+                                )}
+                            </div>
+                        </motion.div>
+                    );
+                })()}
 
                 {/* Question 3: Days per week */}
                 {step === 'days' && (

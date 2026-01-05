@@ -11,9 +11,10 @@
 
 'use client';
 
-import { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { useMemo, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { calculatePaceZones, formatPace } from '@/domain/vdot/paces';
+import { HeartIcon } from '@/components/ui/heart';
 
 // =============================================================================
 // TYPES
@@ -24,6 +25,7 @@ interface PacesCardProps {
     age?: number | null;
     maxHR?: number | null;
     onRecalibrate?: () => void;
+    onMaxHRUpdate?: (newMaxHR: number) => void;
 }
 
 interface Zone {
@@ -122,13 +124,18 @@ function calculateHRZones(maxHR: number): Record<string, { min: number; max: num
 // COMPONENT
 // =============================================================================
 
-export function PacesCard({ vdot, age, maxHR, onRecalibrate }: PacesCardProps) {
+export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: PacesCardProps) {
+    const [showHREditor, setShowHREditor] = useState(false);
+    const [hrInput, setHRInput] = useState('');
+
     // Calculate max HR from age if not provided
     const calculatedMaxHR = useMemo(() => {
         if (maxHR) return maxHR;
         if (age && age > 0) return Math.round(220 - age);
         return null;
     }, [maxHR, age]);
+
+    const isEstimated = !maxHR && age; // true if using age estimation
 
     // Get pace zones
     const paceZones = useMemo(() => calculatePaceZones(vdot), [vdot]);
@@ -189,9 +196,29 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate }: PacesCardProps) {
             <div className="flex items-start justify-between mb-6">
                 <div>
                     <h2 className="v2-heading-md mb-1">Your Training Zones</h2>
-                    <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
-                        VDOT {vdot}{calculatedMaxHR ? ` • Max HR ${calculatedMaxHR}` : ''}
-                    </p>
+                    <div className="flex items-center gap-2">
+                        <span className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                            VDOT {vdot}
+                        </span>
+                        {calculatedMaxHR && (
+                            <>
+                                <span style={{ color: 'var(--v2-text-subtle)' }}>•</span>
+                                <button
+                                    onClick={() => {
+                                        setHRInput(String(calculatedMaxHR));
+                                        setShowHREditor(true);
+                                    }}
+                                    className="v2-body-sm flex items-center gap-1 transition-colors hover:underline"
+                                    style={{ color: 'var(--v2-text-muted)' }}
+                                    title="Click to update your max HR"
+                                >
+                                    <HeartIcon size={12} />
+                                    Max HR {calculatedMaxHR}
+                                    {isEstimated && <span className="text-[10px]">(est.)</span>}
+                                </button>
+                            </>
+                        )}
+                    </div>
                 </div>
                 {onRecalibrate && (
                     <button
@@ -203,9 +230,60 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate }: PacesCardProps) {
                 )}
             </div>
 
+            {/* Max HR Editor Popover */}
+            <AnimatePresence>
+                {showHREditor && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="mb-6 p-4 rounded-lg border"
+                        style={{ background: 'var(--v2-bg-elevated)', borderColor: 'var(--v2-border)' }}
+                    >
+                        <div className="flex items-center gap-2 mb-3">
+                            <HeartIcon size={16} className="v2-accent" />
+                            <span className="v2-heading-sm">Update Max Heart Rate</span>
+                        </div>
+                        <p className="v2-body-sm mb-4" style={{ color: 'var(--v2-text-muted)' }}>
+                            The default (220 - age) is a rough estimate. For accuracy, use your highest HR from an all-out effort like a 5K race or uphill sprint.
+                        </p>
+                        <div className="flex gap-2">
+                            <input
+                                type="number"
+                                value={hrInput}
+                                onChange={(e) => setHRInput(e.target.value)}
+                                className="v2-input v2-mono w-24 text-center"
+                                placeholder="180"
+                                min="120"
+                                max="220"
+                            />
+                            <span className="v2-body-sm self-center" style={{ color: 'var(--v2-text-muted)' }}>bpm</span>
+                            <button
+                                onClick={() => {
+                                    const val = parseInt(hrInput);
+                                    if (val >= 120 && val <= 220 && onMaxHRUpdate) {
+                                        onMaxHRUpdate(val);
+                                    }
+                                    setShowHREditor(false);
+                                }}
+                                className="v2-btn v2-btn-primary v2-btn-sm"
+                            >
+                                Save
+                            </button>
+                            <button
+                                onClick={() => setShowHREditor(false)}
+                                className="v2-btn v2-btn-ghost v2-btn-sm"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* Pace Zones */}
             <div className="space-y-3 mb-8">
-                {zones.map((zone, i) => (
+                {zones.map((zone) => (
                     <div
                         key={zone.name}
                         className="flex items-center justify-between py-3 border-b"
@@ -222,8 +300,9 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate }: PacesCardProps) {
                         <div className="text-right">
                             <span className="v2-mono v2-body-md">{zone.pace}/mi</span>
                             {zone.hrRange && (
-                                <div className="v2-body-xs" style={{ color: 'var(--v2-text-subtle)' }}>
-                                    ❤️ {zone.hrRange}
+                                <div className="v2-body-xs flex items-center justify-end gap-1" style={{ color: 'var(--v2-text-subtle)' }}>
+                                    <HeartIcon size={10} />
+                                    {zone.hrRange}
                                 </div>
                             )}
                         </div>

@@ -103,24 +103,25 @@ export default function DashboardPage() {
     const { status, plan, currentWeek, todayWorkout, currentWeekPlan } = usePlan();
     const { user, athleteId, status: authStatus } = useAuth();
     const [athlete, setAthlete] = useState<Athlete | null>(null);
-    const [readinessScore, setReadinessScore] = useState<number | null>(null);
+
     const [streak, setStreak] = useState(0);
     const [workoutLogs, setWorkoutLogs] = useState<WorkoutLog[]>([]);
     const [dataLoading, setDataLoading] = useState(true);
     const [showRecalibrationModal, setShowRecalibrationModal] = useState(false);
     const [displayVdotOverride, setDisplayVdotOverride] = useState<number | null>(null);
+    const [maxHROverride, setMaxHROverride] = useState<number | null>(null);
+    const [completedToday, setCompletedToday] = useState<Set<string>>(new Set());
 
     // Handle VDOT recalibration
     const handleRecalibrate = async (newVdot: number) => {
-        // Update local state immediately for responsive UI
         setDisplayVdotOverride(newVdot);
-
-        // TODO: Persist to database and update plan paces
-        // For now, this updates the UI. Full DB integration would:
-        // 1. Update athlete.vdot in database
-        // 2. Recalculate paces for future workouts
-        // 3. Trigger plan context refresh
         console.log('VDOT updated to:', newVdot);
+    };
+
+    // Handle max HR update
+    const handleMaxHRUpdate = (newMaxHR: number) => {
+        setMaxHROverride(newMaxHR);
+        console.log('Max HR updated to:', newMaxHR);
     };
 
     // Fetch athlete data on mount
@@ -155,17 +156,7 @@ export default function DashboardPage() {
                     });
                 }
 
-                const { data: healthData } = await supabase
-                    .from('garmin_health_metrics')
-                    .select('readiness_score')
-                    .eq('athlete_id', athleteId)
-                    .order('summary_date', { ascending: false })
-                    .limit(1)
-                    .single();
 
-                if (healthData?.readiness_score) {
-                    setReadinessScore(healthData.readiness_score);
-                }
 
                 const { count } = await supabase
                     .from('completed_workouts')
@@ -329,7 +320,7 @@ export default function DashboardPage() {
 
     const displayName = athlete?.name || plan?.athleteName || 'Athlete';
     const displayVdot = displayVdotOverride || athlete?.vdot || plan?.vdot || 45;
-    const displayReadiness = readinessScore ?? 85;
+
 
     return (
         <div className="v2-root min-h-screen">
@@ -351,42 +342,13 @@ export default function DashboardPage() {
             <main className="v2-container py-10">
                 {/* Greeting + Readiness */}
                 <motion.div
-                    className="flex items-start justify-between mb-10"
+                    className="mb-10"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <div>
-                        <p className="v2-body-sm mb-1" style={{ color: 'var(--v2-text-muted)' }}>{getGreeting()}</p>
-                        <h1 className="v2-heading-lg">{displayName}</h1>
-                    </div>
-
-                    {/* Readiness Ring */}
-                    <div className="text-center">
-                        <div className="relative w-20 h-20">
-                            <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                                <circle
-                                    cx="50" cy="50" r="42"
-                                    strokeWidth="8"
-                                    fill="none"
-                                    stroke="var(--v2-bg-elevated)"
-                                />
-                                <circle
-                                    cx="50" cy="50" r="42"
-                                    strokeWidth="8"
-                                    fill="none"
-                                    stroke="var(--v2-accent)"
-                                    strokeDasharray="264"
-                                    strokeDashoffset={264 * (1 - displayReadiness / 100)}
-                                    strokeLinecap="round"
-                                />
-                            </svg>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                <span className="v2-heading-md v2-mono">{displayReadiness}</span>
-                            </div>
-                        </div>
-                        <p className="v2-label mt-2">Readiness</p>
-                    </div>
+                    <p className="v2-body-sm mb-1" style={{ color: 'var(--v2-text-muted)' }}>{getGreeting()}</p>
+                    <h1 className="v2-heading-lg">{displayName}</h1>
                 </motion.div>
 
                 {/* Today's Workouts */}
@@ -414,10 +376,11 @@ export default function DashboardPage() {
                                     initial={{ opacity: 0, x: -20 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }}
+                                    className="flex items-center gap-2"
                                 >
                                     <Link
                                         href={`/workout/${workout.id}`}
-                                        className="v2-card v2-card-interactive p-5 flex items-center gap-4"
+                                        className="v2-card v2-card-interactive p-5 flex items-center gap-4 flex-1"
                                     >
                                         <div
                                             className="w-12 h-12 rounded-xl flex items-center justify-center"
@@ -451,6 +414,24 @@ export default function DashboardPage() {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                         </svg>
                                     </Link>
+
+                                    {/* Mark Complete Button */}
+                                    {!completedToday.has(workout.id) ? (
+                                        <button
+                                            onClick={() => {
+                                                setCompletedToday(prev => new Set([...prev, workout.id]));
+                                            }}
+                                            className="v2-btn v2-btn-ghost v2-btn-sm shrink-0"
+                                            title="Mark as complete"
+                                        >
+                                            <CheckIcon size={16} />
+                                            <span className="ml-1">Done</span>
+                                        </button>
+                                    ) : (
+                                        <span className="v2-badge v2-badge-success flex items-center gap-1 shrink-0">
+                                            <CheckIcon size={12} /> Complete
+                                        </span>
+                                    )}
                                 </motion.div>
                             ))
                         ) : (
@@ -472,11 +453,33 @@ export default function DashboardPage() {
                 >
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="v2-heading-md">This Week</h2>
-                        {plan && (
-                            <span className="v2-mono" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
-                                Week {currentWeek} • {currentWeekPlan?.phase.toUpperCase()} • {currentWeekPlan?.totalMiles || 0} miles
-                            </span>
-                        )}
+                        {plan && (() => {
+                            // Calculate week vs last week delta
+                            const currentMiles = currentWeekPlan?.totalMiles || 0;
+                            const prevWeekPlan = plan.weeks.find(w => w.weekNumber === (currentWeek || 1) - 1);
+                            const prevMiles = prevWeekPlan?.totalMiles || 0;
+                            const delta = prevMiles > 0 ? Math.round(((currentMiles - prevMiles) / prevMiles) * 100) : 0;
+
+                            return (
+                                <div className="flex items-center gap-3">
+                                    <span className="v2-mono" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
+                                        Week {currentWeek} • {currentWeekPlan?.phase.toUpperCase()} • {Math.round((currentWeekPlan?.totalMiles || 0) * 10) / 10} mi
+                                    </span>
+                                    {delta !== 0 && prevMiles > 0 && (
+                                        <span
+                                            className="v2-mono px-2 py-0.5 rounded-full"
+                                            style={{
+                                                fontSize: '10px',
+                                                background: delta > 0 ? 'var(--v2-accent-subtle)' : 'var(--v2-bg-inset)',
+                                                color: delta > 0 ? 'var(--v2-accent)' : 'var(--v2-text-muted)'
+                                            }}
+                                        >
+                                            {delta > 0 ? '+' : ''}{delta}% vs last week
+                                        </span>
+                                    )}
+                                </div>
+                            );
+                        })()}
                     </div>
 
                     <div className="grid grid-cols-7 gap-2">
@@ -579,7 +582,9 @@ export default function DashboardPage() {
                     <PacesCard
                         vdot={displayVdot}
                         age={athlete?.age}
+                        maxHR={maxHROverride}
                         onRecalibrate={() => setShowRecalibrationModal(true)}
+                        onMaxHRUpdate={handleMaxHRUpdate}
                     />
                 </motion.section>
 
@@ -602,6 +607,6 @@ export default function DashboardPage() {
                 onClose={() => setShowRecalibrationModal(false)}
                 onConfirm={handleRecalibrate}
             />
-        </div>
+        </div >
     );
 }

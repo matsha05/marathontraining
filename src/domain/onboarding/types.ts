@@ -26,7 +26,7 @@ export type OnboardingStep =
     | 'calibration-method'
     | 'race-input'
     | 'easy-pace-input'
-    | 'device-import'
+
     | 'manual-vo2max'
     | 'hard-effort-input'
     | 'estimation-flow'
@@ -283,9 +283,6 @@ export function getNextStep(
             return 'vdot-reveal';
 
         case 'vdot-reveal':
-            return 'device-import';
-
-        case 'device-import':
             return 'weekly-mileage';
 
         case 'weekly-mileage':
@@ -373,9 +370,6 @@ export function getPreviousStep(
         case 'manual-vo2max':
             return 'calibration-method';
 
-        case 'device-import':
-            return 'vdot-reveal';
-
         case 'vdot-reveal':
             switch (data.calibrationMethod) {
                 case 'race': return 'race-input';
@@ -387,7 +381,7 @@ export function getPreviousStep(
             }
 
         case 'weekly-mileage':
-            return 'device-import';
+            return 'vdot-reveal';
 
         case 'runs-per-week':
             return 'weekly-mileage';
@@ -451,7 +445,7 @@ const STEP_PROGRESS: Record<OnboardingStep, number> = {
     'hard-effort-input': 30,
     'estimation-flow': 30,
     'vdot-reveal': 40,
-    'device-import': 45,
+
     'weekly-mileage': 50,
     'runs-per-week': 55,
     'longest-run': 60,
@@ -499,10 +493,6 @@ export const STEP_TOOLTIPS: Partial<Record<OnboardingStep, CoachTooltip>> = {
         content: 'Your VO2max/VDOT sets every training pace. Too fast on easy days = injury. Too slow on hard days = no adaptation. Choose the most accurate option you have.',
         coach: 'Jack Daniels',
         coachLink: '/methodology#daniels',
-    },
-    'device-import': {
-        title: 'Why connect data',
-        content: 'Strava brings in your completed runs automatically. Garmin exports fill your sleep/HRV history so readiness insights stay accurate.',
     },
     'weekly-mileage': {
         title: 'Why we ask',
@@ -573,8 +563,6 @@ export function isStepComplete(step: OnboardingStep, data: OnboardingData): bool
         case 'easy-pace-input':
             return data.easyPaceMinutes !== null && data.easyPaceSeconds !== null;
 
-        case 'device-import':
-            return true;
 
         case 'hard-effort-input':
             return data.effortType !== null &&

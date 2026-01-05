@@ -109,7 +109,7 @@ export function calculateHRZones(maxHR: number): HRZones {
  * - Easy runs: Trust HR (heat/fatigue affect perceived pace)
  * - Intervals: Trust pace (HR lags effort)
  */
-export function paceZoneToHRZone(paceZone: TrainingZone, maxHR: number): { min: number; max: number; percent: string } {
+export function paceZoneToHRZone(paceZone: TrainingZone, maxHR: number): { min: number; max: number; percent: string; zone: number } {
     const zones = calculateHRZones(maxHR);
 
     switch (paceZone) {
@@ -118,36 +118,42 @@ export function paceZoneToHRZone(paceZone: TrainingZone, maxHR: number): { min: 
                 min: zones.zone2.minBpm,
                 max: zones.zone2.maxBpm,
                 percent: '60-70%',
+                zone: 2,
             };
         case 'M': // Marathon
             return {
                 min: zones.zone3.minBpm,
                 max: zones.zone3.maxBpm,
                 percent: '70-80%',
+                zone: 3,
             };
         case 'T': // Threshold
             return {
                 min: zones.zone4.minBpm,
                 max: zones.zone4.maxBpm,
                 percent: '80-88%',
+                zone: 4,
             };
         case 'I': // Interval
             return {
                 min: zones.zone5.minBpm,
                 max: Math.round(maxHR * 0.95),
                 percent: '88-95%',
+                zone: 5,
             };
         case 'R': // Repetition
             return {
                 min: Math.round(maxHR * 0.95),
                 max: maxHR,
                 percent: '95-100%',
+                zone: 5,
             };
         default:
             return {
                 min: zones.zone2.minBpm,
                 max: zones.zone2.maxBpm,
                 percent: '60-70%',
+                zone: 2,
             };
     }
 }

@@ -14,7 +14,6 @@
     "visual:check": "node scripts/visual-pass.mjs"
   },
   "dependencies": {
-    "@garmin/fitsdk": "^21.0.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.89.0",
     "class-variance-authority": "^0.7.1",

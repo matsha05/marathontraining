@@ -33,16 +33,6 @@ export default function SettingsPage() {
     const [profileSaving, setProfileSaving] = useState(false);
     const [profileMessage, setProfileMessage] = useState<string | null>(null);
 
-    const [garminStatus, setGarminStatus] = useState<{
-        connected: boolean;
-        garminUserId?: string | null;
-        lastActivityAt?: string | null;
-        lastHealthDate?: string | null;
-    } | null>(null);
-    const [garminBusy, setGarminBusy] = useState(false);
-    const [garminMessage, setGarminMessage] = useState<string | null>(null);
-    const [importBusy, setImportBusy] = useState(false);
-    const [importMessage, setImportMessage] = useState<string | null>(null);
     const [stravaStatus, setStravaStatus] = useState<{
         connected: boolean;
         stravaAthleteId?: number | null;
@@ -50,13 +40,9 @@ export default function SettingsPage() {
     } | null>(null);
     const [stravaBusy, setStravaBusy] = useState(false);
     const [stravaMessage, setStravaMessage] = useState<string | null>(null);
-    const [garminAuthRequired, setGarminAuthRequired] = useState(false);
     const [stravaAuthRequired, setStravaAuthRequired] = useState(false);
     const [isLocalhost, setIsLocalhost] = useState(false);
-    const authRequired = garminAuthRequired || stravaAuthRequired;
     const stravaConnected = Boolean(stravaStatus?.connected);
-    const hasHealthData = Boolean(garminStatus?.lastHealthDate);
-    const setupComplete = stravaConnected && hasHealthData;
     const [signOutBusy, setSignOutBusy] = useState(false);
 
     const currentVdot = plan?.vdot || null;
@@ -147,87 +133,8 @@ export default function SettingsPage() {
         if (connect === 'strava' && status === 'connected') {
             setStravaMessage('Strava connected.');
         }
-        void refreshGarminStatus();
         void refreshStravaStatus();
     }, []);
-
-    const refreshGarminStatus = async () => {
-        try {
-            setGarminAuthRequired(false);
-            const response = await fetch('/api/garmin/status');
-            if (response.status === 401) {
-                setGarminAuthRequired(true);
-                setGarminStatus(null);
-                return;
-            }
-            if (!response.ok) throw new Error('Unable to load Garmin status');
-            const data = await response.json() as { connected: boolean; garminUserId?: string | null; lastActivityAt?: string | null; lastHealthDate?: string | null; };
-            setGarminStatus(data);
-        } catch (error) {
-            setGarminMessage(error instanceof Error ? error.message : 'Garmin status failed');
-        }
-    };
-
-    const handleFitUpload = async (file: File) => {
-        setGarminBusy(true);
-        setGarminMessage(null);
-
-        try {
-            const formData = new FormData();
-            formData.append('file', file);
-
-            const response = await fetch('/api/garmin/upload', {
-                method: 'POST',
-                body: formData,
-            });
-
-            if (response.status === 401) {
-                setGarminAuthRequired(true);
-                setGarminStatus(null);
-                return;
-            }
-            if (!response.ok) throw new Error('FIT upload failed');
-            setGarminMessage('FIT uploaded and processed.');
-            await refreshGarminStatus();
-        } catch (error) {
-            setGarminMessage(error instanceof Error ? error.message : 'Upload failed');
-        } finally {
-            setGarminBusy(false);
-        }
-    };
-
-    const handleGarminExportImport = async (file: File) => {
-        setImportBusy(true);
-        setImportMessage(null);
-
-        try {
-            const formData = new FormData();
-            formData.append('file', file);
-
-            const response = await fetch('/api/garmin/import', {
-                method: 'POST',
-                body: formData,
-            });
-
-            if (response.status === 401) {
-                setGarminAuthRequired(true);
-                setGarminStatus(null);
-                return;
-            }
-            if (!response.ok) throw new Error('Garmin export import failed');
-            const payload = await response.json().catch(() => null) as { result?: { activitiesImported?: number; healthDaysImported?: number } } | null;
-            if (payload?.result) {
-                setImportMessage(`Imported ${payload.result.activitiesImported ?? 0} activities and ${payload.result.healthDaysImported ?? 0} health days.`);
-            } else {
-                setImportMessage('Garmin export imported.');
-            }
-            await refreshGarminStatus();
-        } catch (error) {
-            setImportMessage(error instanceof Error ? error.message : 'Garmin export import failed');
-        } finally {
-            setImportBusy(false);
-        }
-    };
 
     const refreshStravaStatus = async () => {
         try {
@@ -282,7 +189,7 @@ export default function SettingsPage() {
             await supabase.auth.signOut();
             router.push('/auth');
         } catch (error) {
-            setGarminMessage(error instanceof Error ? error.message : 'Sign out failed');
+            console.error('Sign out failed:', error);
         } finally {
             setSignOutBusy(false);
         }
@@ -423,113 +330,103 @@ export default function SettingsPage() {
                     </div>
                 </motion.section>
 
-                {/* Integrations */}
+                {/* Strava Integration */}
                 <motion.section
                     className="mb-10"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.2 }}
                 >
-                    <h2 className="v2-heading-md mb-4">Integrations</h2>
-                    <div className="v2-card p-6 space-y-6">
-                        <div className="flex flex-wrap items-start justify-between gap-4">
-                            <div className="space-y-2">
-                                <p className="v2-heading-sm">Recommended data setup</p>
+                    <h2 className="v2-heading-md mb-4">Strava Integration</h2>
+                    <div className="v2-card p-6 space-y-4">
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <p className="v2-heading-sm">Connect Strava</p>
                                 <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
-                                    Activities sync automatically via Strava. Health metrics come from a Garmin export ZIP.
+                                    Sync your runs automatically. Connect Garmin → Strava first in the Garmin Connect app.
                                 </p>
                             </div>
-                            <span className={`v2-badge ${setupComplete ? 'v2-badge-accent' : ''}`}>
-                                {authRequired ? 'Sign in required' : setupComplete ? 'Ready' : 'Recommended'}
+                            <span className={`v2-badge ${stravaConnected ? 'v2-badge-accent' : ''}`} style={!stravaConnected ? { background: 'var(--v2-error-subtle)', color: 'var(--v2-error)' } : {}}>
+                                {stravaAuthRequired ? 'Sign in required' : stravaConnected ? 'Connected' : 'Not connected'}
                             </span>
                         </div>
+                        <div className="flex flex-wrap gap-3">
+                            <button
+                                className="v2-btn v2-btn-primary v2-btn-sm"
+                                onClick={handleStravaConnect}
+                                disabled={stravaBusy || stravaAuthRequired || stravaConnected || isLocalhost}
+                            >
+                                Connect Strava
+                            </button>
+                            <button
+                                className="v2-btn v2-btn-secondary v2-btn-sm"
+                                onClick={handleStravaSyncNow}
+                                disabled={stravaBusy || stravaAuthRequired || !stravaConnected}
+                            >
+                                Sync now
+                            </button>
+                            <button
+                                className="v2-btn v2-btn-ghost v2-btn-sm"
+                                onClick={handleStravaDisconnect}
+                                disabled={stravaBusy || stravaAuthRequired || !stravaConnected}
+                            >
+                                Disconnect
+                            </button>
+                        </div>
+                        {stravaMessage && (
+                            <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>{stravaMessage}</p>
+                        )}
+                        {isLocalhost && (
+                            <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
+                                Strava OAuth only works on production. Deploy to connect.
+                            </p>
+                        )}
+                    </div>
+                </motion.section>
 
-                        {/* Step 1: Garmin → Strava */}
-                        <div className="v2-card p-4 flex items-start gap-4" style={{ background: 'var(--v2-bg-elevated)' }}>
-                            <div className="w-10 h-10 rounded-full flex items-center justify-center v2-mono" style={{ background: 'var(--v2-bg-hover)' }}>1</div>
-                            <div className="space-y-1">
-                                <p className="v2-heading-sm">Link Garmin → Strava</p>
+                {/* Preferences */}
+                <motion.section
+                    className="mb-10"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.25 }}
+                >
+                    <h2 className="v2-heading-md mb-4">Preferences</h2>
+                    <div className="v2-card p-6 space-y-6">
+                        <div className="flex items-center justify-between gap-4">
+                            <div>
+                                <p className="v2-heading-sm">Training Reminders</p>
                                 <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
-                                    Garmin Connect app → Settings → Connected Apps → Strava → Enable.
+                                    Get notified about upcoming workouts
                                 </p>
                             </div>
+                            <Toggle
+                                checked={true}
+                                onChange={() => { }}
+                            />
                         </div>
-
-                        {/* Step 2: Strava */}
-                        <div className="v2-card p-4 flex items-start gap-4">
-                            <div className="w-10 h-10 rounded-full flex items-center justify-center v2-mono" style={{ background: 'var(--v2-bg-elevated)' }}>2</div>
-                            <div className="flex-1 space-y-3">
-                                <div className="flex flex-wrap items-center justify-between gap-3">
-                                    <div>
-                                        <p className="v2-heading-sm">Connect Strava to The Long Game</p>
-                                        <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
-                                            Runs will appear automatically after each sync.
-                                        </p>
-                                    </div>
-                                    <span className={`v2-badge ${stravaConnected ? 'v2-badge-accent' : ''}`} style={!stravaConnected ? { background: 'var(--v2-error-subtle)', color: 'var(--v2-error)' } : {}}>
-                                        {stravaAuthRequired ? 'Sign in required' : stravaConnected ? 'Connected' : 'Not connected'}
-                                    </span>
-                                </div>
-                                <div className="flex flex-wrap gap-3">
-                                    <button
-                                        className="v2-btn v2-btn-primary v2-btn-sm"
-                                        onClick={handleStravaConnect}
-                                        disabled={stravaBusy || authRequired || stravaConnected || isLocalhost}
-                                    >
-                                        Connect Strava
-                                    </button>
-                                    <button
-                                        className="v2-btn v2-btn-secondary v2-btn-sm"
-                                        onClick={handleStravaSyncNow}
-                                        disabled={stravaBusy || authRequired || !stravaConnected}
-                                    >
-                                        Sync now
-                                    </button>
-                                    <button
-                                        className="v2-btn v2-btn-ghost v2-btn-sm"
-                                        onClick={handleStravaDisconnect}
-                                        disabled={stravaBusy || authRequired || !stravaConnected}
-                                    >
-                                        Disconnect
-                                    </button>
-                                </div>
-                                {stravaMessage && (
-                                    <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>{stravaMessage}</p>
-                                )}
+                        <div className="flex items-center justify-between gap-4">
+                            <div>
+                                <p className="v2-heading-sm">Weekly Progress Summary</p>
+                                <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                    Receive a recap every Monday
+                                </p>
                             </div>
+                            <Toggle
+                                checked={true}
+                                onChange={() => { }}
+                            />
                         </div>
-
-                        {/* Step 3: Garmin Health */}
-                        <div className="v2-card p-4 flex items-start gap-4">
-                            <div className="w-10 h-10 rounded-full flex items-center justify-center v2-mono" style={{ background: 'var(--v2-bg-elevated)' }}>3</div>
-                            <div className="flex-1 space-y-3">
-                                <div className="flex flex-wrap items-center justify-between gap-3">
-                                    <div>
-                                        <p className="v2-heading-sm">Import Garmin health data (ZIP)</p>
-                                        <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
-                                            This fills sleep, HRV, stress, and Body Battery history.
-                                        </p>
-                                    </div>
-                                    <span className={`v2-badge ${hasHealthData ? 'v2-badge-accent' : ''}`}>
-                                        {hasHealthData ? 'Imported' : 'Needed'}
-                                    </span>
-                                </div>
-                                <input
-                                    type="file"
-                                    accept=".zip,application/zip"
-                                    className="v2-input"
-                                    disabled={authRequired || importBusy}
-                                    onChange={(event) => {
-                                        const file = event.target.files?.[0];
-                                        if (file) {
-                                            void handleGarminExportImport(file);
-                                            event.currentTarget.value = '';
-                                        }
-                                    }}
-                                />
-                                {importMessage && (
-                                    <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>{importMessage}</p>
-                                )}
+                        <div className="flex items-center justify-between gap-4">
+                            <div>
+                                <p className="v2-heading-sm">Units</p>
+                                <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                    Distances and paces displayed in
+                                </p>
+                            </div>
+                            <div className="flex gap-2">
+                                <button className="v2-btn v2-btn-sm v2-btn-primary">Miles</button>
+                                <button className="v2-btn v2-btn-sm v2-btn-ghost">Kilometers</button>
                             </div>
                         </div>
                     </div>

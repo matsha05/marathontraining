@@ -1,20 +1,31 @@
 /**
  * Strava webhook processing pipeline
+ * 
+ * Simplified version - activities logged directly to completed_workouts
  */
 
 import { fetchStravaActivity } from './api';
 import { getValidAccessToken } from './token';
-import { getStravaTokensByStravaAthleteId } from './store';
+import { getStravaTokensByStravaAthleteId, upsertStravaActivity, deleteStravaActivity } from './store';
 import type { StravaWebhookEvent } from './webhook';
-import { insertGarminActivity, deleteGarminActivityBySourceId } from '@/infrastructure/garmin/store';
-import { logCompletedWorkoutFromActivity } from '@/infrastructure/garmin/activity-log';
-import type { GarminActivitySummary } from '@/domain/garmin/types';
 
 const METERS_PER_MILE = 1609.344;
 
 export interface ProcessResult {
     status: 'processed' | 'ignored';
     message?: string;
+}
+
+export interface StravaActivitySummary {
+    startTime?: string;
+    distanceMeters?: number;
+    durationSeconds?: number;
+    avgSpeedMetersPerSecond?: number;
+    avgPaceSecPerMile?: number;
+    avgHeartRate?: number;
+    maxHeartRate?: number;
+    avgCadence?: number;
+    activityType?: string;
 }
 
 export async function processStravaWebhookEvent(event: StravaWebhookEvent): Promise<ProcessResult> {
@@ -28,32 +39,20 @@ export async function processStravaWebhookEvent(event: StravaWebhookEvent): Prom
     }
 
     if (event.aspectType === 'delete') {
-        await deleteGarminActivityBySourceId(tokenRow.athlete_id, 'strava', `strava:${event.objectId}`);
+        await deleteStravaActivity(tokenRow.athlete_id, `strava:${event.objectId}`);
         return { status: 'processed' };
     }
 
     const accessToken = await getValidAccessToken(tokenRow, () => getStravaTokensByStravaAthleteId(event.ownerId));
     const activity = await fetchStravaActivity(event.objectId, accessToken);
     const summary = mapStravaActivity(activity);
-    const activityId = `strava:${event.objectId}`;
 
-    await insertGarminActivity(
-        tokenRow.athlete_id,
-        null,
-        activityId,
-        summary.activityType ?? null,
-        { ...summary, source: 'strava' },
-        activity as import('@/infrastructure/supabase/types').Json,
-        null,
-        null,
-        'strava'
-    );
-    await logCompletedWorkoutFromActivity(tokenRow.athlete_id, summary, { allowUnmatched: false });
+    await upsertStravaActivity(tokenRow.athlete_id, `strava:${event.objectId}`, summary as Record<string, unknown>, activity);
 
     return { status: 'processed' };
 }
 
-export function mapStravaActivity(activity: Record<string, unknown>): GarminActivitySummary {
+export function mapStravaActivity(activity: Record<string, unknown>): StravaActivitySummary {
     const distanceMeters = asNumber(activity.distance);
     const durationSeconds = asNumber(activity.moving_time) ?? asNumber(activity.elapsed_time);
     const avgSpeed = asNumber(activity.average_speed);

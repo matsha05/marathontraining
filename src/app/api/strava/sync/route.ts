@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { resolveAthleteId } from '@/infrastructure/garmin/auth';
-import { getStravaTokensByAthleteId } from '@/infrastructure/strava/store';
+import { getStravaTokensByAthleteId, upsertStravaActivity } from '@/infrastructure/strava/store';
 import { getValidAccessToken } from '@/infrastructure/strava/token';
 import { fetchStravaActivities } from '@/infrastructure/strava/api';
-import { insertGarminActivity } from '@/infrastructure/garmin/store';
-import { logCompletedWorkoutFromActivity } from '@/infrastructure/garmin/activity-log';
 import { mapStravaActivity } from '@/infrastructure/strava/processor';
+import { resolveAthleteId } from '@/infrastructure/auth';
 
 export const runtime = 'nodejs';
 
@@ -39,19 +37,13 @@ export async function POST(request: NextRequest) {
         if (!Number.isFinite(activityId)) continue;
         const summary = mapStravaActivity(activity);
 
-        await insertGarminActivity(
+        await upsertStravaActivity(
             tokenRow.athlete_id,
-            null,
             `strava:${activityId}`,
-            summary.activityType ?? null,
             { ...summary, source: 'strava' },
-            activity as import('@/infrastructure/supabase/types').Json,
-            null,
-            null,
-            'strava'
+            activity as Record<string, unknown>
         );
 
-        await logCompletedWorkoutFromActivity(tokenRow.athlete_id, summary, { allowUnmatched: false });
         imported += 1;
     }
 

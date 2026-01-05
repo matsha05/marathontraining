@@ -10,6 +10,7 @@ import { DayPlan, Workout, TrainingZone } from '@/domain/plan/types';
 import { WorkoutSkeleton } from '@/components/ui/Skeleton';
 import { formatPace, formatPaceRange, getPaceForZone, formatDuration } from '@/lib/format';
 import { paceZoneToHRZone, estimateMaxHR } from '@/domain/hr/zones';
+import { HeartIcon } from '@/components/ui/heart';
 
 /**
  * Workout Detail Page
@@ -262,11 +263,16 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
                                             >
                                                 {pace}{segment.pace !== 'E' ? '/mi' : ''}
                                             </p>
-                                            {maxHR && segment.pace && (
-                                                <p className="text-[10px]" style={{ color: 'var(--v2-text-subtle)' }}>
-                                                    ❤️ {paceZoneToHRZone(segment.pace, maxHR).min}-{paceZoneToHRZone(segment.pace, maxHR).max} bpm
-                                                </p>
-                                            )}
+                                            {maxHR && segment.pace && (() => {
+                                                const hrZone = paceZoneToHRZone(segment.pace, maxHR);
+                                                return (
+                                                    <p className="text-[10px] flex items-center gap-1" style={{ color: 'var(--v2-text-subtle)' }}>
+                                                        <HeartIcon size={10} />
+                                                        <span className="v2-mono">Z{hrZone.zone}</span>
+                                                        <span style={{ color: 'var(--v2-text-muted)' }}>({hrZone.min}-{hrZone.max})</span>
+                                                    </p>
+                                                );
+                                            })()}
                                             <p className="text-[10px]" style={{ color: 'var(--v2-text-muted)' }}>{duration}</p>
                                         </div>
                                     </div>

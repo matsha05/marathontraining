@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { usePlan } from '@/domain/plan/context';
 import { formatPace, getDayName } from '@/lib/format';
+import { CheckIcon } from '@/components/ui/check';
 import { motion } from 'framer-motion';
 
 /**
@@ -64,12 +65,31 @@ export default function WeekDetailPage() {
 
             if (dayPlan.runWorkout) {
                 const run = dayPlan.runWorkout;
+                // Get appropriate pace based on workout type
+                let paceGuidance: string | undefined;
+                if (plan?.paces) {
+                    const paceMap: Record<string, string> = {
+                        'easy': `${formatPace(plan.paces.easy.min)}-${formatPace(plan.paces.easy.max)}`,
+                        'recovery': `${formatPace(plan.paces.easy.min)}-${formatPace(plan.paces.easy.max)}`,
+                        'tempo': formatPace(plan.paces.threshold),
+                        'threshold': formatPace(plan.paces.threshold),
+                        'long_easy': `${formatPace(plan.paces.easy.min)}-${formatPace(plan.paces.easy.max)}`,
+                        'long_progression': `${formatPace(plan.paces.easy.min)} → ${formatPace(plan.paces.marathon)}`,
+                        'long_mp_finish': `${formatPace(plan.paces.easy.min)} → ${formatPace(plan.paces.marathon)}`,
+                        'cruise_intervals': formatPace(plan.paces.threshold),
+                        'vo2max_800s': formatPace(plan.paces.interval),
+                        'vo2max_1000s': formatPace(plan.paces.interval),
+                        'vo2max_1200s': formatPace(plan.paces.interval),
+                        'fartlek': 'varied',
+                    };
+                    paceGuidance = paceMap[run.type] || `${formatPace(plan.paces.easy.min)}-${formatPace(plan.paces.easy.max)}`;
+                }
                 result.runWorkout = {
                     name: run.name,
                     type: run.type.replace(/_/g, ' '),
-                    distance: run.totalDistance,
+                    distance: Math.round(run.totalDistance * 10) / 10, // Fix floating point
                     duration: run.estimatedDuration,
-                    paceGuidance: plan?.paces ? formatPace(plan.paces.easy.min) : undefined,
+                    paceGuidance,
                 };
             }
 
@@ -158,11 +178,27 @@ export default function WeekDetailPage() {
                     <div className="flex items-center gap-4">
                         <span className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>{phaseLabel} Phase</span>
                         <span className="v2-mono" style={{ fontSize: '12px', color: 'var(--v2-text-subtle)' }}>•</span>
-                        <span className="v2-mono" style={{ fontSize: '12px' }}>{Math.round(weekPlan.totalMiles)} miles</span>
+                        <span className="v2-mono" style={{ fontSize: '12px' }}>{Math.round(weekPlan.totalMiles * 10) / 10} miles</span>
                         <span className="v2-mono" style={{ fontSize: '12px', color: 'var(--v2-text-subtle)' }}>•</span>
                         <span className="v2-mono" style={{ fontSize: '12px' }}>{weekPlan.keyWorkouts} quality sessions</span>
                     </div>
                 </motion.div>
+
+                {/* Coach Notes */}
+                {weekPlan.coachNotes && (
+                    <motion.div
+                        className="mb-8 p-4 rounded-xl"
+                        style={{ background: 'var(--v2-bg-inset)', borderLeft: '3px solid var(--v2-accent)' }}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: 0.05 }}
+                    >
+                        <p className="v2-label mb-1" style={{ color: 'var(--v2-accent)' }}>Coach&apos;s Note</p>
+                        <p className="v2-body-sm" style={{ color: 'var(--v2-text-secondary)' }}>
+                            {weekPlan.coachNotes}
+                        </p>
+                    </motion.div>
+                )}
 
                 {/* Daily Schedule */}
                 <motion.section

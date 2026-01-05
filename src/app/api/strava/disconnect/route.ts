@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { deauthorizeStrava } from '@/infrastructure/strava/api';
 import { deleteStravaTokens, getStravaTokensByAthleteId } from '@/infrastructure/strava/store';
 import { getValidAccessToken } from '@/infrastructure/strava/token';
-import { resolveAthleteId } from '@/infrastructure/garmin/auth';
+import { resolveAthleteId } from '@/infrastructure/auth';
 
 export const runtime = 'nodejs';
 

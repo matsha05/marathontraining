@@ -49,7 +49,6 @@ import {
     CalibrationMethodScreen,
     RaceInputScreen,
     EasyPaceInputScreen,
-    DeviceImportScreen,
     ManualVo2maxInputScreen,
     HardEffortInputScreen,
     EstimationFlowScreen,
@@ -325,7 +324,12 @@ function OnboardingContent() {
     return (
         <>
             {step !== 'welcome' && step !== 'complete' && (
-                <ProgressBar progress={progress} />
+                <div className="text-center">
+                    <ProgressBar progress={progress} />
+                    <p className="v2-body-sm mt-2" style={{ color: 'var(--v2-text-muted)' }}>
+                        Step {Math.max(1, Math.ceil(progress / 5.5))} of ~18
+                    </p>
+                </div>
             )}
 
             <AnimatePresence mode="wait">
@@ -421,18 +425,7 @@ function OnboardingContent() {
                     />
                 )}
 
-                {step === 'device-import' && (
-                    <DeviceImportScreen
-                        onStravaConnect={() => {
-                            if (typeof window !== 'undefined') {
-                                window.open('/api/strava/connect?from=onboarding', '_blank', 'noopener,noreferrer');
-                            }
-                        }}
-                        onContinue={goToNext}
-                        connectError={connectErrorMessage}
-                        onBack={goBack}
-                    />
-                )}
+
 
                 {step === 'manual-vo2max' && (
                     <ManualVo2maxInputScreen

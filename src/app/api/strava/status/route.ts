@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSupabaseServerClient } from '@/infrastructure/supabase/server';
-import { getStravaTokensByAthleteId } from '@/infrastructure/strava/store';
-import { resolveAthleteId } from '@/infrastructure/garmin/auth';
+import { getStravaTokensByAthleteId, getLatestStravaActivity } from '@/infrastructure/strava/store';
+import { resolveAthleteId } from '@/infrastructure/auth';
 
 export const runtime = 'nodejs';
 
@@ -18,15 +17,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ connected: false });
     }
 
-    const supabase = getSupabaseServerClient();
-    const { data: lastActivity } = await supabase
-        .from('garmin_activities')
-        .select('start_time')
-        .eq('athlete_id', athleteId)
-        .eq('source', 'strava')
-        .order('start_time', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+    const lastActivity = await getLatestStravaActivity(athleteId);
 
     return NextResponse.json({
         connected: true,

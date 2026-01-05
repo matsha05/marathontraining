@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildAuthorizationUrl, generateState, withStateContext } from '@/infrastructure/strava/oauth';
 import { saveStravaOauthState } from '@/infrastructure/strava/store';
-import { resolveAthleteId } from '@/infrastructure/garmin/auth';
+import { resolveAthleteId } from '@/infrastructure/auth';
 import { stravaConfig } from '@/infrastructure/strava/config';
 import { getSafeRedirectPath } from '@/lib/redirects';
 

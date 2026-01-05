@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { exchangeStravaToken } from '@/infrastructure/strava/api';
 import { consumeStravaOauthState, upsertStravaTokens } from '@/infrastructure/strava/store';
 import { stravaConfig } from '@/infrastructure/strava/config';
-import { resolveAthleteId } from '@/infrastructure/garmin/auth';
+import { resolveAthleteId } from '@/infrastructure/auth';
 import { parseStateContext } from '@/infrastructure/strava/oauth';
 import { isSafeRedirectPath } from '@/lib/redirects';
 
