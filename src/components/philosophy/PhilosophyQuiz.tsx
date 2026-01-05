@@ -16,6 +16,11 @@ import { useState, useCallback } from 'react';
 import { QuestionScreen } from './QuestionScreen';
 import { RecommendationScreen } from './RecommendationScreen';
 
+/**
+ * Philosophy Quiz - V2 Design System
+ * 100% token usage, zero hardcoded colors
+ */
+
 type QuestionStep = 'distance' | 'timing' | 'days' | 'experience' | 'mileage' | 'mindset' | 'result';
 
 const STEP_ORDER: QuestionStep[] = ['distance', 'timing', 'days', 'experience', 'mileage', 'mindset', 'result'];
@@ -79,12 +84,13 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
     const recommendation = step === 'result' ? calculateRecommendation(answers) : null;
 
     return (
-        <div className="min-h-screen bg-[#08080a] text-white">
+        <div className="v2-root min-h-screen" style={{ background: 'var(--v2-bg-deep)', color: 'var(--v2-text-primary)' }}>
             {/* Progress bar */}
             {step !== 'result' && (
-                <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-white/5">
+                <div className="fixed top-0 left-0 right-0 z-50 h-1" style={{ background: 'var(--v2-border)' }}>
                     <motion.div
-                        className="h-full bg-[#19e38c]"
+                        className="h-full"
+                        style={{ background: 'var(--v2-accent)' }}
                         initial={{ width: 0 }}
                         animate={{ width: `${progress}%` }}
                         transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
@@ -130,7 +136,6 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
 
                 {/* Question 3: Days per week */}
                 {step === 'days' && (
-
                     <QuestionScreen
                         key="days"
                         question="How many days can you RUN each week?"
@@ -202,7 +207,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                     />
                 )}
 
-                {/* Question 5: Mindset */}
+                {/* Question 6: Mindset */}
                 {step === 'mindset' && (
                     <QuestionScreen
                         key="mindset"

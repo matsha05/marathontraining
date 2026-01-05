@@ -5,7 +5,7 @@ import { CheckIcon } from '@/components/ui/check';
 /**
  * WeeklyCalendar - Week-at-a-glance component
  * 
- * Shows 7 days with workout type, completion status, and today highlight
+ * V2 Design System - Shows 7 days with workout type, completion status, and today highlight
  */
 
 type DayStatus = 'completed' | 'today' | 'upcoming' | 'rest';
@@ -32,9 +32,9 @@ interface WeeklyCalendarProps {
 
 export function WeeklyCalendar({ days, weekLabel, onDayClick }: WeeklyCalendarProps) {
     return (
-        <div className="card p-6">
+        <div className="v2-card p-6">
             {weekLabel && (
-                <p className="text-label mb-4">{weekLabel}</p>
+                <p className="v2-label mb-4">{weekLabel}</p>
             )}
 
             <div className="grid grid-cols-7 gap-2">
@@ -44,26 +44,31 @@ export function WeeklyCalendar({ days, weekLabel, onDayClick }: WeeklyCalendarPr
                         type="button"
                         onClick={() => onDayClick?.(index)}
                         disabled={day.status === 'rest'}
-                        className={`
-              text-center py-3 rounded-xl transition-all tap-target
-              focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]
-              ${day.status === 'today'
-                                ? 'bg-[var(--color-accent)] text-black'
+                        className="text-center py-3 rounded-xl transition-all"
+                        style={{
+                            background: day.status === 'today'
+                                ? 'var(--v2-accent)'
                                 : day.status === 'completed'
-                                    ? 'bg-[var(--bg-muted)]'
-                                    : day.status === 'rest'
-                                        ? 'opacity-50 cursor-default'
-                                        : 'hover:bg-[var(--bg-muted)]'
-                            }
-            `}
+                                    ? 'var(--v2-bg-elevated)'
+                                    : 'transparent',
+                            color: day.status === 'today' ? '#000' : 'var(--v2-text-secondary)',
+                            opacity: day.status === 'rest' ? 0.5 : 1,
+                            cursor: day.status === 'rest' ? 'default' : 'pointer',
+                        }}
                     >
-                        <p className="text-label mb-1">{day.day}</p>
-                        <p className={`text-caption ${day.status === 'today' ? 'text-black/70' : ''}`}>
+                        <p className="v2-label mb-1">{day.day}</p>
+                        <p
+                            className="text-[10px]"
+                            style={{ color: day.status === 'today' ? 'rgba(0,0,0,0.7)' : 'var(--v2-text-muted)' }}
+                        >
                             {day.status === 'rest' ? '—' : day.label}
                         </p>
 
                         {day.status === 'completed' && (
-                            <div className="w-5 h-5 rounded-full bg-[var(--color-accent)] mx-auto mt-2 flex items-center justify-center">
+                            <div
+                                className="w-5 h-5 rounded-full mx-auto mt-2 flex items-center justify-center"
+                                style={{ background: 'var(--v2-accent)' }}
+                            >
                                 <CheckIcon size={12} className="text-black" />
                             </div>
                         )}

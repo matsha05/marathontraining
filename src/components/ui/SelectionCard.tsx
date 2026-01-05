@@ -3,8 +3,7 @@
 /**
  * SelectionCard - Reusable selection card for option lists
  * 
- * Used for distance/equipment selection in onboarding and settings
- * Supports selected, hover, and disabled states
+ * V2 Design System - Used for distance/equipment selection
  */
 
 interface SelectionCardProps {
@@ -37,10 +36,10 @@ export function SelectionCard({
     domain = 'accent',
 }: SelectionCardProps) {
     const domainColors = {
-        running: 'var(--color-running)',
-        strength: 'var(--color-strength)',
-        durability: 'var(--color-durability)',
-        accent: 'var(--color-accent)',
+        running: 'var(--v2-running)',
+        strength: 'var(--v2-strength)',
+        durability: 'var(--v2-durability)',
+        accent: 'var(--v2-accent)',
     };
 
     const sizeClasses = {
@@ -56,24 +55,26 @@ export function SelectionCard({
             type="button"
             onClick={() => !disabled && onSelect()}
             disabled={disabled}
-            className={`
-        w-full ${sizeClasses[size]} rounded-xl text-left 
-        transition-all border tap-target
-        ${selected
-                    ? 'border-transparent'
-                    : 'bg-[var(--bg-elevated)] border-[var(--border-base)] hover:border-[var(--border-emphasis)]'
-                }
-        ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-        focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]
-      `}
-            style={selected ? { backgroundColor: selectedColor, color: '#000' } : undefined}
+            className={`w-full ${sizeClasses[size]} rounded-xl text-left transition-all border`}
+            style={{
+                background: selected ? selectedColor : 'var(--v2-bg-elevated)',
+                borderColor: selected ? 'transparent' : 'var(--v2-border)',
+                color: selected ? '#000' : 'var(--v2-text-secondary)',
+                opacity: disabled ? 0.5 : 1,
+                cursor: disabled ? 'not-allowed' : 'pointer',
+            }}
         >
             <div className="flex items-center gap-3">
                 {icon && <span className="text-2xl flex-shrink-0">{icon}</span>}
                 <div className="flex-1">
-                    <p className={`text-heading-sm ${selected ? '' : ''}`}>{label}</p>
+                    <p className="text-base font-medium">{label}</p>
                     {description && (
-                        <p className={`text-body-sm ${selected ? 'opacity-70' : 'text-[var(--text-muted)]'}`}>
+                        <p
+                            className="text-sm"
+                            style={{
+                                color: selected ? 'rgba(0,0,0,0.7)' : 'var(--v2-text-muted)'
+                            }}
+                        >
                             {description}
                         </p>
                     )}

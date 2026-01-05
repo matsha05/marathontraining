@@ -2,6 +2,11 @@
 
 import { motion } from 'framer-motion';
 
+/**
+ * QuestionScreen - Quiz question component
+ * V2 Design System - 100% token usage
+ */
+
 interface Option<T> {
     value: T;
     label: string;
@@ -37,7 +42,8 @@ export function QuestionScreen<T>({
             {onBack && (
                 <button
                     onClick={onBack}
-                    className="fixed top-8 left-6 text-sm text-white/30 hover:text-white/60 transition-colors"
+                    className="fixed top-8 left-6 text-sm transition-colors"
+                    style={{ color: 'var(--v2-text-subtle)' }}
                 >
                     ← {backLabel}
                 </button>
@@ -49,7 +55,8 @@ export function QuestionScreen<T>({
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="text-3xl md:text-4xl font-light text-white/90 mb-4"
+                    className="text-3xl md:text-4xl font-light mb-4"
+                    style={{ color: 'var(--v2-text-primary)' }}
                 >
                     {question}
                 </motion.h1>
@@ -58,7 +65,8 @@ export function QuestionScreen<T>({
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.15 }}
-                    className="text-lg text-white/40 mb-12"
+                    className="text-lg mb-12"
+                    style={{ color: 'var(--v2-text-muted)' }}
                 >
                     {subtitle}
                 </motion.p>
@@ -72,12 +80,22 @@ export function QuestionScreen<T>({
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 + i * 0.05 }}
                             onClick={() => onSelect(option.value)}
-                            className="w-full p-5 rounded-xl bg-white/[0.03] border border-white/10 hover:bg-white/[0.06] hover:border-white/20 transition-all text-left group"
+                            className="w-full p-5 rounded-xl border transition-all text-left group"
+                            style={{
+                                background: 'var(--v2-bg-hover)',
+                                borderColor: 'var(--v2-border-hover)',
+                            }}
                         >
-                            <p className="text-lg text-white/80 group-hover:text-white transition-colors">
+                            <p
+                                className="text-lg transition-colors"
+                                style={{ color: 'var(--v2-text-primary)' }}
+                            >
                                 {option.label}
                             </p>
-                            <p className="text-sm text-white/40 mt-1">
+                            <p
+                                className="text-sm mt-1"
+                                style={{ color: 'var(--v2-text-muted)' }}
+                            >
                                 {option.description}
                             </p>
                         </motion.button>

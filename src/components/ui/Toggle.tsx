@@ -5,11 +5,7 @@ import { useId } from 'react';
 /**
  * Toggle - Accessible toggle switch component
  * 
- * Follows accessibility best practices:
- * - Keyboard navigable (Space/Enter to toggle)
- * - aria-checked for screen readers
- * - Visible focus states
- * - Proper label association
+ * V2 Design System - Follows accessibility best practices
  */
 
 interface ToggleProps {
@@ -58,12 +54,16 @@ export function Toggle({
             {(label || description) && (
                 <div className="flex-1">
                     {label && (
-                        <label htmlFor={id} className="font-semibold cursor-pointer">
+                        <label
+                            htmlFor={id}
+                            className="font-medium cursor-pointer"
+                            style={{ color: 'var(--v2-text-secondary)' }}
+                        >
                             {label}
                         </label>
                     )}
                     {description && (
-                        <p className="text-body-sm text-[var(--text-muted)]">{description}</p>
+                        <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>{description}</p>
                     )}
                 </div>
             )}
@@ -78,18 +78,21 @@ export function Toggle({
                 onClick={() => !disabled && onChange(!checked)}
                 onKeyDown={handleKeyDown}
                 className={`
-          relative inline-flex flex-shrink-0 ${track} 
-          rounded-full transition-colors cursor-pointer
-          focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]
-          ${checked ? 'bg-[var(--color-accent)]' : 'bg-[var(--bg-muted)]'}
-          ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-        `}
+                    relative inline-flex flex-shrink-0 ${track} 
+                    rounded-full transition-colors cursor-pointer
+                    focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+                `}
+                style={{
+                    background: checked ? 'var(--v2-accent)' : 'var(--v2-bg-elevated)',
+                    opacity: disabled ? 0.5 : 1,
+                    cursor: disabled ? 'not-allowed' : 'pointer',
+                }}
             >
                 <span
                     className={`
-            inline-block ${thumb} rounded-full bg-white shadow 
-            transition-transform ${checked ? translate : 'translate-x-1'}
-          `}
+                        inline-block ${thumb} rounded-full bg-white shadow 
+                        transition-transform ${checked ? translate : 'translate-x-1'}
+                    `}
                 />
             </button>
         </div>

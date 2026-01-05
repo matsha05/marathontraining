@@ -12,6 +12,11 @@ import {
 import { getOverrideWarnings, isPhilosophyAvailableForDistance } from '@/domain/philosophy/recommendation';
 import { PhilosophyCard } from './PhilosophyCard';
 
+/**
+ * RecommendationScreen - Quiz result component
+ * V2 Design System - 100% token usage
+ */
+
 interface RecommendationScreenProps {
     recommendation: PhilosophyRecommendation;
     answers: QuizAnswers;
@@ -64,22 +69,41 @@ export function RecommendationScreen({
                     {/* Back */}
                     <button
                         onClick={() => setShowConfirmOverride(false)}
-                        className="text-sm text-white/30 hover:text-white/60 transition-colors mb-8"
+                        className="text-sm transition-colors mb-8"
+                        style={{ color: 'var(--v2-text-subtle)' }}
                     >
                         ← Back to recommendation
                     </button>
 
-                    <h1 className="text-3xl font-light text-white/90 mb-4">
+                    <h1
+                        className="text-3xl font-light mb-4"
+                        style={{ color: 'var(--v2-text-primary)' }}
+                    >
                         Switching to {selectedPhilosophy.name}
                     </h1>
 
                     {/* Warnings if any */}
                     {overrideWarnings.length > 0 && (
-                        <div className="mb-8 p-5 rounded-xl bg-[#f59e0b]/10 border border-[#f59e0b]/30">
-                            <p className="text-sm text-[#f59e0b] font-medium mb-3">Heads up</p>
+                        <div
+                            className="mb-8 p-5 rounded-xl border"
+                            style={{
+                                background: 'rgba(245, 158, 11, 0.1)',
+                                borderColor: 'rgba(245, 158, 11, 0.3)'
+                            }}
+                        >
+                            <p
+                                className="text-sm font-medium mb-3"
+                                style={{ color: 'var(--v2-warning)' }}
+                            >
+                                Heads up
+                            </p>
                             <ul className="space-y-2">
                                 {overrideWarnings.map((warning, i) => (
-                                    <li key={i} className="text-sm text-white/60">
+                                    <li
+                                        key={i}
+                                        className="text-sm"
+                                        style={{ color: 'var(--v2-text-tertiary)' }}
+                                    >
                                         • {warning}
                                     </li>
                                 ))}
@@ -91,15 +115,18 @@ export function RecommendationScreen({
                     <PhilosophyCard philosophy={selectedPhilosophy} expanded />
 
                     {/* Foundation reminder */}
-                    <div className="mt-8 p-5 rounded-xl bg-white/[0.02] border border-white/10">
-                        <p className="text-xs text-white/40 uppercase tracking-widest mb-4">
+                    <div className="v2-card mt-8 p-5">
+                        <p
+                            className="text-xs uppercase tracking-widest mb-4"
+                            style={{ color: 'var(--v2-text-muted)' }}
+                        >
                             Still included regardless
                         </p>
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                             {FOUNDATION_LAYERS.map((layer) => (
                                 <div key={layer.coach} className="text-center">
-                                    <p className="text-xs text-white/60">{layer.focus}</p>
-                                    <p className="text-[10px] text-white/30 mt-1">{layer.coach}</p>
+                                    <p className="text-xs" style={{ color: 'var(--v2-text-tertiary)' }}>{layer.focus}</p>
+                                    <p className="text-[10px] mt-1" style={{ color: 'var(--v2-text-subtle)' }}>{layer.coach}</p>
                                 </div>
                             ))}
                         </div>
@@ -108,7 +135,7 @@ export function RecommendationScreen({
                     {/* Confirm */}
                     <button
                         onClick={handleConfirmOverride}
-                        className="w-full mt-8 py-4 bg-white text-black font-medium rounded-xl hover:bg-white/90 transition-colors"
+                        className="v2-btn v2-btn-primary w-full mt-8"
                     >
                         Start with {selectedPhilosophy.name}
                     </button>
@@ -128,7 +155,8 @@ export function RecommendationScreen({
             {/* Back button */}
             <button
                 onClick={onBack}
-                className="fixed top-8 left-6 text-sm text-white/30 hover:text-white/60 transition-colors"
+                className="fixed top-8 left-6 text-sm transition-colors"
+                style={{ color: 'var(--v2-text-subtle)' }}
             >
                 ← Back
             </button>
@@ -140,10 +168,16 @@ export function RecommendationScreen({
                     animate={{ opacity: 1, y: 0 }}
                     className="text-center mb-12"
                 >
-                    <p className="text-xs text-white/40 uppercase tracking-widest mb-3">
+                    <p
+                        className="text-xs uppercase tracking-widest mb-3"
+                        style={{ color: 'var(--v2-text-muted)' }}
+                    >
                         Based on your answers
                     </p>
-                    <h1 className="text-4xl md:text-5xl font-light text-white/90">
+                    <h1
+                        className="text-4xl md:text-5xl font-light"
+                        style={{ color: 'var(--v2-text-primary)' }}
+                    >
                         We recommend
                     </h1>
                 </motion.div>
@@ -157,14 +191,21 @@ export function RecommendationScreen({
                     <PhilosophyCard philosophy={primary} expanded recommended />
 
                     {/* Reasoning */}
-                    <div className="mt-6 p-5 rounded-xl bg-white/[0.02] border border-white/10">
-                        <p className="text-xs text-white/40 uppercase tracking-widest mb-3">
+                    <div className="v2-card mt-6 p-5">
+                        <p
+                            className="text-xs uppercase tracking-widest mb-3"
+                            style={{ color: 'var(--v2-text-muted)' }}
+                        >
                             Why this fits you
                         </p>
                         <ul className="space-y-2">
                             {recommendation.reasoning.map((reason, i) => (
-                                <li key={i} className="text-sm text-white/60 flex items-start gap-2">
-                                    <span className="text-[#19e38c] mt-0.5">✓</span>
+                                <li
+                                    key={i}
+                                    className="text-sm flex items-start gap-2"
+                                    style={{ color: 'var(--v2-text-tertiary)' }}
+                                >
+                                    <span className="mt-0.5" style={{ color: 'var(--v2-accent)' }}>✓</span>
                                     {reason}
                                 </li>
                             ))}
@@ -173,10 +214,20 @@ export function RecommendationScreen({
 
                     {/* Warnings if any */}
                     {recommendation.warnings.length > 0 && (
-                        <div className="mt-4 p-4 rounded-xl bg-[#f59e0b]/10 border border-[#f59e0b]/30">
+                        <div
+                            className="mt-4 p-4 rounded-xl border"
+                            style={{
+                                background: 'rgba(245, 158, 11, 0.1)',
+                                borderColor: 'rgba(245, 158, 11, 0.3)'
+                            }}
+                        >
                             <ul className="space-y-2">
                                 {recommendation.warnings.map((warning, i) => (
-                                    <li key={i} className="text-sm text-white/60">
+                                    <li
+                                        key={i}
+                                        className="text-sm"
+                                        style={{ color: 'var(--v2-text-tertiary)' }}
+                                    >
                                         • {warning}
                                     </li>
                                 ))}
@@ -185,15 +236,18 @@ export function RecommendationScreen({
                     )}
 
                     {/* Foundation reminder */}
-                    <div className="mt-6 p-5 rounded-xl bg-white/[0.02] border border-white/10">
-                        <p className="text-xs text-white/40 uppercase tracking-widest mb-4">
+                    <div className="v2-card mt-6 p-5">
+                        <p
+                            className="text-xs uppercase tracking-widest mb-4"
+                            style={{ color: 'var(--v2-text-muted)' }}
+                        >
                             Also included in every plan
                         </p>
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                             {FOUNDATION_LAYERS.map((layer) => (
                                 <div key={layer.coach} className="text-center">
-                                    <p className="text-xs text-white/60">{layer.focus}</p>
-                                    <p className="text-[10px] text-white/30 mt-1">{layer.coach}</p>
+                                    <p className="text-xs" style={{ color: 'var(--v2-text-tertiary)' }}>{layer.focus}</p>
+                                    <p className="text-[10px] mt-1" style={{ color: 'var(--v2-text-subtle)' }}>{layer.coach}</p>
                                 </div>
                             ))}
                         </div>
@@ -202,7 +256,7 @@ export function RecommendationScreen({
                     {/* Primary CTA */}
                     <button
                         onClick={() => onSelect(recommendation.primary)}
-                        className="w-full mt-8 py-4 bg-white text-black font-medium rounded-xl hover:bg-white/90 transition-colors"
+                        className="v2-btn v2-btn-primary w-full mt-8"
                     >
                         Start with {primary.name}
                     </button>
@@ -217,7 +271,11 @@ export function RecommendationScreen({
                 >
                     <button
                         onClick={() => setShowAlternatives(!showAlternatives)}
-                        className="w-full text-center text-sm text-white/40 hover:text-white/60 transition-colors py-4 border-t border-white/5"
+                        className="w-full text-center text-sm transition-colors py-4"
+                        style={{
+                            color: 'var(--v2-text-muted)',
+                            borderTop: '1px solid var(--v2-border)'
+                        }}
                     >
                         {showAlternatives ? 'Hide alternatives' : 'See other approaches'}
                     </button>
@@ -233,7 +291,7 @@ export function RecommendationScreen({
                                     <PhilosophyCard philosophy={alt} expanded />
                                     <button
                                         onClick={() => handleSelectAlternative(alt.id)}
-                                        className="w-full mt-4 py-3 bg-white/[0.05] border border-white/10 text-white/70 font-medium rounded-xl hover:bg-white/[0.08] hover:border-white/20 transition-all"
+                                        className="v2-btn v2-btn-secondary w-full mt-4"
                                     >
                                         Choose {alt.name} instead
                                     </button>

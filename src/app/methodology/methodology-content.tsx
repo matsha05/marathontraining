@@ -3,8 +3,7 @@
 /**
  * THE LONG GAME - Methodology Page Content
  * 
- * Premium, trust-building page showcasing the coaching science
- * behind our training plans. Links from onboarding tooltips.
+ * V2 Design System - Premium, trust-building page showcasing coaching science
  */
 
 import { useState } from 'react';
@@ -30,7 +29,8 @@ function CoachCard({ coach }: { coach: Coach }) {
             layout
             layoutId={`coach-${coach.id}`}
             onClick={() => setExpanded(!expanded)}
-            className="card card-interactive p-6 hover:border-[var(--color-accent)] transition-colors cursor-pointer select-none"
+            className="v2-card v2-card-interactive p-6 cursor-pointer select-none"
+            style={{ borderColor: expanded ? 'var(--v2-accent)' : undefined }}
             role="button"
             tabIndex={0}
             aria-expanded={expanded}
@@ -42,14 +42,21 @@ function CoachCard({ coach }: { coach: Coach }) {
                 }
             }}
         >
-            {/* Header: Name + Credentials + Toggle Indicator */}
+            {/* Header */}
             <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
-                    <h3 className="text-heading-sm mb-1">{coach.name}</h3>
+                    <h3 className="text-lg font-light mb-1" style={{ color: 'var(--v2-text-secondary)' }}>{coach.name}</h3>
                     <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-body-sm text-[var(--text-muted)]">{coach.title}</span>
+                        <span className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>{coach.title}</span>
                         {coach.credentials && (
-                            <span className="px-2 py-0.5 text-caption rounded-full bg-[var(--color-accent)]/15 text-[var(--color-accent)] border border-[var(--color-accent)]/30">
+                            <span
+                                className="px-2 py-0.5 text-[10px] rounded-full"
+                                style={{
+                                    background: 'var(--v2-accent-subtle)',
+                                    color: 'var(--v2-accent)',
+                                    border: '1px solid rgba(25, 227, 140, 0.3)'
+                                }}
+                            >
                                 {coach.credentials}
                             </span>
                         )}
@@ -60,10 +67,9 @@ function CoachCard({ coach }: { coach: Coach }) {
                     transition={{ duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
                     className="p-2 rounded-lg"
                 >
-                    <ChevronDown className="w-5 h-5 text-[var(--text-muted)]" />
+                    <ChevronDown className="w-5 h-5" style={{ color: 'var(--v2-text-muted)' }} />
                 </motion.div>
             </div>
-
 
             {/* Expertise Tags */}
             <div className="mt-4">
@@ -71,7 +77,8 @@ function CoachCard({ coach }: { coach: Coach }) {
                     {coach.expertise.map((tag) => (
                         <span
                             key={tag}
-                            className="px-2 py-1 text-caption rounded-full bg-[var(--bg-inset)] text-[var(--text-muted)]"
+                            className="px-2 py-1 text-[10px] rounded-full"
+                            style={{ background: 'var(--v2-bg-elevated)', color: 'var(--v2-text-muted)' }}
                         >
                             {tag}
                         </span>
@@ -80,12 +87,12 @@ function CoachCard({ coach }: { coach: Coach }) {
             </div>
 
             {/* Key Concept Box */}
-            <div className="mt-4 p-3 rounded-xl bg-[var(--bg-inset)]">
+            <div className="mt-4 p-3 rounded-xl" style={{ background: 'var(--v2-bg-elevated)' }}>
                 <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="w-4 h-4 text-[var(--color-accent)]" />
-                    <span className="text-label text-[var(--color-accent)]">{coach.keyConceptShort}</span>
+                    <Sparkles className="w-4 h-4" style={{ color: 'var(--v2-accent)' }} />
+                    <span className="v2-label" style={{ color: 'var(--v2-accent)' }}>{coach.keyConceptShort}</span>
                 </div>
-                <p className="text-body-sm text-[var(--text-base)]">
+                <p className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>
                     {expanded ? coach.keyConceptFull : coach.keyConceptFull.slice(0, 80) + (coach.keyConceptFull.length > 80 ? '...' : '')}
                 </p>
             </div>
@@ -106,10 +113,11 @@ function CoachCard({ coach }: { coach: Coach }) {
                                 initial={{ opacity: 0, y: 8 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.08 }}
-                                className="mt-4 pt-4 border-t border-[var(--border-muted)]"
+                                className="mt-4 pt-4"
+                                style={{ borderTop: '1px solid var(--v2-border)' }}
                             >
-                                <p className="text-label text-[var(--text-muted)] mb-2">Background</p>
-                                <p className="text-body-sm text-[var(--text-base)] leading-relaxed">
+                                <p className="v2-label mb-2" style={{ color: 'var(--v2-text-muted)' }}>Background</p>
+                                <p className="text-sm leading-relaxed" style={{ color: 'var(--v2-text-secondary)' }}>
                                     {coach.bio}
                                 </p>
                             </motion.div>
@@ -121,13 +129,14 @@ function CoachCard({ coach }: { coach: Coach }) {
                                 initial={{ opacity: 0, y: 8 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.12 }}
-                                className="mt-4 pt-4 border-t border-[var(--border-muted)]"
+                                className="mt-4 pt-4"
+                                style={{ borderTop: '1px solid var(--v2-border)' }}
                             >
-                                <p className="text-label text-[var(--text-muted)] mb-2">Key Achievements</p>
+                                <p className="v2-label mb-2" style={{ color: 'var(--v2-text-muted)' }}>Key Achievements</p>
                                 <ul className="space-y-1.5">
                                     {coach.achievements.map((achievement, i) => (
-                                        <li key={i} className="text-body-sm text-[var(--text-base)] flex items-start gap-2">
-                                            <span className="text-[var(--color-accent)] mt-0.5">•</span>
+                                        <li key={i} className="text-sm flex items-start gap-2" style={{ color: 'var(--v2-text-secondary)' }}>
+                                            <span style={{ color: 'var(--v2-accent)' }}>•</span>
                                             {achievement}
                                         </li>
                                     ))}
@@ -135,21 +144,22 @@ function CoachCard({ coach }: { coach: Coach }) {
                             </motion.div>
                         )}
 
-                        {/* Publications & Notable Athletes (grid) */}
+                        {/* Publications & Notable Athletes */}
                         {((coach.publications && coach.publications.length > 0) || (coach.notableAthletes && coach.notableAthletes.length > 0)) && (
                             <motion.div
                                 initial={{ opacity: 0, y: 8 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.16 }}
-                                className="mt-4 pt-4 border-t border-[var(--border-muted)] grid sm:grid-cols-2 gap-4"
+                                className="mt-4 pt-4 grid sm:grid-cols-2 gap-4"
+                                style={{ borderTop: '1px solid var(--v2-border)' }}
                             >
                                 {coach.publications && coach.publications.length > 0 && (
                                     <div>
-                                        <p className="text-label text-[var(--text-muted)] mb-2">Publications</p>
+                                        <p className="v2-label mb-2" style={{ color: 'var(--v2-text-muted)' }}>Publications</p>
                                         <ul className="space-y-1">
                                             {coach.publications.map((pub, i) => (
-                                                <li key={i} className="text-body-sm text-[var(--text-base)] flex items-start gap-2">
-                                                    <BookOpen className="w-3.5 h-3.5 text-[var(--text-subtle)] mt-0.5 flex-shrink-0" />
+                                                <li key={i} className="text-sm flex items-start gap-2" style={{ color: 'var(--v2-text-secondary)' }}>
+                                                    <BookOpen className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style={{ color: 'var(--v2-text-subtle)' }} />
                                                     {pub}
                                                 </li>
                                             ))}
@@ -158,10 +168,10 @@ function CoachCard({ coach }: { coach: Coach }) {
                                 )}
                                 {coach.notableAthletes && coach.notableAthletes.length > 0 && (
                                     <div>
-                                        <p className="text-label text-[var(--text-muted)] mb-2">Notable Athletes</p>
+                                        <p className="v2-label mb-2" style={{ color: 'var(--v2-text-muted)' }}>Notable Athletes</p>
                                         <ul className="space-y-1">
                                             {coach.notableAthletes.map((athlete, i) => (
-                                                <li key={i} className="text-body-sm text-[var(--text-base)]">{athlete}</li>
+                                                <li key={i} className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>{athlete}</li>
                                             ))}
                                         </ul>
                                     </div>
@@ -169,15 +179,16 @@ function CoachCard({ coach }: { coach: Coach }) {
                             </motion.div>
                         )}
 
-                        {/* What This Means - the main explanation */}
+                        {/* What This Means */}
                         <motion.div
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.20 }}
-                            className="mt-4 pt-4 border-t border-[var(--border-muted)]"
+                            className="mt-4 pt-4"
+                            style={{ borderTop: '1px solid var(--v2-border)' }}
                         >
-                            <p className="text-label text-[var(--text-muted)] mb-2">What this means for your training</p>
-                            <p className="text-body-sm text-[var(--text-base)] leading-relaxed">
+                            <p className="v2-label mb-2" style={{ color: 'var(--v2-text-muted)' }}>What this means for your training</p>
+                            <p className="text-sm leading-relaxed" style={{ color: 'var(--v2-text-secondary)' }}>
                                 {coach.whatThisMeans}
                             </p>
                         </motion.div>
@@ -187,9 +198,10 @@ function CoachCard({ coach }: { coach: Coach }) {
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.24 }}
-                            className="mt-4 pt-3 border-t border-[var(--border-muted)]"
+                            className="mt-4 pt-3"
+                            style={{ borderTop: '1px solid var(--v2-border)' }}
                         >
-                            <div className="flex items-center gap-2 text-body-sm text-[var(--text-muted)]">
+                            <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--v2-text-muted)' }}>
                                 <BookOpen className="w-4 h-4" />
                                 <span>Source: {coach.source}</span>
                             </div>
@@ -198,7 +210,8 @@ function CoachCard({ coach }: { coach: Coach }) {
                                     href={coach.website}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-2 mt-2 text-body-sm text-[var(--color-accent)] hover:underline"
+                                    className="flex items-center gap-2 mt-2 text-sm hover:underline"
+                                    style={{ color: 'var(--v2-accent)' }}
                                 >
                                     <ExternalLink className="w-4 h-4" />
                                     Learn more
@@ -222,10 +235,10 @@ function CategorySection({ category }: { category: typeof METHODOLOGY_CATEGORIES
 
     return (
         <section className="space-y-8">
-            {/* Section Header with larger typography */}
+            {/* Section Header */}
             <div className="space-y-3">
-                <h2 className="text-display-md">{category.title}</h2>
-                <p className="text-body-lg text-[var(--text-muted)] max-w-2xl">{category.description}</p>
+                <h2 className="text-4xl font-light" style={{ color: 'var(--v2-text-primary)' }}>{category.title}</h2>
+                <p className="text-lg max-w-2xl" style={{ color: 'var(--v2-text-muted)' }}>{category.description}</p>
             </div>
 
             {/* Coach Cards Grid */}
@@ -246,22 +259,19 @@ function ResearchSection() {
     return (
         <section className="space-y-6">
             <div className="space-y-2">
-                <h2 className="text-display-sm mb-2">Research Foundation</h2>
-                <p className="text-body-md text-[var(--text-muted)]">
+                <h2 className="text-2xl font-light mb-2" style={{ color: 'var(--v2-text-primary)' }}>Research Foundation</h2>
+                <p className="text-base" style={{ color: 'var(--v2-text-muted)' }}>
                     Peer-reviewed studies that inform our training engine
                 </p>
             </div>
 
             <div className="space-y-4">
                 {RESEARCH_SOURCES.slice(0, 4).map((source) => (
-                    <div
-                        key={source.id}
-                        className="card p-5"
-                    >
+                    <div key={source.id} className="v2-card p-5">
                         <div className="flex items-start justify-between gap-4">
                             <div>
-                                <h3 className="text-label mb-1">{source.title}</h3>
-                                <p className="text-caption text-[var(--text-muted)]">
+                                <h3 className="v2-label mb-1">{source.title}</h3>
+                                <p className="text-[10px]" style={{ color: 'var(--v2-text-muted)' }}>
                                     {source.authors} ({source.year})
                                 </p>
                             </div>
@@ -270,13 +280,14 @@ function ResearchSection() {
                                     href={`https://doi.org/${source.doi}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-[var(--color-accent)] hover:underline text-caption"
+                                    className="text-[10px] hover:underline"
+                                    style={{ color: 'var(--v2-accent)' }}
                                 >
                                     DOI
                                 </a>
                             )}
                         </div>
-                        <p className="mt-3 text-body-sm text-[var(--text-base)]">
+                        <p className="mt-3 text-sm" style={{ color: 'var(--v2-text-secondary)' }}>
                             {source.keyFinding}
                         </p>
                     </div>
@@ -292,78 +303,86 @@ function ResearchSection() {
 
 export function MethodologyContent() {
     return (
-        <div className="min-h-screen landing-shell">
-            {/* Header */}
-            <header className="sticky top-0 z-50 glass border-b border-[var(--border-muted)]">
-                <div className="container-page h-[var(--header-height)] flex items-center justify-between">
+        <div className="v2-root min-h-screen" style={{ background: 'var(--v2-bg-deep)', color: 'var(--v2-text-primary)' }}>
+            {/* Nav - matches landing page exactly */}
+            <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-5">
+                <div className="max-w-5xl mx-auto flex items-center justify-between">
                     <Link
                         href="/"
-                        className="inline-flex items-center gap-2 text-body-sm text-[var(--text-muted)] hover:text-[var(--text-base)] transition-colors"
+                        className="text-xs transition-colors flex items-center gap-2"
+                        style={{ color: 'var(--v2-text-muted)' }}
                     >
                         <ArrowLeft className="w-4 h-4" />
                         Back
                     </Link>
-                    <Link href="/auth" className="btn btn-gradient btn-sm">
-                        Build Your Plan
+                    <Link
+                        href="/auth"
+                        className="text-xs transition-colors"
+                        style={{ color: 'var(--v2-text-primary)' }}
+                    >
+                        Build Your Plan →
                     </Link>
                 </div>
-            </header>
+            </nav>
 
             {/* Hero */}
-            <section className="hero-section hero-surface">
-                <div className="container-page">
+            <section className="px-6 py-24 relative overflow-hidden" style={{ background: 'var(--v2-bg-section)' }}>
+                {/* Glow */}
+                <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{ background: 'radial-gradient(800px circle at 50% 40%, rgba(25, 227, 140, 0.04), transparent 60%)' }}
+                />
+                <div className="max-w-5xl mx-auto relative">
                     <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 items-center">
                         <div className="max-w-2xl">
-                            <p className="text-label text-[var(--color-accent)] mb-4">Our Methodology</p>
-                            <h1 className="text-display-lg mb-6">
+                            <p className="v2-label mb-4" style={{ color: 'var(--v2-accent)' }}>Our Methodology</p>
+                            <h1 className="text-5xl md:text-6xl font-light mb-6 tracking-tight" style={{ color: 'var(--v2-text-primary)' }}>
                                 Built on science.<br />
-                                <span className="gradient-text">Not opinions.</span>
+                                <span style={{ color: 'var(--v2-accent)' }}>Not opinions.</span>
                             </h1>
-                            <p className="text-body-lg text-[var(--text-muted)]">
+                            <p className="text-lg" style={{ color: 'var(--v2-text-muted)' }}>
                                 Every pace, every workout, every progression in The Long Game is
                                 grounded in decades of coaching wisdom and peer-reviewed research.
                                 Here&apos;s who we learn from.
                             </p>
                             <div className="flex flex-wrap gap-3 mt-8">
-                                <span className="metric-chip">12 coaching standards</span>
-                                <span className="metric-chip">8 research sources</span>
-                                <span className="metric-chip">200+ training rules</span>
+                                <span className="v2-badge">12 coaching standards</span>
+                                <span className="v2-badge">8 research sources</span>
+                                <span className="v2-badge">200+ training rules</span>
                             </div>
                         </div>
 
-                        <div className="hero-visual">
-                            <div className="hero-visual-inner">
-                                <div className="flex items-center justify-between">
-                                    <p className="text-label">The Engine</p>
-                                    <span className="metric-chip">4 pillars</span>
+                        <div className="v2-card p-6 space-y-4">
+                            <div className="flex items-center justify-between">
+                                <p className="v2-label">The Engine</p>
+                                <span className="v2-badge">4 pillars</span>
+                            </div>
+                            <div style={{ height: '1px', background: 'linear-gradient(90deg, var(--v2-accent), transparent)' }} />
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="v2-card p-3" style={{ background: 'var(--v2-bg-elevated)' }}>
+                                    <p className="v2-label mb-1">Running</p>
+                                    <p className="text-sm font-light" style={{ color: 'var(--v2-text-secondary)' }}>VDOT Pacing</p>
+                                    <p className="text-[10px]" style={{ color: 'var(--v2-text-subtle)' }}>Hansons · Daniels</p>
                                 </div>
-                                <div className="signal-line" />
-                                <div className="stat-grid">
-                                    <div className="hero-visual-card">
-                                        <p className="text-label mb-1">Running</p>
-                                        <p className="text-heading-md text-data">VDOT Pacing</p>
-                                        <p className="text-caption">Hansons · Daniels</p>
-                                    </div>
-                                    <div className="hero-visual-card">
-                                        <p className="text-label mb-1">Strength</p>
-                                        <p className="text-heading-md text-data">Interference-safe</p>
-                                        <p className="text-caption">Hybrid standards</p>
-                                    </div>
-                                    <div className="hero-visual-card">
-                                        <p className="text-label mb-1">Durability</p>
-                                        <p className="text-heading-md text-data">12 checks</p>
-                                        <p className="text-caption">Prehab protocols</p>
-                                    </div>
-                                    <div className="hero-visual-card">
-                                        <p className="text-label mb-1">Recovery</p>
-                                        <p className="text-heading-md text-data">Adaptive</p>
-                                        <p className="text-caption">Garmin-ready</p>
-                                    </div>
+                                <div className="v2-card p-3" style={{ background: 'var(--v2-bg-elevated)' }}>
+                                    <p className="v2-label mb-1">Strength</p>
+                                    <p className="text-sm font-light" style={{ color: 'var(--v2-text-secondary)' }}>Interference-safe</p>
+                                    <p className="text-[10px]" style={{ color: 'var(--v2-text-subtle)' }}>Hybrid standards</p>
                                 </div>
-                                <div className="hero-visual-card">
-                                    <p className="text-label text-[var(--color-accent)] mb-2">Evidence stack</p>
-                                    <p className="text-body-sm">Seiler · Dicharry · Starrett + peer‑reviewed labs</p>
+                                <div className="v2-card p-3" style={{ background: 'var(--v2-bg-elevated)' }}>
+                                    <p className="v2-label mb-1">Durability</p>
+                                    <p className="text-sm font-light" style={{ color: 'var(--v2-text-secondary)' }}>12 checks</p>
+                                    <p className="text-[10px]" style={{ color: 'var(--v2-text-subtle)' }}>Prehab protocols</p>
                                 </div>
+                                <div className="v2-card p-3" style={{ background: 'var(--v2-bg-elevated)' }}>
+                                    <p className="v2-label mb-1">Recovery</p>
+                                    <p className="text-sm font-light" style={{ color: 'var(--v2-text-secondary)' }}>Adaptive</p>
+                                    <p className="text-[10px]" style={{ color: 'var(--v2-text-subtle)' }}>Garmin-ready</p>
+                                </div>
+                            </div>
+                            <div className="v2-card p-3" style={{ background: 'var(--v2-bg-elevated)' }}>
+                                <p className="v2-label mb-1" style={{ color: 'var(--v2-accent)' }}>Evidence stack</p>
+                                <p className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>Seiler · Dicharry · Starrett + peer‑reviewed labs</p>
                             </div>
                         </div>
                     </div>
@@ -371,7 +390,7 @@ export function MethodologyContent() {
             </section>
 
             {/* Main Content */}
-            <main className="container-page pt-16 pb-24">
+            <main className="max-w-5xl mx-auto px-6 pt-16 pb-24">
                 <div className="space-y-24">
                     {/* Running Science */}
                     <CategorySection category={METHODOLOGY_CATEGORIES.running} />
@@ -390,18 +409,21 @@ export function MethodologyContent() {
                 </div>
 
                 {/* CTA */}
-                <section className="section">
-                    <div className="cta-panel text-center">
-                        <h2 className="text-display-sm mb-4">Ready to train smarter?</h2>
-                        <p className="text-body-md text-[var(--text-muted)] mb-8 max-w-lg mx-auto">
-                            Get a personalized plan built on these proven methodologies.
-                        </p>
-                        <Link
-                            href="/auth"
-                            className="btn btn-gradient btn-lg inline-flex"
-                        >
-                            Build Your Plan
-                        </Link>
+                <section className="mt-24">
+                    <div className="v2-card p-12 text-center relative overflow-hidden">
+                        <div
+                            className="absolute inset-0 pointer-events-none"
+                            style={{ background: 'radial-gradient(600px circle at 50% 100%, rgba(25, 227, 140, 0.06), transparent 60%)' }}
+                        />
+                        <div className="relative">
+                            <h2 className="text-2xl font-light mb-4" style={{ color: 'var(--v2-text-primary)' }}>Ready to train smarter?</h2>
+                            <p className="text-base mb-8 max-w-lg mx-auto" style={{ color: 'var(--v2-text-muted)' }}>
+                                Get a personalized plan built on these proven methodologies.
+                            </p>
+                            <Link href="/auth" className="v2-btn v2-btn-primary v2-btn-lg">
+                                Build Your Plan
+                            </Link>
+                        </div>
                     </div>
                 </section>
             </main>

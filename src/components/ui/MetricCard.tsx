@@ -3,7 +3,7 @@
 /**
  * MetricCard - Consistent metric display component
  * 
- * Used for displaying stats with value, unit, label, and optional delta
+ * V2 Design System - Used for displaying stats with value, unit, label, and optional delta
  */
 
 interface MetricCardProps {
@@ -35,16 +35,16 @@ export function MetricCard({
     size = 'md',
     animationDelay,
 }: MetricCardProps) {
-    const sizeClasses = {
-        sm: { card: 'p-4', value: 'text-heading-lg', label: 'text-caption' },
-        md: { card: 'p-5', value: 'text-display-md', label: 'text-caption' },
-        lg: { card: 'p-6', value: 'text-display-lg', label: 'text-body-sm' },
+    const sizeStyles = {
+        sm: { card: 'p-4', valueSize: 'text-lg', labelSize: 'text-[10px]' },
+        md: { card: 'p-5', valueSize: 'text-2xl', labelSize: 'text-[10px]' },
+        lg: { card: 'p-6', valueSize: 'text-3xl', labelSize: 'text-sm' },
     };
 
     const trendColors = {
-        up: 'text-[var(--color-success)]',
-        down: 'text-[var(--color-error)]',
-        neutral: 'text-[var(--text-muted)]',
+        up: 'var(--v2-success)',
+        down: 'var(--v2-error)',
+        neutral: 'var(--v2-text-muted)',
     };
 
     const trendIcons = {
@@ -53,28 +53,28 @@ export function MetricCard({
         neutral: '→',
     };
 
-    const { card, value: valueClass, label: labelClass } = sizeClasses[size];
+    const { card, valueSize, labelSize } = sizeStyles[size];
 
     return (
         <div
-            className={`card ${card} animate-fade-in`}
+            className={`v2-card ${card}`}
             style={animationDelay ? { animationDelay: `${animationDelay}ms` } : undefined}
         >
             {/* Header with icon and label */}
             <div className="flex items-center gap-2 mb-2">
-                {icon && <span className="text-[var(--color-accent)]">{icon}</span>}
-                <span className="text-label">{label}</span>
+                {icon && <span style={{ color: 'var(--v2-accent)' }}>{icon}</span>}
+                <span className="v2-label">{label}</span>
             </div>
 
             {/* Main value */}
             <div className="flex items-baseline gap-1">
-                <p className={`${valueClass} text-data`}>{value}</p>
-                {unit && <span className="text-body-sm text-[var(--text-muted)]">{unit}</span>}
+                <p className={`${valueSize} font-mono`} style={{ color: 'var(--v2-accent)' }}>{value}</p>
+                {unit && <span className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>{unit}</span>}
             </div>
 
             {/* Optional delta */}
             {delta && (
-                <p className={`text-caption mt-1 ${trendColors[delta.trend]}`}>
+                <p className={`${labelSize} mt-1`} style={{ color: trendColors[delta.trend] }}>
                     {trendIcons[delta.trend]} {delta.value}
                 </p>
             )}

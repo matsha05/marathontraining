@@ -3,12 +3,10 @@
 /**
  * Durability Assessment Page
  *
- * Based on Jay Dicharry's Running Rewired methodology.
- * Allows athletes to self-assess movement quality and
- * receive prescribed mobility/strength modules.
+ * V2 Design System - Based on Jay Dicharry's Running Rewired methodology.
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { AppHeader } from '@/components/ui/AppHeader';
 import {
     getAllAssessments,
@@ -27,7 +25,6 @@ export default function DurabilityPage() {
 
     const assessments = getAllAssessments();
 
-    // Calculate prescribed modules based on failed assessments
     const failedIds = Object.entries(results)
         .filter(([_, r]) => r.result === 'fail')
         .map(([id]) => id);
@@ -62,40 +59,43 @@ export default function DurabilityPage() {
     };
 
     return (
-        <div className="min-h-screen landing-shell">
+        <div className="min-h-screen" style={{ background: 'var(--v2-bg-deep)', color: 'var(--v2-text-primary)' }}>
             <AppHeader streak={0} />
 
-            <main className="container-page py-10 space-y-8">
+            <main className="max-w-3xl mx-auto px-6 py-10 space-y-8">
                 {/* Header */}
                 <div>
-                    <h1 className="text-display-sm mb-2">Durability Assessment</h1>
-                    <p className="text-body-lg text-[var(--text-muted)]">
+                    <h1 className="text-2xl font-light mb-2" style={{ color: 'var(--v2-text-primary)' }}>Durability Assessment</h1>
+                    <p className="text-lg" style={{ color: 'var(--v2-text-muted)' }}>
                         Based on Jay Dicharry's Running Rewired methodology.
                         Identify movement limitations before they become injuries.
                     </p>
                 </div>
 
                 {/* Progress */}
-                <div className="card p-6">
+                <div className="v2-card p-6">
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <p className="text-label">Progress</p>
-                            <p className="text-data text-2xl">{completedCount} / {totalCount}</p>
+                            <p className="v2-label">Progress</p>
+                            <p className="text-2xl font-mono" style={{ color: 'var(--v2-accent)' }}>{completedCount} / {totalCount}</p>
                         </div>
-                        <div className="flex gap-4 text-body-sm">
-                            <span className="text-green-400">✓ {passCount} pass</span>
-                            <span className="text-red-400">✗ {failCount} fail</span>
+                        <div className="flex gap-4 text-sm">
+                            <span style={{ color: '#4ade80' }}>✓ {passCount} pass</span>
+                            <span style={{ color: '#f87171' }}>✗ {failCount} fail</span>
                         </div>
                     </div>
-                    <div className="h-2 bg-[var(--bg-muted)] rounded-full overflow-hidden">
+                    <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--v2-bg-elevated)' }}>
                         <div
-                            className="h-full bg-[var(--color-accent)] transition-all duration-300"
-                            style={{ width: `${(completedCount / totalCount) * 100}%` }}
+                            className="h-full transition-all duration-300"
+                            style={{
+                                width: `${(completedCount / totalCount) * 100}%`,
+                                background: 'var(--v2-accent)'
+                            }}
                         />
                     </div>
                     {completedCount === totalCount && (
                         <button
-                            className="btn btn-primary mt-4 w-full"
+                            className="v2-btn v2-btn-primary mt-4 w-full"
                             onClick={() => setShowResults(true)}
                         >
                             View Your Prescription
@@ -105,38 +105,38 @@ export default function DurabilityPage() {
 
                 {/* Results Modal */}
                 {showResults && (
-                    <div className="card p-6 border-2 border-[var(--color-accent)]">
-                        <h2 className="text-heading mb-4">Your Durability Prescription</h2>
+                    <div className="v2-card p-6" style={{ border: '2px solid var(--v2-accent)' }}>
+                        <h2 className="text-xl font-light mb-4" style={{ color: 'var(--v2-text-primary)' }}>Your Durability Prescription</h2>
                         {prescribedModules.length === 0 ? (
                             <div className="text-center py-8">
                                 <p className="text-4xl mb-4">🎉</p>
-                                <p className="text-body-lg">All assessments passed!</p>
-                                <p className="text-body-sm text-[var(--text-muted)]">
+                                <p className="text-lg" style={{ color: 'var(--v2-text-secondary)' }}>All assessments passed!</p>
+                                <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
                                     Maintain your durability with general strength work.
                                 </p>
                             </div>
                         ) : (
                             <div className="space-y-4">
-                                <p className="text-body-sm text-[var(--text-muted)]">
+                                <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
                                     Based on your failed assessments, prioritize these modules:
                                 </p>
                                 {prescribedModules.map(mod => (
-                                    <div key={mod.id} className="p-4 rounded-lg bg-[var(--bg-muted)]">
+                                    <div key={mod.id} className="p-4 rounded-lg" style={{ background: 'var(--v2-bg-elevated)' }}>
                                         <div className="flex items-center justify-between mb-2">
-                                            <h3 className="font-semibold">{mod.name}</h3>
-                                            <span className="badge">{mod.durationMin} min</span>
+                                            <h3 className="font-medium" style={{ color: 'var(--v2-text-secondary)' }}>{mod.name}</h3>
+                                            <span className="v2-badge">{mod.durationMin} min</span>
                                         </div>
-                                        <p className="text-body-sm text-[var(--text-muted)] mb-3">
+                                        <p className="text-sm mb-3" style={{ color: 'var(--v2-text-muted)' }}>
                                             {mod.frequency.replace('_', ' ')} • {mod.source}
                                         </p>
                                         <div className="space-y-1">
                                             {mod.exercises.slice(0, 3).map((ex, i) => (
-                                                <p key={i} className="text-caption">
+                                                <p key={i} className="text-[10px]" style={{ color: 'var(--v2-text-subtle)' }}>
                                                     • {ex.name}: {ex.sets}×{ex.reps}
                                                 </p>
                                             ))}
                                             {mod.exercises.length > 3 && (
-                                                <p className="text-caption text-[var(--text-subtle)]">
+                                                <p className="text-[10px]" style={{ color: 'var(--v2-text-ghost)' }}>
                                                     + {mod.exercises.length - 3} more exercises
                                                 </p>
                                             )}
@@ -146,7 +146,7 @@ export default function DurabilityPage() {
                             </div>
                         )}
                         <button
-                            className="btn btn-secondary mt-6 w-full"
+                            className="v2-btn v2-btn-secondary mt-6 w-full"
                             onClick={() => setShowResults(false)}
                         >
                             Close
@@ -163,9 +163,11 @@ export default function DurabilityPage() {
                         return (
                             <div
                                 key={assessment.id}
-                                className={`card p-4 transition-all ${result?.result === 'pass' ? 'border-green-500/30' :
-                                    result?.result === 'fail' ? 'border-red-500/30' : ''
-                                    }`}
+                                className="v2-card p-4 transition-all"
+                                style={{
+                                    borderColor: result?.result === 'pass' ? 'rgba(74, 222, 128, 0.3)' :
+                                        result?.result === 'fail' ? 'rgba(248, 113, 113, 0.3)' : undefined
+                                }}
                             >
                                 <button
                                     className="w-full flex items-center gap-4 text-left"
@@ -173,36 +175,42 @@ export default function DurabilityPage() {
                                 >
                                     <span className="text-2xl">{getCategoryIcon(assessment.category)}</span>
                                     <div className="flex-1">
-                                        <h3 className="font-semibold">{assessment.name}</h3>
-                                        <p className="text-body-sm text-[var(--text-muted)]">
+                                        <h3 className="font-medium" style={{ color: 'var(--v2-text-secondary)' }}>{assessment.name}</h3>
+                                        <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
                                             {assessment.description}
                                         </p>
                                     </div>
                                     {result && (
-                                        <span className={`badge ${result.result === 'pass' ? 'badge-accent' :
-                                            result.result === 'fail' ? 'badge-error' : 'badge-warning'
-                                            }`}>
+                                        <span
+                                            className="v2-badge"
+                                            style={{
+                                                background: result.result === 'pass' ? 'var(--v2-accent-subtle)' :
+                                                    result.result === 'fail' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                                                color: result.result === 'pass' ? 'var(--v2-accent)' :
+                                                    result.result === 'fail' ? '#ef4444' : '#f59e0b'
+                                            }}
+                                        >
                                             {result.result}
                                         </span>
                                     )}
-                                    <span className="text-[var(--text-subtle)]">
+                                    <span style={{ color: 'var(--v2-text-subtle)' }}>
                                         {isExpanded ? '▲' : '▼'}
                                     </span>
                                 </button>
 
                                 {isExpanded && (
-                                    <div className="mt-4 pt-4 border-t border-[var(--border-subtle)] space-y-4">
+                                    <div className="mt-4 pt-4 space-y-4" style={{ borderTop: '1px solid var(--v2-border)' }}>
                                         <div>
-                                            <p className="text-label mb-1">Test Procedure</p>
-                                            <p className="text-body-sm">{assessment.testProcedure}</p>
+                                            <p className="v2-label mb-1">Test Procedure</p>
+                                            <p className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>{assessment.testProcedure}</p>
                                         </div>
                                         <div>
-                                            <p className="text-label mb-1">Pass Standard</p>
-                                            <p className="text-body-sm text-green-400">{assessment.passStandard}</p>
+                                            <p className="v2-label mb-1">Pass Standard</p>
+                                            <p className="text-sm" style={{ color: '#4ade80' }}>{assessment.passStandard}</p>
                                         </div>
                                         <div>
-                                            <p className="text-label mb-1">If Failed</p>
-                                            <ul className="text-body-sm text-[var(--text-muted)] list-disc list-inside">
+                                            <p className="v2-label mb-1">If Failed</p>
+                                            <ul className="text-sm list-disc list-inside" style={{ color: 'var(--v2-text-muted)' }}>
                                                 {assessment.failImplications.map((imp, i) => (
                                                     <li key={i}>{imp}</li>
                                                 ))}
@@ -210,19 +218,19 @@ export default function DurabilityPage() {
                                         </div>
                                         <div className="flex gap-3">
                                             <button
-                                                className={`btn flex-1 ${result?.result === 'pass' ? 'btn-primary' : 'btn-secondary'}`}
+                                                className={`v2-btn flex-1 ${result?.result === 'pass' ? 'v2-btn-primary' : 'v2-btn-secondary'}`}
                                                 onClick={() => handleResult(assessment.id, 'pass')}
                                             >
                                                 ✓ Pass
                                             </button>
                                             <button
-                                                className={`btn flex-1 ${result?.result === 'partial' ? 'btn-primary' : 'btn-secondary'}`}
+                                                className={`v2-btn flex-1 ${result?.result === 'partial' ? 'v2-btn-primary' : 'v2-btn-secondary'}`}
                                                 onClick={() => handleResult(assessment.id, 'partial')}
                                             >
                                                 ~ Partial
                                             </button>
                                             <button
-                                                className={`btn flex-1 ${result?.result === 'fail' ? 'btn-primary' : 'btn-secondary'}`}
+                                                className={`v2-btn flex-1 ${result?.result === 'fail' ? 'v2-btn-primary' : 'v2-btn-secondary'}`}
                                                 onClick={() => handleResult(assessment.id, 'fail')}
                                             >
                                                 ✗ Fail

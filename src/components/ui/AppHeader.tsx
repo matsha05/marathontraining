@@ -8,15 +8,15 @@ import { FlameIcon } from '@/components/ui/flame';
 /**
  * AppHeader - Shared header component for all app pages
  * 
- * Provides consistent navigation, branding, and optional streak display
+ * V2 Design System - Dark atmospheric aesthetic
  */
 
 interface AppHeaderProps {
-    /** Optional custom title - if not provided, shows "The Long Game" with logo */
+    /** Optional custom title */
     title?: string;
-    /** If provided, shows a back link to this href */
+    /** If provided, shows a back link */
     backHref?: string;
-    /** Custom content for right side of header */
+    /** Custom content for right side */
     rightContent?: React.ReactNode;
     /** If provided, shows streak badge */
     streak?: number;
@@ -32,29 +32,39 @@ export function AppHeader({
     hideSettings = false,
 }: AppHeaderProps) {
     return (
-        <header className="sticky top-0 z-50 glass border-b border-[var(--border-muted)]">
-            <div className="container-page h-[var(--header-height)] flex items-center justify-between">
-                {/* Left side - Logo/Title or Back link */}
+        <header
+            className="sticky top-0 z-50 border-b"
+            style={{
+                background: 'rgba(8, 8, 10, 0.8)',
+                backdropFilter: 'blur(12px)',
+                borderColor: 'var(--v2-border)'
+            }}
+        >
+            <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+                {/* Left side */}
                 <div className="flex items-center gap-3">
                     {backHref ? (
                         <Link
                             href={backHref}
-                            className="text-[var(--text-muted)] hover:text-[var(--text-base)] flex items-center gap-2 tap-target"
+                            className="flex items-center gap-2 transition-colors"
+                            style={{ color: 'var(--v2-text-muted)' }}
                         >
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                             </svg>
-                            {title ? <span className="text-heading-sm">{title}</span> : 'Back'}
+                            {title ? <span className="text-sm font-medium">{title}</span> : 'Back'}
                         </Link>
                     ) : (
                         <>
                             <div
-                                className="w-9 h-9 rounded-xl flex items-center justify-center"
-                                style={{ background: "var(--gradient-primary)" }}
+                                className="w-8 h-8 rounded-lg flex items-center justify-center"
+                                style={{ background: 'var(--v2-accent)' }}
                             >
-                                <ActivityIcon size={20} className="text-black" />
+                                <ActivityIcon size={18} className="text-black" />
                             </div>
-                            <span className="text-heading-sm">{title || 'The Long Game'}</span>
+                            <span className="text-sm font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
+                                {title || 'The Long Game'}
+                            </span>
                         </>
                     )}
                 </div>
@@ -63,9 +73,12 @@ export function AppHeader({
                 <div className="flex items-center gap-4">
                     {/* Streak badge */}
                     {streak !== undefined && streak > 0 && (
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--color-accent)]/15">
-                            <FlameIcon size={18} className="text-[var(--color-accent)]" />
-                            <span className="text-body-sm font-bold text-[var(--color-accent)]">{streak}</span>
+                        <div
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+                            style={{ background: 'var(--v2-accent-subtle)' }}
+                        >
+                            <FlameIcon size={18} style={{ color: 'var(--v2-accent)' }} />
+                            <span className="text-sm font-bold" style={{ color: 'var(--v2-accent)' }}>{streak}</span>
                         </div>
                     )}
 
@@ -74,11 +87,12 @@ export function AppHeader({
 
                     {/* Settings link */}
                     {!hideSettings && !backHref && (
-                        <Link href="/settings" className="tap-target flex items-center justify-center">
-                            <SettingsIcon
-                                size={22}
-                                className="text-[var(--text-muted)] hover:text-[var(--text-base)]"
-                            />
+                        <Link
+                            href="/settings"
+                            className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors"
+                            style={{ color: 'var(--v2-text-muted)' }}
+                        >
+                            <SettingsIcon size={22} />
                         </Link>
                     )}
                 </div>
