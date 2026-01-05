@@ -1,299 +1,87 @@
-'use client';
+"use client";
 
 /**
  * THE LONG GAME - Methodology Page Content
  * 
- * V2 Design System - Premium, trust-building page showcasing coaching science
+ * Flow variant: Homepage-style full-width scrolling sections with inline expand
+ * All content included: bio, achievements, publications, notable athletes, whatThisMeans, source, website
  */
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { ArrowLeft, BookOpen, ExternalLink, ChevronDown, Sparkles } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-    COACHES,
-    METHODOLOGY_CATEGORIES,
-    RESEARCH_SOURCES,
-    Coach,
-} from '@/config/coach-spec/methodology';
+import React, { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import { BookOpen, ExternalLink, ChevronDown } from "lucide-react";
+import { COACHES, METHODOLOGY_CATEGORIES, RESEARCH_SOURCES, Coach } from "@/config/coach-spec/methodology";
+
+const ease = [0.25, 0.46, 0.45, 0.94] as const;
 
 // =============================================================================
-// COACH CARD COMPONENT
+// COACH DETAIL CONTENT
 // =============================================================================
 
-function CoachCard({ coach }: { coach: Coach }) {
-    const [expanded, setExpanded] = useState(false);
-
+function CoachDetailContent({ coach }: { coach: Coach }) {
     return (
-        <motion.div
-            layout
-            layoutId={`coach-${coach.id}`}
-            onClick={() => setExpanded(!expanded)}
-            className="v2-card v2-card-interactive p-6 cursor-pointer select-none"
-            style={{ borderColor: expanded ? 'var(--v2-accent)' : undefined }}
-            role="button"
-            tabIndex={0}
-            aria-expanded={expanded}
-            aria-label={`${coach.name} - ${expanded ? 'click to collapse' : 'click to expand'}`}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setExpanded(!expanded);
-                }
-            }}
-        >
-            {/* Header */}
-            <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                    <h3 className="text-lg font-light mb-1" style={{ color: 'var(--v2-text-secondary)' }}>{coach.name}</h3>
-                    <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>{coach.title}</span>
-                        {coach.credentials && (
-                            <span
-                                className="px-2 py-0.5 text-[10px] rounded-full"
-                                style={{
-                                    background: 'var(--v2-accent-subtle)',
-                                    color: 'var(--v2-accent)',
-                                    border: '1px solid rgba(25, 227, 140, 0.3)'
-                                }}
-                            >
-                                {coach.credentials}
-                            </span>
-                        )}
-                    </div>
+        <>
+            {coach.bio && (
+                <div className="mb-6">
+                    <p className="text-xs uppercase tracking-widest mb-3" style={{ color: 'var(--v2-text-muted)' }}>Background</p>
+                    <p className="text-sm leading-relaxed" style={{ color: 'var(--v2-text-secondary)' }}>{coach.bio}</p>
                 </div>
-                <motion.div
-                    animate={{ rotate: expanded ? 180 : 0 }}
-                    transition={{ duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
-                    className="p-2 rounded-lg"
-                >
-                    <ChevronDown className="w-5 h-5" style={{ color: 'var(--v2-text-muted)' }} />
-                </motion.div>
-            </div>
-
-            {/* Expertise Tags */}
-            <div className="mt-4">
-                <div className="flex flex-wrap gap-2">
-                    {coach.expertise.map((tag) => (
-                        <span
-                            key={tag}
-                            className="px-2 py-1 text-[10px] rounded-full"
-                            style={{ background: 'var(--v2-bg-elevated)', color: 'var(--v2-text-muted)' }}
-                        >
-                            {tag}
-                        </span>
-                    ))}
+            )}
+            {coach.achievements && coach.achievements.length > 0 && (
+                <div className="mb-6">
+                    <p className="text-xs uppercase tracking-widest mb-3" style={{ color: 'var(--v2-text-muted)' }}>Key Achievements</p>
+                    <ul className="space-y-2">
+                        {coach.achievements.map((a, i) => (
+                            <li key={i} className="text-sm flex items-start gap-2" style={{ color: 'var(--v2-text-secondary)' }}>
+                                <span style={{ color: 'var(--v2-accent)' }}>•</span>{a}
+                            </li>
+                        ))}
+                    </ul>
                 </div>
-            </div>
-
-            {/* Key Concept Box */}
-            <div className="mt-4 p-3 rounded-xl" style={{ background: 'var(--v2-bg-elevated)' }}>
-                <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="w-4 h-4" style={{ color: 'var(--v2-accent)' }} />
-                    <span className="v2-label" style={{ color: 'var(--v2-accent)' }}>{coach.keyConceptShort}</span>
-                </div>
-                <p className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>
-                    {expanded ? coach.keyConceptFull : coach.keyConceptFull.slice(0, 80) + (coach.keyConceptFull.length > 80 ? '...' : '')}
-                </p>
-            </div>
-
-            {/* Expanded Content */}
-            <AnimatePresence>
-                {expanded && (
-                    <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.24, ease: [0.2, 0.8, 0.2, 1] }}
-                        className="overflow-hidden"
-                    >
-                        {/* Bio Section */}
-                        {coach.bio && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 8 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.08 }}
-                                className="mt-4 pt-4"
-                                style={{ borderTop: '1px solid var(--v2-border)' }}
-                            >
-                                <p className="v2-label mb-2" style={{ color: 'var(--v2-text-muted)' }}>Background</p>
-                                <p className="text-sm leading-relaxed" style={{ color: 'var(--v2-text-secondary)' }}>
-                                    {coach.bio}
-                                </p>
-                            </motion.div>
-                        )}
-
-                        {/* Achievements Section */}
-                        {coach.achievements && coach.achievements.length > 0 && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 8 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.12 }}
-                                className="mt-4 pt-4"
-                                style={{ borderTop: '1px solid var(--v2-border)' }}
-                            >
-                                <p className="v2-label mb-2" style={{ color: 'var(--v2-text-muted)' }}>Key Achievements</p>
-                                <ul className="space-y-1.5">
-                                    {coach.achievements.map((achievement, i) => (
-                                        <li key={i} className="text-sm flex items-start gap-2" style={{ color: 'var(--v2-text-secondary)' }}>
-                                            <span style={{ color: 'var(--v2-accent)' }}>•</span>
-                                            {achievement}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </motion.div>
-                        )}
-
-                        {/* Publications & Notable Athletes */}
-                        {((coach.publications && coach.publications.length > 0) || (coach.notableAthletes && coach.notableAthletes.length > 0)) && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 8 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.16 }}
-                                className="mt-4 pt-4 grid sm:grid-cols-2 gap-4"
-                                style={{ borderTop: '1px solid var(--v2-border)' }}
-                            >
-                                {coach.publications && coach.publications.length > 0 && (
-                                    <div>
-                                        <p className="v2-label mb-2" style={{ color: 'var(--v2-text-muted)' }}>Publications</p>
-                                        <ul className="space-y-1">
-                                            {coach.publications.map((pub, i) => (
-                                                <li key={i} className="text-sm flex items-start gap-2" style={{ color: 'var(--v2-text-secondary)' }}>
-                                                    <BookOpen className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style={{ color: 'var(--v2-text-subtle)' }} />
-                                                    {pub}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                )}
-                                {coach.notableAthletes && coach.notableAthletes.length > 0 && (
-                                    <div>
-                                        <p className="v2-label mb-2" style={{ color: 'var(--v2-text-muted)' }}>Notable Athletes</p>
-                                        <ul className="space-y-1">
-                                            {coach.notableAthletes.map((athlete, i) => (
-                                                <li key={i} className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>{athlete}</li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                )}
-                            </motion.div>
-                        )}
-
-                        {/* What This Means */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 8 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.20 }}
-                            className="mt-4 pt-4"
-                            style={{ borderTop: '1px solid var(--v2-border)' }}
-                        >
-                            <p className="v2-label mb-2" style={{ color: 'var(--v2-text-muted)' }}>What this means for your training</p>
-                            <p className="text-sm leading-relaxed" style={{ color: 'var(--v2-text-secondary)' }}>
-                                {coach.whatThisMeans}
-                            </p>
-                        </motion.div>
-
-                        {/* Source attribution */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 8 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.24 }}
-                            className="mt-4 pt-3"
-                            style={{ borderTop: '1px solid var(--v2-border)' }}
-                        >
-                            <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--v2-text-muted)' }}>
-                                <BookOpen className="w-4 h-4" />
-                                <span>Source: {coach.source}</span>
-                            </div>
-                            {coach.website && (
-                                <a
-                                    href={coach.website}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-2 mt-2 text-sm hover:underline"
-                                    style={{ color: 'var(--v2-accent)' }}
-                                >
-                                    <ExternalLink className="w-4 h-4" />
-                                    Learn more
-                                </a>
-                            )}
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </motion.div>
-    );
-}
-
-
-// =============================================================================
-// CATEGORY SECTION
-// =============================================================================
-
-function CategorySection({ category }: { category: typeof METHODOLOGY_CATEGORIES.running }) {
-    const coaches = category.coaches.map(id => COACHES[id]).filter(Boolean);
-
-    return (
-        <section className="space-y-8">
-            {/* Section Header */}
-            <div className="space-y-3">
-                <h2 className="text-4xl font-light" style={{ color: 'var(--v2-text-primary)' }}>{category.title}</h2>
-                <p className="text-lg max-w-2xl" style={{ color: 'var(--v2-text-muted)' }}>{category.description}</p>
-            </div>
-
-            {/* Coach Cards Grid */}
-            <div className="grid md:grid-cols-2 gap-4">
-                {coaches.map((coach) => (
-                    <CoachCard key={coach.id} coach={coach} />
-                ))}
-            </div>
-        </section>
-    );
-}
-
-// =============================================================================
-// RESEARCH SOURCES SECTION
-// =============================================================================
-
-function ResearchSection() {
-    return (
-        <section className="space-y-6">
-            <div className="space-y-2">
-                <h2 className="text-2xl font-light mb-2" style={{ color: 'var(--v2-text-primary)' }}>Research Foundation</h2>
-                <p className="text-base" style={{ color: 'var(--v2-text-muted)' }}>
-                    Peer-reviewed studies that inform our training engine
-                </p>
-            </div>
-
-            <div className="space-y-4">
-                {RESEARCH_SOURCES.slice(0, 4).map((source) => (
-                    <div key={source.id} className="v2-card p-5">
-                        <div className="flex items-start justify-between gap-4">
-                            <div>
-                                <h3 className="v2-label mb-1">{source.title}</h3>
-                                <p className="text-[10px]" style={{ color: 'var(--v2-text-muted)' }}>
-                                    {source.authors} ({source.year})
-                                </p>
-                            </div>
-                            {source.doi && (
-                                <a
-                                    href={`https://doi.org/${source.doi}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-[10px] hover:underline"
-                                    style={{ color: 'var(--v2-accent)' }}
-                                >
-                                    DOI
-                                </a>
-                            )}
+            )}
+            {((coach.publications && coach.publications.length > 0) || (coach.notableAthletes && coach.notableAthletes.length > 0)) && (
+                <div className="mb-6 grid sm:grid-cols-2 gap-6">
+                    {coach.publications && coach.publications.length > 0 && (
+                        <div>
+                            <p className="text-xs uppercase tracking-widest mb-3" style={{ color: 'var(--v2-text-muted)' }}>Publications</p>
+                            <ul className="space-y-2">
+                                {coach.publications.map((pub, i) => (
+                                    <li key={i} className="text-sm flex items-start gap-2" style={{ color: 'var(--v2-text-secondary)' }}>
+                                        <BookOpen className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style={{ color: 'var(--v2-text-subtle)' }} />{pub}
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
-                        <p className="mt-3 text-sm" style={{ color: 'var(--v2-text-secondary)' }}>
-                            {source.keyFinding}
-                        </p>
-                    </div>
-                ))}
+                    )}
+                    {coach.notableAthletes && coach.notableAthletes.length > 0 && (
+                        <div>
+                            <p className="text-xs uppercase tracking-widest mb-3" style={{ color: 'var(--v2-text-muted)' }}>Notable Athletes</p>
+                            <ul className="space-y-1">
+                                {coach.notableAthletes.map((athlete, i) => (
+                                    <li key={i} className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>{athlete}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </div>
+            )}
+            <div className="mb-6">
+                <p className="text-xs uppercase tracking-widest mb-3" style={{ color: 'var(--v2-accent)' }}>What this means for your training</p>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--v2-text-secondary)' }}>{coach.whatThisMeans}</p>
             </div>
-        </section>
+            <div className="pt-4" style={{ borderTop: '1px solid var(--v2-border)' }}>
+                <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                    <BookOpen className="w-4 h-4" /><span>Source: {coach.source}</span>
+                </div>
+                {coach.website && (
+                    <a href={coach.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 mt-2 text-sm hover:underline" style={{ color: 'var(--v2-accent)' }} onClick={(e) => e.stopPropagation()}>
+                        <ExternalLink className="w-4 h-4" />Learn more
+                    </a>
+                )}
+            </div>
+        </>
     );
 }
 
@@ -302,131 +90,139 @@ function ResearchSection() {
 // =============================================================================
 
 export function MethodologyContent() {
+    const [expandedId, setExpandedId] = useState<string | null>(null);
+    const allCoaches = Object.values(COACHES);
+    const colors = ['var(--v2-secondary)', '#ec4899', '#06b6d4', 'var(--v2-accent)', '#8b5cf6', '#14b8a6', '#f59e0b', '#ef4444'];
+
     return (
         <div className="v2-root min-h-screen" style={{ background: 'var(--v2-bg-deep)', color: 'var(--v2-text-primary)' }}>
-            {/* Nav - matches landing page exactly */}
-            <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-5">
+            {/* Nav */}
+            <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-5 backdrop-blur-xl" style={{ background: 'rgba(8, 8, 10, 0.8)' }}>
                 <div className="max-w-5xl mx-auto flex items-center justify-between">
-                    <Link
-                        href="/"
-                        className="text-xs transition-colors flex items-center gap-2"
-                        style={{ color: 'var(--v2-text-muted)' }}
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        Back
+                    <Link href="/" className="flex items-center gap-3">
+                        <Image src="/icon-192.png" alt="The Long Game" width={28} height={28} className="rounded opacity-70" />
+                        <span className="text-sm font-medium" style={{ color: 'var(--v2-text-primary)' }}>The Long Game</span>
                     </Link>
-                    <Link
-                        href="/auth"
-                        className="text-xs transition-colors"
-                        style={{ color: 'var(--v2-text-primary)' }}
-                    >
-                        Build Your Plan →
-                    </Link>
+                    <div className="flex items-center gap-6">
+                        <Link href="/browse" className="text-xs transition-colors" style={{ color: 'var(--v2-text-muted)' }}>Browse</Link>
+                        <Link href="/philosophy" className="text-xs transition-colors" style={{ color: 'var(--v2-text-muted)' }}>Find Your Coach</Link>
+                        <Link href="/auth" className="text-xs transition-colors" style={{ color: 'var(--v2-text-primary)' }}>Get Started →</Link>
+                    </div>
                 </div>
             </nav>
 
             {/* Hero */}
-            <section className="px-6 py-24 relative overflow-hidden" style={{ background: 'var(--v2-bg-section)' }}>
-                {/* Glow */}
-                <div
-                    className="absolute inset-0 pointer-events-none"
-                    style={{ background: 'radial-gradient(800px circle at 50% 40%, rgba(25, 227, 140, 0.04), transparent 60%)' }}
-                />
-                <div className="max-w-5xl mx-auto relative">
-                    <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 items-center">
-                        <div className="max-w-2xl">
-                            <p className="v2-label mb-4" style={{ color: 'var(--v2-accent)' }}>Our Methodology</p>
-                            <h1 className="text-5xl md:text-6xl font-light mb-6 tracking-tight" style={{ color: 'var(--v2-text-primary)' }}>
-                                Built on science.<br />
-                                <span style={{ color: 'var(--v2-accent)' }}>Not opinions.</span>
-                            </h1>
-                            <p className="text-lg" style={{ color: 'var(--v2-text-muted)' }}>
-                                Every pace, every workout, every progression in The Long Game is
-                                grounded in decades of coaching wisdom and peer-reviewed research.
-                                Here&apos;s who we learn from.
-                            </p>
-                            <div className="flex flex-wrap gap-3 mt-8">
-                                <span className="v2-badge">12 coaching standards</span>
-                                <span className="v2-badge">8 research sources</span>
-                                <span className="v2-badge">200+ training rules</span>
-                            </div>
-                        </div>
+            <section className="min-h-[70vh] flex flex-col items-center justify-center px-6 relative overflow-hidden">
+                <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(800px circle at 50% 55%, var(--v2-accent-glow) 0%, transparent 60%)' }} />
+                <div className="text-center w-full max-w-3xl relative z-10">
+                    <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-xs uppercase tracking-widest mb-4" style={{ color: 'var(--v2-text-muted)' }}>Our Methodology</motion.p>
+                    <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, ease }} className="text-5xl md:text-6xl font-light mb-6 tracking-tight" style={{ color: 'var(--v2-text-primary)' }}>Built on science.</motion.h1>
+                    <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, ease }} className="text-lg mb-8" style={{ color: 'var(--v2-text-subtle)' }}>Every pace, every workout, every progression is grounded in decades of coaching wisdom.</motion.p>
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="flex flex-wrap justify-center gap-3">
+                        <span className="px-3 py-1 text-xs rounded-full" style={{ background: 'var(--v2-bg-elevated)', color: 'var(--v2-text-muted)' }}>12 coaching standards</span>
+                        <span className="px-3 py-1 text-xs rounded-full" style={{ background: 'var(--v2-bg-elevated)', color: 'var(--v2-text-muted)' }}>5 research sources</span>
+                    </motion.div>
+                </div>
+            </section>
 
-                        <div className="v2-card p-6 space-y-4">
-                            <div className="flex items-center justify-between">
-                                <p className="v2-label">The Engine</p>
-                                <span className="v2-badge">4 pillars</span>
-                            </div>
-                            <div style={{ height: '1px', background: 'linear-gradient(90deg, var(--v2-accent), transparent)' }} />
-                            <div className="grid grid-cols-2 gap-3">
-                                <div className="v2-card p-3" style={{ background: 'var(--v2-bg-elevated)' }}>
-                                    <p className="v2-label mb-1">Running</p>
-                                    <p className="text-sm font-light" style={{ color: 'var(--v2-text-secondary)' }}>VDOT Pacing</p>
-                                    <p className="text-[10px]" style={{ color: 'var(--v2-text-subtle)' }}>Hansons · Daniels</p>
-                                </div>
-                                <div className="v2-card p-3" style={{ background: 'var(--v2-bg-elevated)' }}>
-                                    <p className="v2-label mb-1">Strength</p>
-                                    <p className="text-sm font-light" style={{ color: 'var(--v2-text-secondary)' }}>Interference-safe</p>
-                                    <p className="text-[10px]" style={{ color: 'var(--v2-text-subtle)' }}>Hybrid standards</p>
-                                </div>
-                                <div className="v2-card p-3" style={{ background: 'var(--v2-bg-elevated)' }}>
-                                    <p className="v2-label mb-1">Durability</p>
-                                    <p className="text-sm font-light" style={{ color: 'var(--v2-text-secondary)' }}>12 checks</p>
-                                    <p className="text-[10px]" style={{ color: 'var(--v2-text-subtle)' }}>Prehab protocols</p>
-                                </div>
-                                <div className="v2-card p-3" style={{ background: 'var(--v2-bg-elevated)' }}>
-                                    <p className="v2-label mb-1">Recovery</p>
-                                    <p className="text-sm font-light" style={{ color: 'var(--v2-text-secondary)' }}>Adaptive</p>
-                                    <p className="text-[10px]" style={{ color: 'var(--v2-text-subtle)' }}>Garmin-ready</p>
-                                </div>
-                            </div>
-                            <div className="v2-card p-3" style={{ background: 'var(--v2-bg-elevated)' }}>
-                                <p className="v2-label mb-1" style={{ color: 'var(--v2-accent)' }}>Evidence stack</p>
-                                <p className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>Seiler · Dicharry · Starrett + peer‑reviewed labs</p>
-                            </div>
+            {/* Categories + Coaches */}
+            {Object.entries(METHODOLOGY_CATEGORIES).map(([key, category]) => (
+                <React.Fragment key={key}>
+                    <section className="px-6 py-20" style={{ background: 'var(--v2-bg-section)' }}>
+                        <div className="max-w-3xl mx-auto text-center">
+                            <h2 className="text-3xl font-light mb-3" style={{ color: 'var(--v2-text-primary)' }}>{category.title}</h2>
+                            <p className="text-base" style={{ color: 'var(--v2-text-muted)' }}>{category.description}</p>
                         </div>
+                    </section>
+                    {category.coaches.map((id) => {
+                        const coach = COACHES[id];
+                        if (!coach) return null;
+                        const isExpanded = expandedId === coach.id;
+                        const color = colors[allCoaches.findIndex(c => c.id === id) % colors.length];
+                        return (
+                            <section
+                                key={coach.id}
+                                className="px-6 py-12 cursor-pointer transition-colors hover:bg-white/[0.02]"
+                                style={{ borderTop: '1px solid var(--v2-border)' }}
+                                onClick={() => setExpandedId(isExpanded ? null : coach.id)}
+                            >
+                                <div className="max-w-3xl mx-auto">
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-3 mb-3">
+                                                <div className="w-2 h-2 rounded-full" style={{ background: color }} />
+                                                <h3 className="text-xl font-light" style={{ color: 'var(--v2-text-primary)' }}>{coach.name}</h3>
+                                                <span className="text-xs uppercase tracking-wider" style={{ color: 'var(--v2-text-subtle)' }}>{coach.keyConceptShort}</span>
+                                            </div>
+                                            <p className="text-sm" style={{ color: 'var(--v2-text-tertiary)' }}>{coach.keyConceptFull}</p>
+                                        </div>
+                                        <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} className="p-2 rounded-lg" style={{ background: 'var(--v2-bg-elevated)' }}>
+                                            <ChevronDown className="w-4 h-4" style={{ color: 'var(--v2-text-muted)' }} />
+                                        </motion.div>
+                                    </div>
+                                    <AnimatePresence>
+                                        {isExpanded && (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: 'auto', opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                transition={{ duration: 0.3 }}
+                                                className="overflow-hidden"
+                                            >
+                                                <div className="mt-6 pt-6" style={{ borderTop: '1px solid var(--v2-border)' }}>
+                                                    <CoachDetailContent coach={coach} />
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+                            </section>
+                        );
+                    })}
+                </React.Fragment>
+            ))}
+
+            {/* Research */}
+            <section className="px-6 py-16" style={{ background: 'var(--v2-bg-section)' }}>
+                <div className="max-w-3xl mx-auto">
+                    <p className="text-xs uppercase tracking-widest mb-4" style={{ color: 'var(--v2-text-muted)' }}>Research Foundation</p>
+                    <h2 className="text-3xl font-light mb-8" style={{ color: 'var(--v2-text-primary)' }}>Peer-reviewed studies</h2>
+                    <div className="space-y-4">
+                        {RESEARCH_SOURCES.map((source) => (
+                            <div key={source.id} className="p-5 rounded-xl" style={{ background: 'var(--v2-bg-elevated)', border: '1px solid var(--v2-border)' }}>
+                                <div className="flex items-start justify-between gap-4">
+                                    <div>
+                                        <h3 className="text-sm font-medium mb-1" style={{ color: 'var(--v2-text-secondary)' }}>{source.title}</h3>
+                                        <p className="text-[10px]" style={{ color: 'var(--v2-text-muted)' }}>{source.authors} ({source.year}) {source.journal && `· ${source.journal}`}</p>
+                                    </div>
+                                    {source.doi && <a href={`https://doi.org/${source.doi}`} target="_blank" rel="noopener noreferrer" className="text-[10px] hover:underline flex-shrink-0" style={{ color: 'var(--v2-accent)' }}>DOI ↗</a>}
+                                </div>
+                                <p className="mt-3 text-sm" style={{ color: 'var(--v2-text-tertiary)' }}>{source.keyFinding}</p>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </section>
 
-            {/* Main Content */}
-            <main className="max-w-5xl mx-auto px-6 pt-16 pb-24">
-                <div className="space-y-24">
-                    {/* Running Science */}
-                    <CategorySection category={METHODOLOGY_CATEGORIES.running} />
-
-                    {/* Strength */}
-                    <CategorySection category={METHODOLOGY_CATEGORIES.strength} />
-
-                    {/* Durability */}
-                    <CategorySection category={METHODOLOGY_CATEGORIES.durability} />
-
-                    {/* Elite */}
-                    <CategorySection category={METHODOLOGY_CATEGORIES.elite} />
-
-                    {/* Research */}
-                    <ResearchSection />
+            {/* CTA */}
+            <section className="px-6 py-24" style={{ background: 'var(--v2-bg-deep)' }}>
+                <div className="max-w-3xl mx-auto text-center">
+                    <h2 className="text-3xl font-light mb-6" style={{ color: 'var(--v2-text-primary)' }}>Ready to train smarter?</h2>
+                    <p className="text-lg mb-8" style={{ color: 'var(--v2-text-muted)' }}>Get a personalized plan built on these proven methodologies.</p>
+                    <Link href="/auth" className="v2-btn v2-btn-primary v2-btn-lg">Build Your Plan</Link>
                 </div>
+            </section>
 
-                {/* CTA */}
-                <section className="mt-24">
-                    <div className="v2-card p-12 text-center relative overflow-hidden">
-                        <div
-                            className="absolute inset-0 pointer-events-none"
-                            style={{ background: 'radial-gradient(600px circle at 50% 100%, rgba(25, 227, 140, 0.06), transparent 60%)' }}
-                        />
-                        <div className="relative">
-                            <h2 className="text-2xl font-light mb-4" style={{ color: 'var(--v2-text-primary)' }}>Ready to train smarter?</h2>
-                            <p className="text-base mb-8 max-w-lg mx-auto" style={{ color: 'var(--v2-text-muted)' }}>
-                                Get a personalized plan built on these proven methodologies.
-                            </p>
-                            <Link href="/auth" className="v2-btn v2-btn-primary v2-btn-lg">
-                                Build Your Plan
-                            </Link>
-                        </div>
+            {/* Footer */}
+            <footer className="px-6 py-6" style={{ borderTop: '1px solid var(--v2-border)' }}>
+                <div className="max-w-5xl mx-auto flex items-center justify-between">
+                    <p className="text-[10px]" style={{ color: 'var(--v2-text-muted)' }}>© 2026 The Long Game</p>
+                    <div className="flex items-center gap-6">
+                        <Link href="/privacy" className="text-[10px] transition-colors" style={{ color: 'var(--v2-text-muted)' }}>Privacy</Link>
+                        <Link href="/terms" className="text-[10px] transition-colors" style={{ color: 'var(--v2-text-muted)' }}>Terms</Link>
                     </div>
-                </section>
-            </main>
+                </div>
+            </footer>
         </div>
     );
 }

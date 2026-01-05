@@ -51,6 +51,14 @@
     --v2-warning: #f59e0b;
     --v2-success: #19e38c;
 
+    /* Warning variants */
+    --v2-warning-subtle: rgba(245, 158, 11, 0.1);
+    --v2-warning-muted: rgba(245, 158, 11, 0.3);
+
+    /* Error variants */
+    --v2-error-subtle: rgba(239, 68, 68, 0.1);
+    --v2-error-muted: rgba(239, 68, 68, 0.3);
+
     /* Borders */
     --v2-border: rgba(255, 255, 255, 0.05);
     --v2-border-hover: rgba(255, 255, 255, 0.1);

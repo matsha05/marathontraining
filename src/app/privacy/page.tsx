@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
     title: 'Privacy Policy | The Long Game',
@@ -9,6 +10,14 @@ export default function PrivacyPolicyPage() {
     return (
         <main className="v2-root min-h-screen px-6 py-16">
             <article className="v2-container-narrow mx-auto">
+                {/* Back Button */}
+                <Link
+                    href="/"
+                    className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white/60 transition-colors mb-8"
+                >
+                    ← Back
+                </Link>
+
                 {/* Header */}
                 <header className="mb-12">
                     <h1 className="v2-heading-lg mb-4">Privacy Policy</h1>

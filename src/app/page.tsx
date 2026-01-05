@@ -52,6 +52,13 @@ export default function LandingPage() {
               Methodology
             </Link>
             <Link
+              href="/browse"
+              className="text-xs transition-colors"
+              style={{ color: 'var(--v2-text-muted)' }}
+            >
+              Browse
+            </Link>
+            <Link
               href="/philosophy"
               className="text-xs transition-colors"
               style={{ color: 'var(--v2-text-muted)' }}

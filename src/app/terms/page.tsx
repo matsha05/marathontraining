@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
     title: 'Terms of Service | The Long Game',
@@ -9,6 +10,14 @@ export default function TermsPage() {
     return (
         <main className="v2-root min-h-screen px-6 py-16">
             <article className="v2-container-narrow mx-auto">
+                {/* Back Button */}
+                <Link
+                    href="/"
+                    className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white/60 transition-colors mb-8"
+                >
+                    ← Back
+                </Link>
+
                 <h1 className="v2-heading-lg mb-4">Terms of Service</h1>
                 <p className="v2-body-sm mb-12" style={{ color: 'var(--v2-text-muted)' }}>Last updated: January 3, 2026</p>
 

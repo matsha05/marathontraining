@@ -18,6 +18,7 @@
 import { createSupabaseBrowserClient } from '@/infrastructure/supabase/client';
 import type { TrainingPlan, WeekPlan, DayPlan } from './types';
 import type { Database } from '@/infrastructure/supabase/types';
+import { queueWrite, emitSyncEvent } from '@/domain/sync';
 
 // =============================================================================
 // TYPES
@@ -164,16 +165,11 @@ async function saveToSupabase(plan: TrainingPlan, athleteId: string): Promise<Pl
             }
         }
 
-        // 4. Batch insert workouts (delete old ones first for idempotency)
+        // 4. Upsert workouts (atomic - no data loss window)
         if (workoutRows.length > 0) {
-            await supabase
-                .from('planned_workouts')
-                .delete()
-                .eq('plan_id', plan.id);
-
             const { error: workoutsError } = await supabase
                 .from('planned_workouts')
-                .insert(workoutRows);
+                .upsert(workoutRows, { onConflict: 'id' });
 
             if (workoutsError) {
                 return {
@@ -409,34 +405,68 @@ function reconstructPlan(
 /**
  * Save a training plan.
  *
- * Strategy:
- * 1. Save to localStorage immediately (optimistic)
- * 2. Save to Supabase in background
- * 3. If Supabase fails but we're authenticated, log but don't fail
+ * Enterprise-grade strategy:
+ * 1. Emit 'saving' status for UI
+ * 2. Save to localStorage immediately (optimistic)
+ * 3. Save to Supabase
+ * 4. On failure: queue for retry, emit 'pending' status
+ * 5. On success: emit 'synced' status
  */
 export async function savePlanV2(plan: TrainingPlan): Promise<PlanResult<void>> {
-    // 1. Optimistic save to cache
+    // 1. Emit saving status
+    emitSyncEvent('start');
+
+    // 2. Optimistic save to cache
     saveToCache(plan);
 
-    // 2. Get athlete ID
+    // 3. Get athlete ID
     const athleteId = await getAuthenticatedAthleteId();
 
     if (!athleteId) {
-        // Not authenticated - cache only (will sync on next auth)
-        console.warn('[PlanRepository] No auth - plan saved to cache only');
+        // Not authenticated - queue for sync when authenticated
+        console.warn('[PlanRepository] No auth - plan queued for sync');
+        queueWrite({ id: plan.id, type: 'plan', payload: { plan, athleteId: null } });
+        emitSyncEvent('pending');
         return { success: true, data: undefined };
     }
 
-    // 3. Save to Supabase
+    // 4. Save to Supabase
     const result = await saveToSupabase(plan, athleteId);
 
     if (!result.success) {
-        console.error('[PlanRepository] Supabase save failed:', result.error);
-        // Still return success since we have cache - will retry later
+        // Queue for retry
+        console.error('[PlanRepository] Supabase save failed, queuing:', result.error);
+        queueWrite({ id: plan.id, type: 'plan', payload: { plan, athleteId } });
+        emitSyncEvent('pending');
+        // Return success since we have it cached and queued
         return { success: true, data: undefined };
     }
 
+    // 5. Success!
+    emitSyncEvent('success');
     return { success: true, data: undefined };
+}
+
+/**
+ * Direct save to Supabase (used by sync processor for retries)
+ * Exported for use by sync/processor.ts
+ */
+export async function saveToSupabaseDirectly(
+    payload: unknown
+): Promise<PlanResult<void>> {
+    const { plan, athleteId } = payload as { plan: TrainingPlan; athleteId: string | null };
+
+    // If no athleteId stored, try to get current
+    const resolvedAthleteId = athleteId || await getAuthenticatedAthleteId();
+
+    if (!resolvedAthleteId) {
+        return {
+            success: false,
+            error: { code: 'AUTH_REQUIRED', message: 'Not authenticated' },
+        };
+    }
+
+    return saveToSupabase(plan, resolvedAthleteId);
 }
 
 /**
