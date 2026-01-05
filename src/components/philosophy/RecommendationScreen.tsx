@@ -12,7 +12,7 @@ import {
     DaysPerWeek,
 } from '@/domain/philosophy/types';
 import { getOverrideWarnings, isPhilosophyAvailableForDistance } from '@/domain/philosophy/recommendation';
-import { getPersonalizedPhilosophyCard, getDistanceSpecificPrinciples } from '@/domain/philosophy/personalized-card';
+import { getPersonalizedPhilosophyCard, getDistanceSpecificPrinciples, getTypicalWeek } from '@/domain/philosophy/personalized-card';
 import { PhilosophyCard } from './PhilosophyCard';
 import { matchCoachesToUser } from '@/domain/philosophy/coach-matcher';
 
@@ -54,6 +54,12 @@ export function RecommendationScreen({
         getDistanceSpecificPrinciples(recommendation.primary, answers.targetDistance || 'marathon'),
         [recommendation.primary, answers.targetDistance]
     );
+
+    // Get distance/tier-specific typical week
+    const personalizedTypicalWeek = useMemo(() => {
+        const tier = personalizedPrimary.adjustedTier || 'intermediate';
+        return getTypicalWeek(recommendation.primary, answers.targetDistance || 'marathon', tier);
+    }, [recommendation.primary, answers.targetDistance, personalizedPrimary.adjustedTier]);
 
     // Convert mileage string to number for coach matcher
     const mileageToNumber = (mileage: CurrentMileage | null): number => {
@@ -242,6 +248,7 @@ export function RecommendationScreen({
                         personalizedDuration={personalizedPrimary.personalizedDuration}
                         personalizedKeyWorkouts={personalizedPrimary.personalizedKeyWorkouts}
                         personalizedPrinciples={personalizedPrinciples}
+                        personalizedTypicalWeek={personalizedTypicalWeek}
                         userDistance={distanceLabel}
                     />
 

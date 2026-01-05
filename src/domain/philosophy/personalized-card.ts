@@ -141,6 +141,175 @@ const PLAN_SPECS: Record<TrainingPhilosophy, Partial<Record<TargetDistance, Part
     },
 };
 
+/**
+ * Typical week schedules by coach, distance, and tier
+ * Source: research/21-higdon-complete-library.md, research/22-hansons, etc.
+ */
+const TYPICAL_WEEKS: Record<TrainingPhilosophy, Partial<Record<TargetDistance, Partial<Record<Experience, string[]>>>>> = {
+    higdon: {
+        '5k': {
+            beginner: [
+                'M: Rest/r-w', 'T: 1.5-3 mi', 'W: Rest/r-w', 'Th: 1.5-2 mi',
+                'F: Rest', 'S: 1.5-3 mi', 'Su: 30-60 min walk'
+            ],
+            intermediate: [
+                'M: Rest', 'T: 3 mi', 'W: 5-8×400m', 'Th: 3 mi',
+                'F: Rest', 'S: 3 mi fast', 'Su: 5-7 mi'
+            ],
+            advanced: [
+                'M: 3 mi', 'T: 400/200 intervals', 'W: Rest/easy', 'Th: 30-45 min tempo',
+                'F: Rest', 'S: 4-6 mi fast', 'Su: 60-90 min'
+            ],
+        },
+        '10k': {
+            beginner: [
+                'M: Rest', 'T: 2.5-3 mi', 'W: 30-35 min XT', 'Th: 2 mi',
+                'F: Rest', 'S: 40 min XT', 'Su: Long run'
+            ],
+            intermediate: [
+                'M: 3 mi', 'T: 3.5-6 mi', 'W: Tempo or 8-10×400', 'Th: 3-4 mi',
+                'F: Rest', 'S: 60 min XT', 'Su: Long run'
+            ],
+            advanced: [
+                'M: 3 mi', 'T: 30-60 min tempo', 'W: 6-12×400', 'Th: 3-6 mi',
+                'F: Rest/3 mi', 'S: 5-6 mi pace', 'Su: Long run (3/1)'
+            ],
+        },
+        'half': {
+            beginner: [
+                'M: Rest', 'T: 3-5 mi', 'W: 2-3 mi/XT', 'Th: 3-5 mi',
+                'F: Rest', 'S: 30 min XT', 'Su: Long run'
+            ],
+            intermediate: [
+                'M: 30-60 min XT', 'T: 3-5 mi', 'W: 4-8 mi pace', 'Th: 3-5 mi',
+                'F: Rest', 'S: 3-5 mi pace', 'Su: Long run'
+            ],
+            advanced: [
+                'M: 3 mi', 'T: Hills/Intervals', 'W: 3 mi', 'Th: 30-50 min tempo',
+                'F: Rest', 'S: 3-4 mi pace', 'Su: 90-100 min (3/1)'
+            ],
+        },
+        'marathon': {
+            beginner: [
+                'M: Rest', 'T: 3-4 mi', 'W: Cross-train', 'Th: 3-4 mi',
+                'F: Rest', 'S: Cross-train (opt)', 'Su: Long run'
+            ],
+            intermediate: [
+                'M: Rest', 'T: 5 mi', 'W: 5-8 mi pace', 'Th: 5 mi',
+                'F: Rest', 'S: Cross-train', 'Su: Long run'
+            ],
+            advanced: [
+                'M: 3 mi', 'T: Intervals', 'W: 6-10 mi', 'Th: 3 mi',
+                'F: Tempo', 'S: Race pace (3/1)', 'Su: Long run'
+            ],
+        },
+        'base': {
+            beginner: [
+                'M: Rest', 'T: 3 mi', 'W: 3 mi', 'Th: 3 mi',
+                'F: Rest', 'S: 30 min walk', 'Su: Long run'
+            ],
+            intermediate: [
+                'M: 3 mi', 'T: 3 mi + str', 'W: 4-8 mi', 'Th: 3 mi',
+                'F: 3 mi + str', 'S: 3 mi', 'Su: Long run'
+            ],
+            advanced: [
+                'M: 3 mi + str', 'T: Hills/Intervals', 'W: 3 mi + stretch', 'Th: Tempo/Fartlek',
+                'F: 3 mi + str', 'S: 30 min fartlek', 'Su: Long run or Race'
+            ],
+        },
+    },
+    hansons: {
+        'marathon': {
+            beginner: [
+                'M: Easy', 'T: Speed intervals', 'W: Rest/XT', 'Th: Tempo at MP',
+                'F: Easy', 'S: Easy (pre-long)', 'Su: Long run (16mi cap)'
+            ],
+            intermediate: [
+                'M: Easy', 'T: Speed intervals', 'W: Rest/XT', 'Th: Tempo at MP',
+                'F: Easy', 'S: Easy (pre-long)', 'Su: Long run (16mi cap)'
+            ],
+            advanced: [
+                'M: Easy', 'T: Speed intervals', 'W: Rest/XT', 'Th: Tempo at MP-10s',
+                'F: Easy', 'S: Easy (pre-long)', 'Su: Long run (16mi cap)'
+            ],
+        },
+    },
+    pfitzinger: {
+        '5k': {
+            intermediate: [
+                'M: Recovery', 'T: LT intervals', 'W: Recovery', 'Th: VO2max',
+                'F: Rest/easy', 'S: Speed', 'Su: Endurance (10-13 mi)'
+            ],
+            advanced: [
+                'M: Recovery', 'T: LT intervals', 'W: Recovery (AM)/Speed (PM)', 'Th: VO2max',
+                'F: Rest', 'S: Tune-up race', 'Su: Endurance (10-13 mi)'
+            ],
+        },
+        '10k': {
+            intermediate: [
+                'M: Recovery', 'T: LT tempo', 'W: Recovery', 'Th: VO2max',
+                'F: Rest/easy', 'S: Race pace', 'Su: Endurance (11 mi)'
+            ],
+            advanced: [
+                'M: Recovery', 'T: LT intervals', 'W: Recovery', 'Th: VO2max',
+                'F: Rest', 'S: Race pace', 'Su: Endurance (11 mi)'
+            ],
+        },
+        'half': {
+            intermediate: [
+                'M: Recovery', 'T: LT tempo', 'W: Recovery', 'Th: VO2max',
+                'F: Rest/easy', 'S: Progression', 'Su: Long run (14-19 mi)'
+            ],
+            advanced: [
+                'M: Recovery', 'T: LT tempo', 'W: Medium-long', 'Th: VO2max',
+                'F: Rest', 'S: Progression', 'Su: Long run (14-19 mi)'
+            ],
+        },
+        'marathon': {
+            intermediate: [
+                'M: Recovery (5-7 mi)', 'T: LT tempo (8-10 mi)', 'W: MLR (12-15 mi)', 'Th: Recovery (5-7 mi)',
+                'F: Rest/easy (4-6 mi)', 'S: VO2max or tune-up', 'Su: Long run (18-22 mi + MP)'
+            ],
+            advanced: [
+                'M: Recovery', 'T: LT tempo', 'W: MLR (12-15 mi)', 'Th: Recovery',
+                'F: Rest/easy', 'S: VO2max', 'Su: Long run (20-22 mi + MP)'
+            ],
+        },
+    },
+    daniels: {
+        '5k': {
+            intermediate: [
+                'M: E pace', 'T: Quality #1 (I/T)', 'W: E pace', 'Th: E/off',
+                'F: E pace', 'S: Strides', 'Su: Quality #2 (Long + work)'
+            ],
+            advanced: [
+                'M: E pace', 'T: Quality #1 (I or R)', 'W: E pace', 'Th: E/off',
+                'F: E pace', 'S: Strides', 'Su: Quality #2 (Long + T)'
+            ],
+        },
+        '10k': {
+            intermediate: [
+                'M: E pace', 'T: Quality #1 (I/T)', 'W: E pace', 'Th: E/off',
+                'F: E pace', 'S: Strides', 'Su: Quality #2 (Long + work)'
+            ],
+            advanced: [
+                'M: E pace', 'T: Quality #1 (I/T)', 'W: E pace', 'Th: E/off',
+                'F: E pace', 'S: Strides', 'Su: Quality #2 (Long + M/T)'
+            ],
+        },
+        'marathon': {
+            intermediate: [
+                'M: E pace', 'T: Quality #1 (T session)', 'W: E pace', 'Th: E/off',
+                'F: E pace', 'S: Recovery/strides', 'Su: Quality #2 (Long + M/T work)'
+            ],
+            advanced: [
+                'M: E pace', 'T: Quality #1 (I/T)', 'W: E pace', 'Th: E/off',
+                'F: E pace', 'S: Recovery', 'Su: Quality #2 (Long + M/T work)'
+            ],
+        },
+    },
+};
+
 // =============================================================================
 // PERSONALIZATION FUNCTION
 // =============================================================================
@@ -302,4 +471,37 @@ function getDistanceLabel(distance: TargetDistance): string {
         case 'base': return 'base fitness';
         default: return 'race';
     }
+}
+
+/**
+ * Get the typical week schedule for a coach/distance/tier combination.
+ * Returns research-verified week structure, falling back to static data if not found.
+ */
+export function getTypicalWeek(
+    coach: TrainingPhilosophy,
+    distance: TargetDistance,
+    tier: Experience
+): string[] {
+    return TYPICAL_WEEKS[coach]?.[distance]?.[tier]
+        || PHILOSOPHIES[coach].methodology.typicalWeek;
+}
+
+/**
+ * Get minimum days required for a distance with any coach.
+ * Uses Higdon as the floor since they support the lowest day counts.
+ */
+export function getMinDaysForDistance(distance: TargetDistance): number {
+    // Check all coaches and find the minimum days for this distance
+    const higdonSpec = PLAN_SPECS.higdon?.[distance];
+    if (higdonSpec) {
+        // Find lowest minDays across all tiers
+        const allMinDays = Object.values(higdonSpec)
+            .map(spec => spec?.minDays || 99)
+            .filter(d => d < 99);
+        if (allMinDays.length > 0) {
+            return Math.min(...allMinDays);
+        }
+    }
+    // Default fallback
+    return 4;
 }

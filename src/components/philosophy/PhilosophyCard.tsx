@@ -19,6 +19,7 @@ interface PhilosophyCardProps {
     personalizedDuration?: string;
     personalizedKeyWorkouts?: string[];
     personalizedPrinciples?: string[];
+    personalizedTypicalWeek?: string[];
     userDistance?: string;
 }
 
@@ -31,12 +32,14 @@ export function PhilosophyCard({
     personalizedDuration,
     personalizedKeyWorkouts,
     personalizedPrinciples,
+    personalizedTypicalWeek,
     userDistance,
 }: PhilosophyCardProps) {
     // Use personalized values if provided, otherwise fall back to static
     const displayRunDays = personalizedRunDays || philosophy.runDays;
     const displayLongRunCap = personalizedLongRunCap || philosophy.longRunCap;
     const displayPrinciples = personalizedPrinciples || philosophy.methodology.keyPrinciples;
+    const displayTypicalWeek = personalizedTypicalWeek || philosophy.methodology.typicalWeek;
 
     return (
         <div
@@ -210,7 +213,7 @@ export function PhilosophyCard({
                             Typical week
                         </p>
                         <div className="grid grid-cols-7 gap-1 text-center">
-                            {philosophy.methodology.typicalWeek.map((day, i) => {
+                            {displayTypicalWeek.map((day, i) => {
                                 const [, ...rest] = day.split(': ');
                                 const activity = rest.join(': ');
                                 const dayLetter = ['M', 'T', 'W', 'T', 'F', 'S', 'S'][i];

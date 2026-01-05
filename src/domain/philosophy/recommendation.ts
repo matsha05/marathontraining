@@ -13,6 +13,7 @@ import {
     PhilosophyRecommendation,
     TargetDistance,
 } from './types';
+import { getMinDaysForDistance } from './personalized-card';
 
 /**
  * Calculate philosophy recommendation from quiz answers.
@@ -162,12 +163,20 @@ export function calculateRecommendation(answers: QuizAnswers): PhilosophyRecomme
     // Days modifiers (only positive scoring now, gates handled above)
     if (answers.daysPerWeek !== null) {
         if (answers.daysPerWeek === 3) {
-            // IMPORTANT: No coach truly supports 3 days. Higdon Novice is 4 days minimum.
-            // We still recommend Higdon as closest option, but add warning.
+            // Check if the selected distance actually supports 3 days
+            const minDaysForDistance = answers.targetDistance ? getMinDaysForDistance(answers.targetDistance) : 4;
+
             scores.higdon += 3;
             if (danielsAvailable) scores.daniels += 2; // 2Q can work with 3 days
-            reasoning.push(`3 run days/week is below minimum for most programs. Higdon Novice starts at 4 days, but we can adapt.`);
-            warnings.push(`Our plans are designed for 4+ run days/week. With 3 days, you may miss key workouts or need to combine sessions. Consider if you can add one more day.`);
+
+            if (minDaysForDistance <= 3) {
+                // Distance supports 3 days (5K, 10K, HM3) - no warning needed!
+                reasoning.push(`3 run days/week fits perfectly with Higdon's ${answers.targetDistance?.toUpperCase() || ''} Novice plan.`);
+            } else {
+                // Distance requires more days (marathon, base) - add warning
+                reasoning.push(`3 run days/week is below the ${minDaysForDistance}-day minimum for ${answers.targetDistance || 'marathon'}. We'll adapt to your schedule.`);
+                warnings.push(`${answers.targetDistance === 'marathon' ? 'Marathon' : 'This distance'} training typically requires ${minDaysForDistance}+ days/week. With 3 days, we'll adjust the plan but consider if you can add one more day.`);
+            }
         } else if (answers.daysPerWeek === 4) {
             scores.higdon += 3;
             if (danielsAvailable) scores.daniels += 2; // 2Q works great with 4 days
