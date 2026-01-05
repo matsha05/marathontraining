@@ -659,3 +659,57 @@ export function getPfitzTierDisplayName(tier: PfitzTier): string {
         case 'pfitz_18_85': return 'Pfitzinger 18/85';
     }
 }
+
+// =============================================================================
+// ELIGIBILITY CRITERIA
+// Source: "Advanced Marathoning" 2nd/3rd Ed + research/23-pfitzinger-complete-library.md
+// =============================================================================
+
+import type { CoachEligibility } from './hansons';
+
+/**
+ * Pfitzinger eligibility criteria.
+ * 
+ * Philosophy: Serious training for committed marathoners. Requires solid base
+ * and consistent training history. Not a beginner's program.
+ */
+export const PFITZ_ELIGIBILITY: CoachEligibility = {
+    // Pfitz marathon plans - FRR covers 5K-Half but implemented separately
+    distances: ['marathon'] as const,
+
+    // Pfitz 18/55 is 5-day, 18/70+ is 6-day (research/23-pfitzinger-complete-library.md)
+    minDays: 5,
+
+    // Pfitz 18/55 starts at 33 mpw, needs ~75% of that as base (~25)
+    // Pfitz 12/55 starts at 42 mpw, needs ~75% of that as base (~32)
+    // Use 30 as reasonable minimum to safely start any Pfitz plan
+    minMileage: 30,
+
+    tiers: {
+        '12_55': {
+            // 12-week plan starting at 42 mpw
+            // For time-crunched runners with established base
+            mileageRange: [35, 50],
+            startMileage: 42,  // Week 1 mileage from plan
+        },
+        '18_55': {
+            // 18-week 55 mpw peak - lowest full Pfitz plan
+            // Source: research/23-pfitzinger-complete-library.md
+            mileageRange: [30, 50],
+            startMileage: 33,  // Week 1 mileage from plan
+        },
+        '18_70': {
+            // 18-week 70 mpw peak - serious competitor
+            // Requires 6 days (PFITZ_TIER_CONFIGS.pfitz_18_70.runDays)
+            mileageRange: [45, 65],
+            startMileage: 48,  // Week 1 mileage from plan
+        },
+        '18_85': {
+            // 18-week 85 mpw peak - elite/sub-elite
+            // Only for very experienced high-mileage runners
+            mileageRange: [55, Infinity],
+            startMileage: 57,  // Week 1 mileage from plan
+        },
+    },
+};
+

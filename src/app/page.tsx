@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { motion } from "framer-motion";
+import { SiteHeader } from "@/components/ui/SiteHeader";
+import { Footer } from "@/components/ui/Footer";
 
 /**
  * THE LONG GAME - Landing Page
@@ -33,48 +34,7 @@ const coachColors = {
 export default function LandingPage() {
   return (
     <div className="v2-root min-h-screen" style={{ background: 'var(--v2-bg-deep)', color: 'var(--v2-text-primary)' }}>
-      {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-5">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <Image
-            src="/icon-192.png"
-            alt="The Long Game"
-            width={28}
-            height={28}
-            className="rounded opacity-70"
-          />
-          <div className="flex items-center gap-6">
-            <Link
-              href="/methodology"
-              className="text-xs transition-colors"
-              style={{ color: 'var(--v2-text-muted)' }}
-            >
-              Methodology
-            </Link>
-            <Link
-              href="/browse"
-              className="text-xs transition-colors"
-              style={{ color: 'var(--v2-text-muted)' }}
-            >
-              Browse
-            </Link>
-            <Link
-              href="/auth"
-              className="text-xs transition-colors"
-              style={{ color: 'var(--v2-text-muted)' }}
-            >
-              Log In
-            </Link>
-            <Link
-              href="/onboarding"
-              className="text-xs transition-colors"
-              style={{ color: 'var(--v2-text-primary)' }}
-            >
-              Get Started →
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <SiteHeader />
 
       {/* Hero - Big text + Week preview with animations */}
       <section className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden">
@@ -471,21 +431,12 @@ export default function LandingPage() {
             Race on the calendar or just building fitness. We'll meet you where you are.
           </p>
           <Link href="/onboarding" className="v2-btn v2-btn-primary v2-btn-lg">
-            Get Started →
+            Get Started
           </Link>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="px-6 py-6" style={{ borderTop: '1px solid var(--v2-border)' }}>
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <p className="text-[10px]" style={{ color: 'var(--v2-text-muted)' }}>© 2026 The Long Game</p>
-          <div className="flex items-center gap-6">
-            <Link href="/privacy" className="text-[10px] transition-colors" style={{ color: 'var(--v2-text-muted)' }}>Privacy</Link>
-            <Link href="/terms" className="text-[10px] transition-colors" style={{ color: 'var(--v2-text-muted)' }}>Terms</Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

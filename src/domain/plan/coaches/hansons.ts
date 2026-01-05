@@ -497,3 +497,50 @@ export function formatSpeedWorkout(workout: HansonsSpeedWorkout): string {
 export function formatStrengthWorkout(workout: HansonsStrengthWorkout): string {
     return `${workout.reps}×${workout.distance} @ ${workout.pace} (${workout.recovery})`;
 }
+
+// =============================================================================
+// ELIGIBILITY CRITERIA
+// Source: research/16-hansons-method.md + official PDFs
+// =============================================================================
+
+export interface CoachEligibility {
+    distances: readonly string[];
+    minDays: number;
+    minMileage: number;
+    tiers: Record<string, { mileageRange: [number, number]; startMileage: number }>;
+}
+
+/**
+ * Hansons eligibility criteria.
+ * 
+ * Philosophy: Cumulative fatigue requires 6 days of running - this is core to the method.
+ * The 16-mile long run cap only works because of consistent daily volume.
+ */
+export const HANSONS_ELIGIBILITY: CoachEligibility = {
+    // Hansons supports Half (unofficially) and Marathon
+    distances: ['half', 'marathon'] as const,
+
+    // Core philosophy: Cumulative fatigue requires 6 days
+    // Source: "Running on tired legs is the cornerstone of the Hansons Method"
+    minDays: 6,
+
+    // Beginner plan starts at 12 mpw but ramps quickly to 40 mpw by week 6
+    // Need base of ~25-30 mpw to safely handle that ramp (10-15% rule)
+    minMileage: 25,
+
+    tiers: {
+        beginner: {
+            // Beginner plan: 12→57.5 mpw
+            // Suitable for runners with 25-40 mpw base
+            mileageRange: [25, 40],
+            startMileage: 12,  // Week 1 mileage (research/22-hansons-complete-library.md)
+        },
+        advanced: {
+            // Advanced plan: 38→61.5 mpw
+            // Requires 35+ mpw base to safely start at 38
+            mileageRange: [35, Infinity],
+            startMileage: 38,  // Week 1 mileage (research/22-hansons-complete-library.md)
+        },
+    },
+};
+

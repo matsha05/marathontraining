@@ -217,6 +217,7 @@ function OnboardingContent() {
     const [step, setStep] = useState<OnboardingStep>('welcome');
     const [data, setData] = useState<OnboardingData>(INITIAL_ONBOARDING_DATA);
     const [mounted, setMounted] = useState(false);
+    const [authChecked, setAuthChecked] = useState(false);
     const [showResumePrompt, setShowResumePrompt] = useState(false);
     const [savedProgress, setSavedProgress] = useState<{ step: OnboardingStep; data: OnboardingData } | null>(null);
     const connectProvider = searchParams.get('connect');
@@ -226,8 +227,28 @@ function OnboardingContent() {
     const [generationError, setGenerationError] = useState<string | null>(null);
     const router = useRouter();
 
-    // Load saved progress on mount
+    // Auth check - require login before quiz
     useEffect(() => {
+        async function checkAuth() {
+            const supabase = (await import('@/infrastructure/supabase')).createSupabaseBrowserClient();
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (!user) {
+                // Redirect to auth with return URL
+                router.replace('/auth?next=/onboarding');
+                return;
+            }
+
+            setAuthChecked(true);
+        }
+
+        checkAuth();
+    }, [router]);
+
+    // Load saved progress on mount (only after auth confirmed)
+    useEffect(() => {
+        if (!authChecked) return;
+
         setMounted(true);
 
         // Philosophy is now integrated into onboarding flow - no localStorage handoff needed
@@ -237,7 +258,7 @@ function OnboardingContent() {
             setSavedProgress(saved);
             setShowResumePrompt(true);
         }
-    }, []);
+    }, [authChecked]);
 
     // Save progress on every change
     useEffect(() => {
@@ -285,9 +306,16 @@ function OnboardingContent() {
         setSavedProgress(null);
     };
 
-    // Don't render until mounted (prevents hydration mismatch)
-    if (!mounted) {
-        return null;
+    // Show loading while checking auth or mounting
+    if (!authChecked || !mounted) {
+        return (
+            <div className="v2-root min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="w-12 h-12 border-2 rounded-full animate-spin mx-auto mb-4" style={{ borderColor: 'var(--v2-accent)', borderTopColor: 'transparent' }} />
+                    <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>Preparing your coaching experience...</p>
+                </div>
+            </div>
+        );
     }
 
     // Resume prompt

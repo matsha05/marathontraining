@@ -8,10 +8,13 @@ import {
     PhilosophyRecommendation,
     PHILOSOPHIES,
     FOUNDATION_LAYERS,
+    CurrentMileage,
+    DaysPerWeek,
 } from '@/domain/philosophy/types';
 import { getOverrideWarnings, isPhilosophyAvailableForDistance } from '@/domain/philosophy/recommendation';
 import { getPersonalizedPhilosophyCard, getDistanceSpecificPrinciples } from '@/domain/philosophy/personalized-card';
 import { PhilosophyCard } from './PhilosophyCard';
+import { matchCoachesToUser } from '@/domain/philosophy/coach-matcher';
 
 /**
  * RecommendationScreen - Quiz result component
@@ -23,6 +26,8 @@ interface RecommendationScreenProps {
     answers: QuizAnswers;
     onSelect: (philosophy: string) => void;
     onBack: () => void;
+    /** Optional: Called when user clicks a fix suggestion to auto-adjust their answers */
+    onUpdateAnswers?: (updates: Partial<QuizAnswers>) => void;
 }
 
 export function RecommendationScreen({
@@ -30,6 +35,7 @@ export function RecommendationScreen({
     answers,
     onSelect,
     onBack,
+    onUpdateAnswers,
 }: RecommendationScreenProps) {
     const [showAlternatives, setShowAlternatives] = useState(false);
     const [selectedOverride, setSelectedOverride] = useState<TrainingPhilosophy | null>(null);
@@ -49,6 +55,24 @@ export function RecommendationScreen({
         [recommendation.primary, answers.targetDistance]
     );
 
+    // Convert mileage string to number for coach matcher
+    const mileageToNumber = (mileage: CurrentMileage | null): number => {
+        if (!mileage) return 20;
+        if (mileage === 'under_20') return 15;
+        if (mileage === '20_40') return 30;
+        return 50; // over_40
+    };
+
+    // Get coach matching results (shows excluded coaches with reasons)
+    const coachMatch = useMemo(() =>
+        matchCoachesToUser(
+            answers.targetDistance || 'marathon',
+            answers.daysPerWeek || 4,
+            mileageToNumber(answers.currentMileage)
+        ),
+        [answers.targetDistance, answers.daysPerWeek, answers.currentMileage]
+    );
+
     // Distance label for display
     const distanceLabel = answers.targetDistance === 'half' ? 'Half Marathon' :
         answers.targetDistance === '5k' ? '5K' :
@@ -56,10 +80,10 @@ export function RecommendationScreen({
                 answers.targetDistance === 'marathon' ? 'Marathon' :
                     answers.targetDistance === 'base' ? 'Base Building' : 'Plan';
 
-    // Only show alternatives that can actually deliver plans for this distance
+    // Only show alternatives that are eligible based on coach matcher
     const alternatives = Object.values(PHILOSOPHIES).filter(p =>
         p.id !== recommendation.primary &&
-        isPhilosophyAvailableForDistance(p.id, answers.targetDistance)
+        coachMatch.eligibleCoaches.includes(p.id)
     );
 
     const handleSelectAlternative = (philosophy: TrainingPhilosophy) => {
@@ -357,6 +381,76 @@ export function RecommendationScreen({
                                     </button>
                                 </div>
                             ))}
+
+                            {/* Excluded coaches with reasons */}
+                            {coachMatch.excludedCoaches.length > 0 && (
+                                <div
+                                    className="mt-8 p-5 rounded-xl border"
+                                    style={{
+                                        background: 'var(--v2-bg-elevated)',
+                                        borderColor: 'var(--v2-border)'
+                                    }}
+                                >
+                                    <p
+                                        className="text-xs uppercase tracking-widest mb-4"
+                                        style={{ color: 'var(--v2-text-muted)' }}
+                                    >
+                                        Not available for your profile
+                                    </p>
+                                    <div className="space-y-3">
+                                        {coachMatch.excludedCoaches.map(({ coach, reason, fixSuggestion, requiredDays, fixType }) => {
+                                            // Handler for fix suggestion click
+                                            const handleFixClick = () => {
+                                                if (onUpdateAnswers && fixType === 'days' && requiredDays) {
+                                                    // Auto-adjust days to meet requirement
+                                                    onUpdateAnswers({ daysPerWeek: requiredDays as DaysPerWeek });
+                                                } else {
+                                                    // Fallback: go back to manually adjust
+                                                    onBack();
+                                                }
+                                            };
+
+                                            return (
+                                                <div key={coach} className="flex items-start gap-3">
+                                                    <span
+                                                        className="text-sm mt-0.5"
+                                                        style={{ color: 'var(--v2-text-subtle)' }}
+                                                    >
+                                                        ×
+                                                    </span>
+                                                    <div>
+                                                        <p
+                                                            className="text-sm"
+                                                            style={{ color: 'var(--v2-text-tertiary)' }}
+                                                        >
+                                                            {reason}
+                                                        </p>
+                                                        {fixSuggestion && (
+                                                            <button
+                                                                onClick={handleFixClick}
+                                                                className="text-xs mt-1.5 flex items-center gap-1.5 transition-colors hover:opacity-80"
+                                                                style={{ color: 'var(--v2-accent)' }}
+                                                            >
+                                                                <span style={{
+                                                                    display: 'inline-block',
+                                                                    width: '4px',
+                                                                    height: '4px',
+                                                                    borderRadius: '50%',
+                                                                    background: 'var(--v2-accent)'
+                                                                }} />
+                                                                {fixType === 'days' && onUpdateAnswers
+                                                                    ? `Bump to ${requiredDays} days →`
+                                                                    : `${fixSuggestion} →`
+                                                                }
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
                         </motion.div>
                     )}
                 </motion.div>

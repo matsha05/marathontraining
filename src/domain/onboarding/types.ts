@@ -545,6 +545,9 @@ export function isStepComplete(step: OnboardingStep, data: OnboardingData): bool
         case 'welcome':
             return true;
 
+        case 'philosophy':
+            return data.trainingPhilosophy !== null;
+
         case 'name':
             return data.name.trim().length >= 2;
 

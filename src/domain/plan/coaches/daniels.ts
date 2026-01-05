@@ -784,3 +784,58 @@ export function validateDanielsPlan(tier: DanielsTier): {
 
     return { valid: errors.length === 0, errors };
 }
+
+// =============================================================================
+// ELIGIBILITY CRITERIA
+// Source: "Daniels' Running Formula" (3rd/4th Ed) + research/26-daniels-running-formula.md
+// =============================================================================
+
+import type { CoachEligibility } from './hansons';
+
+/**
+ * Daniels eligibility criteria.
+ * 
+ * Philosophy: Science-based, VDOT-driven training. Requires commitment to
+ * precise pacing and structured workouts. Best for runners who want to
+ * understand the "why" behind every workout.
+ */
+export const DANIELS_ELIGIBILITY: CoachEligibility = {
+    // Daniels has 5K, 10K (24-week 4-phase) and Marathon (18-week 2Q)
+    distances: ['5k', '10k', 'marathon'] as const,
+
+    // Daniels 2Q marathon is 2 quality days, easy days flexible
+    // 5K/10K plans are 3 quality days (research/26-daniels-running-formula.md)
+    // Minimum 4 days to hit quality + recovery pattern
+    minDays: 4,
+
+    // Daniels 2Q 40mpw is lowest marathon plan
+    // 5K/10K can start lower but benefit from consistent mileage
+    // Use 25 as minimum to properly execute quality workouts
+    minMileage: 25,
+
+    tiers: {
+        // Marathon 2Q tiers - explicitly mileage-based
+        '2q_40': {
+            mileageRange: [25, 45],
+            startMileage: 32,  // 80% of 40mpw peak (week 1)
+        },
+        '2q_55': {
+            mileageRange: [40, 60],
+            startMileage: 44,  // 80% of 55mpw peak (week 1)
+        },
+        '2q_70': {
+            mileageRange: [55, 75],
+            startMileage: 56,  // 80% of 70mpw peak (week 1)
+        },
+        '2q_85': {
+            mileageRange: [70, Infinity],
+            startMileage: 68,  // 80% of 85mpw peak (week 1)
+        },
+        // 5K/10K use phase-based, not mileage-based tier selection
+        '5k_10k': {
+            mileageRange: [25, 70],
+            startMileage: 30,  // Flexible based on runner
+        },
+    },
+};
+

@@ -42,7 +42,7 @@ export default function WeekLanding() {
                         height={22}
                         className="rounded opacity-50"
                     />
-                    <Link href="/auth" className="text-xs text-white/20 hover:text-white/40 transition-colors">
+                    <Link href="/onboarding" className="text-xs text-white/20 hover:text-white/40 transition-colors">
                         →
                     </Link>
                 </div>
@@ -133,10 +133,10 @@ export default function WeekLanding() {
                         transition={{ delay: 1.0, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
                     >
                         <Link
-                            href="/auth"
+                            href="/onboarding"
                             className="inline-block px-6 py-3 bg-white text-black text-sm font-medium rounded-lg hover:bg-white/90 hover:scale-[1.02] transition-all duration-200"
                         >
-                            Build yours
+                            Get Started
                         </Link>
                     </motion.div>
                 </div>
@@ -159,7 +159,7 @@ export default function WeekLanding() {
                     <h2 className="text-4xl md:text-5xl font-light text-white/80 mb-4">Evidence-based training</h2>
                     <p className="text-lg text-white/40 mb-8">7 methodologies. We'll help you find the right one.</p>
                     <Link
-                        href="/philosophy"
+                        href="/onboarding"
                         className="inline-block px-6 py-3 bg-white/[0.05] border border-white/20 text-white/70 text-sm font-medium rounded-lg hover:bg-white/[0.08] hover:border-white/30 transition-all"
                     >
                         Take the quiz →

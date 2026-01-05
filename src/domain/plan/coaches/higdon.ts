@@ -699,3 +699,60 @@ export function recommendHigdonTier(
     const middleIndex = Math.floor(tiers.length / 2);
     return tiers[middleIndex];
 }
+
+// =============================================================================
+// ELIGIBILITY CRITERIA
+// Source: research/21-higdon-complete-library.md + halhigdon.com
+// =============================================================================
+
+import type { CoachEligibility } from './hansons';
+
+/**
+ * Higdon eligibility criteria.
+ * 
+ * Philosophy: Accessibility is core to Higdon. Plans exist for nearly all
+ * runner types, with lowest barrier to entry of any coach.
+ */
+export const HIGDON_ELIGIBILITY: CoachEligibility = {
+    // Higdon has plans for all distances
+    distances: ['5k', '10k', 'half', 'marathon', 'base'] as const,
+
+    // Higdon has 3-day plans for shorter distances (research/21-higdon-complete-library.md)
+    // Marathon needs 4 days, Base needs 4 days
+    // Use the minimum across all distances for the global check
+    minDays: 3,
+
+    // Higdon welcomes everyone - no minimum weekly mileage
+    // Novice 1 plans start from zero/couch-to-race
+    minMileage: 0,
+
+    tiers: {
+        // Mileage thresholds for tier inference
+        // Source: Weekly mileage ranges in research/21-higdon-complete-library.md
+        novice: {
+            mileageRange: [0, 20],
+            startMileage: 0,  // Truly beginner-friendly
+        },
+        intermediate: {
+            mileageRange: [15, 40],
+            startMileage: 15,
+        },
+        advanced: {
+            mileageRange: [30, Infinity],
+            startMileage: 30,
+        },
+    },
+};
+
+/**
+ * Distance-specific day requirements for Higdon.
+ * Use this for filtering when we know the target distance.
+ */
+export const HIGDON_DAYS_BY_DISTANCE: Record<HigdonDistance, number> = {
+    '5k': 3,    // 5K Novice is 3 days (research/21-higdon-complete-library.md)
+    '10k': 3,   // 10K Novice is 3 days
+    half: 3,    // HM3 is 3 days
+    marathon: 4,  // Novice 1 is 4 days - marathon minimum
+    base: 4,    // Base Novice is 4 days
+};
+

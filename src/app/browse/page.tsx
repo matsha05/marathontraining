@@ -3,10 +3,11 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { COACHES } from '@/config/coach-spec';
 import { isPhilosophyAvailableForDistance } from '@/domain/philosophy/recommendation';
 import type { TargetDistance, TrainingPhilosophy } from '@/domain/philosophy/types';
+import { SiteHeader } from '@/components/ui/SiteHeader';
+import { Footer } from '@/components/ui/Footer';
 
 /**
  * Plan Library Page
@@ -87,23 +88,10 @@ export default function PlansPage() {
 
     return (
         <div className="v2-root min-h-screen" style={{ background: 'var(--v2-bg-deep)' }}>
-            {/* Nav - matches methodology page */}
-            <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-5 backdrop-blur-xl" style={{ background: 'rgba(8, 8, 10, 0.8)' }}>
-                <div className="max-w-5xl mx-auto flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-3">
-                        <Image src="/icon-192.png" alt="The Long Game" width={28} height={28} className="rounded opacity-70" />
-                        <span className="text-sm font-medium" style={{ color: 'var(--v2-text-primary)' }}>The Long Game</span>
-                    </Link>
-                    <div className="flex items-center gap-6">
-                        <Link href="/methodology" className="text-xs transition-colors" style={{ color: 'var(--v2-text-muted)' }}>Methodology</Link>
-                        <Link href="/philosophy" className="text-xs transition-colors" style={{ color: 'var(--v2-text-muted)' }}>Find Your Coach</Link>
-                        <Link href="/auth" className="text-xs transition-colors" style={{ color: 'var(--v2-text-primary)' }}>Get Started →</Link>
-                    </div>
-                </div>
-            </nav>
+            <SiteHeader />
 
             {/* Header */}
-            <header className="pt-28 pb-12 px-6 text-center">
+            <header className="pt-12 pb-12 px-6 text-center">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -356,6 +344,8 @@ export default function PlansPage() {
                     </motion.div>
                 </div>
             </main>
+
+            <Footer />
         </div>
     );
 }

@@ -9,10 +9,11 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { BookOpen, ExternalLink, ChevronDown } from "lucide-react";
 import { COACHES, METHODOLOGY_CATEGORIES, RESEARCH_SOURCES, Coach } from "@/config/coach-spec/methodology";
+import { SiteHeader } from "@/components/ui/SiteHeader";
+import { Footer } from "@/components/ui/Footer";
 
 const ease = [0.25, 0.46, 0.45, 0.94] as const;
 
@@ -96,20 +97,7 @@ export function MethodologyContent() {
 
     return (
         <div className="v2-root min-h-screen" style={{ background: 'var(--v2-bg-deep)', color: 'var(--v2-text-primary)' }}>
-            {/* Nav */}
-            <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-5 backdrop-blur-xl" style={{ background: 'rgba(8, 8, 10, 0.8)' }}>
-                <div className="max-w-5xl mx-auto flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-3">
-                        <Image src="/icon-192.png" alt="The Long Game" width={28} height={28} className="rounded opacity-70" />
-                        <span className="text-sm font-medium" style={{ color: 'var(--v2-text-primary)' }}>The Long Game</span>
-                    </Link>
-                    <div className="flex items-center gap-6">
-                        <Link href="/browse" className="text-xs transition-colors" style={{ color: 'var(--v2-text-muted)' }}>Browse</Link>
-                        <Link href="/philosophy" className="text-xs transition-colors" style={{ color: 'var(--v2-text-muted)' }}>Find Your Coach</Link>
-                        <Link href="/auth" className="text-xs transition-colors" style={{ color: 'var(--v2-text-primary)' }}>Get Started →</Link>
-                    </div>
-                </div>
-            </nav>
+            <SiteHeader />
 
             {/* Hero */}
             <section className="min-h-[70vh] flex flex-col items-center justify-center px-6 relative overflow-hidden">
@@ -209,20 +197,11 @@ export function MethodologyContent() {
                 <div className="max-w-3xl mx-auto text-center">
                     <h2 className="text-3xl font-light mb-6" style={{ color: 'var(--v2-text-primary)' }}>Ready to train smarter?</h2>
                     <p className="text-lg mb-8" style={{ color: 'var(--v2-text-muted)' }}>Get a personalized plan built on these proven methodologies.</p>
-                    <Link href="/auth" className="v2-btn v2-btn-primary v2-btn-lg">Build Your Plan</Link>
+                    <Link href="/onboarding" className="v2-btn v2-btn-primary v2-btn-lg">Get Started</Link>
                 </div>
             </section>
 
-            {/* Footer */}
-            <footer className="px-6 py-6" style={{ borderTop: '1px solid var(--v2-border)' }}>
-                <div className="max-w-5xl mx-auto flex items-center justify-between">
-                    <p className="text-[10px]" style={{ color: 'var(--v2-text-muted)' }}>© 2026 The Long Game</p>
-                    <div className="flex items-center gap-6">
-                        <Link href="/privacy" className="text-[10px] transition-colors" style={{ color: 'var(--v2-text-muted)' }}>Privacy</Link>
-                        <Link href="/terms" className="text-[10px] transition-colors" style={{ color: 'var(--v2-text-muted)' }}>Terms</Link>
-                    </div>
-                </div>
-            </footer>
+            <Footer />
         </div>
     );
 }

@@ -5,7 +5,6 @@ import {
     QuizAnswers,
     TargetDistance,
     DaysPerWeek,
-    Experience,
     CurrentMileage,
     Mindset,
     RaceTiming,
@@ -21,10 +20,11 @@ import { RecommendationScreen } from './RecommendationScreen';
  * 100% token usage, zero hardcoded colors
  */
 
-type QuestionStep = 'beginner_gate' | 'distance' | 'timing' | 'date_input' | 'days' | 'experience' | 'mileage' | 'mindset' | 'result';
+// 'experience' removed - now inferred from mileage via coach-matcher
+type QuestionStep = 'beginner_gate' | 'distance' | 'timing' | 'date_input' | 'days' | 'mileage' | 'mindset' | 'result';
 
 // Base step order (date_input is conditionally inserted)
-const BASE_STEP_ORDER: QuestionStep[] = ['beginner_gate', 'distance', 'timing', 'days', 'experience', 'mileage', 'mindset', 'result'];
+const BASE_STEP_ORDER: QuestionStep[] = ['beginner_gate', 'distance', 'timing', 'days', 'mileage', 'mindset', 'result'];
 
 interface PhilosophyQuizProps {
     onComplete: (philosophy: string) => void;
@@ -39,7 +39,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
 
     // Dynamic step order based on timing selection
     const STEP_ORDER = answers.raceTiming === 'specific'
-        ? ['distance', 'timing', 'date_input', 'days', 'experience', 'mileage', 'mindset', 'result'] as QuestionStep[]
+        ? ['distance', 'timing', 'date_input', 'days', 'mileage', 'mindset', 'result'] as QuestionStep[]
         : BASE_STEP_ORDER;
 
     const currentIndex = STEP_ORDER.indexOf(step);
@@ -84,10 +84,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
         goNext();
     };
 
-    const handleExperienceSelect = (value: Experience) => {
-        setAnswers(prev => ({ ...prev, experience: value }));
-        goNext();
-    };
+    // Experience is now inferred from mileage via coach-matcher - no question needed
 
     const handleMileageSelect = (value: CurrentMileage) => {
         setAnswers(prev => ({ ...prev, currentMileage: value }));
@@ -549,40 +546,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                     );
                 })()}
 
-                {/* Question 4: Experience */}
-                {step === 'experience' && (
-                    <QuestionScreen
-                        key="experience"
-                        question="Where are you right now?"
-                        subtitle="This helps us set the right starting intensity."
-                        options={[
-                            {
-                                value: 'beginner' as Experience,
-                                label: 'Just starting out',
-                                description: 'New to running, returning after a break, or not following a structured plan'
-                            },
-                            {
-                                value: 'intermediate' as Experience,
-                                label: 'Building steadily',
-                                description: 'Running regularly, ready for structure, or getting back into shape after time off'
-                            },
-                            {
-                                value: 'advanced' as Experience,
-                                label: 'Training hard',
-                                description: 'High volume, structured workouts, chasing PRs'
-                            },
-                            {
-                                value: 'unsure' as Experience,
-                                label: 'Not sure',
-                                description: 'We\'ll start moderate and calibrate from your mileage'
-                            },
-                        ]}
-                        onSelect={handleExperienceSelect}
-                        onBack={goBack}
-                    />
-                )}
-
-                {/* Question 5: Current mileage */}
+                {/* Question 4: Current mileage (experience is now inferred from mileage) */}
                 {step === 'mileage' && (
                     <QuestionScreen
                         key="mileage"
@@ -646,6 +610,9 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                         answers={answers}
                         onSelect={onComplete}
                         onBack={goBack}
+                        onUpdateAnswers={(updates) => {
+                            setAnswers(prev => ({ ...prev, ...updates }));
+                        }}
                     />
                 )}
             </AnimatePresence>

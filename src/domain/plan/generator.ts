@@ -37,7 +37,7 @@ import {
     WorkoutTemplate,
 } from './workouts/templates';
 import { generateStrengthWorkout, getStrengthPhaseConfig, getDicharryHipCircuit } from './strength-engine';
-import { StrengthWorkout, DurabilityModule, WodWorkout, DailyDurabilityRoutine } from './types';
+import { StrengthWorkout, DurabilityModule, WodWorkout, DailyDurabilityRoutine, CrossTrainingSuggestion } from './types';
 import { getDailyDurabilityModule, getDailyDurabilityRoutine } from './durability-modules';
 
 // =============================================================================
@@ -201,7 +201,7 @@ function generateWeek(
  * - Avoid strength day before long run
  * - BASE/BUILD: 2 sessions/week, PEAK: 1 session/week, TAPER: 0-1
  */
-function scheduleStrengthForDay(
+export function scheduleStrengthForDay(
     phase: TrainingPhase,
     dayType: 'rest' | 'easy' | 'quality' | 'long' | 'easy_strides',
     dayOfWeek: number,
@@ -266,7 +266,7 @@ function scheduleStrengthForDay(
  * - Rest days: mobility work if available
  * - Long run days: pre-run readiness scan
  */
-function scheduleDurabilityForDay(
+export function scheduleDurabilityForDay(
     dayType: 'rest' | 'easy' | 'quality' | 'long' | 'easy_strides'
 ): DurabilityModule | undefined {
     // Map day types to the getDailyDurabilityModule function
@@ -279,11 +279,51 @@ function scheduleDurabilityForDay(
  * Schedule FULL durability routine for a specific day.
  * Returns the complete 8-12 min routine per research (04-starrett-dicharry-durability.md).
  */
-function scheduleDurabilityRoutineForDay(
+export function scheduleDurabilityRoutineForDay(
     dayType: 'rest' | 'easy' | 'quality' | 'long' | 'easy_strides'
 ): DailyDurabilityRoutine | undefined {
     const mappedType = dayType === 'easy_strides' ? 'easy' : dayType;
     return getDailyDurabilityRoutine(mappedType as 'quality' | 'easy' | 'rest' | 'long');
+}
+
+/**
+ * Schedule cross-training for a day when user opts out of strength.
+ * This provides Higdon-style "Cross" day suggestions.
+ * Only shown when:
+ * - User hasn't opted into strength training
+ * - It's not a running day or rest day
+ */
+export function scheduleCrossTrainingForDay(
+    dayType: 'rest' | 'easy' | 'quality' | 'long' | 'easy_strides',
+    input: PlanGenerationInput
+): CrossTrainingSuggestion | undefined {
+    // If user opted into structured strength, no cross-training needed
+    if (input.includeStrength) {
+        return undefined;
+    }
+
+    // Cross-training typically suggested on easy days or rest days (optional)
+    if (dayType === 'rest') {
+        return {
+            type: 'rest_optional',
+            duration: 30,
+            intensity: 'easy',
+            notes: 'Optional: light walk, yoga, or complete rest',
+        };
+    }
+
+    // On easy days, suggest cross-training as alternative/supplement
+    if (dayType === 'easy' || dayType === 'easy_strides') {
+        return {
+            type: 'cycling',
+            duration: 30,
+            intensity: 'easy',
+            notes: 'Cross-training: cycling, swimming, or elliptical at easy effort',
+        };
+    }
+
+    // No cross-training on quality or long run days
+    return undefined;
 }
 
 // =============================================================================
@@ -353,6 +393,7 @@ function generateWeekDays(
                 i,
                 input
             ),
+            crossTraining: scheduleCrossTrainingForDay(dayInfo.type, input),
             durabilityModule: scheduleDurabilityForDay(dayInfo.type),
             durabilityRoutine: scheduleDurabilityRoutineForDay(dayInfo.type),
             // wodWorkout: opt-in via includeConditioning (not auto-scheduled)

@@ -85,6 +85,15 @@ export function SiteHeader({ isDark, onToggleTheme, hideAuth = false }: SiteHead
                             Methodology
                         </Link>
                         <Link
+                            href="/browse"
+                            className="text-xs transition-colors"
+                            style={{ color: 'var(--v2-text-muted)' }}
+                            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--v2-text-secondary)'}
+                            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--v2-text-muted)'}
+                        >
+                            Browse
+                        </Link>
+                        <Link
                             href="/philosophy"
                             className="text-xs transition-colors"
                             style={{ color: 'var(--v2-text-muted)' }}
@@ -119,13 +128,24 @@ export function SiteHeader({ isDark, onToggleTheme, hideAuth = false }: SiteHead
                                     Dashboard
                                 </Link>
                             ) : (
-                                <Link
-                                    href="/auth"
-                                    className="text-xs transition-colors"
-                                    style={{ color: 'white' }}
-                                >
-                                    Get Started →
-                                </Link>
+                                <>
+                                    <Link
+                                        href="/auth"
+                                        className="text-xs transition-colors"
+                                        style={{ color: 'var(--v2-text-muted)' }}
+                                        onMouseEnter={(e) => e.currentTarget.style.color = 'var(--v2-text-secondary)'}
+                                        onMouseLeave={(e) => e.currentTarget.style.color = 'var(--v2-text-muted)'}
+                                    >
+                                        Log In
+                                    </Link>
+                                    <Link
+                                        href="/onboarding"
+                                        className="text-xs transition-colors"
+                                        style={{ color: 'white' }}
+                                    >
+                                        Get Started →
+                                    </Link>
+                                </>
                             )}
                         </div>
                     )}

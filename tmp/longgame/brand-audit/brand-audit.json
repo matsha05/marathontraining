@@ -1,0 +1,626 @@
+[
+  {
+    "pagePath": "/",
+    "viewport": "desktop",
+    "info": {
+      "title": "The Long Game | Precision Running Training",
+      "url": "https://thelonggame-black.vercel.app/",
+      "headerText": "Methodology Browse Log In Get Started →",
+      "navLinks": [
+        "Methodology",
+        "Browse",
+        "Log In",
+        "Get Started →"
+      ],
+      "logoText": "The Long Game",
+      "h1Text": "The Long Game",
+      "bodyStyle": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "25.6px",
+        "color": "rgb(241, 245, 249)",
+        "backgroundColor": "rgb(11, 15, 20)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.176px"
+      },
+      "h1Style": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, sans-serif",
+        "fontSize": "72px",
+        "fontWeight": "300",
+        "lineHeight": "72px",
+        "color": "rgba(255, 255, 255, 0.9)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-1.8px"
+      },
+      "ctaText": "Get Started →",
+      "ctaStyle": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, sans-serif",
+        "fontSize": "12px",
+        "fontWeight": "400",
+        "lineHeight": "16px",
+        "color": "rgba(255, 255, 255, 0.9)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.176px"
+      },
+      "footerText": "© 2026 The Long Game Privacy Terms",
+      "footerLinks": [
+        "Privacy",
+        "Terms"
+      ]
+    }
+  },
+  {
+    "pagePath": "/",
+    "viewport": "mobile",
+    "info": {
+      "title": "The Long Game | Precision Running Training",
+      "url": "https://thelonggame-black.vercel.app/",
+      "headerText": "Methodology Browse Log In Get Started →",
+      "navLinks": [
+        "Methodology",
+        "Browse",
+        "Log In",
+        "Get Started →"
+      ],
+      "logoText": "The Long Game",
+      "h1Text": "The Long Game",
+      "bodyStyle": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "25.6px",
+        "color": "rgb(241, 245, 249)",
+        "backgroundColor": "rgb(11, 15, 20)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.176px"
+      },
+      "h1Style": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, sans-serif",
+        "fontSize": "48px",
+        "fontWeight": "300",
+        "lineHeight": "48px",
+        "color": "rgba(255, 255, 255, 0.9)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-1.2px"
+      },
+      "ctaText": "Get Started →",
+      "ctaStyle": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, sans-serif",
+        "fontSize": "12px",
+        "fontWeight": "400",
+        "lineHeight": "16px",
+        "color": "rgba(255, 255, 255, 0.9)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.176px"
+      },
+      "footerText": "© 2026 The Long Game Privacy Terms",
+      "footerLinks": [
+        "Privacy",
+        "Terms"
+      ]
+    }
+  },
+  {
+    "pagePath": "/methodology",
+    "viewport": "desktop",
+    "info": {
+      "title": "Our Methodology | The Long Game",
+      "url": "https://thelonggame-black.vercel.app/methodology",
+      "headerText": "The Long Game Browse Find Your Coach Get Started →",
+      "navLinks": [
+        "The Long Game",
+        "Browse",
+        "Find Your Coach",
+        "Get Started →"
+      ],
+      "logoText": "The Long Game",
+      "h1Text": "Built on science.",
+      "bodyStyle": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "25.6px",
+        "color": "rgb(241, 245, 249)",
+        "backgroundColor": "rgb(11, 15, 20)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.176px"
+      },
+      "h1Style": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, sans-serif",
+        "fontSize": "60px",
+        "fontWeight": "300",
+        "lineHeight": "60px",
+        "color": "rgba(255, 255, 255, 0.9)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-1.5px"
+      },
+      "ctaText": "Get Started →",
+      "ctaStyle": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, sans-serif",
+        "fontSize": "12px",
+        "fontWeight": "400",
+        "lineHeight": "16px",
+        "color": "rgba(255, 255, 255, 0.9)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.176px"
+      },
+      "footerText": "© 2026 The Long Game Privacy Terms",
+      "footerLinks": [
+        "Privacy",
+        "Terms"
+      ]
+    }
+  },
+  {
+    "pagePath": "/methodology",
+    "viewport": "mobile",
+    "info": {
+      "title": "Our Methodology | The Long Game",
+      "url": "https://thelonggame-black.vercel.app/methodology",
+      "headerText": "The Long Game Browse Find Your Coach Get Started →",
+      "navLinks": [
+        "The Long Game",
+        "Browse",
+        "Find Your Coach",
+        "Get Started →"
+      ],
+      "logoText": "The Long Game",
+      "h1Text": "Built on science.",
+      "bodyStyle": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "25.6px",
+        "color": "rgb(241, 245, 249)",
+        "backgroundColor": "rgb(11, 15, 20)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.176px"
+      },
+      "h1Style": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, sans-serif",
+        "fontSize": "48px",
+        "fontWeight": "300",
+        "lineHeight": "48px",
+        "color": "rgba(255, 255, 255, 0.9)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-1.2px"
+      },
+      "ctaText": "Get Started →",
+      "ctaStyle": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, sans-serif",
+        "fontSize": "12px",
+        "fontWeight": "400",
+        "lineHeight": "16px",
+        "color": "rgba(255, 255, 255, 0.9)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.176px"
+      },
+      "footerText": "© 2026 The Long Game Privacy Terms",
+      "footerLinks": [
+        "Privacy",
+        "Terms"
+      ]
+    }
+  },
+  {
+    "pagePath": "/browse",
+    "viewport": "desktop",
+    "info": {
+      "title": "The Long Game | Precision Running Training",
+      "url": "https://thelonggame-black.vercel.app/browse",
+      "headerText": "Training Plan Library Browse all available programs. Each plan is built from proven methodologies, adapted to your fitness level.",
+      "navLinks": [],
+      "logoText": "",
+      "h1Text": "Training Plan Library",
+      "bodyStyle": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "25.6px",
+        "color": "rgb(241, 245, 249)",
+        "backgroundColor": "rgb(11, 15, 20)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.176px"
+      },
+      "h1Style": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, sans-serif",
+        "fontSize": "48px",
+        "fontWeight": "300",
+        "lineHeight": "48px",
+        "color": "rgba(255, 255, 255, 0.9)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.176px"
+      },
+      "ctaText": "Get Started →",
+      "ctaStyle": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, sans-serif",
+        "fontSize": "12px",
+        "fontWeight": "400",
+        "lineHeight": "16px",
+        "color": "rgba(255, 255, 255, 0.9)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.176px"
+      },
+      "footerText": "",
+      "footerLinks": []
+    }
+  },
+  {
+    "pagePath": "/browse",
+    "viewport": "mobile",
+    "info": {
+      "title": "The Long Game | Precision Running Training",
+      "url": "https://thelonggame-black.vercel.app/browse",
+      "headerText": "Training Plan Library Browse all available programs. Each plan is built from proven methodologies, adapted to your fitness level.",
+      "navLinks": [],
+      "logoText": "",
+      "h1Text": "Training Plan Library",
+      "bodyStyle": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "25.6px",
+        "color": "rgb(241, 245, 249)",
+        "backgroundColor": "rgb(11, 15, 20)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.176px"
+      },
+      "h1Style": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, sans-serif",
+        "fontSize": "36px",
+        "fontWeight": "300",
+        "lineHeight": "40px",
+        "color": "rgba(255, 255, 255, 0.9)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.176px"
+      },
+      "ctaText": "Get Started →",
+      "ctaStyle": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, sans-serif",
+        "fontSize": "12px",
+        "fontWeight": "400",
+        "lineHeight": "16px",
+        "color": "rgba(255, 255, 255, 0.9)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.176px"
+      },
+      "footerText": "",
+      "footerLinks": []
+    }
+  },
+  {
+    "pagePath": "/philosophy",
+    "viewport": "desktop",
+    "info": {
+      "title": "The Long Game | Precision Running Training",
+      "url": "https://thelonggame-black.vercel.app/onboarding",
+      "headerText": "",
+      "navLinks": [],
+      "logoText": "",
+      "h1Text": "Let's build your plan",
+      "bodyStyle": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "25.6px",
+        "color": "rgb(241, 245, 249)",
+        "backgroundColor": "rgb(11, 15, 20)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.176px"
+      },
+      "h1Style": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, sans-serif",
+        "fontSize": "48px",
+        "fontWeight": "300",
+        "lineHeight": "48px",
+        "color": "rgba(255, 255, 255, 0.9)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-1.2px"
+      },
+      "ctaText": "",
+      "ctaStyle": null,
+      "footerText": "",
+      "footerLinks": []
+    }
+  },
+  {
+    "pagePath": "/philosophy",
+    "viewport": "mobile",
+    "info": {
+      "title": "The Long Game | Precision Running Training",
+      "url": "https://thelonggame-black.vercel.app/onboarding",
+      "headerText": "",
+      "navLinks": [],
+      "logoText": "",
+      "h1Text": "Let's build your plan",
+      "bodyStyle": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "25.6px",
+        "color": "rgb(241, 245, 249)",
+        "backgroundColor": "rgb(11, 15, 20)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.176px"
+      },
+      "h1Style": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, sans-serif",
+        "fontSize": "36px",
+        "fontWeight": "300",
+        "lineHeight": "40px",
+        "color": "rgba(255, 255, 255, 0.9)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.9px"
+      },
+      "ctaText": "",
+      "ctaStyle": null,
+      "footerText": "",
+      "footerLinks": []
+    }
+  },
+  {
+    "pagePath": "/auth",
+    "viewport": "desktop",
+    "info": {
+      "title": "The Long Game | Precision Running Training",
+      "url": "https://thelonggame-black.vercel.app/auth",
+      "headerText": "",
+      "navLinks": [],
+      "logoText": "",
+      "h1Text": "Get Started",
+      "bodyStyle": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "25.6px",
+        "color": "rgb(241, 245, 249)",
+        "backgroundColor": "rgb(11, 15, 20)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.176px"
+      },
+      "h1Style": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, sans-serif",
+        "fontSize": "48px",
+        "fontWeight": "300",
+        "lineHeight": "76.8px",
+        "color": "rgba(255, 255, 255, 0.8)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.96px"
+      },
+      "ctaText": "",
+      "ctaStyle": null,
+      "footerText": "",
+      "footerLinks": []
+    }
+  },
+  {
+    "pagePath": "/auth",
+    "viewport": "mobile",
+    "info": {
+      "title": "The Long Game | Precision Running Training",
+      "url": "https://thelonggame-black.vercel.app/auth",
+      "headerText": "",
+      "navLinks": [],
+      "logoText": "",
+      "h1Text": "Get Started",
+      "bodyStyle": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "25.6px",
+        "color": "rgb(241, 245, 249)",
+        "backgroundColor": "rgb(11, 15, 20)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.176px"
+      },
+      "h1Style": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, sans-serif",
+        "fontSize": "32px",
+        "fontWeight": "300",
+        "lineHeight": "51.2px",
+        "color": "rgba(255, 255, 255, 0.8)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.64px"
+      },
+      "ctaText": "",
+      "ctaStyle": null,
+      "footerText": "",
+      "footerLinks": []
+    }
+  },
+  {
+    "pagePath": "/privacy",
+    "viewport": "desktop",
+    "info": {
+      "title": "Privacy Policy | The Long Game",
+      "url": "https://thelonggame-black.vercel.app/privacy",
+      "headerText": "Privacy Policy Effective Date: January 3, 2026 · Last Updated: January 3, 2026",
+      "navLinks": [],
+      "logoText": "",
+      "h1Text": "Privacy Policy",
+      "bodyStyle": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "25.6px",
+        "color": "rgb(241, 245, 249)",
+        "backgroundColor": "rgb(11, 15, 20)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.176px"
+      },
+      "h1Style": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, sans-serif",
+        "fontSize": "48px",
+        "fontWeight": "300",
+        "lineHeight": "76.8px",
+        "color": "rgba(255, 255, 255, 0.8)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.96px"
+      },
+      "ctaText": "",
+      "ctaStyle": null,
+      "footerText": "",
+      "footerLinks": []
+    }
+  },
+  {
+    "pagePath": "/privacy",
+    "viewport": "mobile",
+    "info": {
+      "title": "Privacy Policy | The Long Game",
+      "url": "https://thelonggame-black.vercel.app/privacy",
+      "headerText": "Privacy Policy Effective Date: January 3, 2026 · Last Updated: January 3, 2026",
+      "navLinks": [],
+      "logoText": "",
+      "h1Text": "Privacy Policy",
+      "bodyStyle": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "25.6px",
+        "color": "rgb(241, 245, 249)",
+        "backgroundColor": "rgb(11, 15, 20)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.176px"
+      },
+      "h1Style": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, sans-serif",
+        "fontSize": "32px",
+        "fontWeight": "300",
+        "lineHeight": "51.2px",
+        "color": "rgba(255, 255, 255, 0.8)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.64px"
+      },
+      "ctaText": "",
+      "ctaStyle": null,
+      "footerText": "",
+      "footerLinks": []
+    }
+  },
+  {
+    "pagePath": "/terms",
+    "viewport": "desktop",
+    "info": {
+      "title": "Terms of Service | The Long Game",
+      "url": "https://thelonggame-black.vercel.app/terms",
+      "headerText": "",
+      "navLinks": [],
+      "logoText": "",
+      "h1Text": "Terms of Service",
+      "bodyStyle": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "25.6px",
+        "color": "rgb(241, 245, 249)",
+        "backgroundColor": "rgb(11, 15, 20)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.176px"
+      },
+      "h1Style": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, sans-serif",
+        "fontSize": "48px",
+        "fontWeight": "300",
+        "lineHeight": "76.8px",
+        "color": "rgba(255, 255, 255, 0.8)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.96px"
+      },
+      "ctaText": "",
+      "ctaStyle": null,
+      "footerText": "",
+      "footerLinks": []
+    }
+  },
+  {
+    "pagePath": "/terms",
+    "viewport": "mobile",
+    "info": {
+      "title": "Terms of Service | The Long Game",
+      "url": "https://thelonggame-black.vercel.app/terms",
+      "headerText": "",
+      "navLinks": [],
+      "logoText": "",
+      "h1Text": "Terms of Service",
+      "bodyStyle": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "25.6px",
+        "color": "rgb(241, 245, 249)",
+        "backgroundColor": "rgb(11, 15, 20)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.176px"
+      },
+      "h1Style": {
+        "fontFamily": "\"Instrument Sans\", \"Instrument Sans Fallback\", system-ui, sans-serif",
+        "fontSize": "32px",
+        "fontWeight": "300",
+        "lineHeight": "51.2px",
+        "color": "rgba(255, 255, 255, 0.8)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderRadius": "0px",
+        "textTransform": "none",
+        "letterSpacing": "-0.64px"
+      },
+      "ctaText": "",
+      "ctaStyle": null,
+      "footerText": "",
+      "footerLinks": []
+    }
+  }
+]

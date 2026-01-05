@@ -1,8 +1,8 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { SettingsIcon } from '@/components/ui/settings';
-import { ActivityIcon } from '@/components/ui/activity';
 import { FlameIcon } from '@/components/ui/flame';
 
 /**
@@ -55,17 +55,20 @@ export function AppHeader({
                             {title ? <span className="text-sm font-medium">{title}</span> : 'Back'}
                         </Link>
                     ) : (
-                        <>
-                            <div
-                                className="w-8 h-8 rounded-lg flex items-center justify-center"
-                                style={{ background: 'var(--v2-accent)' }}
-                            >
-                                <ActivityIcon size={18} className="text-black" />
+                        <Link href="/dashboard" className="flex items-center gap-3 group">
+                            <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center group-hover:scale-105 transition-transform">
+                                <Image
+                                    src="/icon-192.png"
+                                    alt="The Long Game"
+                                    width={32}
+                                    height={32}
+                                    className="object-cover opacity-70"
+                                />
                             </div>
                             <span className="text-sm font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
                                 {title || 'The Long Game'}
                             </span>
-                        </>
+                        </Link>
                     )}
                 </div>
 

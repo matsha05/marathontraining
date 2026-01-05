@@ -29,15 +29,35 @@ export function calculateRecommendation(answers: QuizAnswers): PhilosophyRecomme
     const warnings: string[] = [];
 
     // ==========================================================================
+    // INFER EXPERIENCE FROM MILEAGE
+    // The experience question was removed - we now infer it from weekly mileage
+    // ==========================================================================
+    let effectiveExperience = answers.experience;
+    if (!effectiveExperience || effectiveExperience === 'unsure') {
+        if (answers.currentMileage === 'under_20') {
+            effectiveExperience = 'beginner';
+        } else if (answers.currentMileage === '20_40') {
+            effectiveExperience = 'intermediate';
+        } else if (answers.currentMileage === 'over_40') {
+            effectiveExperience = 'advanced';
+        } else {
+            effectiveExperience = 'intermediate'; // Safe default
+        }
+    }
+
+    // Create a working copy of answers with inferred experience
+    const workingAnswers = { ...answers, experience: effectiveExperience };
+
+    // ==========================================================================
     // BASE BUILDING SHORT-CIRCUIT
     // If no race target, always recommend Higdon Base Training
     // ==========================================================================
     if (answers.targetDistance === 'base') {
         // Determine tier based on experience and mileage
         let tierLabel = 'Novice';
-        if (answers.experience === 'advanced' && answers.currentMileage === 'over_40') {
+        if (workingAnswers.experience === 'advanced' && answers.currentMileage === 'over_40') {
             tierLabel = 'Advanced';
-        } else if (answers.experience === 'intermediate' || answers.currentMileage === '20_40') {
+        } else if (workingAnswers.experience === 'intermediate' || answers.currentMileage === '20_40') {
             tierLabel = 'Intermediate';
         }
 
@@ -70,9 +90,9 @@ export function calculateRecommendation(answers: QuizAnswers): PhilosophyRecomme
     const pfitzMileageOk = answers.currentMileage !== 'under_20';
     const hansonsMileageOk = answers.currentMileage !== 'under_20' || answers.currentMileage === null;
 
-    // Gate 4: Experience — Pfitz and Daniels are not for beginners
-    const pfitzExperienceOk = answers.experience !== 'beginner';
-    const danielsExperienceOk = answers.experience === 'advanced';
+    // Gate 4: Experience — Pfitz and Daniels are not for beginners (using inferred experience)
+    const pfitzExperienceOk = workingAnswers.experience !== 'beginner';
+    const danielsExperienceOk = workingAnswers.experience === 'advanced';
 
     // Gate 5: Distance — Daniels only has 5K, 10K, and Marathon plans (NO half or ultra)
     const danielsDistanceOk = answers.targetDistance === null ||
@@ -99,13 +119,13 @@ export function calculateRecommendation(answers: QuizAnswers): PhilosophyRecomme
     if (!hansonsAvailable && answers.daysPerWeek !== null && answers.daysPerWeek < 6) {
         reasoning.push(`Hansons requires 6 run days (cumulative fatigue approach). Your ${answers.daysPerWeek} days don't fit this structure.`);
     }
-    if (!pfitzAvailable && answers.experience === 'beginner') {
+    if (!pfitzAvailable && workingAnswers.experience === 'beginner') {
         reasoning.push(`Pfitzinger is designed for experienced runners with structured training background.`);
     }
     if (!pfitzAvailable && answers.currentMileage === 'under_20') {
         reasoning.push(`Pfitzinger requires a 30-40 mile weekly base to start.`);
     }
-    if (!danielsAvailable && answers.experience !== 'advanced') {
+    if (!danielsAvailable && workingAnswers.experience !== 'advanced') {
         reasoning.push(`Daniels' precision approach is best suited for advanced runners who understand training zones.`);
     }
 
@@ -166,15 +186,15 @@ export function calculateRecommendation(answers: QuizAnswers): PhilosophyRecomme
         }
     }
 
-    // Experience modifiers
-    if (answers.experience !== null) {
-        if (answers.experience === 'beginner') {
+    // Experience modifiers (using inferred experience)
+    if (workingAnswers.experience !== null) {
+        if (workingAnswers.experience === 'beginner') {
             scores.higdon += 4;
             reasoning.push(`First ${distanceLabel} — Higdon's gradual, accessible approach is the safest path.`);
             if (answers.daysPerWeek === 6) {
                 warnings.push('6 run days is ambitious for beginners. We\'ll keep intensity low and build gradually.');
             }
-        } else if (answers.experience === 'intermediate') {
+        } else if (workingAnswers.experience === 'intermediate') {
             if (hansonsAvailable) scores.hansons += 2;
             scores.higdon += 1;
             if (pfitzAvailable) scores.pfitzinger += 1;

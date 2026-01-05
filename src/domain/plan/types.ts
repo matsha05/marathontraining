@@ -129,6 +129,19 @@ export interface StrengthExercise {
 }
 
 // =============================================================================
+// CROSS TRAINING (Higdon-style "Cross" days)
+// =============================================================================
+
+export type CrossTrainingType = 'cycling' | 'swimming' | 'elliptical' | 'walking' | 'yoga' | 'rest_optional';
+
+export interface CrossTrainingSuggestion {
+    type: CrossTrainingType;
+    duration: number; // minutes
+    intensity: 'easy' | 'moderate';
+    notes?: string;
+}
+
+// =============================================================================
 // DURABILITY MODULE (from research: 04-starrett-dicharry-durability.md)
 // =============================================================================
 
@@ -212,6 +225,7 @@ export interface DayPlan {
     dayOfWeek: number; // 0-6, 0 = Sunday
     runWorkout: Workout | null;
     strengthWorkout: StrengthWorkout | null;
+    crossTraining?: CrossTrainingSuggestion; // Higdon-style "Cross" day suggestion
     durabilityModule?: DurabilityModule; // For backward compat (first module)
     durabilityRoutine?: DailyDurabilityRoutine; // Full 8-12 min routine per research
     wodWorkout?: WodWorkout; // Optional conditioning (opt-in)

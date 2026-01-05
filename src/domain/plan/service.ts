@@ -181,7 +181,9 @@ function validateOnboardingData(data: OnboardingData): {
 
 import { selectPlanTier, TierSelectionInput } from '@/domain/philosophy/tier-selector';
 import { generateCoachPlan } from '@/domain/plan/coach-generators';
-import { PfitzFRRTier, DanielsTier } from '@/domain/plan/types';
+import { PfitzFRRTier, DanielsTier, HigdonTier } from '@/domain/plan/types';
+import { HansonsTier } from '@/domain/plan/coaches/hansons';
+import { PfitzTier } from '@/domain/plan/coaches/pfitzinger';
 
 /**
  * Map OnboardingData experience/mileage to tier-selector format
@@ -246,9 +248,24 @@ export function createPlanFromOnboarding(
             plan = generateCoachPlan(inputResult.data, tierResult.tier as PfitzFRRTier);
         } else if (tierResult.tier.startsWith('daniels_')) {
             plan = generateCoachPlan(inputResult.data, tierResult.tier as DanielsTier);
+        } else if (tierResult.tier.startsWith('hansons_')) {
+            // Hansons tiers - use coach-specific generator with proper long run progression
+            plan = generateCoachPlan(inputResult.data, tierResult.tier as HansonsTier);
+        } else if (tierResult.tier.startsWith('pfitz_12_') || tierResult.tier.startsWith('pfitz_18_')) {
+            // Pfitzinger Advanced Marathoning tiers
+            plan = generateCoachPlan(inputResult.data, tierResult.tier as PfitzTier);
+        } else if (
+            tierResult.tier.startsWith('base_') ||
+            tierResult.tier.startsWith('5k_') ||
+            tierResult.tier.startsWith('10k_') ||
+            tierResult.tier.startsWith('half_') ||
+            tierResult.tier.startsWith('marathon_')
+        ) {
+            // Higdon tiers - use coach-specific generator with proper long run progression
+            plan = generateCoachPlan(inputResult.data, tierResult.tier as HigdonTier);
         } else {
-            // Use generic generator for Higdon/Hansons (for now)
-            // TODO: Add Higdon/Hansons-specific generators
+            // Fallback for any unrecognized tiers
+            console.warn('[PlanService] Using generic generator for tier:', tierResult.tier);
             plan = generatePlan(inputResult.data);
         }
 
