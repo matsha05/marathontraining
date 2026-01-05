@@ -124,6 +124,76 @@ export interface StrengthExercise {
     name: string;
     sets: number;
     reps: number | string; // "8-10" or "30sec"
+    rest?: string; // "60-90s", "full recovery"
+    notes?: string;
+}
+
+// =============================================================================
+// DURABILITY MODULE (from research: 04-starrett-dicharry-durability.md)
+// =============================================================================
+
+export interface DurabilityModule {
+    id: string;
+    name: string;
+    category: 'mobility' | 'control' | 'capacity' | 'tissue' | 'integration';
+    durationMinutes: number;
+    exercises: DurabilityExercise[];
+    basedOnAssessment?: string; // Assessment ID that triggered this
+    frequency: string; // "daily", "2-3x/week"
+}
+
+export interface DurabilityExercise {
+    name: string;
+    dosage: string; // "2:00 hold", "20 reps"
+    cues: string[];
+}
+
+/**
+ * Complete daily durability routine (8-12 minutes per research)
+ * From 04-starrett-dicharry-durability.md:
+ * 1. Readiness scan (1-2 min)
+ * 2. Mobility module (3-5 min) - only if test indicates
+ * 3. Control module (3-5 min) - always beneficial
+ * 4. Optional capacity (2-4 min) - on easy/rest days
+ */
+export interface DailyDurabilityRoutine {
+    id: string;
+    name: string;
+    totalMinutes: number;
+    dayType: 'quality' | 'easy' | 'rest' | 'long';
+    modules: DurabilityModule[];
+}
+
+// =============================================================================
+// WOD WORKOUT (from research: 11-crossfit-running-hybrid-programming.md)
+// =============================================================================
+
+export type WodType =
+    | 'WOD_STRENGTH_LOW_VOL'      // Heavy-ish, low reps, long rests
+    | 'WOD_AEROBIC_MIXED_MODAL'   // 20-45 min, RPE 5-6
+    | 'WOD_THRESHOLD_MACHINE'     // 12-30 min controlled hard
+    | 'WOD_ALACTIC_POWER'         // 10-20 sec bursts, lots of rest
+    | 'WOD_GLYCOLYTIC_METCON';    // Avoid in marathon-specific phases
+
+export interface WodWorkout {
+    id: string;
+    name: string;
+    type: WodType;
+    timeDomain: number; // minutes
+    format: string; // "AMRAP 20", "6 rounds for quality", etc.
+    movements: WodMovement[];
+    equipmentNeeded: string[];
+    notes?: string[];
+    scalingOptions?: {
+        rx: string;
+        scaled: string;
+        beginner: string;
+    };
+}
+
+export interface WodMovement {
+    name: string;
+    reps: string; // "12/10 calories", "10 reps", "40m"
     notes?: string;
 }
 
@@ -139,6 +209,9 @@ export interface DayPlan {
     dayOfWeek: number; // 0-6, 0 = Sunday
     runWorkout: Workout | null;
     strengthWorkout: StrengthWorkout | null;
+    durabilityModule?: DurabilityModule; // For backward compat (first module)
+    durabilityRoutine?: DailyDurabilityRoutine; // Full 8-12 min routine per research
+    wodWorkout?: WodWorkout; // Optional conditioning (opt-in)
     isKeyDay: boolean; // SOS day (Hansons "Something of Substance")
     totalMiles: number;
     qualityMiles: number;
@@ -338,6 +411,7 @@ export interface PlanGenerationInput {
 
     trainingIntensity: 'conservative' | 'moderate' | 'aggressive';
     includeStrength: boolean;
+    strengthBackground?: 'none' | 'recreational' | 'intermediate' | 'advanced';
 }
 
 // =============================================================================

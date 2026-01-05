@@ -1,0 +1,294 @@
+{
+  "/": {
+    "headings": [
+      "The Long Game",
+      "Evidence-based training",
+      "Hansons",
+      "Hal Higdon",
+      "Pete Pfitzinger",
+      "Matt Fitzgerald",
+      "Steve Magness",
+      "Built on every plan",
+      "Jack Daniels",
+      "Stephen Seiler",
+      "Jay Dicharry",
+      "Kelly Starrett",
+      "Lift to run faster",
+      "Øyvind Støren",
+      "The Long Game Strength Engine",
+      "World-class training",
+      "Gjert Ingebrigtsen",
+      "Base building to 50K."
+    ],
+    "buttons": [],
+    "links": [
+      {
+        "text": "Methodology",
+        "href": "https://thelonggame-black.vercel.app/methodology"
+      },
+      {
+        "text": "Browse",
+        "href": "https://thelonggame-black.vercel.app/browse"
+      },
+      {
+        "text": "Find Your Coach",
+        "href": "https://thelonggame-black.vercel.app/philosophy"
+      },
+      {
+        "text": "Get Started →",
+        "href": "https://thelonggame-black.vercel.app/auth"
+      },
+      {
+        "text": "Build yours",
+        "href": "https://thelonggame-black.vercel.app/auth"
+      },
+      {
+        "text": "Take the quiz →",
+        "href": "https://thelonggame-black.vercel.app/philosophy"
+      },
+      {
+        "text": "Start →",
+        "href": "https://thelonggame-black.vercel.app/auth"
+      },
+      {
+        "text": "Privacy",
+        "href": "https://thelonggame-black.vercel.app/privacy"
+      },
+      {
+        "text": "Terms",
+        "href": "https://thelonggame-black.vercel.app/terms"
+      }
+    ],
+    "inputs": []
+  },
+  "/methodology": {
+    "headings": [
+      "Built on science.",
+      "Running Science",
+      "Jack Daniels",
+      "Hansons",
+      "Hal Higdon",
+      "Stephen Seiler",
+      "Pete Pfitzinger",
+      "Matt Fitzgerald",
+      "Steve Magness",
+      "Strength Training",
+      "Øyvind Støren",
+      "The Long Game Strength Engine",
+      "Durability & Movement",
+      "Jay Dicharry",
+      "Kelly Starrett",
+      "Elite Methods",
+      "Gjert Ingebrigtsen",
+      "Peer-reviewed studies",
+      "Maximal Strength Training Improves Running Economy",
+      "What is Best Practice for Training Intensity Distribution",
+      "Explosive-strength training improves 5-km running time",
+      "The Effect of Strength Training on Performance Indicators in Distance Runners",
+      "ACSM Guidelines for Exercise Testing and Prescription",
+      "Ready to train smarter?"
+    ],
+    "buttons": [],
+    "links": [
+      {
+        "text": "The Long Game",
+        "href": "https://thelonggame-black.vercel.app/"
+      },
+      {
+        "text": "Browse",
+        "href": "https://thelonggame-black.vercel.app/browse"
+      },
+      {
+        "text": "Find Your Coach",
+        "href": "https://thelonggame-black.vercel.app/philosophy"
+      },
+      {
+        "text": "Get Started →",
+        "href": "https://thelonggame-black.vercel.app/auth"
+      },
+      {
+        "text": "DOI ↗",
+        "href": "https://doi.org/10.1249/MSS.0b013e3181760e0e"
+      },
+      {
+        "text": "DOI ↗",
+        "href": "https://doi.org/10.1123/ijspp.5.3.276"
+      },
+      {
+        "text": "DOI ↗",
+        "href": "https://doi.org/10.1152/jappl.1999.86.5.1527"
+      },
+      {
+        "text": "DOI ↗",
+        "href": "https://doi.org/10.1519/JSC.0000000000001584"
+      },
+      {
+        "text": "Build Your Plan",
+        "href": "https://thelonggame-black.vercel.app/auth"
+      },
+      {
+        "text": "Privacy",
+        "href": "https://thelonggame-black.vercel.app/privacy"
+      },
+      {
+        "text": "Terms",
+        "href": "https://thelonggame-black.vercel.app/terms"
+      }
+    ],
+    "inputs": []
+  },
+  "/browse": {
+    "headings": [
+      "Training Plan Library",
+      "Jack Daniels",
+      "Pete Pfitzinger",
+      "Hansons",
+      "Hal Higdon"
+    ],
+    "buttons": [
+      "5K 3.1 miles",
+      "10K 6.2 miles",
+      "Half 13.1 miles",
+      "Marathon 26.2 miles",
+      "Base No race target",
+      "Jack Daniels 1 PLAN Every pace calculated from your VDOT—E, M, T, I, R zones scientifically derived from race performance",
+      "Pete Pfitzinger 1 PLAN 12-18 week progressive plans with medium-long runs and lactate threshold focus",
+      "Hansons 1 PLAN 6 runs/week, 16-mile long run cap, train on tired legs to simulate race conditions",
+      "Hal Higdon 1 PLAN Long-run-centered plans, stepback weeks, conservative pacing, and clear weekly rhythm for beginners"
+    ],
+    "links": [
+      {
+        "text": "The Long Game",
+        "href": "https://thelonggame-black.vercel.app/"
+      },
+      {
+        "text": "Methodology",
+        "href": "https://thelonggame-black.vercel.app/methodology"
+      },
+      {
+        "text": "Find Your Coach",
+        "href": "https://thelonggame-black.vercel.app/philosophy"
+      },
+      {
+        "text": "Get Started →",
+        "href": "https://thelonggame-black.vercel.app/auth"
+      },
+      {
+        "text": "Take the Quiz →",
+        "href": "https://thelonggame-black.vercel.app/philosophy"
+      }
+    ],
+    "inputs": []
+  },
+  "/philosophy": {
+    "headings": [
+      "Quick check first"
+    ],
+    "buttons": [
+      "Yes, I can run a mile Great! Let's find your training approach.",
+      "Not yet That's okay — we'll point you in the right direction."
+    ],
+    "links": [],
+    "inputs": []
+  },
+  "/auth": {
+    "headings": [
+      "Get Started"
+    ],
+    "buttons": [
+      "Continue with Google",
+      "Continue"
+    ],
+    "links": [
+      {
+        "text": "Terms of Service",
+        "href": "https://thelonggame-black.vercel.app/terms"
+      },
+      {
+        "text": "Privacy Policy",
+        "href": "https://thelonggame-black.vercel.app/privacy"
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "input",
+        "type": "email",
+        "name": "",
+        "placeholder": "you@example.com",
+        "ariaLabel": ""
+      }
+    ]
+  },
+  "/privacy": {
+    "headings": [
+      "Privacy Policy",
+      "1. Data Controller",
+      "2. Information We Collect",
+      "ACCOUNT INFORMATION",
+      "TRAINING & HEALTH DATA",
+      "CONNECTED SERVICES (OPTIONAL)",
+      "TECHNICAL DATA",
+      "3. Legal Basis for Processing (GDPR)",
+      "4. How We Use Your Information",
+      "5. Data Retention",
+      "6. Data Sharing & Third Parties",
+      "7. International Data Transfers",
+      "8. Your Rights",
+      "9. California Privacy Rights (CCPA)",
+      "10. Cookies & Tracking",
+      "11. Data Security",
+      "12. Children's Privacy",
+      "13. Changes to This Policy",
+      "14. Contact & Complaints"
+    ],
+    "buttons": [],
+    "links": [
+      {
+        "text": "← Back",
+        "href": "https://thelonggame-black.vercel.app/"
+      },
+      {
+        "text": "privacy@thelonggame.app",
+        "href": "mailto:privacy@thelonggame.app"
+      },
+      {
+        "text": "privacy@thelonggame.app",
+        "href": "mailto:privacy@thelonggame.app"
+      },
+      {
+        "text": "privacy@thelonggame.app",
+        "href": "mailto:privacy@thelonggame.app"
+      }
+    ],
+    "inputs": []
+  },
+  "/terms": {
+    "headings": [
+      "Terms of Service",
+      "1. Acceptance of Terms",
+      "2. Description of Service",
+      "3. User Accounts",
+      "4. Medical Disclaimer",
+      "5. Acceptable Use",
+      "6. Intellectual Property",
+      "7. Third-Party Services",
+      "8. Limitation of Liability",
+      "9. Termination",
+      "10. Changes to Terms",
+      "11. Governing Law",
+      "Contact"
+    ],
+    "buttons": [],
+    "links": [
+      {
+        "text": "← Back",
+        "href": "https://thelonggame-black.vercel.app/"
+      },
+      {
+        "text": "legal@thelonggame.app",
+        "href": "mailto:legal@thelonggame.app"
+      }
+    ],
+    "inputs": []
+  }
+}

@@ -299,7 +299,7 @@ export function ManualVo2maxInputScreen({
         <QuestionScreen onBack={onBack}>
             <QuestionHeader
                 title="Enter your VO2max"
-                subtitle="Use the number from your watch or Garmin Connect profile."
+                subtitle="Use the number from your fitness watch or running app."
             />
 
             <TextInput

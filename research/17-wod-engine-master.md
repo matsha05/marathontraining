@@ -639,3 +639,178 @@ tier_selection:
 ---
 
 *Sources: CompTrain, HWPO, Mayhem, Linchpin, Functional Bodybuilding, CrossFit Programming Guidance, DOMS/Neuromuscular Fatigue Research*
+
+---
+
+## 11. Equipment Substitution Matrix
+
+### Equipment Tier Definitions
+
+| Tier | Name | Equipment Included |
+|------|------|-------------------|
+| **A** | Full Gym | Rower, Ski, Bike, Sled, Rings, Barbell, KB, DBs, Pull-up bar, Sandbag |
+| **B** | Home Gym | Bike OR Rower, Barbell, KB, DBs, Pull-up bar |
+| **C** | Minimal | KB, DBs, Pull-up bar, Jump rope |
+| **D** | Bodyweight | Pull-up bar only (optional), Floor space |
+
+### Cardio Equipment Substitutions
+
+| Primary | Tier B Sub | Tier C Sub | Tier D Sub |
+|---------|------------|------------|------------|
+| Ski Erg | Bike OR Row | Jump rope 2:1 ratio | Mountain climbers 3:1 |
+| Rower | Bike | Jump rope 1.5:1 | Burpees (cals → reps) |
+| Assault Bike | Any erg OR Run | Jump rope | High knees + burpees |
+| Sled Push | Bike (hard gear) OR Row | Plate push OR KB swings | Bear crawls |
+| Sled Pull | Row | Band rows OR KB rows | Inverted rows |
+
+**Time/Cal Conversion Ratios:**
+- Ski → Bike: Same time or 0.8x cals
+- Row → Bike: Same time or 0.9x cals  
+- Jump rope: 2x the erg time (30s row → 60s jump rope)
+- Running: 400m ≈ 15 cal erg
+
+### Implement Substitutions
+
+| Primary | Tier B Sub | Tier C Sub |
+|---------|------------|------------|
+| Sandbag carry | DB farmer carry | KB goblet carry |
+| Ring row | Barbell bent row | DB rows |
+| Ring dip | Bench dip | Push-up |
+| Farmer carry | Same | Same (lighter load) |
+
+### Load Adjustments by Tier
+
+```yaml
+load_scaling:
+  tier_b:
+    barbells: "use DB equivalent at 70% total load"
+  tier_c:
+    heavy_compounds: "KB or DB at manageable load"
+    focus: "time under tension over absolute load"
+  tier_d:
+    all_loading: "bodyweight progressions"
+    tempo: "slow eccentrics to increase difficulty"
+```
+
+---
+
+## 12. WOD Equipment Requirements
+
+| WOD# | Primary Equipment | Tier B Available | Tier C Available | Tier D Available |
+|------|-------------------|------------------|------------------|------------------|
+| 01 | Sled, Ski, Farmer | ✗ (needs sled) | ✗ | ✗ |
+| 02 | Bike, Rings, Push-up | ✓ | ✓ (sub jump rope) | ✓ |
+| 03 | Bike, Pull-up, DB | ✓ | ✓ | ✗ |
+| 04 | Row, KB, Plank | ✓ | ✓ | ✓ |
+| 05 | Bike | ✓ | ✓ (jump rope) | ✓ (high knees) |
+| 06 | Row | ✓ | ✓ | ✗ |
+| 07 | Farmer weights | ✓ | ✓ | ✗ |
+| 08 | Trap bar, DB, Bike | ✓ | ✓ (KB) | ✗ |
+| 09 | Ski, Pull-up, Push-up | ✓ | ✓ | ✓ |
+| 10 | Sled | ✗ | ✗ | ✗ |
+| 11 | DB, Bike | ✓ | ✓ | ✓ (step-up) |
+| 12 | Squat, Pull-up, Row | ✓ | ✓ | ✓ |
+| 13 | Ski, Row, Bike, Carry | ✓ | ✓ | ✓ |
+| 14 | Row, Press, Ring row | ✓ | ✓ | ✓ |
+| 15 | Bike, Push-up, Row | ✓ | ✓ | ✓ |
+| 16 | Sandbag, Row/Bike | ✓ | ✓ | ✗ |
+| 17 | Bike | ✓ | ✓ | ✓ |
+| 18 | Row, Plank | ✓ | ✓ | ✓ |
+| 19 | Ski | ✓ | ✓ | ✗ |
+| 20 | Sled | ✗ | ✗ | ✗ |
+| 21 | Sled | ✗ | ✗ | ✗ |
+| 22 | Row | ✓ | ✓ | ✗ |
+| 23 | Bench, RDL, Bike | ✓ | ✓ | ✗ |
+| 24 | Row, Push press, Ring | ✓ | ✓ | ✓ |
+
+**Availability Summary:**
+- Tier A (Full): 24/24 WODs
+- Tier B (Home): 20/24 WODs  
+- Tier C (Minimal): 16/24 WODs
+- Tier D (Bodyweight): 10/24 WODs
+
+---
+
+## 13. Minimal Equipment WOD Variants
+
+For Tier C/D athletes, here are **6 additional bodyweight-friendly WODs**:
+
+### WOD_25: Bodyweight Engine Builder (20 min)
+**Type:** AEROBIC_MIXED_MODAL | **Fatigue:** Green | **Equipment:** None
+
+| Tier | Prescription |
+|------|--------------|
+| **Rx** | AMRAP 20: 10 burpees, 15 push-ups, 20 air squats, 400m run |
+| **Scaled** | AMRAP 20: 8 burpees, 12 push-ups, 15 air squats, 300m run |
+| **Beginner** | AMRAP 15: 5 burpees (step-out), 10 incline push-ups, 12 squats, 200m run/walk |
+
+### WOD_26: Jump Rope Threshold (18 min)
+**Type:** THRESHOLD_MACHINE | **Fatigue:** Green | **Equipment:** Jump rope
+
+| Tier | Prescription |
+|------|--------------|
+| **Rx** | 6 rounds: 2:00 jump rope @RPE 8, 1:00 rest |
+| **Scaled** | 6 rounds: 1:30 jump rope, 1:00 rest |
+| **Beginner** | 6 rounds: 1:00 singles, 1:30 rest |
+
+### WOD_27: Pull-up + Hollow EMOM (20 min)
+**Type:** STRENGTH_LOW_VOL | **Fatigue:** Green | **Equipment:** Pull-up bar
+
+| Tier | Prescription |
+|------|--------------|
+| **Rx** | EMOM 20: Odd - 8 pull-ups, Even - 30s hollow hold |
+| **Scaled** | EMOM 20: Odd - 6 jumping pull-ups, Even - 20s hollow |
+| **Beginner** | EMOM 16: Odd - 8 ring rows, Even - 20s dead bug |
+
+### WOD_28: KB Flow Conditioning (25 min)
+**Type:** AEROBIC_MIXED_MODAL | **Fatigue:** Yellow | **Equipment:** KB only
+
+| Tier | Prescription |
+|------|--------------|
+| **Rx** | 5 rounds: 15 KB swings, 10 goblet squats, 10 KB deadlift, 200m run, Rest 1:00 |
+| **Scaled** | 5 rounds: 12 swings, 8 goblet squats, 8 DL, 150m run |
+| **Beginner** | 4 rounds: 10 swings, 8 squats, 8 DL, 100m walk/jog |
+
+### WOD_29: Plyo + Core Circuit (15 min)
+**Type:** ALACTIC_POWER | **Fatigue:** Yellow | **Equipment:** None | **Phase:** BASE only
+
+| Tier | Prescription |
+|------|--------------|
+| **Rx** | 5 rounds: 10 jump squats, 10 plyo push-ups, 20 mountain climbers, 30s plank |
+| **Scaled** | 5 rounds: 8 jump squats, 10 push-ups, 15 mountain climbers, 25s plank |
+| **Beginner** | 4 rounds: 8 air squats, 8 incline push-ups, 12 mountain climbers, 20s plank |
+
+### WOD_30: DB Complex Grind (30 min)
+**Type:** AEROBIC_MIXED_MODAL | **Fatigue:** Yellow | **Equipment:** DBs only
+
+| Tier | Prescription |
+|------|--------------|
+| **Rx** | AMRAP 30: 8 DB snatch (alt), 8 DB push press, 8 DB front squat, 400m run |
+| **Scaled** | AMRAP 30: 6 each movement, 300m run |
+| **Beginner** | AMRAP 25: 5 each movement, 200m run |
+
+---
+
+## 14. Equipment Onboarding Question
+
+```yaml
+equipment_question:
+  prompt: "What conditioning equipment do you have access to?"
+  options:
+    - id: "full_gym"
+      label: "Full gym (rower, ski, bike, sleds)"
+      tier: "A"
+    - id: "home_gym"
+      label: "Home gym (bike or rower, barbell, KB/DBs)"
+      tier: "B"
+    - id: "minimal"
+      label: "Minimal (KB, dumbbells, jump rope)"
+      tier: "C"
+    - id: "bodyweight"
+      label: "Bodyweight only"
+      tier: "D"
+```
+
+---
+
+*Sources: CompTrain, HWPO, Mayhem, Linchpin, Functional Bodybuilding, CrossFit Programming Guidance, DOMS/Neuromuscular Fatigue Research*

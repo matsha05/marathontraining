@@ -44,6 +44,7 @@ import { calculateVdotFromRace, vdotFromVO2max } from '@/domain/vdot/vdot-estima
 
 // Screen components
 import { WelcomeScreen, NameScreen, DemographicsScreen } from '@/components/onboarding/screens/identity';
+import { PhilosophyScreen } from '@/components/onboarding/screens/philosophy';
 import { TrainingGoalScreen, RaceDetailsScreen, FitnessDurationScreen } from '@/components/onboarding/screens/goal';
 import {
     CalibrationMethodScreen,
@@ -229,15 +230,7 @@ function OnboardingContent() {
     useEffect(() => {
         setMounted(true);
 
-        // Check for philosophy selected from quiz (before auth)
-        const selectedPhilosophy = localStorage.getItem('selected-philosophy');
-        if (selectedPhilosophy && ['hansons', 'higdon', 'pfitzinger', 'daniels'].includes(selectedPhilosophy)) {
-            setData(prev => ({
-                ...prev,
-                trainingPhilosophy: selectedPhilosophy as 'hansons' | 'higdon' | 'pfitzinger' | 'daniels'
-            }));
-            localStorage.removeItem('selected-philosophy'); // Clear after use
-        }
+        // Philosophy is now integrated into onboarding flow - no localStorage handoff needed
 
         const saved = loadOnboardingProgress();
         if (saved && saved.step !== 'welcome' && saved.step !== 'complete') {
@@ -336,6 +329,17 @@ function OnboardingContent() {
                 {/* WELCOME */}
                 {step === 'welcome' && (
                     <WelcomeScreen onContinue={goToNext} />
+                )}
+
+                {/* PHILOSOPHY - Full premium quiz experience */}
+                {step === 'philosophy' && (
+                    <PhilosophyScreen
+                        onSelect={(philosophy) => {
+                            setData(prev => ({ ...prev, trainingPhilosophy: philosophy }));
+                            goToNext();
+                        }}
+                        onBack={goBack}
+                    />
                 )}
 
                 {/* IDENTITY */}

@@ -10,8 +10,9 @@
 // =============================================================================
 
 export type OnboardingStep =
-    // Phase 1: Welcome
+    // Phase 1: Welcome & Philosophy
     | 'welcome'
+    | 'philosophy'
 
     // Phase 2: Identity
     | 'name'
@@ -246,6 +247,9 @@ export function getNextStep(
 ): OnboardingStep {
     switch (currentStep) {
         case 'welcome':
+            return 'philosophy';
+
+        case 'philosophy':
             return 'name';
 
         case 'name':
@@ -341,8 +345,11 @@ export function getPreviousStep(
         case 'welcome':
             return null; // Can't go back from welcome
 
-        case 'name':
+        case 'philosophy':
             return 'welcome';
+
+        case 'name':
+            return 'philosophy';
 
         case 'demographics':
             return 'name';
@@ -433,7 +440,8 @@ export function getPreviousStep(
 
 const STEP_PROGRESS: Record<OnboardingStep, number> = {
     'welcome': 0,
-    'name': 5,
+    'philosophy': 3,
+    'name': 6,
     'demographics': 10,
     'training-goal': 15,
     'race-details': 20,

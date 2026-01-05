@@ -36,6 +36,9 @@ import {
     buildWorkout,
     WorkoutTemplate,
 } from './workouts/templates';
+import { generateStrengthWorkout, getStrengthPhaseConfig, getDicharryHipCircuit } from './strength-engine';
+import { StrengthWorkout, DurabilityModule, WodWorkout, DailyDurabilityRoutine } from './types';
+import { getDailyDurabilityModule, getDailyDurabilityRoutine } from './durability-modules';
 
 // =============================================================================
 // MAIN GENERATOR FUNCTION
@@ -188,6 +191,102 @@ function generateWeek(
 }
 
 // =============================================================================
+// STRENGTH SCHEDULING
+// =============================================================================
+
+/**
+ * Schedule strength workout for a specific day.
+ * Rules from research (09-strength-protocols-for-runners.md):
+ * - Place strength on quality run days (after run) so easy days stay easy
+ * - Avoid strength day before long run
+ * - BASE/BUILD: 2 sessions/week, PEAK: 1 session/week, TAPER: 0-1
+ */
+function scheduleStrengthForDay(
+    phase: TrainingPhase,
+    dayType: 'rest' | 'easy' | 'quality' | 'long' | 'easy_strides',
+    dayOfWeek: number,
+    input: PlanGenerationInput
+): StrengthWorkout | null {
+    // Skip if user opted out of strength
+    if (!input.includeStrength) {
+        return null;
+    }
+
+    const config = getStrengthPhaseConfig(phase);
+
+    // Rest days: no strength (user should rest)
+    if (dayType === 'rest') {
+        return null;
+    }
+
+    // Long run days: no strength (protect the key run)
+    if (dayType === 'long') {
+        return null;
+    }
+
+    // Determine equipment level
+    const equipment: 'none' | 'minimal' | 'gym' =
+        input.strengthBackground === 'advanced' ? 'gym' :
+            input.strengthBackground === 'intermediate' ? 'minimal' : 'minimal';
+
+    // Research rule: Quality days get strength (hard day stacking)
+    if (dayType === 'quality') {
+        // Tuesday (2) = Session 1, Thursday (4) = Session 2
+        const sessionNumber: 1 | 2 = dayOfWeek <= 2 ? 1 : 2;
+
+        // Check if we should have this session based on phase
+        if (phase === 'taper' && sessionNumber === 2) {
+            // Taper: only 1 session per week max
+            return null;
+        }
+        if (phase === 'peak' && sessionNumber === 2) {
+            // Peak: 1 session per week
+            return null;
+        }
+
+        return generateStrengthWorkout(phase, equipment, sessionNumber);
+    }
+
+    // Easy + strides days: optional hip circuit for durability
+    if (dayType === 'easy_strides' && (phase === 'base' || phase === 'build')) {
+        // Only on one day per week (typically Sunday = 0 or Friday = 5)
+        if (dayOfWeek === 0 || dayOfWeek === 5) {
+            return getDicharryHipCircuit();
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Schedule durability module for a specific day.
+ * Rules from research (04-starrett-dicharry-durability.md):
+ * - Quality days: minimal (readiness scan only)
+ * - Easy days: control module (core, foot)
+ * - Rest days: mobility work if available
+ * - Long run days: pre-run readiness scan
+ */
+function scheduleDurabilityForDay(
+    dayType: 'rest' | 'easy' | 'quality' | 'long' | 'easy_strides'
+): DurabilityModule | undefined {
+    // Map day types to the getDailyDurabilityModule function
+    const mappedType = dayType === 'easy_strides' ? 'easy' : dayType;
+    const module = getDailyDurabilityModule(mappedType as 'quality' | 'easy' | 'rest' | 'long');
+    return module || undefined;
+}
+
+/**
+ * Schedule FULL durability routine for a specific day.
+ * Returns the complete 8-12 min routine per research (04-starrett-dicharry-durability.md).
+ */
+function scheduleDurabilityRoutineForDay(
+    dayType: 'rest' | 'easy' | 'quality' | 'long' | 'easy_strides'
+): DailyDurabilityRoutine | undefined {
+    const mappedType = dayType === 'easy_strides' ? 'easy' : dayType;
+    return getDailyDurabilityRoutine(mappedType as 'quality' | 'easy' | 'rest' | 'long');
+}
+
+// =============================================================================
 // DAY GENERATOR
 // =============================================================================
 
@@ -248,7 +347,15 @@ function generateWeekDays(
             date,
             dayOfWeek: i,
             runWorkout,
-            strengthWorkout: null, // TODO: Add strength integration
+            strengthWorkout: scheduleStrengthForDay(
+                phase,
+                dayInfo.type,
+                i,
+                input
+            ),
+            durabilityModule: scheduleDurabilityForDay(dayInfo.type),
+            durabilityRoutine: scheduleDurabilityRoutineForDay(dayInfo.type),
+            // wodWorkout: opt-in via includeConditioning (not auto-scheduled)
             isKeyDay,
             totalMiles: runWorkout?.totalDistance ?? 0,
             qualityMiles: runWorkout?.qualityMiles ?? 0,

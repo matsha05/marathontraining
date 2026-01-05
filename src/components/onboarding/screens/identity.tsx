@@ -51,27 +51,27 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
                     Get Started
                 </button>
 
-                <div className="flex flex-wrap justify-center gap-4 mt-12">
+                <div className="flex flex-wrap justify-center gap-3 mt-12">
                     <div
-                        className="v2-card px-4 py-3 text-center"
-                        style={{ background: 'var(--v2-bg-elevated)' }}
+                        className="v2-card px-5 py-4 text-center"
+                        style={{ background: 'var(--v2-bg-elevated)', borderColor: 'var(--v2-accent-subtle)' }}
                     >
-                        <p className="v2-label v2-accent">Trusted</p>
-                        <p className="v2-body-sm">2,400+ athletes trained</p>
+                        <p className="v2-heading-sm v2-accent">Research-Backed</p>
+                        <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>Pfitzinger, Daniels, Hansons</p>
                     </div>
                     <div
-                        className="v2-card px-4 py-3 text-center"
+                        className="v2-card px-5 py-4 text-center"
                         style={{ background: 'var(--v2-bg-elevated)' }}
                     >
-                        <p className="v2-label" style={{ color: 'var(--v2-secondary)' }}>Built on</p>
-                        <p className="v2-body-sm">12 coach-backed standards</p>
+                        <p className="v2-heading-sm" style={{ color: 'var(--v2-text-secondary)' }}>Precision Paces</p>
+                        <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>VDOT-calibrated training</p>
                     </div>
                     <div
-                        className="v2-card px-4 py-3 text-center"
+                        className="v2-card px-5 py-4 text-center"
                         style={{ background: 'var(--v2-bg-elevated)' }}
                     >
-                        <p className="v2-label" style={{ color: 'var(--v2-tertiary)' }}>Sync ready</p>
-                        <p className="v2-body-sm">Garmin export + Strava</p>
+                        <p className="v2-heading-sm" style={{ color: 'var(--v2-text-secondary)' }}>Strava Sync</p>
+                        <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>Auto-track your progress</p>
                     </div>
                 </div>
 
