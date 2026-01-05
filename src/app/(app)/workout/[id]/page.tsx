@@ -9,6 +9,7 @@ import { useAuth } from '@/domain/auth/context';
 import { DayPlan, Workout, TrainingZone } from '@/domain/plan/types';
 import { WorkoutSkeleton } from '@/components/ui/Skeleton';
 import { formatPace, formatPaceRange, getPaceForZone, formatDuration } from '@/lib/format';
+import { paceZoneToHRZone, estimateMaxHR } from '@/domain/hr/zones';
 
 /**
  * Workout Detail Page
@@ -37,9 +38,35 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
     const resolvedParams = use(params);
     const router = useRouter();
     const { plan, currentWeek, currentWeekPlan, todayWorkout } = usePlan();
+    const { athleteId } = useAuth();
     const [showLogging, setShowLogging] = useState(false);
     const [workout, setWorkout] = useState<DayPlan | null>(null);
     const [loading, setLoading] = useState(true);
+    const [athleteAge, setAthleteAge] = useState<number | null>(null);
+    const [maxHR, setMaxHR] = useState<number | null>(null);
+
+    // Fetch athlete age for HR zones
+    useEffect(() => {
+        const fetchAthleteAge = async () => {
+            if (!athleteId) return;
+            try {
+                const { createSupabaseBrowserClient } = await import('@/infrastructure/supabase');
+                const supabase = createSupabaseBrowserClient();
+                const { data } = await supabase
+                    .from('athletes')
+                    .select('age')
+                    .eq('id', athleteId)
+                    .single();
+                if (data?.age) {
+                    setAthleteAge(data.age);
+                    setMaxHR(estimateMaxHR(data.age));
+                }
+            } catch (e) {
+                console.warn('Failed to fetch athlete age:', e);
+            }
+        };
+        fetchAthleteAge();
+    }, [athleteId]);
 
     // Find the workout from the plan
     useEffect(() => {
@@ -235,6 +262,11 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
                                             >
                                                 {pace}{segment.pace !== 'E' ? '/mi' : ''}
                                             </p>
+                                            {maxHR && segment.pace && (
+                                                <p className="text-[10px]" style={{ color: 'var(--v2-text-subtle)' }}>
+                                                    ❤️ {paceZoneToHRZone(segment.pace, maxHR).min}-{paceZoneToHRZone(segment.pace, maxHR).max} bpm
+                                                </p>
+                                            )}
                                             <p className="text-[10px]" style={{ color: 'var(--v2-text-muted)' }}>{duration}</p>
                                         </div>
                                     </div>

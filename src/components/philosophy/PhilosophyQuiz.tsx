@@ -21,9 +21,10 @@ import { RecommendationScreen } from './RecommendationScreen';
  * 100% token usage, zero hardcoded colors
  */
 
-type QuestionStep = 'distance' | 'timing' | 'days' | 'experience' | 'mileage' | 'mindset' | 'result';
+type QuestionStep = 'distance' | 'timing' | 'date_input' | 'days' | 'experience' | 'mileage' | 'mindset' | 'result';
 
-const STEP_ORDER: QuestionStep[] = ['distance', 'timing', 'days', 'experience', 'mileage', 'mindset', 'result'];
+// Base step order (date_input is conditionally inserted)
+const BASE_STEP_ORDER: QuestionStep[] = ['distance', 'timing', 'days', 'experience', 'mileage', 'mindset', 'result'];
 
 interface PhilosophyQuizProps {
     onComplete: (philosophy: string) => void;
@@ -33,6 +34,11 @@ interface PhilosophyQuizProps {
 export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
     const [step, setStep] = useState<QuestionStep>('distance');
     const [answers, setAnswers] = useState<QuizAnswers>(INITIAL_QUIZ_ANSWERS);
+
+    // Dynamic step order based on timing selection
+    const STEP_ORDER = answers.raceTiming === 'specific'
+        ? ['distance', 'timing', 'date_input', 'days', 'experience', 'mileage', 'mindset', 'result'] as QuestionStep[]
+        : BASE_STEP_ORDER;
 
     const currentIndex = STEP_ORDER.indexOf(step);
     const progress = ((currentIndex) / (STEP_ORDER.length - 1)) * 100;
@@ -58,7 +64,17 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
 
     const handleTimingSelect = (value: RaceTiming) => {
         setAnswers(prev => ({ ...prev, raceTiming: value }));
-        goNext();
+        // If specific date selected, go to date input; otherwise go to days
+        if (value === 'specific') {
+            setStep('date_input');
+        } else {
+            setStep('days');
+        }
+    };
+
+    const handleDateSelect = (date: string) => {
+        setAnswers(prev => ({ ...prev, raceDate: date }));
+        setStep('days');
     };
 
     const handleDaysSelect = (value: DaysPerWeek) => {
@@ -87,14 +103,21 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
         <div className="v2-root min-h-screen" style={{ background: 'var(--v2-bg-deep)', color: 'var(--v2-text-primary)' }}>
             {/* Progress bar */}
             {step !== 'result' && (
-                <div className="fixed top-0 left-0 right-0 z-50 h-1" style={{ background: 'var(--v2-border)' }}>
-                    <motion.div
-                        className="h-full"
-                        style={{ background: 'var(--v2-accent)' }}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${progress}%` }}
-                        transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
-                    />
+                <div className="fixed top-0 left-0 right-0 z-50">
+                    <div className="h-1" style={{ background: 'var(--v2-border)' }}>
+                        <motion.div
+                            className="h-full"
+                            style={{ background: 'var(--v2-accent)' }}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${progress}%` }}
+                            transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
+                        />
+                    </div>
+                    <div className="v2-container py-2">
+                        <p className="v2-mono text-center" style={{ fontSize: '11px', color: 'var(--v2-text-muted)' }}>
+                            Step {currentIndex + 1} of 6
+                        </p>
+                    </div>
                 </div>
             )}
 
@@ -132,6 +155,57 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                         onSelect={handleTimingSelect}
                         onBack={goBack}
                     />
+                )}
+
+                {/* Question 2b: Date Input (only when specific timing selected) */}
+                {step === 'date_input' && (
+                    <motion.div
+                        key="date_input"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.24, ease: [0.2, 0.8, 0.2, 1] }}
+                        className="min-h-screen flex flex-col items-center justify-center px-6 py-16"
+                    >
+                        <button
+                            onClick={goBack}
+                            className="fixed top-8 left-6 text-sm transition-colors"
+                            style={{ color: 'var(--v2-text-subtle)' }}
+                        >
+                            ← Back
+                        </button>
+                        <div className="max-w-xl w-full text-center">
+                            <h1
+                                className="text-3xl md:text-4xl font-light mb-4"
+                                style={{ color: 'var(--v2-text-primary)' }}
+                            >
+                                When is race day?
+                            </h1>
+                            <p
+                                className="text-lg mb-8"
+                                style={{ color: 'var(--v2-text-muted)' }}
+                            >
+                                We&apos;ll calculate how many weeks you have to train.
+                            </p>
+                            <input
+                                type="date"
+                                className="v2-input text-center text-lg py-4 px-6 w-full max-w-xs mx-auto"
+                                style={{ background: 'var(--v2-bg-elevated)', border: '1px solid var(--v2-border)' }}
+                                min={new Date().toISOString().split('T')[0]}
+                                onChange={(e) => {
+                                    if (e.target.value) {
+                                        handleDateSelect(e.target.value);
+                                    }
+                                }}
+                            />
+                            <p
+                                className="text-sm mt-4"
+                                style={{ color: 'var(--v2-text-subtle)' }}
+                            >
+                                Pick your target race date
+                            </p>
+                        </div>
+                    </motion.div>
                 )}
 
                 {/* Question 3: Days per week */}

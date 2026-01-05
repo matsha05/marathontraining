@@ -16,6 +16,8 @@ import { InsightsCard } from '@/components/insights/InsightsCard';
 import { WorkoutLog } from '@/domain/insights';
 import { formatPace, getDayName, getFullDayName } from '@/lib/format';
 import { motion } from 'framer-motion';
+import { PacesCard } from '@/components/paces/PacesCard';
+import { RecalibrationModal } from '@/components/vdot/RecalibrationModal';
 
 /**
  * THE LONG GAME - Dashboard V2
@@ -49,6 +51,7 @@ interface DayOverview {
 interface Athlete {
     name: string;
     vdot: number;
+    age: number | null;
 }
 
 // =============================================================================
@@ -104,6 +107,21 @@ export default function DashboardPage() {
     const [streak, setStreak] = useState(0);
     const [workoutLogs, setWorkoutLogs] = useState<WorkoutLog[]>([]);
     const [dataLoading, setDataLoading] = useState(true);
+    const [showRecalibrationModal, setShowRecalibrationModal] = useState(false);
+    const [displayVdotOverride, setDisplayVdotOverride] = useState<number | null>(null);
+
+    // Handle VDOT recalibration
+    const handleRecalibrate = async (newVdot: number) => {
+        // Update local state immediately for responsive UI
+        setDisplayVdotOverride(newVdot);
+
+        // TODO: Persist to database and update plan paces
+        // For now, this updates the UI. Full DB integration would:
+        // 1. Update athlete.vdot in database
+        // 2. Recalculate paces for future workouts
+        // 3. Trigger plan context refresh
+        console.log('VDOT updated to:', newVdot);
+    };
 
     // Fetch athlete data on mount
     useEffect(() => {
@@ -127,11 +145,13 @@ export default function DashboardPage() {
                     setAthlete({
                         name: athleteData.name || user?.email?.split('@')[0] || 'Athlete',
                         vdot: plan?.vdot || 45,
+                        age: athleteData.age || null,
                     });
                 } else if (plan) {
                     setAthlete({
                         name: plan.athleteName || user?.email?.split('@')[0] || 'Athlete',
                         vdot: plan.vdot,
+                        age: null,
                     });
                 }
 
@@ -202,12 +222,7 @@ export default function DashboardPage() {
         }
     }, [status, plan, router, authStatus]);
 
-    // Show skeleton during initial load
-    if (status === 'loading' || authStatus === 'loading' || (dataLoading && !athlete)) {
-        return <DashboardSkeletonV2 />;
-    }
-
-    // Build today's workouts from plan data
+    // Build today's workouts from plan data - MUST be before any conditional returns
     const todaysWorkouts = useMemo<DashboardWorkout[]>(() => {
         if (!todayWorkout) return [];
 
@@ -251,7 +266,7 @@ export default function DashboardPage() {
         return workouts;
     }, [todayWorkout, plan]);
 
-    // Build week overview from plan data
+    // Build week overview from plan data - MUST be before any conditional returns
     const weekOverview = useMemo<DayOverview[]>(() => {
         if (!currentWeekPlan) {
             return [0, 1, 2, 3, 4, 5, 6].map(i => ({
@@ -307,8 +322,13 @@ export default function DashboardPage() {
         });
     }, [currentWeekPlan]);
 
+    // Show skeleton during initial load - AFTER all hooks are declared
+    if (status === 'loading' || authStatus === 'loading' || (dataLoading && !athlete)) {
+        return <DashboardSkeletonV2 />;
+    }
+
     const displayName = athlete?.name || plan?.athleteName || 'Athlete';
-    const displayVdot = athlete?.vdot || plan?.vdot || 45;
+    const displayVdot = displayVdotOverride || athlete?.vdot || plan?.vdot || 45;
     const displayReadiness = readinessScore ?? 85;
 
     return (
@@ -549,6 +569,20 @@ export default function DashboardPage() {
                     </div>
                 </motion.section>
 
+                {/* Training Zones & Paces */}
+                <motion.section
+                    className="mt-10"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.38 }}
+                >
+                    <PacesCard
+                        vdot={displayVdot}
+                        age={athlete?.age}
+                        onRecalibrate={() => setShowRecalibrationModal(true)}
+                    />
+                </motion.section>
+
                 {/* Training Insights */}
                 <motion.section
                     className="mt-10"
@@ -560,6 +594,14 @@ export default function DashboardPage() {
                     <InsightsCard workoutLogs={workoutLogs} />
                 </motion.section>
             </main>
+
+            {/* Recalibration Modal */}
+            <RecalibrationModal
+                isOpen={showRecalibrationModal}
+                currentVdot={displayVdot}
+                onClose={() => setShowRecalibrationModal(false)}
+                onConfirm={handleRecalibrate}
+            />
         </div>
     );
 }

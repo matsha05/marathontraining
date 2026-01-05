@@ -219,10 +219,10 @@ export default function PlanPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.3, delay: i * 0.05 }}
                                 className={`flex-1 min-w-[100px] p-4 rounded-xl transition-all ${phase.status === 'current'
-                                        ? 'v2-card-accent'
-                                        : phase.status === 'completed'
-                                            ? 'v2-card opacity-60'
-                                            : 'v2-card'
+                                    ? 'v2-card-accent'
+                                    : phase.status === 'completed'
+                                        ? 'v2-card opacity-60'
+                                        : 'v2-card'
                                     }`}
                                 style={{
                                     background: phase.status === 'current' ? 'var(--v2-bg-active)' : 'var(--v2-bg-elevated)',
@@ -256,10 +256,6 @@ export default function PlanPage() {
                             >
                                 <Link
                                     href={`/plan/week/${week.number}`}
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        setSelectedWeek(week.number);
-                                    }}
                                     className={`v2-card v2-card-interactive p-5 block ${selectedWeek === week.number ? 'v2-card-selected' : ''
                                         } ${week.isCurrent ? 'ring-2 ring-[var(--v2-accent)] ring-offset-2 ring-offset-[var(--v2-bg-base)]' : ''}`}
                                 >

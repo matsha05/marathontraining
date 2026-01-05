@@ -16,20 +16,17 @@ import { motion } from 'framer-motion';
 interface ProfileData {
     name: string;
     email: string;
-    weight: number | null;
     age: number | null;
 }
 
 export default function SettingsPage() {
     const router = useRouter();
     const { plan } = usePlan();
-    const [darkMode, setDarkMode] = useState(true);
 
     // Profile state
     const [profile, setProfile] = useState<ProfileData>({
         name: '',
         email: '',
-        weight: null,
         age: null,
     });
     const [profileLoading, setProfileLoading] = useState(true);
@@ -86,7 +83,6 @@ export default function SettingsPage() {
                 setProfile({
                     name: athlete?.name || user.user_metadata?.name || email.split('@')[0] || '',
                     email,
-                    weight: null,
                     age: athlete?.age || null,
                 });
             } catch (error) {
@@ -371,27 +367,15 @@ export default function SettingsPage() {
                                     />
                                     <span className="v2-form-hint">Email cannot be changed here</span>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="v2-form-group">
-                                        <label className="v2-form-label">Weight (kg)</label>
-                                        <input
-                                            type="number"
-                                            value={profile.weight || ''}
-                                            onChange={(e) => setProfile({ ...profile, weight: e.target.value ? Number(e.target.value) : null })}
-                                            className="v2-input"
-                                            placeholder="—"
-                                        />
-                                    </div>
-                                    <div className="v2-form-group">
-                                        <label className="v2-form-label">Age</label>
-                                        <input
-                                            type="number"
-                                            value={profile.age || ''}
-                                            onChange={(e) => setProfile({ ...profile, age: e.target.value ? Number(e.target.value) : null })}
-                                            className="v2-input"
-                                            placeholder="—"
-                                        />
-                                    </div>
+                                <div className="v2-form-group">
+                                    <label className="v2-form-label">Age</label>
+                                    <input
+                                        type="number"
+                                        value={profile.age || ''}
+                                        onChange={(e) => setProfile({ ...profile, age: e.target.value ? Number(e.target.value) : null })}
+                                        className="v2-input"
+                                        placeholder="—"
+                                    />
                                 </div>
 
                                 <div className="pt-2">
