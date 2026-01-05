@@ -43,6 +43,10 @@ import {
 } from 'lucide-react';
 import { AppHeader } from '@/components/ui/AppHeader';
 import {
+    PrescriptionModuleCard,
+    PrescriptionSummaryHeader,
+} from '@/components/durability/PrescriptionModuleCard';
+import {
     getAllAssessments,
     getModulesForFailedAssessments,
     DurabilityAssessment,
@@ -533,67 +537,71 @@ export default function DurabilityPage() {
 
                             {/* Prescription */}
                             {prescribedModules.length === 0 ? (
-                                <div className="v2-card p-8 text-center" style={{ borderColor: 'var(--v2-accent)' }}>
-                                    <Sparkles size={48} className="text-[var(--v2-accent)] mx-auto mb-4" />
-                                    <h2 className="text-xl font-light mb-2">Outstanding Durability</h2>
-                                    <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
-                                        All assessments passed. Maintain with general strength work and
-                                        retest weekly to catch any changes before they become problems.
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ duration: 0.5 }}
+                                    className="relative overflow-hidden rounded-2xl p-8 text-center"
+                                    style={{
+                                        background: 'linear-gradient(135deg, var(--v2-bg-card), var(--v2-bg-elevated))',
+                                        border: '1px solid var(--v2-accent)',
+                                    }}
+                                >
+                                    {/* Glow effect */}
+                                    <div
+                                        className="absolute -top-20 left-1/2 -translate-x-1/2 w-40 h-40 rounded-full blur-3xl"
+                                        style={{ background: 'var(--v2-accent)', opacity: 0.15 }}
+                                    />
+                                    <Sparkles size={48} className="text-[var(--v2-accent)] mx-auto mb-4 relative" />
+                                    <h2 className="text-2xl font-light mb-2 relative">Outstanding Durability</h2>
+                                    <p className="text-sm relative max-w-md mx-auto" style={{ color: 'var(--v2-text-muted)' }}>
+                                        All assessments passed. You've earned maintenance mode.
+                                        Retest weekly to catch any changes before they become problems.
                                     </p>
-                                </div>
+                                </motion.div>
                             ) : (
-                                <div className="v2-card p-6 space-y-6" style={{ borderColor: 'var(--v2-accent)' }}>
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="v2-label">Your Daily Micro-Dose</p>
-                                            <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
-                                                {prescribedModules.length} module{prescribedModules.length > 1 ? 's' : ''} • ~{totalPrescribedTime} minutes
-                                            </p>
-                                        </div>
-                                    </div>
+                                <div className="space-y-6">
+                                    {/* Premium header */}
+                                    <PrescriptionSummaryHeader
+                                        moduleCount={prescribedModules.length}
+                                        totalMinutes={totalPrescribedTime}
+                                        failCount={failCount}
+                                    />
 
+                                    {/* Module cards */}
                                     <div className="space-y-4">
                                         {prescribedModules.map((mod, index) => (
-                                            <div
+                                            <PrescriptionModuleCard
                                                 key={mod.id}
-                                                className="p-4 rounded-lg"
-                                                style={{ background: 'var(--v2-bg-elevated)' }}
-                                            >
-                                                <div className="flex items-start justify-between mb-3">
-                                                    <div>
-                                                        <span className="text-xs" style={{ color: 'var(--v2-accent)' }}>
-                                                            {index + 1}. {mod.frequency.replace('_', ' ')}
-                                                        </span>
-                                                        <h3 className="font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
-                                                            {mod.name}
-                                                        </h3>
-                                                    </div>
-                                                    <span className="v2-badge">{mod.durationMin} min</span>
-                                                </div>
-                                                <div className="space-y-1">
-                                                    {mod.exercises.map((ex, i) => (
-                                                        <p key={i} className="text-xs" style={{ color: 'var(--v2-text-muted)' }}>
-                                                            • {ex.name}: {ex.sets}×{ex.reps}
-                                                        </p>
-                                                    ))}
-                                                </div>
-                                                <p className="text-[10px] mt-2" style={{ color: 'var(--v2-text-subtle)' }}>
-                                                    Source: {mod.source}
-                                                </p>
-                                            </div>
+                                                module={mod}
+                                                index={index}
+                                            />
                                         ))}
                                     </div>
 
-                                    {/* Dicharry principle reminder */}
-                                    <div className="p-4 rounded-lg" style={{ background: 'rgba(74, 222, 128, 0.05)', borderLeft: '3px solid var(--v2-accent)' }}>
-                                        <p className="text-xs uppercase tracking-widest mb-1" style={{ color: 'var(--v2-accent)' }}>
-                                            RETEST RULE
+                                    {/* Retest rule callout */}
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.5 }}
+                                        className="relative overflow-hidden p-5 rounded-2xl"
+                                        style={{
+                                            background: 'linear-gradient(135deg, rgba(74, 222, 128, 0.05), rgba(74, 222, 128, 0.02))',
+                                            border: '1px solid rgba(74, 222, 128, 0.2)',
+                                        }}
+                                    >
+                                        <div
+                                            className="absolute left-0 top-0 bottom-0 w-1 rounded-l-2xl"
+                                            style={{ background: 'linear-gradient(to bottom, #4ade80, #22c55e)' }}
+                                        />
+                                        <p className="text-xs uppercase tracking-widest mb-2 font-medium" style={{ color: '#4ade80' }}>
+                                            THE RETEST RULE
                                         </p>
                                         <p className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>
-                                            Do these modules daily until you can pass the related assessment,
-                                            then retire them. Small consistent doses beat long sporadic sessions.
+                                            Do these modules daily until you pass the related assessment, then retire them.
+                                            Small consistent doses beat long sporadic sessions. This is Dicharry's "micro-dose" principle.
                                         </p>
-                                    </div>
+                                    </motion.div>
                                 </div>
                             )}
 

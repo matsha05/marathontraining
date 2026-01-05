@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { usePlan } from '@/domain/plan/context';
 import { formatPace, getDayName } from '@/lib/format';
 import { CheckIcon } from '@/components/ui/check';
+import { AppHeader } from '@/components/ui/AppHeader';
+import { Footer } from '@/components/ui/Footer';
 import { motion } from 'framer-motion';
 
 /**
@@ -110,11 +112,7 @@ export default function WeekDetailPage() {
     if (status === 'loading') {
         return (
             <div className="v2-root min-h-screen">
-                <header className="v2-nav sticky top-0 z-50">
-                    <div className="v2-container flex items-center justify-between py-4">
-                        <Link href="/plan" className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>← Back to Plan</Link>
-                    </div>
-                </header>
+                <AppHeader backHref="/plan" title="Back to Plan" />
                 <main className="v2-container py-10">
                     <div className="space-y-4">
                         {[1, 2, 3, 4, 5, 6, 7].map(i => (
@@ -130,11 +128,7 @@ export default function WeekDetailPage() {
     if (!plan || !weekPlan) {
         return (
             <div className="v2-root min-h-screen">
-                <header className="v2-nav sticky top-0 z-50">
-                    <div className="v2-container flex items-center justify-between py-4">
-                        <Link href="/plan" className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>← Back to Plan</Link>
-                    </div>
-                </header>
+                <AppHeader backHref="/plan" title="Back to Plan" />
                 <main className="v2-container py-10">
                     <div className="v2-card p-10 text-center">
                         <h2 className="v2-heading-md mb-4">Week Not Found</h2>
@@ -156,15 +150,16 @@ export default function WeekDetailPage() {
     return (
         <div className="v2-root min-h-screen">
             {/* Header */}
-            <header className="v2-nav sticky top-0 z-50">
-                <div className="v2-container flex items-center justify-between py-4">
-                    <Link href="/plan" className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>← Back to Plan</Link>
+            <AppHeader
+                backHref="/plan"
+                title="Back to Plan"
+                rightContent={
                     <div className="flex items-center gap-2">
                         {isCurrent && <span className="v2-badge v2-badge-accent">Current Week</span>}
                         {weekPlan.isRecoveryWeek && <span className="v2-badge">Cutback</span>}
                     </div>
-                </div>
-            </header>
+                }
+            />
 
             <main className="v2-container py-10">
                 {/* Week Header */}
@@ -317,6 +312,8 @@ export default function WeekDetailPage() {
                     ) : <div />}
                 </motion.div>
             </main>
+
+            <Footer variant="app" />
         </div>
     );
 }

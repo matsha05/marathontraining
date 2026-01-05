@@ -317,12 +317,7 @@ function OnboardingContent() {
     return (
         <>
             {step !== 'welcome' && step !== 'complete' && (
-                <div className="text-center">
-                    <ProgressBar progress={progress} />
-                    <p className="v2-body-sm mt-2" style={{ color: 'var(--v2-text-muted)' }}>
-                        Step {Math.max(1, Math.ceil(progress / 5.5))} of ~18
-                    </p>
-                </div>
+                <ProgressBar progress={progress} />
             )}
 
             <AnimatePresence mode="wait">

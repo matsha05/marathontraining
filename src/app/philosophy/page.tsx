@@ -1,35 +1,28 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { PhilosophyQuiz } from '@/components/philosophy';
 
 /**
- * Philosophy Quiz Page
+ * Philosophy Quiz Page - Now Redirects to Onboarding
  * 
- * Standalone flow that can be accessed:
- * - Pre-auth from landing page
- * - During onboarding  
- * - From settings to change philosophy
+ * The philosophy quiz has been integrated directly into the onboarding flow,
+ * so this page now redirects to /onboarding to maintain any existing links.
  */
 export default function PhilosophyPage() {
     const router = useRouter();
 
-    const handleComplete = (philosophy: string) => {
-        // Store selection and proceed to auth
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('selected-philosophy', philosophy);
-        }
-        router.push('/auth?from=philosophy');
-    };
-
-    const handleSkip = () => {
-        router.push('/auth');
-    };
+    useEffect(() => {
+        // Philosophy is now part of onboarding
+        router.replace('/onboarding');
+    }, [router]);
 
     return (
-        <PhilosophyQuiz
-            onComplete={handleComplete}
-            onSkip={handleSkip}
-        />
+        <div className="v2-root min-h-screen flex items-center justify-center">
+            <div className="text-center">
+                <div className="w-12 h-12 border-2 rounded-full animate-spin mx-auto mb-4" style={{ borderColor: 'var(--v2-accent)', borderTopColor: 'transparent' }} />
+                <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>Redirecting...</p>
+            </div>
+        </div>
     );
 }

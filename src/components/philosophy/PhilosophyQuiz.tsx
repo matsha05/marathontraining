@@ -572,7 +572,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                                 description: 'High volume, structured workouts, chasing PRs'
                             },
                             {
-                                value: 'intermediate' as Experience,
+                                value: 'unsure' as Experience,
                                 label: 'Not sure',
                                 description: 'We\'ll start moderate and calibrate from your mileage'
                             },

@@ -10,7 +10,7 @@ import {
     FOUNDATION_LAYERS,
 } from '@/domain/philosophy/types';
 import { getOverrideWarnings, isPhilosophyAvailableForDistance } from '@/domain/philosophy/recommendation';
-import { getPersonalizedPhilosophyCard } from '@/domain/philosophy/personalized-card';
+import { getPersonalizedPhilosophyCard, getDistanceSpecificPrinciples } from '@/domain/philosophy/personalized-card';
 import { PhilosophyCard } from './PhilosophyCard';
 
 /**
@@ -41,6 +41,12 @@ export function RecommendationScreen({
     const personalizedPrimary = useMemo(() =>
         getPersonalizedPhilosophyCard(recommendation.primary, answers),
         [recommendation.primary, answers]
+    );
+
+    // Get distance-specific principles (replaces marathon-specific text)
+    const personalizedPrinciples = useMemo(() =>
+        getDistanceSpecificPrinciples(recommendation.primary, answers.targetDistance || 'marathon'),
+        [recommendation.primary, answers.targetDistance]
     );
 
     // Distance label for display
@@ -211,8 +217,38 @@ export function RecommendationScreen({
                         personalizedLongRunCap={personalizedPrimary.personalizedLongRunCap}
                         personalizedDuration={personalizedPrimary.personalizedDuration}
                         personalizedKeyWorkouts={personalizedPrimary.personalizedKeyWorkouts}
+                        personalizedPrinciples={personalizedPrinciples}
                         userDistance={distanceLabel}
                     />
+
+                    {/* Tier adjustment context (when auto-downgraded) */}
+                    {personalizedPrimary.tierAdjusted && personalizedPrimary.adjustmentReason && (
+                        <div
+                            className="mt-4 p-4 rounded-xl border"
+                            style={{
+                                background: 'rgba(59, 130, 246, 0.1)',
+                                borderColor: 'rgba(59, 130, 246, 0.3)'
+                            }}
+                        >
+                            <div className="flex items-start gap-3">
+                                <span style={{ color: 'var(--v2-accent)', marginTop: '2px' }}>ℹ️</span>
+                                <div>
+                                    <p
+                                        className="text-sm font-medium mb-1"
+                                        style={{ color: 'var(--v2-text-secondary)' }}
+                                    >
+                                        Plan adjusted to fit your schedule
+                                    </p>
+                                    <p
+                                        className="text-sm"
+                                        style={{ color: 'var(--v2-text-tertiary)' }}
+                                    >
+                                        {personalizedPrimary.adjustmentReason}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Reasoning */}
                     <div className="v2-card mt-6 p-5">

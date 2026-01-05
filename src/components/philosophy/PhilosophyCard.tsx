@@ -18,6 +18,7 @@ interface PhilosophyCardProps {
     personalizedLongRunCap?: string;
     personalizedDuration?: string;
     personalizedKeyWorkouts?: string[];
+    personalizedPrinciples?: string[];
     userDistance?: string;
 }
 
@@ -29,11 +30,13 @@ export function PhilosophyCard({
     personalizedLongRunCap,
     personalizedDuration,
     personalizedKeyWorkouts,
+    personalizedPrinciples,
     userDistance,
 }: PhilosophyCardProps) {
     // Use personalized values if provided, otherwise fall back to static
     const displayRunDays = personalizedRunDays || philosophy.runDays;
     const displayLongRunCap = personalizedLongRunCap || philosophy.longRunCap;
+    const displayPrinciples = personalizedPrinciples || philosophy.methodology.keyPrinciples;
 
     return (
         <div
@@ -177,7 +180,7 @@ export function PhilosophyCard({
                             Key principles
                         </p>
                         <ul className="space-y-3">
-                            {philosophy.methodology.keyPrinciples.map((principle, i) => (
+                            {displayPrinciples.map((principle, i) => (
                                 <li
                                     key={i}
                                     className="text-sm flex items-start gap-2"

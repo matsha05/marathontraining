@@ -255,7 +255,7 @@ export const FOUNDATION_LAYERS = [
 
 export type TargetDistance = '5k' | '10k' | 'half' | 'marathon' | 'ultra' | 'base';
 export type DaysPerWeek = 3 | 4 | 5 | 6;
-export type Experience = 'beginner' | 'intermediate' | 'advanced';
+export type Experience = 'beginner' | 'intermediate' | 'advanced' | 'unsure';
 export type CurrentMileage = 'under_20' | '20_40' | 'over_40';
 export type Mindset = 'rest_focus' | 'consistency' | 'push_limits';
 export type RaceTiming = 'specific' | 'soon' | 'no_race';

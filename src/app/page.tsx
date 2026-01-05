@@ -59,14 +59,14 @@ export default function LandingPage() {
               Browse
             </Link>
             <Link
-              href="/philosophy"
+              href="/auth"
               className="text-xs transition-colors"
               style={{ color: 'var(--v2-text-muted)' }}
             >
-              Find Your Coach
+              Log In
             </Link>
             <Link
-              href="/auth"
+              href="/onboarding"
               className="text-xs transition-colors"
               style={{ color: 'var(--v2-text-primary)' }}
             >
@@ -165,8 +165,8 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.0, duration: 0.5, ease }}
           >
-            <Link href="/auth" className="v2-btn v2-btn-primary">
-              Build yours
+            <Link href="/onboarding" className="v2-btn v2-btn-primary">
+              Get Started
             </Link>
           </motion.div>
         </div>
@@ -187,10 +187,7 @@ export default function LandingPage() {
         <div className="max-w-3xl mx-auto text-center">
           <p className="text-xs uppercase tracking-widest mb-4" style={{ color: 'var(--v2-text-muted)' }}>Running Science</p>
           <h2 className="text-4xl md:text-5xl font-light mb-4" style={{ color: 'var(--v2-text-primary)' }}>Evidence-based training</h2>
-          <p className="text-lg mb-8" style={{ color: 'var(--v2-text-muted)' }}>7 methodologies. We'll help you find the right one.</p>
-          <Link href="/philosophy" className="v2-btn v2-btn-secondary">
-            Take the quiz →
-          </Link>
+          <p className="text-lg" style={{ color: 'var(--v2-text-muted)' }}>7 methodologies. We'll match you with the right one during setup.</p>
         </div>
       </section>
 
@@ -473,8 +470,8 @@ export default function LandingPage() {
           <p className="text-lg mb-8" style={{ color: 'var(--v2-text-muted)' }}>
             Race on the calendar or just building fitness. We'll meet you where you are.
           </p>
-          <Link href="/auth" className="v2-btn v2-btn-primary v2-btn-lg">
-            Start →
+          <Link href="/onboarding" className="v2-btn v2-btn-primary v2-btn-lg">
+            Get Started →
           </Link>
         </div>
       </section>

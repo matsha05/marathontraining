@@ -145,7 +145,10 @@ export interface DurabilityModule {
 export interface DurabilityExercise {
     name: string;
     dosage: string; // "2:00 hold", "20 reps"
-    cues: string[];
+    cues: string[]; // Quick reminders during exercise
+    instructions?: string[]; // Step-by-step how to perform
+    source?: string; // "Dicharry - Running Rewired" or "Starrett - Ready to Run"
+    videoUrl?: string; // YouTube demonstration link
 }
 
 /**

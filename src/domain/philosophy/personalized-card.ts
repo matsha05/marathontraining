@@ -150,11 +150,75 @@ export interface PersonalizedPhilosophyCard extends PhilosophyMetadata {
     personalizedLongRunCap: string;
     personalizedDuration: string;
     personalizedKeyWorkouts: string[];
+    // Adjustment context (when tier was auto-downgraded)
+    tierAdjusted: boolean;
+    adjustedTier: Experience | null;
+    adjustmentReason: string | null;
+}
+
+/**
+ * Find the best-fitting tier for a user's available days.
+ * Prioritizes the user's selected tier, then downgrades if needed.
+ */
+function findBestFittingTier(
+    coach: TrainingPhilosophy,
+    distance: TargetDistance,
+    preferredTier: Experience,
+    userDays: number
+): { tier: Experience; adjusted: boolean; reason: string | null } {
+    const distanceSpecs = PLAN_SPECS[coach]?.[distance];
+    if (!distanceSpecs) {
+        return { tier: preferredTier, adjusted: false, reason: null };
+    }
+
+    // Check if preferred tier fits
+    const preferredSpec = distanceSpecs[preferredTier];
+    if (preferredSpec && userDays >= preferredSpec.minDays) {
+        return { tier: preferredTier, adjusted: false, reason: null };
+    }
+
+    // Tier priority for downgrade: beginner > intermediate > advanced
+    const tierPriority: Experience[] = ['beginner', 'intermediate', 'advanced'];
+
+    // Find the most demanding tier that the user can handle
+    let bestFit: { tier: Experience; minDays: number } | null = null;
+
+    for (const tier of tierPriority) {
+        const spec = distanceSpecs[tier];
+        if (spec && userDays >= spec.minDays) {
+            // User can handle this tier - take the most demanding one they can do
+            if (!bestFit || spec.minDays > bestFit.minDays) {
+                bestFit = { tier, minDays: spec.minDays };
+            }
+        }
+    }
+
+    if (bestFit) {
+        const originalSpec = preferredSpec;
+        const originalDays = originalSpec?.minDays || 'N/A';
+        return {
+            tier: bestFit.tier,
+            adjusted: true,
+            reason: `Adjusted to ${bestFit.tier} tier to fit your ${userDays}-day schedule. ${preferredTier.charAt(0).toUpperCase() + preferredTier.slice(1)} requires ${originalDays} days/week.`,
+        };
+    }
+
+    // No tier fits - return preferred with a warning
+    const lowestTier = tierPriority.find(t => distanceSpecs[t]);
+    const lowestSpec = lowestTier ? distanceSpecs[lowestTier] : null;
+
+    return {
+        tier: lowestTier || preferredTier,
+        adjusted: true,
+        reason: lowestSpec
+            ? `Your ${userDays} days/week is below the minimum (${lowestSpec.minDays} days) for any ${distance} plan with this coach. Consider a shorter distance or adding a training day.`
+            : null,
+    };
 }
 
 /**
  * Generate a personalized philosophy card based on user's quiz answers.
- * All values are verified against COACHSPEC and research files.
+ * Auto-downgrades tier when days don't fit, with clear context.
  */
 export function getPersonalizedPhilosophyCard(
     coach: TrainingPhilosophy,
@@ -162,25 +226,27 @@ export function getPersonalizedPhilosophyCard(
 ): PersonalizedPhilosophyCard {
     const basePhilosophy = PHILOSOPHIES[coach];
     const distance = answers.targetDistance || 'marathon';
-    const experience = answers.experience || 'intermediate';
+    const preferredExperience = answers.experience || 'intermediate';
     const userDays = answers.daysPerWeek || 4;
 
     // Get verified data for this combination
     const longRunCap = LONG_RUN_CAPS[coach][distance] || basePhilosophy.longRunCap;
 
-    // Get plan spec if available
-    const planSpec = PLAN_SPECS[coach]?.[distance]?.[experience];
+    // Find best-fitting tier with auto-downgrade
+    const tierResult = findBestFittingTier(coach, distance, preferredExperience, userDays);
+    const effectiveTier = tierResult.tier;
 
-    // Determine actual run days (user's selection if meets minimum, otherwise minimum)
+    // Get plan spec for the effective tier
+    const planSpec = PLAN_SPECS[coach]?.[distance]?.[effectiveTier];
+
+    // Determine actual run days and workouts
     let actualDays: string;
     let keyWorkouts: string[];
     let duration: string;
 
     if (planSpec) {
-        const meetsMinimum = userDays >= planSpec.minDays;
-        actualDays = meetsMinimum
-            ? `${userDays} days/week`
-            : `${planSpec.minDays}+ days/week (minimum)`;
+        // User fits this tier - show their actual days
+        actualDays = `${userDays} days/week`;
         keyWorkouts = planSpec.keyWorkouts;
         duration = planSpec.planDuration;
     } else {
@@ -196,6 +262,9 @@ export function getPersonalizedPhilosophyCard(
         personalizedLongRunCap: longRunCap,
         personalizedDuration: duration,
         personalizedKeyWorkouts: keyWorkouts,
+        tierAdjusted: tierResult.adjusted,
+        adjustedTier: tierResult.adjusted ? effectiveTier : null,
+        adjustmentReason: tierResult.reason,
     };
 }
 
