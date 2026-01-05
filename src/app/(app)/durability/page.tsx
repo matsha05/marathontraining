@@ -19,8 +19,10 @@
  */
 
 import { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { createSupabaseBrowserClient } from '@/infrastructure/supabase';
 import {
     Zap,
     ClipboardList,
@@ -58,10 +60,13 @@ const QUICK_CHECK_IDS = ['toe_yoga', 'single_leg_balance', 'squat_shape'];
 const CATEGORY_ORDER: DurabilityAssessment['category'][] = ['foot', 'ankle', 'balance', 'knee', 'hip', 'spine'];
 
 export default function DurabilityPage() {
+    const router = useRouter();
     const [mode, setMode] = useState<AssessmentMode>('intro');
     const [results, setResults] = useState<AssessmentResultMap>({});
     const [expandedId, setExpandedId] = useState<string | null>(null);
     const [currentQuickIndex, setCurrentQuickIndex] = useState(0);
+    const [saving, setSaving] = useState(false);
+    const [saveError, setSaveError] = useState<string | null>(null);
 
     const assessments = getAllAssessments();
 
@@ -606,12 +611,44 @@ export default function DurabilityPage() {
                                 </button>
                                 <button
                                     className="v2-btn v2-btn-primary flex-1"
-                                    onClick={() => {
-                                        // TODO: Save results and navigate to plan
+                                    disabled={saving}
+                                    onClick={async () => {
+                                        setSaving(true);
+                                        setSaveError(null);
+                                        try {
+                                            const supabase = createSupabaseBrowserClient();
+                                            const { data: { user } } = await supabase.auth.getUser();
+                                            if (!user) {
+                                                setSaveError('Not signed in');
+                                                return;
+                                            }
+                                            const { error } = await supabase
+                                                .from('durability_assessments')
+                                                .insert({
+                                                    athlete_id: user.id,
+                                                    assessed_date: new Date().toISOString().split('T')[0],
+                                                    results: results,
+                                                    assigned_modules: prescribedModuleIds,
+                                                });
+                                            if (error) {
+                                                setSaveError('Failed to save assessment');
+                                                console.error('Durability save error:', error);
+                                                return;
+                                            }
+                                            router.push('/dashboard');
+                                        } catch (err) {
+                                            setSaveError('An error occurred');
+                                            console.error(err);
+                                        } finally {
+                                            setSaving(false);
+                                        }
                                     }}
                                 >
-                                    Save & Continue
+                                    {saving ? 'Saving...' : 'Save & Continue'}
                                 </button>
+                                {saveError && (
+                                    <p className="text-sm text-center mt-2" style={{ color: 'var(--v2-error)' }}>{saveError}</p>
+                                )}
                             </div>
                         </motion.div>
                     )}

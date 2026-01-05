@@ -35,6 +35,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
     const [step, setStep] = useState<QuestionStep>('beginner_gate');
     const [answers, setAnswers] = useState<QuizAnswers>(INITIAL_QUIZ_ANSWERS);
     const [canRunMile, setCanRunMile] = useState<boolean | null>(null);
+    const [showTooFewDays, setShowTooFewDays] = useState<'2_or_fewer' | '3_for_marathon' | null>(null);
 
     // Dynamic step order based on timing selection
     const STEP_ORDER = answers.raceTiming === 'specific'
@@ -182,7 +183,6 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                         className="min-h-screen flex flex-col items-center justify-center px-6 py-16"
                     >
                         <div className="max-w-xl w-full text-center">
-                            <div className="text-5xl mb-6">🏃‍♂️</div>
                             <h1
                                 className="text-3xl md:text-4xl font-light mb-4"
                                 style={{ color: 'var(--v2-text-primary)' }}
@@ -199,15 +199,15 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                             <div className="v2-card p-6 mb-8 text-left">
                                 <p className="v2-label mb-2">Recommended: Couch to 5K (C25K)</p>
                                 <p className="v2-body-sm mb-4" style={{ color: 'var(--v2-text-muted)' }}>
-                                    A proven 8-week walk/run program that gradually builds you up to running 3 miles without stopping.
+                                    A proven 9-week walk/run program that gradually builds you up to running 3 miles without stopping.
                                 </p>
                                 <a
-                                    href="https://www.nhs.uk/live-well/exercise/couch-to-5k-week-by-week/"
+                                    href="https://c25k.com/"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="v2-btn v2-btn-primary"
                                 >
-                                    Start C25K (NHS Guide) →
+                                    Start C25K Program
                                 </a>
                             </div>
                             <button
@@ -377,43 +377,204 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                 })()}
 
                 {/* Question 3: Days per week */}
-                {step === 'days' && (
-                    <QuestionScreen
-                        key="days"
-                        question="How many days can you RUN each week?"
-                        subtitle="Just running — strength and cross-training are separate."
-                        options={[
+                {step === 'days' && (() => {
+                    // Marathon requires 4+ days (no 3-day marathon plans exist)
+                    const minDaysForDistance: Record<string, number> = {
+                        '5k': 3,
+                        '10k': 3,
+                        'half': 3,
+                        'marathon': 4,
+                        'base': 3,
+                    };
+                    const minDays = answers.targetDistance ? (minDaysForDistance[answers.targetDistance] || 3) : 3;
+
+                    const handleDaysClick = (value: number) => {
+                        if (value <= 2) {
+                            setShowTooFewDays('2_or_fewer');
+                        } else if (value === 3 && minDays === 4) {
+                            // Marathon with 3 days
+                            setShowTooFewDays('3_for_marathon');
+                        } else {
+                            handleDaysSelect(value as DaysPerWeek);
+                        }
+                    };
+
+                    if (showTooFewDays) {
+                        return (
+                            <motion.div
+                                key="too_few_days"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="min-h-screen flex flex-col items-center justify-center px-6 py-16"
+                            >
+                                <div className="max-w-xl w-full text-center">
+                                    <h1
+                                        className="text-3xl md:text-4xl font-light mb-4"
+                                        style={{ color: 'var(--v2-text-primary)' }}
+                                    >
+                                        {showTooFewDays === '2_or_fewer'
+                                            ? 'We need a bit more time'
+                                            : 'Marathon training needs more days'
+                                        }
+                                    </h1>
+                                    <p
+                                        className="text-lg mb-8"
+                                        style={{ color: 'var(--v2-text-muted)' }}
+                                    >
+                                        {showTooFewDays === '2_or_fewer'
+                                            ? 'Our structured training plans require at least 3 running days per week to build fitness safely and effectively.'
+                                            : 'Every marathon method we offer requires at least 4 running days per week. This isn\'t arbitrary — it\'s what the science and proven programs require.'
+                                        }
+                                    </p>
+                                    <div className="v2-card p-6 mb-8 text-left" style={{ borderColor: 'var(--v2-border)' }}>
+                                        <p className="v2-heading-sm mb-2">
+                                            {showTooFewDays === '2_or_fewer'
+                                                ? 'Can you find one more day?'
+                                                : 'Can you commit to 4 days?'
+                                            }
+                                        </p>
+                                        <p className="v2-body-sm mb-4" style={{ color: 'var(--v2-text-muted)' }}>
+                                            {showTooFewDays === '2_or_fewer'
+                                                ? 'Even short 20-30 minute runs count. Many people find morning runs before work, lunch runs, or runs with kids in a stroller.'
+                                                : 'Two of those days can be short easy runs (20-30 minutes). The key is consistency, not crushing volume every day.'
+                                            }
+                                        </p>
+                                        <button
+                                            onClick={() => setShowTooFewDays(null)}
+                                            className="v2-btn v2-btn-primary"
+                                        >
+                                            Let me reconsider
+                                        </button>
+                                    </div>
+                                    <p
+                                        className="text-sm"
+                                        style={{ color: 'var(--v2-text-subtle)' }}
+                                    >
+                                        {showTooFewDays === '2_or_fewer'
+                                            ? 'If you truly can\'t commit to 3 days, consider building your base with casual runs until your schedule opens up.'
+                                            : 'If 4 days isn\'t possible, consider a half marathon or 10K first — both work great with 3 days.'
+                                        }
+                                    </p>
+                                    <button
+                                        onClick={goBack}
+                                        className="v2-btn v2-btn-ghost mt-4"
+                                    >
+                                        Change my goal
+                                    </button>
+                                </div>
+                            </motion.div>
+                        );
+                    }
+
+                    // Build options based on distance
+                    const daysOptions = [
+                        { value: 2, label: '2 days or fewer', description: 'Limited availability' },
+                        ...(minDays <= 3 ? [{ value: 3, label: '3 days', description: 'Fits busy schedules' }] : []),
+                        ...(minDays <= 3 && answers.targetDistance === 'marathon'
+                            ? [{ value: 3, label: '3 days', description: 'Not available for marathon' }]
+                            : []),
+                        { value: 4, label: '4 days', description: 'Room for life and recovery' },
+                        { value: 5, label: '5 days', description: 'Solid commitment' },
+                        { value: 6, label: '6 days', description: 'Unlocks advanced methods' },
+                    ];
+
+                    // Filtered options (marathon doesn't show 3 days as valid)
+                    const filteredOptions = answers.targetDistance === 'marathon'
+                        ? [
+                            { value: 2, label: '2 days or fewer', description: 'Limited availability' },
+                            { value: 3, label: '3 days', description: 'Not enough for marathon' },
+                            { value: 4, label: '4 days', description: 'Minimum for marathon' },
+                            { value: 5, label: '5 days', description: 'Solid commitment' },
+                            { value: 6, label: '6 days', description: 'Unlocks advanced methods' },
+                        ]
+                        : [
+                            { value: 2, label: '2 days or fewer', description: 'Limited availability' },
                             { value: 3, label: '3 days', description: 'Fits busy schedules' },
                             { value: 4, label: '4 days', description: 'Room for life and recovery' },
                             { value: 5, label: '5 days', description: 'Solid commitment' },
                             { value: 6, label: '6 days', description: 'Unlocks advanced methods' },
-                        ]}
-                        onSelect={handleDaysSelect}
-                        onBack={goBack}
-                    />
-                )}
+                        ];
+
+                    return (
+                        <motion.div
+                            key="days"
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{ duration: 0.24, ease: [0.2, 0.8, 0.2, 1] }}
+                            className="min-h-screen flex flex-col items-center justify-center px-6 py-16"
+                        >
+                            <button
+                                onClick={goBack}
+                                className="fixed top-8 left-6 text-sm transition-colors"
+                                style={{ color: 'var(--v2-text-subtle)' }}
+                            >
+                                Back
+                            </button>
+                            <div className="max-w-xl w-full text-center">
+                                <h1
+                                    className="text-3xl md:text-4xl font-light mb-4"
+                                    style={{ color: 'var(--v2-text-primary)' }}
+                                >
+                                    How many days can you RUN each week?
+                                </h1>
+                                <p
+                                    className="text-lg mb-2"
+                                    style={{ color: 'var(--v2-text-muted)' }}
+                                >
+                                    Just running — strength and cross-training are separate.
+                                </p>
+                                <p
+                                    className="text-sm mb-8"
+                                    style={{ color: 'var(--v2-text-subtle)' }}
+                                >
+                                    You can always adjust this later if life changes.
+                                </p>
+                                <div className="space-y-3">
+                                    {filteredOptions.map((option) => (
+                                        <button
+                                            key={option.value}
+                                            onClick={() => handleDaysClick(option.value)}
+                                            className="w-full v2-card v2-card-interactive p-5 text-left"
+                                        >
+                                            <p className="v2-heading-sm">{option.label}</p>
+                                            <p className="v2-body-sm mt-1" style={{ color: 'var(--v2-text-muted)' }}>
+                                                {option.description}
+                                            </p>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </motion.div>
+                    );
+                })()}
 
                 {/* Question 4: Experience */}
                 {step === 'experience' && (
                     <QuestionScreen
                         key="experience"
-                        question="What best describes you right now?"
-                        subtitle="Be honest — this protects you from overtraining."
+                        question="Where are you right now?"
+                        subtitle="This helps us set the right starting intensity."
                         options={[
                             {
                                 value: 'beginner' as Experience,
-                                label: 'Brand new to running',
-                                description: 'Never trained for a race before'
+                                label: 'Just starting out',
+                                description: 'New to running, returning after a break, or not following a structured plan'
                             },
                             {
                                 value: 'intermediate' as Experience,
-                                label: 'Currently running regularly',
-                                description: 'Running at least 2-3 times per week'
+                                label: 'Building steadily',
+                                description: 'Running regularly, ready for structure, or getting back into shape after time off'
                             },
                             {
                                 value: 'advanced' as Experience,
-                                label: 'Experienced & chasing PRs',
-                                description: 'Consistent training, ready to push'
+                                label: 'Training hard',
+                                description: 'High volume, structured workouts, chasing PRs'
+                            },
+                            {
+                                value: 'intermediate' as Experience,
+                                label: 'Not sure',
+                                description: 'We\'ll start moderate and calibrate from your mileage'
                             },
                         ]}
                         onSelect={handleExperienceSelect}

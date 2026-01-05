@@ -18,6 +18,7 @@ import {
     WarningBanner,
     useKeyboardNavigation,
 } from '../ui';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { OnboardingData, TrainingGoal, FitnessDuration } from '@/domain/onboarding/types';
 import { STEP_TOOLTIPS } from '@/domain/onboarding/types';
 import {
@@ -165,14 +166,11 @@ export function RaceDetailsScreen({
                 {/* Race date (optional) */}
                 <div>
                     <label className="v2-label block mb-2">Race date (optional)</label>
-                    <input
-                        type="date"
+                    <DatePicker
                         value={data.raceDate}
-                        onChange={(e) => handleDateChange(e.target.value)}
-                        min={minDateStr}
-                        aria-invalid={Boolean(dateError)}
-                        className="v2-input w-full"
-                        style={{ fontSize: '16px' }}
+                        onChange={handleDateChange}
+                        minDate={minDateStr}
+                        placeholder="Select your race date"
                     />
                     {dateError && (
                         <p className="v2-body-sm mt-2" style={{ color: 'var(--v2-error)' }}>{dateError}</p>

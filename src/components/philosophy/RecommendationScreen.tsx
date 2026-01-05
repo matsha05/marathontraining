@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
     TrainingPhilosophy,
     QuizAnswers,
@@ -10,6 +10,7 @@ import {
     FOUNDATION_LAYERS,
 } from '@/domain/philosophy/types';
 import { getOverrideWarnings, isPhilosophyAvailableForDistance } from '@/domain/philosophy/recommendation';
+import { getPersonalizedPhilosophyCard } from '@/domain/philosophy/personalized-card';
 import { PhilosophyCard } from './PhilosophyCard';
 
 /**
@@ -35,6 +36,20 @@ export function RecommendationScreen({
     const [showConfirmOverride, setShowConfirmOverride] = useState(false);
 
     const primary = PHILOSOPHIES[recommendation.primary];
+
+    // Get personalized card data for the primary recommendation
+    const personalizedPrimary = useMemo(() =>
+        getPersonalizedPhilosophyCard(recommendation.primary, answers),
+        [recommendation.primary, answers]
+    );
+
+    // Distance label for display
+    const distanceLabel = answers.targetDistance === 'half' ? 'Half Marathon' :
+        answers.targetDistance === '5k' ? '5K' :
+            answers.targetDistance === '10k' ? '10K' :
+                answers.targetDistance === 'marathon' ? 'Marathon' :
+                    answers.targetDistance === 'base' ? 'Base Building' : 'Plan';
+
     // Only show alternatives that can actually deliver plans for this distance
     const alternatives = Object.values(PHILOSOPHIES).filter(p =>
         p.id !== recommendation.primary &&
@@ -188,7 +203,16 @@ export function RecommendationScreen({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
                 >
-                    <PhilosophyCard philosophy={primary} expanded recommended />
+                    <PhilosophyCard
+                        philosophy={primary}
+                        expanded
+                        recommended
+                        personalizedRunDays={personalizedPrimary.personalizedRunDays}
+                        personalizedLongRunCap={personalizedPrimary.personalizedLongRunCap}
+                        personalizedDuration={personalizedPrimary.personalizedDuration}
+                        personalizedKeyWorkouts={personalizedPrimary.personalizedKeyWorkouts}
+                        userDistance={distanceLabel}
+                    />
 
                     {/* Reasoning */}
                     <div className="v2-card mt-6 p-5">

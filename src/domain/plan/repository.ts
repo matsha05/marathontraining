@@ -697,3 +697,122 @@ export async function getWeekWorkouts(weekNumber: number): Promise<PlanResult<Db
         };
     }
 }
+
+// =============================================================================
+// PLAN HISTORY FUNCTIONS
+// =============================================================================
+
+/**
+ * Load all training plans (active + archived) for the current user.
+ * Returns plans ordered by creation date descending.
+ */
+export async function loadPlanHistory(): Promise<PlanResult<DbTrainingPlan[]>> {
+    const athleteId = await getAuthenticatedAthleteId();
+    if (!athleteId) {
+        return {
+            success: false,
+            error: { code: 'AUTH_REQUIRED', message: 'Authentication required' },
+        };
+    }
+
+    try {
+        const supabase = createSupabaseBrowserClient();
+        const { data, error } = await supabase
+            .from('training_plans')
+            .select('*')
+            .eq('athlete_id', athleteId)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            return {
+                success: false,
+                error: { code: 'LOAD_FAILED', message: 'Failed to load plan history', details: error },
+            };
+        }
+
+        return { success: true, data: data || [] };
+    } catch (error) {
+        return {
+            success: false,
+            error: { code: 'NETWORK_ERROR', message: 'Network error', details: error },
+        };
+    }
+}
+
+/**
+ * Load all workouts for a specific plan (for drill-down view).
+ */
+export async function loadPlanWorkouts(planId: string): Promise<PlanResult<DbPlannedWorkout[]>> {
+    const athleteId = await getAuthenticatedAthleteId();
+    if (!athleteId) {
+        return {
+            success: false,
+            error: { code: 'AUTH_REQUIRED', message: 'Authentication required' },
+        };
+    }
+
+    try {
+        const supabase = createSupabaseBrowserClient();
+        const { data, error } = await supabase
+            .from('planned_workouts')
+            .select('*')
+            .eq('plan_id', planId)
+            .eq('athlete_id', athleteId)
+            .order('scheduled_date', { ascending: true });
+
+        if (error) {
+            return {
+                success: false,
+                error: { code: 'LOAD_FAILED', message: 'Failed to load workouts', details: error },
+            };
+        }
+
+        return { success: true, data: data || [] };
+    } catch (error) {
+        return {
+            success: false,
+            error: { code: 'NETWORK_ERROR', message: 'Network error', details: error },
+        };
+    }
+}
+
+/**
+ * Restore an archived plan by making it active and deactivating the current plan.
+ * Uses a transaction-safe RPC function to ensure atomicity.
+ */
+export async function restorePlan(planId: string): Promise<PlanResult<void>> {
+    const athleteId = await getAuthenticatedAthleteId();
+    if (!athleteId) {
+        return {
+            success: false,
+            error: { code: 'AUTH_REQUIRED', message: 'Authentication required' },
+        };
+    }
+
+    try {
+        const supabase = createSupabaseBrowserClient();
+
+        // Call the transaction-safe RPC function
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await (supabase.rpc as any)('restore_training_plan', {
+            target_plan_id: planId,
+        });
+
+        if (error) {
+            return {
+                success: false,
+                error: { code: 'SAVE_FAILED', message: 'Failed to restore plan', details: error },
+            };
+        }
+
+        // Clear cache so next load fetches fresh data
+        clearCache();
+
+        return { success: true, data: undefined };
+    } catch (error) {
+        return {
+            success: false,
+            error: { code: 'NETWORK_ERROR', message: 'Network error', details: error },
+        };
+    }
+}

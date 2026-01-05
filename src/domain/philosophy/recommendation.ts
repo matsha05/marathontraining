@@ -141,10 +141,17 @@ export function calculateRecommendation(answers: QuizAnswers): PhilosophyRecomme
 
     // Days modifiers (only positive scoring now, gates handled above)
     if (answers.daysPerWeek !== null) {
-        if (answers.daysPerWeek <= 4) {
+        if (answers.daysPerWeek === 3) {
+            // IMPORTANT: No coach truly supports 3 days. Higdon Novice is 4 days minimum.
+            // We still recommend Higdon as closest option, but add warning.
             scores.higdon += 3;
-            if (danielsAvailable) scores.daniels += 2; // 2Q works great with 3-4 days
-            reasoning.push(`Your ${answers.daysPerWeek} run days/week fit Higdon's accessible structure perfectly.`);
+            if (danielsAvailable) scores.daniels += 2; // 2Q can work with 3 days
+            reasoning.push(`3 run days/week is below minimum for most programs. Higdon Novice starts at 4 days, but we can adapt.`);
+            warnings.push(`Our plans are designed for 4+ run days/week. With 3 days, you may miss key workouts or need to combine sessions. Consider if you can add one more day.`);
+        } else if (answers.daysPerWeek === 4) {
+            scores.higdon += 3;
+            if (danielsAvailable) scores.daniels += 2; // 2Q works great with 4 days
+            reasoning.push(`4 run days/week fits Higdon Novice perfectly.`);
         } else if (answers.daysPerWeek === 5) {
             scores.higdon += 2;
             if (pfitzAvailable) scores.pfitzinger += 1;

@@ -6,17 +6,31 @@ import Link from 'next/link';
 import { Toggle } from '@/components/ui/Toggle';
 import { createSupabaseBrowserClient } from '@/infrastructure/supabase';
 import { usePlan } from '@/domain/plan/context';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { AlertTriangle, X } from 'lucide-react';
 
 /**
  * Settings Page V2
  * Week aesthetic: Dark, atmospheric, light typography
+ * 
+ * Features:
+ * - Profile editing (name, age)
+ * - Notification preferences (persisted to DB)
+ * - Units preference (persisted to DB)
+ * - Strava integration
+ * - Account deletion with confirmation modal
  */
 
 interface ProfileData {
     name: string;
     email: string;
     age: number | null;
+}
+
+interface PreferencesData {
+    notifyTrainingReminders: boolean;
+    notifyWeeklySummary: boolean;
+    units: 'miles' | 'kilometers';
 }
 
 export default function SettingsPage() {
@@ -33,6 +47,15 @@ export default function SettingsPage() {
     const [profileSaving, setProfileSaving] = useState(false);
     const [profileMessage, setProfileMessage] = useState<string | null>(null);
 
+    // Preferences state
+    const [preferences, setPreferences] = useState<PreferencesData>({
+        notifyTrainingReminders: true,
+        notifyWeeklySummary: true,
+        units: 'miles',
+    });
+    const [prefSaving, setPrefSaving] = useState(false);
+
+    // Strava state
     const [stravaStatus, setStravaStatus] = useState<{
         connected: boolean;
         stravaAthleteId?: number | null;
@@ -45,10 +68,17 @@ export default function SettingsPage() {
     const stravaConnected = Boolean(stravaStatus?.connected);
     const [signOutBusy, setSignOutBusy] = useState(false);
 
+    // Deletion state
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleteConfirmText, setDeleteConfirmText] = useState('');
+    const [deleteBusy, setDeleteBusy] = useState(false);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
+
     const currentVdot = plan?.vdot || null;
 
+    // Load profile and preferences
     useEffect(() => {
-        const fetchProfile = async () => {
+        const fetchData = async () => {
             try {
                 const supabase = createSupabaseBrowserClient();
                 const { data: { user } } = await supabase.auth.getUser();
@@ -60,17 +90,35 @@ export default function SettingsPage() {
 
                 const email = user.email || '';
 
-                const { data: athlete } = await supabase
+                // Query includes new columns - cast to any until types are regenerated
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const { data: athleteData } = await supabase
                     .from('athletes')
-                    .select('name, age')
+                    .select('name, age, notify_training_reminders, notify_weekly_summary, units')
                     .eq('id', user.id)
                     .single();
+
+                const athlete = athleteData as {
+                    name?: string;
+                    age?: number | null;
+                    notify_training_reminders?: boolean;
+                    notify_weekly_summary?: boolean;
+                    units?: string;
+                } | null;
 
                 setProfile({
                     name: athlete?.name || user.user_metadata?.name || email.split('@')[0] || '',
                     email,
                     age: athlete?.age || null,
                 });
+
+                if (athlete) {
+                    setPreferences({
+                        notifyTrainingReminders: athlete.notify_training_reminders ?? true,
+                        notifyWeeklySummary: athlete.notify_weekly_summary ?? true,
+                        units: (athlete.units as 'miles' | 'kilometers') || 'miles',
+                    });
+                }
             } catch (error) {
                 console.warn('Failed to load profile:', error);
             } finally {
@@ -78,8 +126,45 @@ export default function SettingsPage() {
             }
         };
 
-        fetchProfile();
+        fetchData();
     }, []);
+
+    // Strava status check
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const connect = params.get('connect');
+        const error = params.get('error');
+        const status = params.get('status');
+        const host = window.location.hostname;
+        setIsLocalhost(host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || host.endsWith('.local'));
+        if (connect && error) {
+            const message = formatConnectError(connect, error);
+            if (connect === 'strava') {
+                setStravaMessage(message);
+            }
+        }
+        if (connect === 'strava' && status === 'connected') {
+            setStravaMessage('Strava connected.');
+        }
+        void refreshStravaStatus();
+    }, []);
+
+    const refreshStravaStatus = async () => {
+        try {
+            setStravaAuthRequired(false);
+            const response = await fetch('/api/strava/status');
+            if (response.status === 401) {
+                setStravaAuthRequired(true);
+                setStravaStatus(null);
+                return;
+            }
+            if (!response.ok) throw new Error('Unable to load Strava status');
+            const data = await response.json() as { connected: boolean; stravaAthleteId?: number | null; lastActivityAt?: string | null };
+            setStravaStatus(data);
+        } catch (error) {
+            setStravaMessage(error instanceof Error ? error.message : 'Strava status failed');
+        }
+    };
 
     const handleSaveProfile = async () => {
         setProfileSaving(true);
@@ -117,39 +202,31 @@ export default function SettingsPage() {
         }
     };
 
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const connect = params.get('connect');
-        const error = params.get('error');
-        const status = params.get('status');
-        const host = window.location.hostname;
-        setIsLocalhost(host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || host.endsWith('.local'));
-        if (connect && error) {
-            const message = formatConnectError(connect, error);
-            if (connect === 'strava') {
-                setStravaMessage(message);
-            }
-        }
-        if (connect === 'strava' && status === 'connected') {
-            setStravaMessage('Strava connected.');
-        }
-        void refreshStravaStatus();
-    }, []);
+    const handlePreferenceChange = async (key: keyof PreferencesData, value: boolean | string) => {
+        // Optimistic update
+        setPreferences(prev => ({ ...prev, [key]: value }));
+        setPrefSaving(true);
 
-    const refreshStravaStatus = async () => {
         try {
-            setStravaAuthRequired(false);
-            const response = await fetch('/api/strava/status');
-            if (response.status === 401) {
-                setStravaAuthRequired(true);
-                setStravaStatus(null);
-                return;
-            }
-            if (!response.ok) throw new Error('Unable to load Strava status');
-            const data = await response.json() as { connected: boolean; stravaAthleteId?: number | null; lastActivityAt?: string | null };
-            setStravaStatus(data);
+            const supabase = createSupabaseBrowserClient();
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (!user) return;
+
+            const updateData: Record<string, unknown> = {};
+            if (key === 'notifyTrainingReminders') updateData.notify_training_reminders = value;
+            if (key === 'notifyWeeklySummary') updateData.notify_weekly_summary = value;
+            if (key === 'units') updateData.units = value;
+
+            await supabase
+                .from('athletes')
+                .update(updateData)
+                .eq('id', user.id);
         } catch (error) {
-            setStravaMessage(error instanceof Error ? error.message : 'Strava status failed');
+            console.error('Failed to save preference:', error);
+            // Revert on error would go here
+        } finally {
+            setPrefSaving(false);
         }
     };
 
@@ -219,6 +296,36 @@ export default function SettingsPage() {
             setStravaMessage(error instanceof Error ? error.message : 'Strava sync failed');
         } finally {
             setStravaBusy(false);
+        }
+    };
+
+    const handleDeleteAccount = async () => {
+        if (deleteConfirmText !== 'DELETE') return;
+
+        setDeleteBusy(true);
+        setDeleteError(null);
+
+        try {
+            const supabase = createSupabaseBrowserClient();
+
+            // Call the transaction-safe RPC function
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (supabase.rpc as any)('delete_user_account');
+
+            if (error) {
+                setDeleteError('Failed to delete account. Please try again.');
+                console.error('Delete account error:', error);
+                return;
+            }
+
+            // Sign out and redirect
+            await supabase.auth.signOut();
+            router.push('/');
+        } catch (error) {
+            setDeleteError('An error occurred. Please try again.');
+            console.error('Delete account error:', error);
+        } finally {
+            setDeleteBusy(false);
         }
     };
 
@@ -401,8 +508,9 @@ export default function SettingsPage() {
                                 </p>
                             </div>
                             <Toggle
-                                checked={true}
-                                onChange={() => { }}
+                                checked={preferences.notifyTrainingReminders}
+                                onChange={(checked) => handlePreferenceChange('notifyTrainingReminders', checked)}
+                                disabled={prefSaving}
                             />
                         </div>
                         <div className="flex items-center justify-between gap-4">
@@ -413,8 +521,9 @@ export default function SettingsPage() {
                                 </p>
                             </div>
                             <Toggle
-                                checked={true}
-                                onChange={() => { }}
+                                checked={preferences.notifyWeeklySummary}
+                                onChange={(checked) => handlePreferenceChange('notifyWeeklySummary', checked)}
+                                disabled={prefSaving}
                             />
                         </div>
                         <div className="flex items-center justify-between gap-4">
@@ -425,8 +534,20 @@ export default function SettingsPage() {
                                 </p>
                             </div>
                             <div className="flex gap-2">
-                                <button className="v2-btn v2-btn-sm v2-btn-primary">Miles</button>
-                                <button className="v2-btn v2-btn-sm v2-btn-ghost">Kilometers</button>
+                                <button
+                                    className={`v2-btn v2-btn-sm ${preferences.units === 'miles' ? 'v2-btn-primary' : 'v2-btn-ghost'}`}
+                                    onClick={() => handlePreferenceChange('units', 'miles')}
+                                    disabled={prefSaving}
+                                >
+                                    Miles
+                                </button>
+                                <button
+                                    className={`v2-btn v2-btn-sm ${preferences.units === 'kilometers' ? 'v2-btn-primary' : 'v2-btn-ghost'}`}
+                                    onClick={() => handlePreferenceChange('units', 'kilometers')}
+                                    disabled={prefSaving}
+                                >
+                                    Kilometers
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -465,15 +586,104 @@ export default function SettingsPage() {
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="v2-heading-sm">Delete Account</p>
-                                <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>Permanently delete your account and data</p>
+                                <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>Permanently delete your account and all data</p>
                             </div>
-                            <button className="v2-btn v2-btn-sm" style={{ background: 'var(--v2-error)', color: 'white' }}>
+                            <button
+                                className="v2-btn v2-btn-sm"
+                                style={{ background: 'var(--v2-error)', color: 'white' }}
+                                onClick={() => setShowDeleteModal(true)}
+                            >
                                 Delete
                             </button>
                         </div>
                     </div>
                 </motion.section>
             </main>
+
+            {/* Delete Confirmation Modal */}
+            <AnimatePresence>
+                {showDeleteModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                        style={{ background: 'rgba(0, 0, 0, 0.8)' }}
+                        onClick={() => setShowDeleteModal(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.95, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.95, opacity: 0 }}
+                            className="v2-card p-6 max-w-md w-full"
+                            style={{ borderColor: 'var(--v2-error)' }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="flex items-start justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'var(--v2-error-subtle)' }}>
+                                        <AlertTriangle size={20} style={{ color: 'var(--v2-error)' }} />
+                                    </div>
+                                    <h3 className="v2-heading-md">Delete Account</h3>
+                                </div>
+                                <button
+                                    onClick={() => setShowDeleteModal(false)}
+                                    className="p-1 rounded hover:bg-white/10"
+                                >
+                                    <X size={20} style={{ color: 'var(--v2-text-muted)' }} />
+                                </button>
+                            </div>
+
+                            <p className="v2-body-sm mb-4" style={{ color: 'var(--v2-text-secondary)' }}>
+                                This will permanently delete:
+                            </p>
+                            <ul className="v2-body-sm mb-6 space-y-1" style={{ color: 'var(--v2-text-muted)' }}>
+                                <li>• All your training plans and workouts</li>
+                                <li>• Your durability assessments</li>
+                                <li>• Your VDOT history and progress</li>
+                                <li>• All connected integrations</li>
+                            </ul>
+
+                            <p className="v2-body-sm mb-2" style={{ color: 'var(--v2-text-secondary)' }}>
+                                Type <strong style={{ color: 'var(--v2-error)' }}>DELETE</strong> to confirm:
+                            </p>
+                            <input
+                                type="text"
+                                value={deleteConfirmText}
+                                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                                className="v2-input mb-4"
+                                placeholder="Type DELETE"
+                                autoComplete="off"
+                            />
+
+                            {deleteError && (
+                                <p className="v2-body-sm mb-4" style={{ color: 'var(--v2-error)' }}>{deleteError}</p>
+                            )}
+
+                            <div className="flex gap-3">
+                                <button
+                                    className="v2-btn v2-btn-secondary flex-1"
+                                    onClick={() => setShowDeleteModal(false)}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    className="v2-btn flex-1"
+                                    style={{
+                                        background: deleteConfirmText === 'DELETE' ? 'var(--v2-error)' : 'var(--v2-bg-elevated)',
+                                        color: deleteConfirmText === 'DELETE' ? 'white' : 'var(--v2-text-muted)',
+                                        cursor: deleteConfirmText === 'DELETE' ? 'pointer' : 'not-allowed',
+                                    }}
+                                    onClick={handleDeleteAccount}
+                                    disabled={deleteConfirmText !== 'DELETE' || deleteBusy}
+                                >
+                                    {deleteBusy ? 'Deleting...' : 'Delete Forever'}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

@@ -5,15 +5,36 @@ import { PhilosophyMetadata } from '@/domain/philosophy/types';
 /**
  * PhilosophyCard - Training philosophy display component
  * V2 Design System - 100% token usage
+ * 
+ * Supports personalized display when provided with user's specific plan details.
  */
 
 interface PhilosophyCardProps {
     philosophy: PhilosophyMetadata;
     expanded?: boolean;
     recommended?: boolean;
+    // Personalized data (overrides static values when provided)
+    personalizedRunDays?: string;
+    personalizedLongRunCap?: string;
+    personalizedDuration?: string;
+    personalizedKeyWorkouts?: string[];
+    userDistance?: string;
 }
 
-export function PhilosophyCard({ philosophy, expanded = false, recommended = false }: PhilosophyCardProps) {
+export function PhilosophyCard({
+    philosophy,
+    expanded = false,
+    recommended = false,
+    personalizedRunDays,
+    personalizedLongRunCap,
+    personalizedDuration,
+    personalizedKeyWorkouts,
+    userDistance,
+}: PhilosophyCardProps) {
+    // Use personalized values if provided, otherwise fall back to static
+    const displayRunDays = personalizedRunDays || philosophy.runDays;
+    const displayLongRunCap = personalizedLongRunCap || philosophy.longRunCap;
+
     return (
         <div
             className="rounded-2xl border transition-all"
@@ -51,17 +72,59 @@ export function PhilosophyCard({ philosophy, expanded = false, recommended = fal
                     )}
                 </div>
 
-                {/* Quick stats */}
-                <div className="flex gap-6 text-sm">
-                    <div>
-                        <span style={{ color: 'var(--v2-text-muted)' }}>Run days:</span>{' '}
-                        <span style={{ color: 'var(--v2-text-secondary)' }}>{philosophy.runDays}</span>
+                {/* Your plan summary (personalized) */}
+                {(personalizedDuration || personalizedKeyWorkouts) && (
+                    <div
+                        className="mb-4 p-3 rounded-lg"
+                        style={{ background: 'var(--v2-bg-active)' }}
+                    >
+                        <p
+                            className="text-xs uppercase tracking-wider mb-2"
+                            style={{ color: 'var(--v2-accent)' }}
+                        >
+                            Your {userDistance || 'plan'}
+                        </p>
+                        <div className="flex flex-wrap gap-4 text-sm">
+                            {personalizedDuration && (
+                                <span style={{ color: 'var(--v2-text-secondary)' }}>
+                                    {personalizedDuration}
+                                </span>
+                            )}
+                            {displayRunDays && (
+                                <span style={{ color: 'var(--v2-text-secondary)' }}>
+                                    {displayRunDays}
+                                </span>
+                            )}
+                            {displayLongRunCap && (
+                                <span style={{ color: 'var(--v2-text-secondary)' }}>
+                                    Long runs: {displayLongRunCap}
+                                </span>
+                            )}
+                        </div>
+                        {personalizedKeyWorkouts && personalizedKeyWorkouts.length > 0 && (
+                            <p
+                                className="text-xs mt-2"
+                                style={{ color: 'var(--v2-text-muted)' }}
+                            >
+                                Key workouts: {personalizedKeyWorkouts.join(' · ')}
+                            </p>
+                        )}
                     </div>
-                    <div>
-                        <span style={{ color: 'var(--v2-text-muted)' }}>Long run cap:</span>{' '}
-                        <span style={{ color: 'var(--v2-text-secondary)' }}>{philosophy.longRunCap}</span>
+                )}
+
+                {/* Quick stats (fallback when not personalized) */}
+                {!personalizedDuration && !personalizedKeyWorkouts && (
+                    <div className="flex gap-6 text-sm">
+                        <div>
+                            <span style={{ color: 'var(--v2-text-muted)' }}>Run days:</span>{' '}
+                            <span style={{ color: 'var(--v2-text-secondary)' }}>{displayRunDays}</span>
+                        </div>
+                        <div>
+                            <span style={{ color: 'var(--v2-text-muted)' }}>Long run cap:</span>{' '}
+                            <span style={{ color: 'var(--v2-text-secondary)' }}>{displayLongRunCap}</span>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
 
             {/* Core beliefs */}

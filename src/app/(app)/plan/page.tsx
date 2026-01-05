@@ -190,7 +190,10 @@ export default function PlanPage() {
                         <Link href="/dashboard" className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>← Back</Link>
                         <span className="v2-heading-sm">Training Plan</span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-4">
+                        <Link href="/plans/history" className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                            History
+                        </Link>
                         <span className="v2-label">{plan.raceName || `${plan.goalDistance.toUpperCase()} Training`}</span>
                         {weeksUntilRace !== null && weeksUntilRace > 0 && (
                             <>
