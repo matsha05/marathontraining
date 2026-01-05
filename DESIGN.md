@@ -263,25 +263,40 @@ All text exceeds WCAG 2.1 AA:
 
 ## Icons
 
-### Static Icons (Lucide)
-| Class | Size |
-|-------|------|
-| `v2-icon-xs` | 12px |
-| `v2-icon-sm` | 16px |
-| `v2-icon-md` | 20px |
-| `v2-icon-lg` | 24px |
-| `v2-icon-xl` | 32px |
+### Static Icons (Lucide React)
+Use `lucide-react` for all static icons:
 
-Color classes: `v2-icon-accent`, `v2-icon-muted`, `v2-icon-ghost`
+```tsx
+import { Footprints, Target, Activity, ChevronDown } from 'lucide-react';
 
-### Animated Icons
+<Footprints size={20} className="text-[var(--v2-accent)]" />
+```
+
+| Size Value | Use |
+|------------|-----|
+| 16 | Inline with text |
+| 20 | Buttons, inputs |
+| 24 | Cards, navigation |
+| 32+ | Hero, empty states |
+
+**Never use emoji for icons in the app UI.**
+
+### Animated Icons (lucide-animated)
+From https://lucide-animated.com/ — install individual icons:
+
+```bash
+npx jsrepo add @nicepkg/lucide-animated/activity
+```
+
+These are stored in `/components/ui/` as individual files (e.g., `activity.tsx`, `flame.tsx`).
+
 Use sparingly — 1-2 key moments per page:
 - **Check**: Success confirmations
-- **Spinner**: Loading states
+- **Flame**: Streak displays
+- **Activity**: Loading/progress
 - **Sparkles**: AI/generation features
-- **Refresh**: Sync actions
 
-Import from `@/components/icons/animated-icons`.
+Import from `@/components/ui/[icon-name]`.
 
 ---
 

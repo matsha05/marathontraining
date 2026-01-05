@@ -1,0 +1,1 @@
+export { DurabilityStatusCard } from './DurabilityStatusCard';

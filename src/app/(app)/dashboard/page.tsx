@@ -18,6 +18,7 @@ import { formatPace, getDayName, getFullDayName } from '@/lib/format';
 import { motion } from 'framer-motion';
 import { PacesCard } from '@/components/paces/PacesCard';
 import { RecalibrationModal } from '@/components/vdot/RecalibrationModal';
+import { DurabilityStatusCard } from '@/components/durability';
 
 /**
  * THE LONG GAME - Dashboard V2
@@ -313,6 +314,15 @@ export default function DashboardPage() {
         });
     }, [currentWeekPlan]);
 
+    // Determine if today is a quality session (Starrett: "before I go smash myself")
+    const isQualityDay = useMemo(() => {
+        if (!todayWorkout?.runWorkout) return false;
+        const workoutType = todayWorkout.runWorkout.type;
+        const qualityTypes = ['tempo', 'threshold', 'cruise_intervals', 'vo2max_800s', 'vo2max_1000s',
+            'vo2max_1200s', 'vo2max_mile', 'long_easy', 'long_progression', 'long_mp_finish', 'long_fast_finish'];
+        return qualityTypes.includes(workoutType);
+    }, [todayWorkout]);
+
     // Show skeleton during initial load - AFTER all hooks are declared
     if (status === 'loading' || authStatus === 'loading' || (dataLoading && !athlete)) {
         return <DashboardSkeletonV2 />;
@@ -350,6 +360,18 @@ export default function DashboardPage() {
                     <p className="v2-body-sm mb-1" style={{ color: 'var(--v2-text-muted)' }}>{getGreeting()}</p>
                     <h1 className="v2-heading-lg">{displayName}</h1>
                 </motion.div>
+
+                {/* Pre-workout readiness nudge on quality days (Starrett methodology) */}
+                {isQualityDay && (
+                    <motion.div
+                        className="mb-4"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: 0.08 }}
+                    >
+                        <DurabilityStatusCard compact isQualityDay={isQualityDay} />
+                    </motion.div>
+                )}
 
                 {/* Today's Workouts */}
                 <motion.section
@@ -545,6 +567,24 @@ export default function DashboardPage() {
                         </Link>
                     </motion.section>
                 )}
+
+                {/* Durability Status - Dicharry/Starrett Integration */}
+                <motion.section
+                    className="mb-10"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.32 }}
+                >
+                    <h2 className="v2-heading-md mb-4">Durability</h2>
+                    <DurabilityStatusCard
+                        isQualityDay={isQualityDay}
+                    // TODO: Wire up to actual assessment data once persisted
+                    // lastQuickCheck={athlete?.lastQuickCheck}
+                    // lastFullAssessment={athlete?.lastFullAssessment}
+                    // failedCount={athlete?.failedAssessments?.length}
+                    />
+                </motion.section>
+
 
                 {/* Stats Row */}
                 <motion.section

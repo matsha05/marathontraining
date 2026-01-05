@@ -3,10 +3,42 @@
 /**
  * Durability Assessment Page
  *
- * V2 Design System - Based on Jay Dicharry's Running Rewired methodology.
+ * V2 Design System - Based on Jay Dicharry's Running Rewired methodology
+ * and Kelly Starrett's Ready to Run standards.
+ * 
+ * Designed to match how the coaches think:
+ * - Quick daily readiness scan (2 min)
+ * - Full weekly assessment (10-12 min)  
+ * - Assessment-driven module prescription
+ * - Distal-to-proximal priority (foot → ankle → hip → core)
+ * 
+ * WHEN TO USE:
+ * - Quick Check: Before any run (especially quality sessions)
+ * - Full Assessment: Weekly (typically Sunday or Monday)
+ * - After injury layoff: Before resuming training
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
+import {
+    Zap,
+    ClipboardList,
+    Footprints,
+    Activity,
+    Target,
+    Dumbbell,
+    Scale,
+    Sparkles,
+    ArrowLeft,
+    Check,
+    X,
+    Minus,
+    Clock,
+    RotateCcw,
+    ChevronDown,
+    ChevronUp,
+} from 'lucide-react';
 import { AppHeader } from '@/components/ui/AppHeader';
 import {
     getAllAssessments,
@@ -17,13 +49,36 @@ import {
 import { DURABILITY_MODULES, DurabilityModule } from '@/domain/durability/modules';
 
 type AssessmentResultMap = Record<string, { result: AssessmentResult; side?: 'left' | 'right' | 'both' }>;
+type AssessmentMode = 'intro' | 'quick' | 'full' | 'results';
+
+// Quick check assessments (daily readiness scan per Dicharry)
+const QUICK_CHECK_IDS = ['toe_yoga', 'single_leg_balance', 'squat_shape'];
+
+// Category order follows distal-to-proximal principle (Dicharry/Starrett)
+const CATEGORY_ORDER: DurabilityAssessment['category'][] = ['foot', 'ankle', 'balance', 'knee', 'hip', 'spine'];
 
 export default function DurabilityPage() {
+    const [mode, setMode] = useState<AssessmentMode>('intro');
     const [results, setResults] = useState<AssessmentResultMap>({});
     const [expandedId, setExpandedId] = useState<string | null>(null);
-    const [showResults, setShowResults] = useState(false);
+    const [currentQuickIndex, setCurrentQuickIndex] = useState(0);
 
     const assessments = getAllAssessments();
+
+    // Organize assessments by category for full mode
+    const assessmentsByCategory = useMemo(() => {
+        const grouped: Record<string, DurabilityAssessment[]> = {};
+        for (const cat of CATEGORY_ORDER) {
+            grouped[cat] = assessments.filter(a => a.category === cat);
+        }
+        return grouped;
+    }, [assessments]);
+
+    // Quick check assessments
+    const quickAssessments = useMemo(() =>
+        QUICK_CHECK_IDS.map(id => assessments.find(a => a.id === id)).filter(Boolean) as DurabilityAssessment[],
+        [assessments]
+    );
 
     const failedIds = Object.entries(results)
         .filter(([_, r]) => r.result === 'fail')
@@ -41,207 +96,526 @@ export default function DurabilityPage() {
         }));
     };
 
+    const handleQuickResult = (result: AssessmentResult) => {
+        const currentAssessment = quickAssessments[currentQuickIndex];
+        if (currentAssessment) {
+            handleResult(currentAssessment.id, result);
+            if (currentQuickIndex < quickAssessments.length - 1) {
+                setCurrentQuickIndex(prev => prev + 1);
+            } else {
+                setMode('results');
+            }
+        }
+    };
+
     const completedCount = Object.keys(results).length;
-    const totalCount = assessments.length;
+    const totalCount = mode === 'quick' ? quickAssessments.length : assessments.length;
     const passCount = Object.values(results).filter(r => r.result === 'pass').length;
     const failCount = Object.values(results).filter(r => r.result === 'fail').length;
 
-    const getCategoryIcon = (cat: DurabilityAssessment['category']) => {
+    const getCategoryIcon = (cat: DurabilityAssessment['category'], size = 24) => {
+        const iconClass = "text-[var(--v2-accent)]";
         switch (cat) {
-            case 'foot': return '🦶';
-            case 'ankle': return '🦵';
-            case 'knee': return '🦵';
-            case 'hip': return '🏃';
-            case 'spine': return '🧘';
-            case 'balance': return '⚖️';
-            default: return '📋';
+            case 'foot': return <Footprints size={size} className={iconClass} />;
+            case 'ankle': return <Activity size={size} className={iconClass} />;
+            case 'knee': return <Target size={size} className={iconClass} />;
+            case 'hip': return <Dumbbell size={size} className={iconClass} />;
+            case 'spine': return <Activity size={size} className={iconClass} />;
+            case 'balance': return <Scale size={size} className={iconClass} />;
+            default: return <ClipboardList size={size} className={iconClass} />;
         }
     };
+
+    const getCategoryLabel = (cat: DurabilityAssessment['category']) => {
+        switch (cat) {
+            case 'foot': return 'Foot Control';
+            case 'ankle': return 'Ankle Mobility & Strength';
+            case 'knee': return 'Knee Stability';
+            case 'hip': return 'Hip Stability & Mobility';
+            case 'spine': return 'Spine & Core';
+            case 'balance': return 'Balance & Proprioception';
+            default: return cat;
+        }
+    };
+
+    const totalPrescribedTime = prescribedModules.reduce((sum, m) => sum + m.durationMin, 0);
 
     return (
         <div className="min-h-screen" style={{ background: 'var(--v2-bg-deep)', color: 'var(--v2-text-primary)' }}>
             <AppHeader streak={0} />
 
             <main className="max-w-3xl mx-auto px-6 py-10 space-y-8">
-                {/* Header */}
-                <div>
-                    <h1 className="text-2xl font-light mb-2" style={{ color: 'var(--v2-text-primary)' }}>Durability Assessment</h1>
-                    <p className="text-lg" style={{ color: 'var(--v2-text-muted)' }}>
-                        Based on Jay Dicharry's Running Rewired methodology.
-                        Identify movement limitations before they become injuries.
-                    </p>
-                </div>
-
-                {/* Progress */}
-                <div className="v2-card p-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <div>
-                            <p className="v2-label">Progress</p>
-                            <p className="text-2xl font-mono" style={{ color: 'var(--v2-accent)' }}>{completedCount} / {totalCount}</p>
-                        </div>
-                        <div className="flex gap-4 text-sm">
-                            <span style={{ color: '#4ade80' }}>✓ {passCount} pass</span>
-                            <span style={{ color: '#f87171' }}>✗ {failCount} fail</span>
-                        </div>
-                    </div>
-                    <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--v2-bg-elevated)' }}>
-                        <div
-                            className="h-full transition-all duration-300"
-                            style={{
-                                width: `${(completedCount / totalCount) * 100}%`,
-                                background: 'var(--v2-accent)'
-                            }}
-                        />
-                    </div>
-                    {completedCount === totalCount && (
-                        <button
-                            className="v2-btn v2-btn-primary mt-4 w-full"
-                            onClick={() => setShowResults(true)}
+                <AnimatePresence mode="wait">
+                    {/* INTRO MODE */}
+                    {mode === 'intro' && (
+                        <motion.div
+                            key="intro"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            className="space-y-8"
                         >
-                            View Your Prescription
-                        </button>
-                    )}
-                </div>
-
-                {/* Results Modal */}
-                {showResults && (
-                    <div className="v2-card p-6" style={{ border: '2px solid var(--v2-accent)' }}>
-                        <h2 className="text-xl font-light mb-4" style={{ color: 'var(--v2-text-primary)' }}>Your Durability Prescription</h2>
-                        {prescribedModules.length === 0 ? (
+                            {/* Hero */}
                             <div className="text-center py-8">
-                                <p className="text-4xl mb-4">🎉</p>
-                                <p className="text-lg" style={{ color: 'var(--v2-text-secondary)' }}>All assessments passed!</p>
-                                <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
-                                    Maintain your durability with general strength work.
+                                <p className="v2-label mb-2" style={{ color: 'var(--v2-accent)' }}>
+                                    DURABILITY ASSESSMENT
+                                </p>
+                                <h1 className="text-3xl font-light mb-4" style={{ color: 'var(--v2-text-primary)' }}>
+                                    Move better, run stronger
+                                </h1>
+                                <p className="text-lg max-w-xl mx-auto" style={{ color: 'var(--v2-text-muted)' }}>
+                                    Based on Jay Dicharry's Running Rewired and Kelly Starrett's Ready to Run.
+                                    Identify movement limitations before they become injuries.
                                 </p>
                             </div>
-                        ) : (
-                            <div className="space-y-4">
-                                <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
-                                    Based on your failed assessments, prioritize these modules:
-                                </p>
-                                {prescribedModules.map(mod => (
-                                    <div key={mod.id} className="p-4 rounded-lg" style={{ background: 'var(--v2-bg-elevated)' }}>
-                                        <div className="flex items-center justify-between mb-2">
-                                            <h3 className="font-medium" style={{ color: 'var(--v2-text-secondary)' }}>{mod.name}</h3>
-                                            <span className="v2-badge">{mod.durationMin} min</span>
-                                        </div>
-                                        <p className="text-sm mb-3" style={{ color: 'var(--v2-text-muted)' }}>
-                                            {mod.frequency.replace('_', ' ')} • {mod.source}
-                                        </p>
-                                        <div className="space-y-1">
-                                            {mod.exercises.slice(0, 3).map((ex, i) => (
-                                                <p key={i} className="text-[10px]" style={{ color: 'var(--v2-text-subtle)' }}>
-                                                    • {ex.name}: {ex.sets}×{ex.reps}
-                                                </p>
-                                            ))}
-                                            {mod.exercises.length > 3 && (
-                                                <p className="text-[10px]" style={{ color: 'var(--v2-text-ghost)' }}>
-                                                    + {mod.exercises.length - 3} more exercises
-                                                </p>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                        <button
-                            className="v2-btn v2-btn-secondary mt-6 w-full"
-                            onClick={() => setShowResults(false)}
-                        >
-                            Close
-                        </button>
-                    </div>
-                )}
 
-                {/* Assessments */}
-                <div className="space-y-4">
-                    {assessments.map(assessment => {
-                        const result = results[assessment.id];
-                        const isExpanded = expandedId === assessment.id;
-
-                        return (
-                            <div
-                                key={assessment.id}
-                                className="v2-card p-4 transition-all"
-                                style={{
-                                    borderColor: result?.result === 'pass' ? 'rgba(74, 222, 128, 0.3)' :
-                                        result?.result === 'fail' ? 'rgba(248, 113, 113, 0.3)' : undefined
-                                }}
-                            >
+                            {/* Mode selection */}
+                            <div className="grid gap-4 md:grid-cols-2">
                                 <button
-                                    className="w-full flex items-center gap-4 text-left"
-                                    onClick={() => setExpandedId(isExpanded ? null : assessment.id)}
+                                    onClick={() => setMode('quick')}
+                                    className="v2-card p-6 text-left hover:border-[var(--v2-accent)] transition-colors"
                                 >
-                                    <span className="text-2xl">{getCategoryIcon(assessment.category)}</span>
-                                    <div className="flex-1">
-                                        <h3 className="font-medium" style={{ color: 'var(--v2-text-secondary)' }}>{assessment.name}</h3>
-                                        <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
-                                            {assessment.description}
-                                        </p>
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <Zap size={28} className="text-[var(--v2-accent)]" />
+                                        <h2 className="text-xl font-light">Quick Check</h2>
                                     </div>
-                                    {result && (
-                                        <span
-                                            className="v2-badge"
-                                            style={{
-                                                background: result.result === 'pass' ? 'var(--v2-accent-subtle)' :
-                                                    result.result === 'fail' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)',
-                                                color: result.result === 'pass' ? 'var(--v2-accent)' :
-                                                    result.result === 'fail' ? '#ef4444' : '#f59e0b'
-                                            }}
-                                        >
-                                            {result.result}
-                                        </span>
-                                    )}
-                                    <span style={{ color: 'var(--v2-text-subtle)' }}>
-                                        {isExpanded ? '▲' : '▼'}
-                                    </span>
+                                    <p className="text-sm mb-4" style={{ color: 'var(--v2-text-muted)' }}>
+                                        Daily readiness scan. 3 key tests in ~2 minutes.
+                                    </p>
+                                    <ul className="text-xs space-y-1" style={{ color: 'var(--v2-text-subtle)' }}>
+                                        <li>• Toe Yoga (foot control)</li>
+                                        <li>• Single Leg Balance</li>
+                                        <li>• Squat Shape</li>
+                                    </ul>
+                                    <div className="mt-4 v2-btn v2-btn-primary w-full">
+                                        Start Quick Check
+                                    </div>
                                 </button>
 
-                                {isExpanded && (
-                                    <div className="mt-4 pt-4 space-y-4" style={{ borderTop: '1px solid var(--v2-border)' }}>
+                                <button
+                                    onClick={() => setMode('full')}
+                                    className="v2-card p-6 text-left hover:border-[var(--v2-accent)] transition-colors"
+                                >
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <ClipboardList size={28} className="text-[var(--v2-accent)]" />
+                                        <h2 className="text-xl font-light">Full Assessment</h2>
+                                    </div>
+                                    <p className="text-sm mb-4" style={{ color: 'var(--v2-text-muted)' }}>
+                                        Complete durability screen. 12 tests in ~10 minutes.
+                                    </p>
+                                    <ul className="text-xs space-y-1" style={{ color: 'var(--v2-text-subtle)' }}>
+                                        <li>• Foot, ankle, hip, spine</li>
+                                        <li>• Strength & mobility gates</li>
+                                        <li>• Personalized prescription</li>
+                                    </ul>
+                                    <div className="mt-4 v2-btn v2-btn-secondary w-full">
+                                        Start Full Assessment
+                                    </div>
+                                </button>
+                            </div>
+
+                            {/* Philosophy note */}
+                            <div className="v2-card p-5" style={{ borderColor: 'var(--v2-accent-subtle)' }}>
+                                <p className="text-xs uppercase tracking-widest mb-2" style={{ color: 'var(--v2-accent)' }}>
+                                    THE DICHARRY PRINCIPLE
+                                </p>
+                                <p className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>
+                                    "Running injuries are often a skill and control problem, not just a mobility problem.
+                                    If you can't hit baseline positions cleanly, your body compensates under load."
+                                </p>
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {/* QUICK MODE - Focused flow */}
+                    {mode === 'quick' && (
+                        <motion.div
+                            key="quick"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            className="space-y-6"
+                        >
+                            {/* Progress */}
+                            <div className="flex items-center justify-between">
+                                <button
+                                    onClick={() => setMode('intro')}
+                                    className="text-sm"
+                                    style={{ color: 'var(--v2-text-subtle)' }}
+                                >
+                                    ← Back
+                                </button>
+                                <p className="v2-mono text-sm" style={{ color: 'var(--v2-accent)' }}>
+                                    {currentQuickIndex + 1} / {quickAssessments.length}
+                                </p>
+                            </div>
+
+                            <div className="h-1 rounded-full overflow-hidden" style={{ background: 'var(--v2-bg-elevated)' }}>
+                                <div
+                                    className="h-full transition-all duration-300"
+                                    style={{
+                                        width: `${((currentQuickIndex + 1) / quickAssessments.length) * 100}%`,
+                                        background: 'var(--v2-accent)'
+                                    }}
+                                />
+                            </div>
+
+                            {/* Current assessment */}
+                            {quickAssessments[currentQuickIndex] && (
+                                <motion.div
+                                    key={quickAssessments[currentQuickIndex].id}
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    className="v2-card p-6 space-y-6"
+                                >
+                                    <div className="text-center">
+                                        <span className="text-4xl mb-4 block">
+                                            {getCategoryIcon(quickAssessments[currentQuickIndex].category)}
+                                        </span>
+                                        <h2 className="text-2xl font-light mb-2">
+                                            {quickAssessments[currentQuickIndex].name}
+                                        </h2>
+                                        <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                            {quickAssessments[currentQuickIndex].description}
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-4 p-4 rounded-lg" style={{ background: 'var(--v2-bg-elevated)' }}>
                                         <div>
-                                            <p className="v2-label mb-1">Test Procedure</p>
-                                            <p className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>{assessment.testProcedure}</p>
+                                            <p className="v2-label mb-1">TEST</p>
+                                            <p className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>
+                                                {quickAssessments[currentQuickIndex].testProcedure}
+                                            </p>
                                         </div>
                                         <div>
-                                            <p className="v2-label mb-1">Pass Standard</p>
-                                            <p className="text-sm" style={{ color: '#4ade80' }}>{assessment.passStandard}</p>
-                                        </div>
-                                        <div>
-                                            <p className="v2-label mb-1">If Failed</p>
-                                            <ul className="text-sm list-disc list-inside" style={{ color: 'var(--v2-text-muted)' }}>
-                                                {assessment.failImplications.map((imp, i) => (
-                                                    <li key={i}>{imp}</li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                        <div className="flex gap-3">
-                                            <button
-                                                className={`v2-btn flex-1 ${result?.result === 'pass' ? 'v2-btn-primary' : 'v2-btn-secondary'}`}
-                                                onClick={() => handleResult(assessment.id, 'pass')}
-                                            >
-                                                ✓ Pass
-                                            </button>
-                                            <button
-                                                className={`v2-btn flex-1 ${result?.result === 'partial' ? 'v2-btn-primary' : 'v2-btn-secondary'}`}
-                                                onClick={() => handleResult(assessment.id, 'partial')}
-                                            >
-                                                ~ Partial
-                                            </button>
-                                            <button
-                                                className={`v2-btn flex-1 ${result?.result === 'fail' ? 'v2-btn-primary' : 'v2-btn-secondary'}`}
-                                                onClick={() => handleResult(assessment.id, 'fail')}
-                                            >
-                                                ✗ Fail
-                                            </button>
+                                            <p className="v2-label mb-1">PASS STANDARD</p>
+                                            <p className="text-sm" style={{ color: '#4ade80' }}>
+                                                {quickAssessments[currentQuickIndex].passStandard}
+                                            </p>
                                         </div>
                                     </div>
+
+                                    <div className="grid grid-cols-3 gap-3">
+                                        <button
+                                            onClick={() => handleQuickResult('pass')}
+                                            className="v2-btn v2-btn-secondary py-4"
+                                            style={{ background: 'rgba(74, 222, 128, 0.1)', borderColor: 'rgba(74, 222, 128, 0.3)' }}
+                                        >
+                                            <span className="block text-lg mb-1">✓</span>
+                                            <span className="text-xs">Pass</span>
+                                        </button>
+                                        <button
+                                            onClick={() => handleQuickResult('partial')}
+                                            className="v2-btn v2-btn-secondary py-4"
+                                            style={{ background: 'rgba(245, 158, 11, 0.1)', borderColor: 'rgba(245, 158, 11, 0.3)' }}
+                                        >
+                                            <span className="block text-lg mb-1">~</span>
+                                            <span className="text-xs">Partial</span>
+                                        </button>
+                                        <button
+                                            onClick={() => handleQuickResult('fail')}
+                                            className="v2-btn v2-btn-secondary py-4"
+                                            style={{ background: 'rgba(248, 113, 113, 0.1)', borderColor: 'rgba(248, 113, 113, 0.3)' }}
+                                        >
+                                            <span className="block text-lg mb-1">✗</span>
+                                            <span className="text-xs">Fail</span>
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </motion.div>
+                    )}
+
+                    {/* FULL MODE - Category-organized */}
+                    {mode === 'full' && (
+                        <motion.div
+                            key="full"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            className="space-y-8"
+                        >
+                            {/* Header */}
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <button
+                                        onClick={() => setMode('intro')}
+                                        className="text-sm mb-2 block"
+                                        style={{ color: 'var(--v2-text-subtle)' }}
+                                    >
+                                        ← Back
+                                    </button>
+                                    <h1 className="text-2xl font-light">Full Durability Assessment</h1>
+                                </div>
+                            </div>
+
+                            {/* Progress */}
+                            <div className="v2-card p-4">
+                                <div className="flex items-center justify-between mb-3">
+                                    <div>
+                                        <p className="v2-label">Progress</p>
+                                        <p className="text-xl font-mono" style={{ color: 'var(--v2-accent)' }}>
+                                            {completedCount} / {totalCount}
+                                        </p>
+                                    </div>
+                                    <div className="flex gap-4 text-sm">
+                                        <span style={{ color: '#4ade80' }}>✓ {passCount}</span>
+                                        <span style={{ color: '#f87171' }}>✗ {failCount}</span>
+                                    </div>
+                                </div>
+                                <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--v2-bg-elevated)' }}>
+                                    <div
+                                        className="h-full transition-all duration-300"
+                                        style={{
+                                            width: `${(completedCount / totalCount) * 100}%`,
+                                            background: 'var(--v2-accent)'
+                                        }}
+                                    />
+                                </div>
+                                {completedCount === totalCount && (
+                                    <button
+                                        className="v2-btn v2-btn-primary mt-4 w-full"
+                                        onClick={() => setMode('results')}
+                                    >
+                                        View Your Prescription
+                                    </button>
                                 )}
                             </div>
-                        );
-                    })}
-                </div>
+
+                            {/* Assessments by category */}
+                            {CATEGORY_ORDER.map(category => {
+                                const categoryAssessments = assessmentsByCategory[category];
+                                if (!categoryAssessments?.length) return null;
+
+                                return (
+                                    <div key={category} className="space-y-3">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xl">{getCategoryIcon(category)}</span>
+                                            <h2 className="text-lg font-light">{getCategoryLabel(category)}</h2>
+                                        </div>
+
+                                        {categoryAssessments.map(assessment => {
+                                            const result = results[assessment.id];
+                                            const isExpanded = expandedId === assessment.id;
+
+                                            return (
+                                                <div
+                                                    key={assessment.id}
+                                                    className="v2-card p-4 transition-all"
+                                                    style={{
+                                                        borderColor: result?.result === 'pass' ? 'rgba(74, 222, 128, 0.3)' :
+                                                            result?.result === 'fail' ? 'rgba(248, 113, 113, 0.3)' : undefined
+                                                    }}
+                                                >
+                                                    <button
+                                                        className="w-full flex items-center gap-4 text-left"
+                                                        onClick={() => setExpandedId(isExpanded ? null : assessment.id)}
+                                                    >
+                                                        <div className="flex-1">
+                                                            <h3 className="font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
+                                                                {assessment.name}
+                                                            </h3>
+                                                            <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                                                {assessment.description}
+                                                            </p>
+                                                        </div>
+                                                        {result && (
+                                                            <span
+                                                                className="v2-badge"
+                                                                style={{
+                                                                    background: result.result === 'pass' ? 'var(--v2-accent-subtle)' :
+                                                                        result.result === 'fail' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                                                                    color: result.result === 'pass' ? 'var(--v2-accent)' :
+                                                                        result.result === 'fail' ? '#ef4444' : '#f59e0b'
+                                                                }}
+                                                            >
+                                                                {result.result}
+                                                            </span>
+                                                        )}
+                                                        <span style={{ color: 'var(--v2-text-subtle)' }}>
+                                                            {isExpanded ? '▲' : '▼'}
+                                                        </span>
+                                                    </button>
+
+                                                    {isExpanded && (
+                                                        <div className="mt-4 pt-4 space-y-4" style={{ borderTop: '1px solid var(--v2-border)' }}>
+                                                            <div>
+                                                                <p className="v2-label mb-1">Test Procedure</p>
+                                                                <p className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>
+                                                                    {assessment.testProcedure}
+                                                                </p>
+                                                            </div>
+                                                            <div>
+                                                                <p className="v2-label mb-1">Pass Standard</p>
+                                                                <p className="text-sm" style={{ color: '#4ade80' }}>
+                                                                    {assessment.passStandard}
+                                                                </p>
+                                                            </div>
+                                                            <div>
+                                                                <p className="v2-label mb-1">If Failed</p>
+                                                                <ul className="text-sm list-disc list-inside" style={{ color: 'var(--v2-text-muted)' }}>
+                                                                    {assessment.failImplications.map((imp, i) => (
+                                                                        <li key={i}>{imp}</li>
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+                                                            <div className="flex gap-3">
+                                                                <button
+                                                                    className={`v2-btn flex-1 ${result?.result === 'pass' ? 'v2-btn-primary' : 'v2-btn-secondary'}`}
+                                                                    onClick={() => handleResult(assessment.id, 'pass')}
+                                                                >
+                                                                    ✓ Pass
+                                                                </button>
+                                                                <button
+                                                                    className={`v2-btn flex-1 ${result?.result === 'partial' ? 'v2-btn-primary' : 'v2-btn-secondary'}`}
+                                                                    onClick={() => handleResult(assessment.id, 'partial')}
+                                                                >
+                                                                    ~ Partial
+                                                                </button>
+                                                                <button
+                                                                    className={`v2-btn flex-1 ${result?.result === 'fail' ? 'v2-btn-primary' : 'v2-btn-secondary'}`}
+                                                                    onClick={() => handleResult(assessment.id, 'fail')}
+                                                                >
+                                                                    ✗ Fail
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                );
+                            })}
+                        </motion.div>
+                    )}
+
+                    {/* RESULTS MODE */}
+                    {mode === 'results' && (
+                        <motion.div
+                            key="results"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            className="space-y-8"
+                        >
+                            <div className="text-center py-4">
+                                <p className="v2-label mb-2" style={{ color: 'var(--v2-accent)' }}>
+                                    YOUR DURABILITY PRESCRIPTION
+                                </p>
+                                <h1 className="text-3xl font-light">
+                                    {failCount === 0 ? 'All Clear!' : `${failCount} area${failCount > 1 ? 's' : ''} to address`}
+                                </h1>
+                            </div>
+
+                            {/* Summary stats */}
+                            <div className="grid grid-cols-3 gap-4">
+                                <div className="v2-card p-4 text-center">
+                                    <p className="text-2xl font-mono" style={{ color: '#4ade80' }}>{passCount}</p>
+                                    <p className="text-xs" style={{ color: 'var(--v2-text-muted)' }}>Pass</p>
+                                </div>
+                                <div className="v2-card p-4 text-center">
+                                    <p className="text-2xl font-mono" style={{ color: '#f59e0b' }}>
+                                        {Object.values(results).filter(r => r.result === 'partial').length}
+                                    </p>
+                                    <p className="text-xs" style={{ color: 'var(--v2-text-muted)' }}>Partial</p>
+                                </div>
+                                <div className="v2-card p-4 text-center">
+                                    <p className="text-2xl font-mono" style={{ color: '#f87171' }}>{failCount}</p>
+                                    <p className="text-xs" style={{ color: 'var(--v2-text-muted)' }}>Fail</p>
+                                </div>
+                            </div>
+
+                            {/* Prescription */}
+                            {prescribedModules.length === 0 ? (
+                                <div className="v2-card p-8 text-center" style={{ borderColor: 'var(--v2-accent)' }}>
+                                    <Sparkles size={48} className="text-[var(--v2-accent)] mx-auto mb-4" />
+                                    <h2 className="text-xl font-light mb-2">Outstanding Durability</h2>
+                                    <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                        All assessments passed. Maintain with general strength work and
+                                        retest weekly to catch any changes before they become problems.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="v2-card p-6 space-y-6" style={{ borderColor: 'var(--v2-accent)' }}>
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="v2-label">Your Daily Micro-Dose</p>
+                                            <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                                {prescribedModules.length} module{prescribedModules.length > 1 ? 's' : ''} • ~{totalPrescribedTime} minutes
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        {prescribedModules.map((mod, index) => (
+                                            <div
+                                                key={mod.id}
+                                                className="p-4 rounded-lg"
+                                                style={{ background: 'var(--v2-bg-elevated)' }}
+                                            >
+                                                <div className="flex items-start justify-between mb-3">
+                                                    <div>
+                                                        <span className="text-xs" style={{ color: 'var(--v2-accent)' }}>
+                                                            {index + 1}. {mod.frequency.replace('_', ' ')}
+                                                        </span>
+                                                        <h3 className="font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
+                                                            {mod.name}
+                                                        </h3>
+                                                    </div>
+                                                    <span className="v2-badge">{mod.durationMin} min</span>
+                                                </div>
+                                                <div className="space-y-1">
+                                                    {mod.exercises.map((ex, i) => (
+                                                        <p key={i} className="text-xs" style={{ color: 'var(--v2-text-muted)' }}>
+                                                            • {ex.name}: {ex.sets}×{ex.reps}
+                                                        </p>
+                                                    ))}
+                                                </div>
+                                                <p className="text-[10px] mt-2" style={{ color: 'var(--v2-text-subtle)' }}>
+                                                    Source: {mod.source}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Dicharry principle reminder */}
+                                    <div className="p-4 rounded-lg" style={{ background: 'rgba(74, 222, 128, 0.05)', borderLeft: '3px solid var(--v2-accent)' }}>
+                                        <p className="text-xs uppercase tracking-widest mb-1" style={{ color: 'var(--v2-accent)' }}>
+                                            RETEST RULE
+                                        </p>
+                                        <p className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>
+                                            Do these modules daily until you can pass the related assessment,
+                                            then retire them. Small consistent doses beat long sporadic sessions.
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Actions */}
+                            <div className="flex gap-4">
+                                <button
+                                    className="v2-btn v2-btn-secondary flex-1"
+                                    onClick={() => {
+                                        setMode('intro');
+                                        setResults({});
+                                        setCurrentQuickIndex(0);
+                                    }}
+                                >
+                                    Retake Assessment
+                                </button>
+                                <button
+                                    className="v2-btn v2-btn-primary flex-1"
+                                    onClick={() => {
+                                        // TODO: Save results and navigate to plan
+                                    }}
+                                >
+                                    Save & Continue
+                                </button>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </main>
         </div>
     );

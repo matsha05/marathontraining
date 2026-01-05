@@ -30,9 +30,9 @@ No more stitching together random running plans, strength programs, and prehab r
 |------------|---------------|
 | Running plan only | Running + Strength + Mobility |
 | Generic paces | Paces calculated from YOUR race time (VDOT) |
-| Static plan | Adapts to your Garmin health data |
+| Static plan | Adapts to your training data |
 | "Based on science" | Built on Hansons, Daniels, Seiler, Dicharry |
-| Manual logging | Syncs with Garmin automatically |
+| Manual logging | Syncs with Strava automatically |
 
 ---
 
@@ -54,8 +54,8 @@ Pick your race. Enter your best recent race time. We calculate your VDOT—the s
 ### 2. Get your plan
 We build a periodized plan: Base → Build → Peak → Taper. Every day has exactly what you need.
 
-### 3. Connect Garmin (optional)
-We pull your sleep, HRV, stress, and workout data. Your plan adjusts based on how recovered you are.
+### 3. Connect Strava (optional)
+We sync your activities to track your training. Your plan stays on track with your actual runs.
 
 ### 4. Execute
 Open the app each morning. See today's workout. Do it. Log it. Repeat.
@@ -81,7 +81,7 @@ We don't make this up. Every workout is rooted in proven methodologies:
 - **Frontend:** Next.js, TypeScript, Tailwind
 - **Icons:** Lucide-animated
 - **Backend:** Supabase
-- **Integrations:** Garmin Connect API (health + activities)
+- **Integrations:** Strava (activity sync)
 
 ---
 
