@@ -1,9 +1,10 @@
 'use client';
 
 /**
- * THE LONG GAME - Onboarding Screens: Preferences & Completion
+ * THE LONG GAME - Onboarding Screens: Preferences & Completion V2
  * 
  * Training intensity, strength training, readiness check, generating, complete
+ * Week aesthetic: Dark, atmospheric, light typography
  */
 
 import { useState, useEffect } from 'react';
@@ -137,7 +138,7 @@ export function StrengthTrainingScreen({
             </OptionGrid>
 
             {value === true && (
-                <p className="text-body-sm text-[var(--text-muted)] mt-4">
+                <p className="v2-body-sm mt-4" style={{ color: 'var(--v2-text-muted)' }}>
                     Our strength work is mostly bodyweight — no gym required.
                     It&apos;s designed to prevent injury and improve running economy.
                 </p>
@@ -187,32 +188,35 @@ export function ReadinessCheckScreen({
         return (
             <QuestionScreen onBack={onBack}>
                 <div className="text-center">
-                    <div className="w-16 h-16 rounded-full bg-[var(--color-success)]/15 flex items-center justify-center mx-auto mb-6">
-                        <Check className="w-8 h-8 text-[var(--color-success)]" />
+                    <div
+                        className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
+                        style={{ background: 'var(--v2-success-subtle)' }}
+                    >
+                        <Check className="w-8 h-8" style={{ color: 'var(--v2-success)' }} />
                     </div>
-                    <h1 className="text-display-md mb-4">You&apos;re ready to start your plan.</h1>
-                    <p className="text-[var(--text-muted)] mb-8">
+                    <h1 className="v2-heading-lg mb-4">You&apos;re ready to start your plan.</h1>
+                    <p className="v2-body-md mb-8" style={{ color: 'var(--v2-text-muted)' }}>
                         Based on what you told us:
                     </p>
 
                     <div className="text-left space-y-2 mb-8">
-                        <div className="flex items-center gap-2 text-body-sm">
-                            <Check className="w-4 h-4 text-[var(--color-success)]" />
+                        <div className="flex items-center gap-2 v2-body-sm">
+                            <Check className="w-4 h-4" style={{ color: 'var(--v2-success)' }} />
                             <span>Your current mileage supports Week 1 volume</span>
                         </div>
-                        <div className="flex items-center gap-2 text-body-sm">
-                            <Check className="w-4 h-4 text-[var(--color-success)]" />
+                        <div className="flex items-center gap-2 v2-body-sm">
+                            <Check className="w-4 h-4" style={{ color: 'var(--v2-success)' }} />
                             <span>Your longest run matches plan requirements</span>
                         </div>
-                        <div className="flex items-center gap-2 text-body-sm">
-                            <Check className="w-4 h-4 text-[var(--color-success)]" />
+                        <div className="flex items-center gap-2 v2-body-sm">
+                            <Check className="w-4 h-4" style={{ color: 'var(--v2-success)' }} />
                             <span>Training days align with plan structure</span>
                         </div>
                     </div>
 
                     <button
                         onClick={onProceed}
-                        className="btn btn-gradient btn-lg w-full"
+                        className="v2-btn v2-btn-primary v2-btn-lg w-full"
                     >
                         Generate my plan
                         <ArrowRight className="w-5 h-5 ml-2" />
@@ -227,15 +231,18 @@ export function ReadinessCheckScreen({
         return (
             <QuestionScreen onBack={onBack}>
                 <div className="text-center">
-                    <div className="w-16 h-16 rounded-full bg-[var(--color-warning)]/15 flex items-center justify-center mx-auto mb-6">
-                        <AlertTriangle className="w-8 h-8 text-[var(--color-warning)]" />
+                    <div
+                        className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
+                        style={{ background: 'var(--v2-warning-subtle)' }}
+                    >
+                        <AlertTriangle className="w-8 h-8" style={{ color: 'var(--v2-warning)' }} />
                     </div>
-                    <h1 className="text-display-sm mb-4">Let&apos;s build your foundation first.</h1>
+                    <h1 className="v2-heading-md mb-4">Let&apos;s build your foundation first.</h1>
                 </div>
 
                 <div className="text-left mb-6">
-                    <p className="text-[var(--text-muted)] mb-4">Based on your current training:</p>
-                    <ul className="space-y-1 text-body-sm text-[var(--text-muted)]">
+                    <p className="v2-body-md mb-4" style={{ color: 'var(--v2-text-muted)' }}>Based on your current training:</p>
+                    <ul className="space-y-1 v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
                         <li>• Weekly miles: {data.weeklyMiles} mi/wk</li>
                         <li>• Longest run: {data.longestRecentRun} miles</li>
                         {weeksToRace && <li>• Race date: {weeksToRace} weeks away</li>}
@@ -250,15 +257,17 @@ export function ReadinessCheckScreen({
                     absorb Week 1 before you start Week 1.
                 </WarningBanner>
 
-                <div className="mt-6 p-4 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-base)]">
-                    <p className="text-label mb-3">Here&apos;s what we recommend:</p>
-                    <div className="space-y-2 text-body-sm">
+                <div
+                    className="mt-6 p-4 rounded-xl v2-card"
+                >
+                    <p className="v2-label mb-3">Here&apos;s what we recommend:</p>
+                    <div className="space-y-2 v2-body-sm">
                         <div className="flex justify-between">
-                            <span className="text-[var(--text-muted)]">Weeks 1-{baseWeeksNeeded}</span>
+                            <span style={{ color: 'var(--v2-text-muted)' }}>Weeks 1-{baseWeeksNeeded}</span>
                             <span>Base Building</span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="text-[var(--text-muted)]">Weeks {baseWeeksNeeded + 1}+</span>
+                            <span style={{ color: 'var(--v2-text-muted)' }}>Weeks {baseWeeksNeeded + 1}+</span>
                             <span>{goalLabel} Plan</span>
                         </div>
                     </div>
@@ -267,13 +276,13 @@ export function ReadinessCheckScreen({
                 <div className="mt-8 space-y-3">
                     <button
                         onClick={onProceed}
-                        className="btn btn-gradient btn-lg w-full"
+                        className="v2-btn v2-btn-primary v2-btn-lg w-full"
                     >
                         Start with base building
                     </button>
                     <button
                         onClick={onProceedAnyway}
-                        className="btn btn-secondary w-full"
+                        className="v2-btn v2-btn-secondary w-full"
                     >
                         I know my limits — start plan anyway
                     </button>
@@ -286,13 +295,16 @@ export function ReadinessCheckScreen({
     return (
         <QuestionScreen onBack={onBack}>
             <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-[var(--color-warning)]/15 flex items-center justify-center mx-auto mb-6">
-                    <AlertTriangle className="w-8 h-8 text-[var(--color-warning)]" />
+                <div
+                    className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
+                    style={{ background: 'var(--v2-warning-subtle)' }}
+                >
+                    <AlertTriangle className="w-8 h-8" style={{ color: 'var(--v2-warning)' }} />
                 </div>
-                <h1 className="text-display-sm mb-4">
+                <h1 className="v2-heading-md mb-4">
                     Heads up: You only have {weeksToRace} weeks until your race.
                 </h1>
-                <p className="text-[var(--text-muted)] mb-8">
+                <p className="v2-body-md mb-8" style={{ color: 'var(--v2-text-muted)' }}>
                     That&apos;s on the short side for a {goalLabel.toLowerCase()}. We can build you
                     a condensed plan, but expectations should be adjusted.
                 </p>
@@ -301,13 +313,13 @@ export function ReadinessCheckScreen({
             <div className="space-y-3">
                 <button
                     onClick={onProceed}
-                    className="btn btn-gradient btn-lg w-full"
+                    className="v2-btn v2-btn-primary v2-btn-lg w-full"
                 >
                     Build me a {weeksToRace}-week plan
                 </button>
                 <button
                     onClick={onBack}
-                    className="btn btn-secondary w-full"
+                    className="v2-btn v2-btn-secondary w-full"
                 >
                     Go back and change my race date
                 </button>
@@ -353,17 +365,17 @@ export function GeneratingScreen({ onComplete }: GeneratingScreenProps) {
     return (
         <QuestionScreen showBack={false}>
             <div className="text-center py-12">
-                <Loader2 className="w-12 h-12 animate-spin mx-auto text-[var(--color-accent)] mb-8" />
-                <h1 className="text-display-sm mb-6">Building your plan...</h1>
+                <Loader2 className="w-12 h-12 animate-spin mx-auto mb-8 v2-accent" />
+                <h1 className="v2-heading-md mb-6">Building your plan...</h1>
 
                 <div className="space-y-2">
                     {stages.slice(0, stage + 1).map((text, i) => (
                         <div
                             key={i}
-                            className={`text-body-sm transition-opacity ${i === stage ? 'text-[var(--text-primary)]' : 'text-[var(--text-subtle)]'
-                                }`}
+                            className="v2-body-sm transition-opacity"
+                            style={{ color: i === stage ? 'var(--v2-text-primary)' : 'var(--v2-text-subtle)' }}
                         >
-                            {i < stage && <Check className="w-4 h-4 inline mr-2 text-[var(--color-success)]" />}
+                            {i < stage && <Check className="w-4 h-4 inline mr-2" style={{ color: 'var(--v2-success)' }} />}
                             {text}
                         </div>
                     ))}
@@ -392,21 +404,24 @@ export function CompleteScreen({ data, onViewDashboard, onViewPlan }: CompleteSc
     return (
         <QuestionScreen showBack={false}>
             <div className="text-center">
-                <div className="w-20 h-20 rounded-full bg-[var(--color-success)]/15 flex items-center justify-center mx-auto mb-6">
-                    <Check className="w-10 h-10 text-[var(--color-success)]" />
+                <div
+                    className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+                    style={{ background: 'var(--v2-success-subtle)' }}
+                >
+                    <Check className="w-10 h-10" style={{ color: 'var(--v2-success)' }} />
                 </div>
 
-                <h1 className="text-display-md mb-2">Your plan is ready, {data.name}.</h1>
+                <h1 className="v2-heading-lg mb-2">Your plan is ready, {data.name}.</h1>
 
                 {data.raceName && data.raceDate && weeksToRace && (
-                    <p className="text-body-lg text-[var(--color-accent)] mb-6">
+                    <p className="v2-body-lg v2-accent mb-6">
                         {weeksToRace * 7} days until {data.raceName}
                     </p>
                 )}
             </div>
 
             <SuccessBanner title={`${weeksToRace ?? 12}-Week ${goalLabel} Plan`}>
-                <div className="space-y-1 mt-2 text-body-sm text-[var(--text-muted)]">
+                <div className="space-y-1 mt-2 v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
                     <p>• Starting VDOT: {data.vdot}</p>
                     <p>• {data.availableDays} training days per week</p>
                     <p>• Long runs on {data.longRunDay}</p>
@@ -417,13 +432,13 @@ export function CompleteScreen({ data, onViewDashboard, onViewPlan }: CompleteSc
             <div className="mt-8 space-y-3">
                 <button
                     onClick={onViewPlan}
-                    className="btn btn-gradient btn-lg w-full"
+                    className="v2-btn v2-btn-primary v2-btn-lg w-full"
                 >
                     View full plan
                 </button>
                 <button
                     onClick={onViewDashboard}
-                    className="btn btn-secondary w-full"
+                    className="v2-btn v2-btn-secondary w-full"
                 >
                     Go to dashboard
                 </button>

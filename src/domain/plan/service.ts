@@ -179,9 +179,36 @@ function validateOnboardingData(data: OnboardingData): {
 // PLAN GENERATION SERVICE
 // =============================================================================
 
+import { selectPlanTier, TierSelectionInput } from '@/domain/philosophy/tier-selector';
+import { generateCoachPlan } from '@/domain/plan/coach-generators';
+import { PfitzFRRTier, DanielsTier } from '@/domain/plan/types';
+
+/**
+ * Map OnboardingData experience/mileage to tier-selector format
+ */
+function mapExperience(data: OnboardingData): 'beginner' | 'intermediate' | 'advanced' {
+    // Use trainingIntensity as proxy for experience if experienceLevel not set
+    if (data.trainingIntensity === 'aggressive') return 'advanced';
+    if (data.trainingIntensity === 'conservative') return 'beginner';
+    return 'intermediate';
+}
+
+function mapCurrentMileage(data: OnboardingData): 'under_20' | '20_40' | 'over_40' {
+    const mileage = data.weeklyMiles ?? 20;
+    if (mileage >= 40) return 'over_40';
+    if (mileage >= 20) return '20_40';
+    return 'under_20';
+}
+
 /**
  * Generate a training plan from onboarding data.
- * Handles transformation, generation, and error wrapping.
+ * 
+ * ROUTING LOGIC (Jan 2026):
+ * 1. Use tier-selector to get specific plan tier
+ * 2. Route to coach-specific generator:
+ *    - Pfitz FRR tiers → generateFRRPlan
+ *    - Daniels tiers → generateDanielsPlan
+ *    - Other tiers → generic generator (fallback for now)
  */
 export function createPlanFromOnboarding(
     onboardingData: OnboardingData
@@ -192,14 +219,42 @@ export function createPlanFromOnboarding(
         return inputResult;
     }
 
-    // Step 2: Generate
-    try {
-        const plan = generatePlan(inputResult.data);
+    // Step 2: Select tier based on philosophy + profile
+    const philosophy = onboardingData.trainingPhilosophy ?? 'higdon';
+    const tierInput: TierSelectionInput = {
+        philosophy: philosophy as 'higdon' | 'hansons' | 'pfitzinger' | 'daniels',
+        distance: inputResult.data.goalDistance as 'base' | '5k' | '10k' | 'half' | 'marathon' | 'ultra',
+        experience: mapExperience(onboardingData),
+        currentMileage: mapCurrentMileage(onboardingData),
+        daysPerWeek: inputResult.data.availableDays,
+        weeksAvailable: onboardingData.trainingGoal === 'general' ? 12 : undefined,
+    };
 
-        // Step 3: Validate plan
+    const tierResult = selectPlanTier(tierInput);
+    console.log('[PlanService] Selected tier:', tierResult.tier, 'for philosophy:', philosophy);
+
+    if (tierResult.warnings.length > 0) {
+        console.warn('[PlanService] Tier selection warnings:', tierResult.warnings);
+    }
+
+    // Step 3: Generate using coach-specific generator
+    try {
+        let plan: TrainingPlan;
+
+        // Route based on tier prefix
+        if (tierResult.tier.startsWith('pfitz_frr_')) {
+            plan = generateCoachPlan(inputResult.data, tierResult.tier as PfitzFRRTier);
+        } else if (tierResult.tier.startsWith('daniels_')) {
+            plan = generateCoachPlan(inputResult.data, tierResult.tier as DanielsTier);
+        } else {
+            // Use generic generator for Higdon/Hansons (for now)
+            // TODO: Add Higdon/Hansons-specific generators
+            plan = generatePlan(inputResult.data);
+        }
+
+        // Step 4: Validate plan
         if (!plan.verification.passed) {
             console.warn('Plan verification warnings:', plan.verification.checks);
-            // Still return the plan, but log warnings
         }
 
         return { success: true, data: plan };
@@ -209,7 +264,7 @@ export function createPlanFromOnboarding(
             error: {
                 code: 'GENERATION_FAILED',
                 message: error instanceof Error ? error.message : 'Unknown generation error',
-                details: { error },
+                details: { error, tier: tierResult.tier },
             },
         };
     }

@@ -13,10 +13,6 @@ import { useRouter } from "next/navigation";
 
 const LANDING_ROUTES = [
     "/landing/week",
-    "/landing/week2",
-    "/landing/prime-a",
-    "/landing/prime-b",
-    "/landing/prime-c",
 ];
 
 export function useLandingNav(currentRoute: string) {

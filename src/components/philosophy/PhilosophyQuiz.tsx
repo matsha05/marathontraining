@@ -8,6 +8,7 @@ import {
     Experience,
     CurrentMileage,
     Mindset,
+    RaceTiming,
     INITIAL_QUIZ_ANSWERS,
 } from '@/domain/philosophy/types';
 import { calculateRecommendation } from '@/domain/philosophy/recommendation';
@@ -15,9 +16,9 @@ import { useState, useCallback } from 'react';
 import { QuestionScreen } from './QuestionScreen';
 import { RecommendationScreen } from './RecommendationScreen';
 
-type QuestionStep = 'distance' | 'days' | 'experience' | 'mileage' | 'mindset' | 'result';
+type QuestionStep = 'distance' | 'timing' | 'days' | 'experience' | 'mileage' | 'mindset' | 'result';
 
-const STEP_ORDER: QuestionStep[] = ['distance', 'days', 'experience', 'mileage', 'mindset', 'result'];
+const STEP_ORDER: QuestionStep[] = ['distance', 'timing', 'days', 'experience', 'mileage', 'mindset', 'result'];
 
 interface PhilosophyQuizProps {
     onComplete: (philosophy: string) => void;
@@ -47,6 +48,11 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
 
     const handleDistanceSelect = (value: TargetDistance) => {
         setAnswers(prev => ({ ...prev, targetDistance: value }));
+        goNext();
+    };
+
+    const handleTimingSelect = (value: RaceTiming) => {
+        setAnswers(prev => ({ ...prev, raceTiming: value }));
         goNext();
     };
 
@@ -99,7 +105,6 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                             { value: '10k' as TargetDistance, label: '10K Race', description: 'The balanced challenge' },
                             { value: 'half' as TargetDistance, label: 'Half Marathon', description: 'The sweet spot' },
                             { value: 'marathon' as TargetDistance, label: 'Marathon', description: 'The classic 26.2' },
-                            { value: 'ultra' as TargetDistance, label: 'Ultra Marathon', description: 'Beyond the standard' },
                         ]}
                         onSelect={handleDistanceSelect}
                         onBack={onSkip}
@@ -107,8 +112,25 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                     />
                 )}
 
-                {/* Question 2: Days per week */}
+                {/* Question 2: Race Timing */}
+                {step === 'timing' && (
+                    <QuestionScreen
+                        key="timing"
+                        question="When is your race?"
+                        subtitle="This helps match you with the right training approach."
+                        options={[
+                            { value: 'specific' as RaceTiming, label: 'I have a specific date', description: 'We\'ll calculate the weeks' },
+                            { value: 'soon' as RaceTiming, label: 'Sometime in 3-6 months', description: 'Standard 18-24 week plans' },
+                            { value: 'no_race' as RaceTiming, label: 'No race planned', description: 'Focus on building fitness' },
+                        ]}
+                        onSelect={handleTimingSelect}
+                        onBack={goBack}
+                    />
+                )}
+
+                {/* Question 3: Days per week */}
                 {step === 'days' && (
+
                     <QuestionScreen
                         key="days"
                         question="How many days can you RUN each week?"
@@ -124,27 +146,27 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                     />
                 )}
 
-                {/* Question 3: Experience */}
+                {/* Question 4: Experience */}
                 {step === 'experience' && (
                     <QuestionScreen
                         key="experience"
-                        question="What's your experience level?"
-                        subtitle="At your current fitness level."
+                        question="What best describes you right now?"
+                        subtitle="Be honest — this protects you from overtraining."
                         options={[
                             {
                                 value: 'beginner' as Experience,
-                                label: 'New to this',
-                                description: 'First time or coming back'
+                                label: 'Brand new to running',
+                                description: 'Never trained for a race before'
                             },
                             {
                                 value: 'intermediate' as Experience,
-                                label: 'Some experience',
-                                description: 'A few races under my belt'
+                                label: 'Currently running regularly',
+                                description: 'Running at least 2-3 times per week'
                             },
                             {
                                 value: 'advanced' as Experience,
                                 label: 'Experienced & chasing PRs',
-                                description: 'Ready to push for faster'
+                                description: 'Consistent training, ready to push'
                             },
                         ]}
                         onSelect={handleExperienceSelect}
@@ -152,7 +174,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                     />
                 )}
 
-                {/* Question 4: Current mileage */}
+                {/* Question 5: Current mileage */}
                 {step === 'mileage' && (
                     <QuestionScreen
                         key="mileage"

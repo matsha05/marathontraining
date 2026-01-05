@@ -1,9 +1,10 @@
 'use client';
 
 /**
- * THE LONG GAME - Onboarding Screens: Training Load & Schedule
+ * THE LONG GAME - Onboarding Screens: Training Load & Schedule V2
  * 
  * Weekly mileage, runs per week, longest run, available days, long run day
+ * Week aesthetic: Dark, atmospheric, light typography
  */
 
 import {
@@ -226,7 +227,7 @@ export function AvailableDaysScreen({
                 ))}
             </OptionGrid>
 
-            <p className="text-body-sm text-[var(--text-subtle)] mt-4">
+            <p className="v2-body-sm mt-4" style={{ color: 'var(--v2-text-subtle)' }}>
                 More days = more adaptation stimulus. But quality beats quantity.
                 A focused 4-day plan often outperforms a half-hearted 6-day plan.
             </p>

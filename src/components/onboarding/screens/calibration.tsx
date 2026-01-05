@@ -1,10 +1,11 @@
 'use client';
 
 /**
- * THE LONG GAME - Onboarding Screens: Calibration
+ * THE LONG GAME - Onboarding Screens: Calibration V2
  * 
  * Fitness calibration method selection, race input, easy pace, 
  * device import, hard effort, estimation, and VDOT reveal screens
+ * Week aesthetic: Dark, atmospheric, light typography
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -165,7 +166,7 @@ export function RaceInputScreen({
             <div className="space-y-6">
                 {/* Distance */}
                 <div>
-                    <label className="text-label block mb-2">Distance</label>
+                    <label className="v2-label block mb-2">Distance</label>
                     <OptionGrid columns={3}>
                         {RACE_DISTANCES.map((dist) => (
                             <OptionButton
@@ -180,7 +181,7 @@ export function RaceInputScreen({
 
                 {/* Time */}
                 <div>
-                    <label className="text-label block mb-2">Finish time</label>
+                    <label className="v2-label block mb-2">Finish time</label>
                     <TimeInput
                         minutes={data.raceTimeMinutes}
                         seconds={data.raceTimeSeconds}
@@ -193,7 +194,7 @@ export function RaceInputScreen({
 
                 {/* Recency */}
                 <div>
-                    <label className="text-label block mb-2">When was this race?</label>
+                    <label className="v2-label block mb-2">When was this race?</label>
                     <OptionGrid columns={2}>
                         {RACE_RECENCY_OPTIONS.map((option) => (
                             <OptionButton
@@ -253,10 +254,10 @@ export function EasyPaceInputScreen({
                     onMinutesChange={(m) => onPaceChange(m, data.easyPaceSeconds)}
                     onSecondsChange={(s) => onPaceChange(data.easyPaceMinutes, s)}
                 />
-                <p className="text-[var(--text-muted)]">per mile</p>
+                <p style={{ color: 'var(--v2-text-muted)' }}>per mile</p>
             </div>
 
-            <p className="text-body-sm text-[var(--text-subtle)] mt-4">
+            <p className="v2-body-sm mt-4" style={{ color: 'var(--v2-text-subtle)' }}>
                 This should feel like you could chat with a friend.<br />
                 If you&apos;re breathing hard, that&apos;s not easy pace.
             </p>
@@ -426,14 +427,14 @@ export function DeviceImportScreen({
             />
 
             {authRequired && !statusLoading && (
-                <div className="mb-6 rounded-xl border border-[var(--border-base)] bg-[var(--bg-elevated)] p-4">
-                    <p className="text-body-sm text-[var(--text-muted)]">
+                <div className="mb-6 rounded-xl v2-card p-4">
+                    <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
                         Sign in to connect Strava or import Garmin health data. You can continue without syncing and link everything later.
                     </p>
                     <button
                         type="button"
                         onClick={handleSignIn}
-                        className="btn btn-secondary w-full mt-3"
+                        className="v2-btn v2-btn-secondary w-full mt-3"
                     >
                         Sign in to connect data
                     </button>
@@ -441,19 +442,25 @@ export function DeviceImportScreen({
             )}
 
             <div className="space-y-4">
-                <div className="rounded-xl border border-[var(--border-base)] bg-[var(--bg-elevated)] p-4">
+                <div className="rounded-xl v2-card p-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                         <div>
-                            <p className="text-label">Connect Strava (recommended)</p>
-                            <p className="text-body-sm text-[var(--text-muted)]">
+                            <p className="v2-label">Connect Strava (recommended)</p>
+                            <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
                                 Runs will appear automatically after each sync from Garmin.
                             </p>
                         </div>
-                        <span className={`badge ${stravaStatus.connected ? 'badge-accent' : 'badge-warning'}`}>
+                        <span
+                            className="v2-badge"
+                            style={{
+                                background: stravaStatus.connected ? 'var(--v2-accent-subtle)' : 'var(--v2-warning-subtle)',
+                                color: stravaStatus.connected ? 'var(--v2-accent)' : 'var(--v2-warning)'
+                            }}
+                        >
                             {stravaStatus.connected ? 'Connected' : 'Not connected'}
                         </span>
                     </div>
-                    <div className="mt-3 text-body-sm text-[var(--text-muted)]">
+                    <div className="mt-3 v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
                         {stravaStatus.connected
                             ? `Connected${stravaLast ? ` · Last activity ${stravaLast}` : ''}`
                             : connectState === 'auth'
@@ -462,18 +469,18 @@ export function DeviceImportScreen({
                                     ? 'Checking connection status...'
                                     : 'Connect Strava to enable automatic activity sync.'}
                     </div>
-                    <p className="text-caption mt-2">
+                    <p className="v2-mono mt-2" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
                         Garmin Connect → Settings → Connected Apps → Strava.
                     </p>
                     {isLocalhost && (
-                        <p className="text-caption mt-2 text-[var(--text-muted)]">
+                        <p className="v2-mono mt-2" style={{ fontSize: '11px', color: 'var(--v2-text-muted)' }}>
                             Strava OAuth only works on the production domain. Open the production site to connect.
                         </p>
                     )}
                     <div className="mt-3 flex flex-wrap gap-3">
                         <button
                             type="button"
-                            className="btn btn-primary"
+                            className="v2-btn v2-btn-primary"
                             onClick={onStravaConnect}
                             disabled={stravaConnectDisabled}
                         >
@@ -482,22 +489,28 @@ export function DeviceImportScreen({
                     </div>
                 </div>
 
-                <div className="rounded-xl border border-[var(--border-base)] p-4">
+                <div className="rounded-xl v2-card p-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                         <div>
-                            <p className="text-label">Import Garmin health metrics (recommended)</p>
-                            <p className="text-body-sm text-[var(--text-muted)]">
+                            <p className="v2-label">Import Garmin health metrics (recommended)</p>
+                            <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
                                 Sleep, HRV, stress, and Body Battery history.
                             </p>
                         </div>
-                        <span className={`badge ${hasHealthData ? 'badge-accent' : 'badge-warning'}`}>
+                        <span
+                            className="v2-badge"
+                            style={{
+                                background: hasHealthData ? 'var(--v2-accent-subtle)' : 'var(--v2-warning-subtle)',
+                                color: hasHealthData ? 'var(--v2-accent)' : 'var(--v2-warning)'
+                            }}
+                        >
                             {hasHealthData ? 'Imported' : 'Upload ZIP'}
                         </span>
                     </div>
                     <input
                         type="file"
                         accept=".zip,application/zip"
-                        className="input mt-3"
+                        className="v2-input mt-3"
                         disabled={connectDisabled || importBusy}
                         onChange={(event) => {
                             const file = event.target.files?.[0];
@@ -507,36 +520,39 @@ export function DeviceImportScreen({
                             }
                         }}
                     />
-                    <p className="text-caption mt-2">
+                    <p className="v2-mono mt-2" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
                         Garmin Connect web → Account Settings → Export Data.
                     </p>
-                    <p className="text-caption">
+                    <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
                         Re-export weekly if you want readiness to stay current.
                     </p>
                     {garminLast && (
-                        <p className="text-body-sm text-[var(--text-muted)] mt-2">
+                        <p className="v2-body-sm mt-2" style={{ color: 'var(--v2-text-muted)' }}>
                             Last health import: {garminLast}
                         </p>
                     )}
                     {importMessage && (
-                        <p className="text-body-sm text-[var(--text-muted)] mt-2">{importMessage}</p>
+                        <p className="v2-body-sm mt-2" style={{ color: 'var(--v2-text-muted)' }}>{importMessage}</p>
                     )}
                 </div>
             </div>
 
             {connectError && (
-                <div className="mt-6 rounded-xl border border-[var(--color-error)]/30 bg-[var(--bg-elevated)] px-4 py-3 text-body-sm text-[var(--color-error)]">
+                <div
+                    className="mt-6 rounded-xl v2-card px-4 py-3 v2-body-sm"
+                    style={{ background: 'var(--v2-error-subtle)', color: 'var(--v2-error)', borderColor: 'var(--v2-error)' }}
+                >
                     {connectError}
                 </div>
             )}
 
-            <div className="mt-6 space-y-3 text-body-sm text-[var(--text-muted)]">
+            <div className="mt-6 space-y-3 v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
                 <p>Connecting opens a new tab. Return here once you finish and this screen will refresh.</p>
                 <p>You can always connect Strava or upload a Garmin export later in Settings.</p>
                 <button
                     type="button"
                     onClick={refreshStatus}
-                    className="text-[var(--color-accent)] hover:underline"
+                    className="v2-accent hover:underline"
                 >
                     {statusLoading ? 'Checking connection...' : 'Refresh connection status'}
                 </button>
@@ -597,10 +613,10 @@ export function ManualVo2maxInputScreen({
                 suffix="VO2max"
             />
 
-            <p className="mt-4 text-body-sm text-[var(--text-muted)]">
+            <p className="mt-4 v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
                 Most runners fall between 30 and 70. We use this to set your training paces.
             </p>
-            <p className="mt-2 text-body-sm text-[var(--text-muted)]">
+            <p className="mt-2 v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
                 Update your VO2max every 4-6 weeks or after a race in Settings.
             </p>
 
@@ -648,7 +664,7 @@ export function HardEffortInputScreen({
             <div className="space-y-6">
                 {/* Effort type */}
                 <div>
-                    <label className="text-label block mb-2">What was it?</label>
+                    <label className="v2-label block mb-2">What was it?</label>
                     <OptionGrid columns={2}>
                         {EFFORT_TYPES.map((type) => (
                             <OptionButton
@@ -669,7 +685,7 @@ export function HardEffortInputScreen({
                 {/* Distance (if needed) */}
                 {data.effortType && data.effortType !== 'parkrun' && (
                     <div>
-                        <label className="text-label block mb-2">Distance</label>
+                        <label className="v2-label block mb-2">Distance</label>
                         <TextInput
                             value={data.effortDistance}
                             onChange={onDistanceChange}
@@ -680,7 +696,7 @@ export function HardEffortInputScreen({
 
                 {/* Time */}
                 <div>
-                    <label className="text-label block mb-2">Time</label>
+                    <label className="v2-label block mb-2">Time</label>
                     <TimeInput
                         minutes={data.effortTimeMinutes}
                         seconds={data.effortTimeSeconds}
@@ -691,22 +707,24 @@ export function HardEffortInputScreen({
 
                 {/* Effort level */}
                 <div>
-                    <label className="text-label block mb-2">Effort level (1-10)</label>
+                    <label className="v2-label block mb-2">Effort level (1-10)</label>
                     <div className="flex items-center gap-2">
                         {[6, 7, 8, 9, 10].map((level) => (
                             <button
                                 key={level}
                                 onClick={() => onEffortLevelChange(level)}
-                                className={`w-10 h-10 rounded-lg border transition-all ${data.effortLevel === level
-                                    ? 'bg-[var(--color-accent)] text-black border-transparent'
-                                    : 'bg-[var(--bg-elevated)] border-[var(--border-base)]'
-                                    }`}
+                                className="w-10 h-10 rounded-lg border transition-all"
+                                style={{
+                                    background: data.effortLevel === level ? 'var(--v2-accent)' : 'var(--v2-bg-elevated)',
+                                    borderColor: data.effortLevel === level ? 'transparent' : 'var(--v2-border)',
+                                    color: data.effortLevel === level ? 'var(--v2-bg-base)' : 'var(--v2-text-primary)',
+                                }}
                             >
                                 {level}
                             </button>
                         ))}
                     </div>
-                    <p className="text-caption text-[var(--text-subtle)] mt-2">
+                    <p className="v2-mono mt-2" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
                         10 = absolute max effort, 6 = comfortably hard
                     </p>
                 </div>
@@ -771,7 +789,7 @@ export function EstimationFlowScreen({
             />
 
             <div>
-                <label className="text-label block mb-3">{promptLabel}</label>
+                <label className="v2-label block mb-3">{promptLabel}</label>
                 <OptionGrid>
                     {EXPERIENCE_LEVELS.map((level, index) => (
                         <OptionButton
@@ -834,8 +852,8 @@ export function VdotRevealScreen({
         return (
             <QuestionScreen onBack={onBack}>
                 <div className="text-center py-12">
-                    <Loader2 className="w-8 h-8 animate-spin mx-auto text-[var(--color-accent)]" />
-                    <p className="text-[var(--text-muted)] mt-4">Calculating your VDOT...</p>
+                    <Loader2 className="w-8 h-8 animate-spin mx-auto v2-accent" />
+                    <p className="mt-4" style={{ color: 'var(--v2-text-muted)' }}>Calculating your VDOT...</p>
                 </div>
             </QuestionScreen>
         );
@@ -845,8 +863,7 @@ export function VdotRevealScreen({
     const percentileInfo = getVdotPercentile(data.vdot);
 
     // Predicted marathon time using VDOT-based formula
-    // Daniels' formula: marathon pace can be derived from VDOT
-    const marathonPaceSeconds = paces.marathon; // seconds per mile
+    const marathonPaceSeconds = paces.marathon;
     const marathonTimeMinutes = Math.round((marathonPaceSeconds * 26.2) / 60);
     const marathonHours = Math.floor(marathonTimeMinutes / 60);
     const marathonMins = marathonTimeMinutes % 60;
@@ -854,22 +871,22 @@ export function VdotRevealScreen({
     return (
         <QuestionScreen onBack={onBack}>
             <div className="text-center mb-6">
-                <p className="text-label text-[var(--color-accent)] mb-2">Your VDOT</p>
-                <div className="text-display-xl text-data mb-2">{data.vdot}</div>
-                <p className="text-[var(--text-muted)]">
+                <p className="v2-label v2-accent mb-2">Your VDOT</p>
+                <div className="v2-heading-xl v2-mono mb-2">{data.vdot}</div>
+                <p style={{ color: 'var(--v2-text-muted)' }}>
                     {percentileInfo.label} • Top {100 - percentileInfo.percentile}% of recreational runners
                 </p>
                 {data.vdotConfidence === 'low' && (
-                    <p className="text-body-sm text-[var(--color-warning)] mt-2">
+                    <p className="v2-body-sm mt-2" style={{ color: 'var(--v2-warning)' }}>
                         This is an estimate — we&apos;ll refine it with your calibration run
                     </p>
                 )}
             </div>
 
             {/* What is VDOT? Explainer */}
-            <div className="p-4 rounded-xl bg-[var(--bg-inset)] mb-4">
-                <p className="text-label text-[var(--text-muted)] mb-2">What is VDOT?</p>
-                <p className="text-body-sm text-[var(--text-base)] leading-relaxed">
+            <div className="p-4 rounded-xl mb-4" style={{ background: 'var(--v2-bg-inset)' }}>
+                <p className="v2-label mb-2" style={{ color: 'var(--v2-text-muted)' }}>What is VDOT?</p>
+                <p className="v2-body-sm leading-relaxed">
                     VDOT is your &quot;running fitness score&quot; developed by legendary coach Jack Daniels.
                     It&apos;s calculated from your race performance and accounts for both your aerobic capacity
                     and running efficiency. Higher number = fitter. This single number determines all your
@@ -880,21 +897,21 @@ export function VdotRevealScreen({
             <SuccessBanner title={`Predicts a ~${marathonHours}:${marathonMins.toString().padStart(2, '0')} marathon`}>
                 This gives us the data we need to set your training zones perfectly.
             </SuccessBanner>
-            <p className="mt-4 text-body-sm text-[var(--text-muted)]">
+            <p className="mt-4 v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
                 You can update VO2max anytime in Settings → Fitness and we&apos;ll adjust your plan.
             </p>
 
             {/* Training Paces with Explanations */}
-            <div className="mt-6 p-4 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-base)]">
-                <p className="text-label mb-4">Your training paces</p>
-                <div className="space-y-4 text-body-sm">
+            <div className="mt-6 p-4 rounded-xl v2-card">
+                <p className="v2-label mb-4">Your training paces</p>
+                <div className="space-y-4 v2-body-sm">
                     {/* Easy Pace */}
                     <div>
                         <div className="flex justify-between mb-1">
-                            <span className="font-medium">Easy</span>
-                            <span className="text-data">{formatPace(paces.easy.min)} - {formatPace(paces.easy.max)}/mi</span>
+                            <span style={{ fontWeight: 500 }}>Easy</span>
+                            <span className="v2-mono">{formatPace(paces.easy.min)} - {formatPace(paces.easy.max)}/mi</span>
                         </div>
-                        <p className="text-caption text-[var(--text-subtle)]">
+                        <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
                             Recovery runs, warm-ups, cool-downs. You should be able to hold a conversation comfortably.
                             This builds your aerobic base without taxing your body.
                         </p>
@@ -903,10 +920,10 @@ export function VdotRevealScreen({
                     {/* Marathon Pace */}
                     <div>
                         <div className="flex justify-between mb-1">
-                            <span className="font-medium">Marathon Pace</span>
-                            <span className="text-data">{formatPace(paces.marathon)}/mi</span>
+                            <span style={{ fontWeight: 500 }}>Marathon Pace</span>
+                            <span className="v2-mono">{formatPace(paces.marathon)}/mi</span>
                         </div>
-                        <p className="text-caption text-[var(--text-subtle)]">
+                        <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
                             Your predicted race-day pace. Feels &quot;comfortably hard&quot; — sustainable for 26.2 miles but
                             requires focus. Tempo blocks at this pace teach your body to hold it.
                         </p>
@@ -915,10 +932,10 @@ export function VdotRevealScreen({
                     {/* Tempo/Threshold Pace */}
                     <div>
                         <div className="flex justify-between mb-1">
-                            <span className="font-medium">Tempo (Threshold)</span>
-                            <span className="text-data">{formatPace(paces.threshold)}/mi</span>
+                            <span style={{ fontWeight: 500 }}>Tempo (Threshold)</span>
+                            <span className="v2-mono">{formatPace(paces.threshold)}/mi</span>
                         </div>
-                        <p className="text-caption text-[var(--text-subtle)]">
+                        <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
                             &quot;Comfortably hard&quot; — you can hold this for 20-40 minutes. Trains your body to clear
                             lactate efficiently, raising the pace you can sustain before your legs give out.
                         </p>
@@ -927,10 +944,10 @@ export function VdotRevealScreen({
                     {/* Interval Pace */}
                     <div>
                         <div className="flex justify-between mb-1">
-                            <span className="font-medium">Interval</span>
-                            <span className="text-data">{formatPace(paces.interval)}/mi</span>
+                            <span style={{ fontWeight: 500 }}>Interval</span>
+                            <span className="v2-mono">{formatPace(paces.interval)}/mi</span>
                         </div>
-                        <p className="text-caption text-[var(--text-subtle)]">
+                        <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
                             Hard, short repeats (400m–1 mile). Builds VO2max — your maximum aerobic capacity.
                             These are the workouts that genuinely hurt, but they make you faster.
                         </p>
@@ -941,13 +958,13 @@ export function VdotRevealScreen({
             <div className="mt-6 flex gap-3">
                 <button
                     onClick={onRecalculate}
-                    className="flex-1 btn btn-secondary"
+                    className="flex-1 v2-btn v2-btn-secondary"
                 >
                     This seems off — recalculate
                 </button>
                 <button
                     onClick={onContinue}
-                    className="flex-1 btn btn-gradient"
+                    className="flex-1 v2-btn v2-btn-primary"
                 >
                     Looks right →
                 </button>

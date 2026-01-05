@@ -77,7 +77,6 @@ function AuthForm() {
         const emailRedirectTo = typeof window !== 'undefined'
             ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`
             : null;
-        // shouldCreateUser: true handles both login AND signup
         const { error } = await supabase.auth.signInWithOtp({
             email: email.toLowerCase().trim(),
             options: {
@@ -138,7 +137,6 @@ function AuthForm() {
 
 
     const handleVerifyOtp = async (code: string) => {
-        // Guard against double submission
         if (loadingAction === 'verify') return;
 
         setLoadingAction('verify');
@@ -159,9 +157,6 @@ function AuthForm() {
                 return;
             }
 
-            // Check if user has a plan to determine routing
-            // For now, route to nextPath (which defaults to /onboarding)
-            // The onboarding page will handle checking if user already has a plan
             if (nextPath.startsWith('/api')) {
                 window.location.assign(nextPath);
             } else {
@@ -177,14 +172,12 @@ function AuthForm() {
     };
 
     const handleOtpChange = (index: number, value: string) => {
-        // Only allow digits
         if (value && !/^\d$/.test(value)) return;
 
         const newOtp = [...otp];
         newOtp[index] = value;
         setOtp(newOtp);
 
-        // Move to next input
         if (value && index < OTP_LENGTH - 1) {
             inputRefs.current[index + 1]?.focus();
         }
@@ -226,10 +219,6 @@ function AuthForm() {
         }
     };
 
-    // ==============================================================
-    // RENDER
-    // ==============================================================
-
     return (
         <>
             {/* Logo */}
@@ -243,10 +232,10 @@ function AuthForm() {
                         className="object-cover"
                     />
                 </div>
-                <h1 className="text-display-md tracking-tight">
+                <h1 className="v2-heading-lg">
                     {step === 'email' ? 'Get Started' : 'Enter code'}
                 </h1>
-                <p className="text-body-sm text-[var(--text-muted)] mt-2">
+                <p className="v2-body-sm mt-2" style={{ color: 'var(--v2-text-muted)' }}>
                     {step === 'email'
                         ? 'Enter your email to continue'
                         : `We sent a code to ${email}`}
@@ -261,20 +250,20 @@ function AuthForm() {
                         type="button"
                         onClick={handleGoogleSignIn}
                         disabled={isLoading}
-                        className="btn btn-secondary w-full mb-6"
+                        className="v2-btn v2-btn-secondary w-full mb-6"
                     >
                         {loadingAction === 'google' ? 'Connecting...' : 'Continue with Google'}
                     </button>
 
                     <div className="flex items-center gap-4 mb-6">
-                        <div className="flex-1 h-px bg-[var(--border-muted)]" />
-                        <span className="text-caption text-[var(--text-muted)]">OR</span>
-                        <div className="flex-1 h-px bg-[var(--border-muted)]" />
+                        <div className="flex-1 h-px" style={{ background: 'var(--v2-border)' }} />
+                        <span className="v2-label" style={{ color: 'var(--v2-text-muted)' }}>OR</span>
+                        <div className="flex-1 h-px" style={{ background: 'var(--v2-border)' }} />
                     </div>
 
                     <form onSubmit={handleSendOtp} className="space-y-4">
-                        <div>
-                            <label className="text-label block mb-2">EMAIL</label>
+                        <div className="v2-form-group">
+                            <label className="v2-form-label">EMAIL</label>
                             <input
                                 type="email"
                                 value={email}
@@ -282,7 +271,7 @@ function AuthForm() {
                                 disabled={isLoading}
                                 required
                                 placeholder="you@example.com"
-                                className="input w-full"
+                                className="v2-input"
                                 autoComplete="email"
                                 autoFocus
                             />
@@ -291,7 +280,7 @@ function AuthForm() {
                         <button
                             type="submit"
                             disabled={isLoading || !email}
-                            className="btn btn-gradient w-full"
+                            className="v2-btn v2-btn-primary w-full"
                         >
                             {loadingAction === 'otp' ? 'Sending code...' : 'Continue'}
                         </button>
@@ -315,7 +304,12 @@ function AuthForm() {
                                 onChange={(e) => handleOtpChange(index, e.target.value)}
                                 onKeyDown={(e) => handleOtpKeyDown(index, e)}
                                 disabled={loadingAction === 'verify'}
-                                className="w-10 h-12 text-center text-lg font-semibold rounded-lg bg-[var(--surface-secondary)] border border-[var(--border-muted)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all"
+                                className="w-10 h-12 text-center text-lg font-semibold rounded-lg transition-all"
+                                style={{
+                                    background: 'var(--v2-bg-elevated)',
+                                    border: '1px solid var(--v2-border)',
+                                    color: 'var(--v2-text-primary)',
+                                }}
                                 autoFocus={index === 0}
                             />
                         ))}
@@ -324,7 +318,7 @@ function AuthForm() {
                     {/* Resend */}
                     <div className="text-center">
                         {resendCooldown > 0 ? (
-                            <p className="text-body-sm text-[var(--text-muted)]">
+                            <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
                                 Resend code in {resendCooldown}s
                             </p>
                         ) : (
@@ -332,7 +326,7 @@ function AuthForm() {
                                 type="button"
                                 onClick={handleResendCode}
                                 disabled={isLoading}
-                                className="text-body-sm text-[var(--color-accent)] hover:underline"
+                                className="v2-body-sm v2-accent hover:underline"
                             >
                                 Didn&apos;t get the code? Resend
                             </button>
@@ -349,7 +343,7 @@ function AuthForm() {
                             setErrorMessage(null);
                             setResendCooldown(0);
                         }}
-                        className="btn btn-secondary w-full"
+                        className="v2-btn v2-btn-secondary w-full"
                     >
                         Use a different email
                     </button>
@@ -358,22 +352,22 @@ function AuthForm() {
 
             {/* Messages */}
             {message && (
-                <p className="text-center text-body-sm text-[var(--color-accent)] mt-6">
+                <p className="text-center v2-body-sm v2-accent mt-6">
                     {message}
                 </p>
             )}
             {errorMessage && (
-                <p className="text-center text-body-sm text-[var(--color-error)] mt-2">
+                <p className="text-center v2-body-sm mt-2" style={{ color: 'var(--v2-error)' }}>
                     {errorMessage}
                 </p>
             )}
 
             {/* Terms */}
-            <p className="text-center text-caption text-[var(--text-muted)] mt-8">
+            <p className="text-center v2-body-sm mt-8" style={{ color: 'var(--v2-text-muted)' }}>
                 By continuing, you agree to our{' '}
-                <Link href="/terms" className="underline hover:text-[var(--text-base)]">Terms of Service</Link>
+                <Link href="/terms" className="underline hover:text-[var(--v2-text-secondary)]">Terms of Service</Link>
                 {' '}and{' '}
-                <Link href="/privacy" className="underline hover:text-[var(--text-base)]">Privacy Policy</Link>
+                <Link href="/privacy" className="underline hover:text-[var(--v2-text-secondary)]">Privacy Policy</Link>
             </p>
         </>
     );
@@ -391,16 +385,16 @@ function AuthFormFallback() {
                     className="object-cover"
                 />
             </div>
-            <h1 className="text-display-md tracking-tight">Get Started</h1>
-            <p className="text-body-sm text-[var(--text-muted)] mt-2">Loading...</p>
+            <h1 className="v2-heading-lg">Get Started</h1>
+            <p className="v2-body-sm mt-2" style={{ color: 'var(--v2-text-muted)' }}>Loading...</p>
         </div>
     );
 }
 
 export default function AuthPage() {
     return (
-        <div className="min-h-screen landing-shell flex items-center justify-center px-6 py-12">
-            <div className="glass card p-8 w-full max-w-md">
+        <div className="v2-root min-h-screen flex items-center justify-center px-6 py-12">
+            <div className="v2-card p-8 w-full max-w-md">
                 <Suspense fallback={<AuthFormFallback />}>
                     <AuthForm />
                 </Suspense>

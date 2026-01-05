@@ -1,15 +1,15 @@
-# The Long Game - Design Principles
+# The Long Game - Design System V2
 
-> A world-class design system for elite athletes. Every pixel is intentional.
+> Refined minimalism for elite athletes. Every pixel is intentional.
 
-## Core Philosophy: "Athletic Precision"
+## Core Philosophy: "Atmospheric Minimalism"
 
-We are not a generic fitness app. We are a **precision training instrument** for serious athletes who demand evidence-based coaching. Our design reflects:
+We are a **precision training instrument** for serious athletes. Our design is:
 
-- **Performance-First**: Bold, confident, data-forward
-- **Scientific Authority**: Show the methodology, not just the result
-- **Premium Craft**: Apple-level attention to detail
-- **Clarity Over Decoration**: Every element earns its place
+- **Dark-First**: Near-black backgrounds with opacity-based text hierarchy
+- **Light Typography**: Instrument Sans in light weight. No heavy display fonts.
+- **Subtle Motion**: Staggered reveals, not bouncy animations
+- **Atmospheric Depth**: Radial glows, not drop shadows
 
 ---
 
@@ -17,277 +17,452 @@ We are not a generic fitness app. We are a **precision training instrument** for
 
 ### Color System
 
+All colors are dark-mode only. We do not support light mode.
+
+#### Backgrounds
 | Token | Value | Purpose |
 |-------|-------|---------|
-| `--color-accent` | `#19e38c` (Volt Green) | Primary CTA, success, running |
-| `--color-strength` | `#3a6bff` (Strength Blue) | Strength training domain |
-| `--color-durability` | `#7a5cff` (Durability Violet) | Durability/mobility domain |
-| `--color-warning` | `#f4b740` (Amber) | Caution states |
-| `--color-error` | `#e5484d` (Red) | Error states |
+| `--v2-bg-deep` | `#08080a` | Page background |
+| `--v2-bg-elevated` | `rgba(255,255,255,0.02)` | Cards, surfaces |
+| `--v2-bg-hover` | `rgba(255,255,255,0.04)` | Hover states |
+| `--v2-bg-active` | `rgba(255,255,255,0.06)` | Active/pressed |
+| `--v2-bg-section` | `rgba(255,255,255,0.01)` | Alternating sections |
 
-#### Dark Mode
+#### Text (Opacity-Based)
+| Token | Opacity | Purpose |
+|-------|---------|---------|
+| `--v2-text-primary` | 90% | Headlines, primary content |
+| `--v2-text-secondary` | 70% | Subheadings, key info |
+| `--v2-text-tertiary` | 50% | Body text |
+| `--v2-text-muted` | 40% | Secondary body |
+| `--v2-text-subtle` | 30% | Labels, metadata |
+| `--v2-text-ghost` | 20% | Hints, disabled |
+| `--v2-text-faint` | 15% | Barely visible |
+
+#### Accents
 | Token | Value | Purpose |
 |-------|-------|---------|
-| `--bg-base` | `#0b0f14` | Page background |
-| `--bg-elevated` | `#121820` | Cards, elevated surfaces |
-| `--bg-muted` | `#1a222d` | Inputs, secondary surfaces |
-| `--text-base` | `#f1f5f9` | Primary text |
-| `--text-muted` | `#b0b9c5` | Secondary text |
-| `--text-subtle` | `#7d8794` | Labels, captions |
+| `--v2-accent` | `#19e38c` | Primary accent (Volt Green) |
+| `--v2-accent-subtle` | `rgba(25,227,140,0.1)` | Accent backgrounds |
+| `--v2-accent-glow` | `rgba(25,227,140,0.04)` | Radial glow effect |
+| `--v2-secondary` | `#3a6bff` | Secondary accent (Strength Blue) |
 
-**Contrast Ratios**: All text exceeds WCAG 2.1 AA (4.5:1 for body, 3:1 for large text)
+#### Domain Colors
+| Domain | Color | Token |
+|--------|-------|-------|
+| Running | `#19e38c` | `--v2-running` |
+| Strength | `#3a6bff` | `--v2-strength` |
+| Durability | `#8b5cf6` | `--v2-durability` |
+
+#### Semantic Colors
+| State | Color |
+|-------|-------|
+| Success | `#19e38c` |
+| Warning | `#f59e0b` |
+| Error | `#ef4444` |
+
+#### Borders
+| Token | Opacity | Use |
+|-------|---------|-----|
+| `--v2-border` | 5% | Default borders |
+| `--v2-border-hover` | 10% | Hover states |
+| `--v2-border-active` | 20% | Active/focus |
+
+---
 
 ### Typography
 
-We use a **three-font system**:
+**Single font family**: Instrument Sans. Light weight for everything.
 
-| Font | Use Case |
-|------|----------|
-| **Space Grotesk** | Display + headings |
-| **Instrument Sans** | Body text, UI copy |
-| **Georgia** | Editorial accents (sparingly) |
-| **IBM Plex Mono** | Data, times, paces, metrics |
+Why? The Week landing page aesthetic prioritizes refined minimalism. Heavy display fonts (Space Grotesk, etc.) break the ethereal quality. Light typography with opacity hierarchy creates sophistication.
 
 #### Type Scale
-
 | Class | Size | Weight | Use |
 |-------|------|--------|-----|
-| `.text-display-xl` | 4rem | 700 | Hero headlines |
-| `.text-display-lg` | 3.25rem | 700 | Page titles |
-| `.text-display-md` | 2.5rem | 700 | Section heroes |
-| `.text-heading-lg` | 1.75rem | 600 | Section titles |
-| `.text-heading-md` | 1.375rem | 600 | Card titles |
-| `.text-heading-sm` | 1.125rem | 600 | Subsections |
-| `.text-body-lg` | 1.125rem | 400 | Feature descriptions |
-| `.text-body-md` | 1rem | 400 | Default body |
-| `.text-body-sm` | 0.875rem | 400 | Supporting text |
-| `.text-label` | 0.6875rem | 600 | Uppercase labels |
-| `.text-caption` | 0.75rem | 400 | Captions, hints |
-| `.text-data` | inherit | 600 | Monospace numbers |
+| `v2-hero` | 72px (clamp) | 300 | Hero headlines |
+| `v2-heading-lg` | 48px | 300 | Page titles |
+| `v2-heading-md` | 24px | 300 | Section titles |
+| `v2-heading-sm` | 18px | 300 | Card titles |
+| `v2-body` | 16px | 400 | Default body |
+| `v2-body-sm` | 14px | 400 | Supporting text |
+| `v2-label` | 10px | 400 | Uppercase labels |
+| `v2-mono` | 10px | 400 | Technical data |
+
+#### Letter Spacing
+| Token | Value | Use |
+|-------|-------|-----|
+| `--v2-tracking-tight` | -0.02em | Headlines |
+| `--v2-tracking-wide` | 0.05em | Body text |
+| `--v2-tracking-widest` | 0.1em | Uppercase labels |
+
+#### Line Height
+| Token | Value |
+|-------|-------|
+| `--v2-leading-none` | 1 |
+| `--v2-leading-tight` | 1.15 |
+| `--v2-leading-snug` | 1.35 |
+| `--v2-leading-normal` | 1.5 |
+| `--v2-leading-relaxed` | 1.65 |
+| `--v2-leading-loose` | 2 |
+
+---
 
 ### Spacing
 
-**8px base grid**. All spacing should be multiples of 8px.
+**8px base grid**. All spacing uses multiples of 8.
 
-Common values: `8, 16, 24, 32, 48, 64, 96`
+| Token | Value |
+|-------|-------|
+| `--v2-space-1` | 4px |
+| `--v2-space-2` | 8px |
+| `--v2-space-3` | 12px |
+| `--v2-space-4` | 16px |
+| `--v2-space-5` | 20px |
+| `--v2-space-6` | 24px |
+| `--v2-space-8` | 32px |
+| `--v2-space-10` | 40px |
+| `--v2-space-12` | 48px |
+| `--v2-space-16` | 64px |
+| `--v2-space-20` | 80px |
+| `--v2-space-24` | 96px |
+
+---
 
 ### Border Radius
 
 | Token | Value | Use |
 |-------|-------|-----|
-| `--radius-sm` | 6px | Small elements, badges |
-| `--radius-md` | 8px | Buttons |
-| `--radius-lg` | 12px | Inputs |
-| `--radius-xl` | 16px | Cards |
-| `--radius-2xl` | 24px | Hero cards, modals |
+| `--v2-radius-sm` | 6px | Small elements |
+| `--v2-radius-md` | 8px | Buttons |
+| `--v2-radius-lg` | 12px | Cards, inputs |
+| `--v2-radius-xl` | 16px | Large cards |
+| `--v2-radius-full` | 9999px | Pills, badges |
+
+---
+
+### Z-Index Scale
+
+| Token | Value | Use |
+|-------|-------|-----|
+| `--v2-z-base` | 0 | Default |
+| `--v2-z-dropdown` | 10 | Dropdowns |
+| `--v2-z-sticky` | 20 | Sticky headers |
+| `--v2-z-fixed` | 30 | Fixed elements |
+| `--v2-z-modal-backdrop` | 40 | Modal overlays |
+| `--v2-z-modal` | 50 | Modal content |
+| `--v2-z-popover` | 60 | Popovers |
+| `--v2-z-tooltip` | 70 | Tooltips |
+| `--v2-z-toast` | 80 | Toast notifications |
 
 ---
 
 ## Component Patterns
 
 ### Cards
-
 ```css
-.card {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-base);
-  border-radius: var(--radius-xl);
+.v2-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 12px;
 }
 ```
-
-- Always have subtle border for definition
-- Hover state brightens border
-- Use `.card-interactive` for clickable cards
+- Always subtle border for definition
+- Hover: background to 0.04, border to 0.1
+- Interactive cards scale 1.02 on hover
 
 ### Buttons
 
-| Class | Use |
-|-------|-----|
-| `.btn-primary` | Primary actions (product UI) |
-| `.btn-gradient` | Brand CTAs (marketing) |
-| `.btn-secondary` | Secondary actions |
-| `.btn-ghost` | Tertiary, inline actions |
-| `.btn-lg` | Hero CTAs |
-| `.btn-sm` | Inline, compact |
+| Class | Style |
+|-------|-------|
+| `v2-btn-primary` | White bg, black text |
+| `v2-btn-secondary` | Transparent, border |
+| `v2-btn-ghost` | Transparent, no border |
+
+Sizes: `v2-btn-sm`, default, `v2-btn-lg`
 
 ### Inputs
+- Background: `rgba(255,255,255,0.02)`
+- Border: `rgba(255,255,255,0.05)`
+- Focus: accent border + subtle glow
+- Error: red border + red glow
 
-- Height: 52px minimum
-- Background: `--bg-muted`
-- Focus: Green ring with accent color
-- Placeholder: `--text-subtle`
-
-### Domain Colors
-
-Training types have distinct colors:
-- Running: Volt Green
-- Strength: Strength Blue
-- Durability: Durability Violet
-
-Use classes: `.domain-running`, `.domain-strength`, `.domain-durability`
-Badge variant: `.domain-badge` (applies 15% opacity background)
-
-#### Domain Tint Tokens (for backgrounds)
-
-| Token | Purpose |
-|-------|---------|
-| `--domain-running-tint` | 15% opacity running background |
-| `--domain-running-border` | 30% opacity running border |
-| `--domain-strength-tint` | 15% opacity strength background |
-| `--domain-strength-border` | 30% opacity strength border |
-| `--domain-durability-tint` | 15% opacity durability background |
-| `--domain-durability-border` | 30% opacity durability border |
-
-### Additional Surface Tokens
-
-| Token | Purpose |
-|-------|---------|
-| `--bg-inset` | Deeper than base for recessed surfaces |
-| `--bg-overlay` | Modal backdrops (60-70% opacity) |
-| `--border-default` | Alias for `--border-base` |
+### Badges
+```css
+.v2-badge {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 9999px;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+```
 
 ---
 
 ## Motion Principles
 
+### Timing
 | Duration | Use |
 |----------|-----|
-| 120ms | Micro-interactions (hover, focus) |
-| 180ms | Standard transitions |
-| 240ms | Page elements appearing |
-| 360ms | Emphasis animations |
+| 150ms | Micro-interactions (hover) |
+| 200ms | Standard transitions |
+| 300ms | Page elements appearing |
+| 500ms | Emphasis, staggered reveals |
 
-**Easing**: `cubic-bezier(0.2, 0.8, 0.2, 1)` for most. Never linear for UI.
+### Easing
+```css
+--v2-ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+--v2-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+```
 
-**Character**: Athletic = snappy, confident. Not floaty or bouncy.
+### Staggered Reveals
+Hero elements fade in sequentially:
+1. Title (0ms delay)
+2. Subtitle (150-200ms delay)
+3. Week grid (350-400ms delay)
+4. Individual cards (staggered 50ms each)
+5. CTA (last)
+
+Use Framer Motion for orchestration.
+
+### Atmospheric Effects
+- **Radial glow**: Subtle accent color behind hero content
+  ```css
+  background: radial-gradient(800px circle at 50% 55%, rgba(25,227,140,0.04), transparent 60%);
+  ```
+- Never use drop shadows. Use border opacity instead.
+
+---
+
+## Accessibility
+
+### Focus States
+```css
+:focus-visible {
+  box-shadow: 0 0 0 2px #08080a, 0 0 0 4px #19e38c;
+}
+```
+
+### Disabled States
+- Opacity: 0.4
+- Cursor: not-allowed
+- Pointer-events: none
+
+### Error States
+- Border: `#ef4444`
+- Focus glow: `rgba(239,68,68,0.15)`
+
+### Contrast Ratios
+All text exceeds WCAG 2.1 AA:
+- Primary text (90% white): 15.8:1
+- Secondary text (70% white): 11.2:1
+- Tertiary text (50% white): 7.5:1
+- Muted text (40% white): 5.9:1
+
+---
+
+## Icons
+
+### Static Icons (Lucide)
+| Class | Size |
+|-------|------|
+| `v2-icon-xs` | 12px |
+| `v2-icon-sm` | 16px |
+| `v2-icon-md` | 20px |
+| `v2-icon-lg` | 24px |
+| `v2-icon-xl` | 32px |
+
+Color classes: `v2-icon-accent`, `v2-icon-muted`, `v2-icon-ghost`
+
+### Animated Icons
+Use sparingly — 1-2 key moments per page:
+- **Check**: Success confirmations
+- **Spinner**: Loading states
+- **Sparkles**: AI/generation features
+- **Refresh**: Sync actions
+
+Import from `@/components/icons/animated-icons`.
 
 ---
 
 ## Layout
 
 ### Containers
+| Class | Max Width |
+|-------|-----------|
+| `v2-container-narrow` | 576px |
+| `v2-container` | 768px |
+| `v2-container-wide` | 1024px |
 
-| Class | Max Width | Use |
-|-------|-----------|-----|
-| `.container-page` | 1200px | Standard pages |
-| `.container-narrow` | 640px | Focus flows (onboarding, auth) |
+### Sections
+```css
+.v2-section {
+  padding: 80px 24px;
+}
+.v2-section-alt {
+  background: rgba(255,255,255,0.01);
+}
+```
 
-### Spacing Rhythm
+### Grids
+- `v2-grid-2`, `v2-grid-3`, `v2-grid-4`: Responsive grids
+- `v2-grid-7`: Week calendar (always 7 columns)
 
-- Page padding: 24px (mobile: 16px)
-- Section gap: 64-96px
-- Card padding: 20-24px
-- Element gap within cards: 16px
+---
 
-### Signature Motifs
+## Form Groups
 
-- `hero-visual`: layered gradient card for hero-side storytelling
-- `signal-line`: thin gradient divider for emphasis and pacing
-- `proof-row` + `proof-chip`: compact social proof blocks for onboarding/auth
-- `cta-panel`: elevated CTA container with subtle brand glow
+```html
+<div class="v2-form-group">
+    <label class="v2-form-label">Email</label>
+    <input class="v2-input" type="email" />
+    <span class="v2-form-hint">We'll never share this.</span>
+</div>
+```
+
+States: `v2-input-error`, `v2-input-success`
+
+---
+
+## Data Tables
+
+```html
+<div class="v2-table-wrapper">
+    <table class="v2-table v2-table-interactive">
+        <thead>
+            <tr><th>Day</th><th>Workout</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Monday</td><td>Easy Run</td></tr>
+        </tbody>
+    </table>
+</div>
+```
+
+Cell utilities: `v2-table-right`, `v2-table-center`, `v2-table-mono`, `v2-table-accent`
+
+---
+
+## Sliders
+
+```html
+<input type="range" class="v2-slider v2-slider-accent" 
+       style="--slider-fill: 50%" />
+<div class="v2-slider-labels">
+    <span>Easy</span><span>Hard</span>
+</div>
+```
+
+---
+
+## Tabs
+
+```html
+<div class="v2-tabs">
+    <button class="v2-tab v2-tab-active">Tab 1</button>
+    <button class="v2-tab">Tab 2</button>
+</div>
+<div class="v2-tab-panel">Content</div>
+```
+
+Pill variant: Add `v2-tabs-pills` to the container.
+
+---
+
+## Avatars
+
+| Class | Size |
+|-------|------|
+| `v2-avatar-xs` | 24px |
+| `v2-avatar-sm` | 32px |
+| `v2-avatar-md` | 40px |
+| `v2-avatar-lg` | 48px |
+| `v2-avatar-xl` | 64px |
+| `v2-avatar-2xl` | 96px |
+
+Modifiers: `v2-avatar-accent` (border), `v2-avatar-group` (stacked)
+
+---
+
+## Dropdowns
+
+```html
+<div class="v2-dropdown">
+    <button class="v2-btn">Open Menu</button>
+    <div class="v2-dropdown-menu">
+        <button class="v2-dropdown-item">Option 1</button>
+        <div class="v2-dropdown-divider"></div>
+        <button class="v2-dropdown-item">Option 2</button>
+    </div>
+</div>
+```
 
 ---
 
 ## Accessibility
 
-- Focus states: 2px accent outline
-- Color contrast: WCAG AA minimum
-- Touch targets: 44px minimum
-- Keyboard navigable
+### Reduced Motion
+Automatically respects `prefers-reduced-motion`. All animations and transitions are disabled when user preference is set.
+
+### Touch Targets
+| Class | Min Size |
+|-------|----------|
+| `v2-touch-target` | 44px × 44px |
+| `v2-touch-target-sm` | 36px × 36px |
+
+### Screen Reader Only
+```html
+<span class="v2-sr-only">Hidden but accessible</span>
+```
 
 ---
 
-## Writing UI Copy
+## Utilities
 
-- **Concise**: Remove every unnecessary word
-- **Confident**: "Start training" not "Get started with training"
-- **Action-oriented**: Lead with verbs
-- **Human**: Not robotic, but not overly casual
-
----
-
-## Component Library
-
-### UI Primitives (`src/components/ui/`)
-
-| Component | Purpose | Key Props |
-|-----------|---------|-----------|
-| `AppHeader` | Shared navigation header | `title`, `backHref`, `streak`, `rightContent` |
-| `Toggle` | Accessible switch | `checked`, `onChange`, `size`, `disabled` |
-| `SelectionCard` | Option selection | `selected`, `domain`, `disabled` |
-| `SelectionGrid` | Grid container | `columns` |
-| `MetricCard` | Metric display | `value`, `unit`, `label`, `delta`, `icon` |
-| `MetricGrid` | Grid container | `columns` |
-| `WeeklyCalendar` | Week-at-a-glance | `days`, `weekLabel`, `onDayClick` |
-
-### Badge Variants
-
-| Class | Use |
-|-------|-----|
-| `.badge` | Base badge (neutral) |
-| `.badge-accent` | Success/active states |
-| `.badge-warning` | Caution states |
-| `.badge-error` | Error states |
-| `.badge-running` | Running domain |
-| `.badge-strength` | Strength domain |
-| `.badge-durability` | Durability domain |
-
-### Icon Sizing
-
-| Class | Size |
-|-------|------|
-| `.icon-xs` | 12px |
-| `.icon-sm` | 16px |
-| `.icon-md` | 20px |
-| `.icon-lg` | 24px |
-| `.icon-xl` | 32px |
-
-Icon color classes: `.icon-accent`, `.icon-running`, `.icon-strength`, `.icon-durability`, `.icon-muted`, `.icon-subtle`, `.icon-error`, `.icon-warning`
+| Class | Purpose |
+|-------|---------|
+| `v2-truncate` | Single-line text truncation |
+| `v2-line-clamp-2` | 2-line text truncation |
+| `v2-line-clamp-3` | 3-line text truncation |
+| `v2-scrollable` | Styled scrollbar container |
 
 ---
 
-## Loading & Empty States
+## Breakpoints
 
-### Skeleton Loading
-
-```html
-<div class="skeleton skeleton-text"></div>
-<div class="skeleton skeleton-text skeleton-text-sm"></div>
-<div class="skeleton skeleton-card"></div>
-```
-
-### Empty States
-
-```html
-<div class="empty-state">
-  <div class="empty-state-icon">📭</div>
-  <h3 class="empty-state-title">No workouts yet</h3>
-  <p class="empty-state-description">Complete your first workout to see it here</p>
-  <button class="btn btn-primary">Start Training</button>
-</div>
-```
-
-### Status Feedback
-
-Use `.status-dot` with `data-status` attribute for color-blind accessible indicators:
-```html
-<span class="status-dot status-dot-success" data-status="success"></span>
-```
+| Token | Value |
+|-------|-------|
+| `--v2-breakpoint-sm` | 640px |
+| `--v2-breakpoint-md` | 768px |
+| `--v2-breakpoint-lg` | 1024px |
+| `--v2-breakpoint-xl` | 1280px |
+| `--v2-breakpoint-2xl` | 1536px |
 
 ---
 
 ## Implementation Checklist
 
-When building a new feature:
+When building a feature:
+- [ ] Uses `v2-` classes from globals-v2.css
+- [ ] Uses opacity-based text colors (not hex)
+- [ ] Uses 8px spacing multiples
+- [ ] Dark background only (no light mode)
+- [ ] Motion uses Framer Motion with staggered delays
+- [ ] Focus states visible on keyboard navigation
+- [ ] Disabled states at 0.4 opacity
+- [ ] Error states use red border + glow
+- [ ] Icons sized and colored with v2 classes
+- [ ] Atmospheric glow on hero sections (if applicable)
+- [ ] Touch targets meet 44px minimum
+- [ ] Respects prefers-reduced-motion
+- [ ] Form groups use v2-form-group pattern
 
-- [ ] Uses typography classes (not arbitrary font sizes)
-- [ ] Uses spacing scale (multiples of 8)
-- [ ] Uses semantic color tokens (not hex values)
-- [ ] Uses domain tint tokens (not inline `color-mix`)
-- [ ] Uses `container-page` or `container-narrow`
-- [ ] Proper dark mode support
-- [ ] Meets contrast requirements
-- [ ] Has appropriate motion (respects reduced-motion)
-- [ ] Touch-friendly on mobile (44px tap targets)
-- [ ] Keyboard accessible
-- [ ] Uses reusable components where available
+---
+
+## Files
+
+| File | Purpose |
+|------|---------|
+| `globals-v2.css` | All design tokens and component classes (~1600 lines) |
+| `animated-icons.tsx` | Framer Motion icon components |
+| `/design-system` | Interactive playground |

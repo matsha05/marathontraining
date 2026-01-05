@@ -1,9 +1,10 @@
 'use client';
 
 /**
- * THE LONG GAME - Onboarding Screens: Goal
+ * THE LONG GAME - Onboarding Screens: Goal V2
  * 
  * Training goal, race details, fitness duration screens
+ * Week aesthetic: Dark, atmospheric, light typography
  */
 
 import { useState } from 'react';
@@ -150,33 +151,34 @@ export function RaceDetailsScreen({
             <div className="space-y-6">
                 {/* Race name (optional) */}
                 <div>
-                    <label className="text-label block mb-2">Race name (optional)</label>
+                    <label className="v2-label block mb-2">Race name (optional)</label>
                     <TextInput
                         value={data.raceName}
                         onChange={onRaceNameChange}
                         placeholder="e.g., Chicago Marathon, Turkey Trot 5K"
                     />
-                    <p className="text-caption text-[var(--text-subtle)] mt-2">
+                    <p className="v2-mono mt-2" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
                         This personalizes your dashboard countdown
                     </p>
                 </div>
 
                 {/* Race date (optional) */}
                 <div>
-                    <label className="text-label block mb-2">Race date (optional)</label>
+                    <label className="v2-label block mb-2">Race date (optional)</label>
                     <input
                         type="date"
                         value={data.raceDate}
                         onChange={(e) => handleDateChange(e.target.value)}
                         min={minDateStr}
                         aria-invalid={Boolean(dateError)}
-                        className="input text-lg w-full"
+                        className="v2-input w-full"
+                        style={{ fontSize: '16px' }}
                     />
                     {dateError && (
-                        <p className="text-body-sm text-[var(--color-error)] mt-2">{dateError}</p>
+                        <p className="v2-body-sm mt-2" style={{ color: 'var(--v2-error)' }}>{dateError}</p>
                     )}
                     {!data.raceDate && (
-                        <p className="text-caption text-[var(--text-subtle)] mt-2">
+                        <p className="v2-mono mt-2" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
                             We&apos;ll build a flexible plan without a specific target date
                         </p>
                     )}
@@ -191,7 +193,7 @@ export function RaceDetailsScreen({
                                 With {weeksToRace} weeks, we&apos;ll focus on finishing strong rather than a time goal.
                             </WarningBanner>
                         ) : (
-                            <p className="text-body-sm text-[var(--text-muted)]">
+                            <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
                                 {weeksToRace} weeks until race day — plenty of time to prepare!
                             </p>
                         )}

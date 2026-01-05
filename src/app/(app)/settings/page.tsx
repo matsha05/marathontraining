@@ -2,18 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AppHeader } from '@/components/ui/AppHeader';
+import Link from 'next/link';
 import { Toggle } from '@/components/ui/Toggle';
 import { createSupabaseBrowserClient } from '@/infrastructure/supabase';
 import { usePlan } from '@/domain/plan/context';
+import { motion } from 'framer-motion';
 
 /**
- * Settings Page
- *
- * V2: Fetches real profile data from Supabase
+ * Settings Page V2
+ * Week aesthetic: Dark, atmospheric, light typography
  */
 
-// Profile state type
 interface ProfileData {
     name: string;
     email: string;
@@ -63,10 +62,8 @@ export default function SettingsPage() {
     const setupComplete = stravaConnected && hasHealthData;
     const [signOutBusy, setSignOutBusy] = useState(false);
 
-    // Current VDOT from plan
     const currentVdot = plan?.vdot || null;
 
-    // Fetch profile data on mount
     useEffect(() => {
         const fetchProfile = async () => {
             try {
@@ -78,10 +75,8 @@ export default function SettingsPage() {
                     return;
                 }
 
-                // Get email from auth
                 const email = user.email || '';
 
-                // Try to get athlete data
                 const { data: athlete } = await supabase
                     .from('athletes')
                     .select('name, age')
@@ -91,7 +86,7 @@ export default function SettingsPage() {
                 setProfile({
                     name: athlete?.name || user.user_metadata?.name || email.split('@')[0] || '',
                     email,
-                    weight: null, // Could add to athletes table if needed
+                    weight: null,
                     age: athlete?.age || null,
                 });
             } catch (error) {
@@ -104,7 +99,6 @@ export default function SettingsPage() {
         fetchProfile();
     }, []);
 
-    // Save profile changes
     const handleSaveProfile = async () => {
         setProfileSaving(true);
         setProfileMessage(null);
@@ -118,7 +112,6 @@ export default function SettingsPage() {
                 return;
             }
 
-            // Update athlete record
             const { error } = await supabase
                 .from('athletes')
                 .upsert({
@@ -327,63 +320,75 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="min-h-screen landing-shell">
-            <AppHeader backHref="/dashboard" title="Settings" />
+        <div className="v2-root min-h-screen">
+            {/* Header */}
+            <header className="v2-nav sticky top-0 z-50">
+                <div className="v2-container flex items-center justify-between py-4">
+                    <div className="flex items-center gap-4">
+                        <Link href="/dashboard" className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                            ← Back
+                        </Link>
+                        <span className="v2-heading-sm">Settings</span>
+                    </div>
+                    <Link href="/" className="v2-nav-logo">The Long Game</Link>
+                </div>
+            </header>
 
-            <main className="container-narrow py-10">
+            <main className="v2-container-narrow py-10">
                 {/* Profile */}
-                <section className="mb-10">
-                    <h2 className="text-heading-md mb-4">Profile</h2>
-                    <div className="card p-6 space-y-6">
+                <motion.section
+                    className="mb-10"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4 }}
+                >
+                    <h2 className="v2-heading-md mb-4">Profile</h2>
+                    <div className="v2-card p-6 space-y-6">
                         {profileLoading ? (
-                            <div className="animate-pulse space-y-4">
-                                <div className="h-10 bg-[var(--bg-muted)] rounded-lg" />
-                                <div className="h-10 bg-[var(--bg-muted)] rounded-lg" />
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="h-10 bg-[var(--bg-muted)] rounded-lg" />
-                                    <div className="h-10 bg-[var(--bg-muted)] rounded-lg" />
-                                </div>
+                            <div className="space-y-4">
+                                <div className="v2-skeleton" style={{ height: '40px' }} />
+                                <div className="v2-skeleton" style={{ height: '40px' }} />
                             </div>
                         ) : (
                             <>
-                                <div>
-                                    <label className="text-label block mb-2">Name</label>
+                                <div className="v2-form-group">
+                                    <label className="v2-form-label">Name</label>
                                     <input
                                         type="text"
                                         value={profile.name}
                                         onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                                        className="input"
+                                        className="v2-input"
                                         placeholder="Your name"
                                     />
                                 </div>
-                                <div>
-                                    <label className="text-label block mb-2">Email</label>
+                                <div className="v2-form-group">
+                                    <label className="v2-form-label">Email</label>
                                     <input
                                         type="email"
                                         value={profile.email}
                                         disabled
-                                        className="input opacity-60"
+                                        className="v2-input v2-input-disabled"
                                     />
-                                    <p className="text-caption text-[var(--text-muted)] mt-1">Email cannot be changed here</p>
+                                    <span className="v2-form-hint">Email cannot be changed here</span>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="text-label block mb-2">Weight (kg)</label>
+                                    <div className="v2-form-group">
+                                        <label className="v2-form-label">Weight (kg)</label>
                                         <input
                                             type="number"
                                             value={profile.weight || ''}
                                             onChange={(e) => setProfile({ ...profile, weight: e.target.value ? Number(e.target.value) : null })}
-                                            className="input"
+                                            className="v2-input"
                                             placeholder="—"
                                         />
                                     </div>
-                                    <div>
-                                        <label className="text-label block mb-2">Age</label>
+                                    <div className="v2-form-group">
+                                        <label className="v2-form-label">Age</label>
                                         <input
                                             type="number"
                                             value={profile.age || ''}
                                             onChange={(e) => setProfile({ ...profile, age: e.target.value ? Number(e.target.value) : null })}
-                                            className="input"
+                                            className="v2-input"
                                             placeholder="—"
                                         />
                                     </div>
@@ -393,12 +398,12 @@ export default function SettingsPage() {
                                     <button
                                         onClick={handleSaveProfile}
                                         disabled={profileSaving}
-                                        className="btn btn-secondary w-full"
+                                        className="v2-btn v2-btn-secondary w-full"
                                     >
                                         {profileSaving ? 'Saving...' : 'Save Profile'}
                                     </button>
                                     {profileMessage && (
-                                        <p className={`text-body-sm mt-2 text-center ${profileMessage.includes('saved') ? 'text-[var(--color-accent)]' : 'text-[var(--color-error)]'}`}>
+                                        <p className={`v2-body-sm mt-2 text-center ${profileMessage.includes('saved') ? 'v2-accent' : ''}`} style={profileMessage.includes('saved') ? {} : { color: 'var(--v2-error)' }}>
                                             {profileMessage}
                                         </p>
                                     )}
@@ -406,304 +411,187 @@ export default function SettingsPage() {
                             </>
                         )}
                     </div>
-                </section>
+                </motion.section>
 
                 {/* Fitness */}
-                <section className="mb-10">
-                    <h2 className="text-heading-md mb-4">Fitness</h2>
-                    <div className="card p-6">
+                <motion.section
+                    className="mb-10"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.1 }}
+                >
+                    <h2 className="v2-heading-md mb-4">Fitness</h2>
+                    <div className="v2-card p-6">
                         <div className="flex items-center justify-between mb-6">
                             <div>
-                                <p className="font-semibold">Current VO2max (VDOT)</p>
-                                <p className="text-body-sm text-[var(--text-muted)]">Update every 4-6 weeks or after a race.</p>
-                                <p className="text-body-sm text-[var(--text-muted)]">Recalibrating rebuilds your plan with new paces.</p>
+                                <p className="v2-heading-sm">Current VO2max (VDOT)</p>
+                                <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>Update every 4-6 weeks or after a race.</p>
                             </div>
-                            <p className="text-display-md text-data text-[var(--color-accent)]">
-                                {currentVdot || '—'}
-                            </p>
+                            <p className="v2-heading-lg v2-mono v2-accent">{currentVdot || '—'}</p>
                         </div>
 
                         <button
-                            className="btn btn-secondary w-full"
+                            className="v2-btn v2-btn-secondary w-full"
                             onClick={() => router.push('/onboarding')}
                         >
                             Recalibrate VO2max (rebuild plan)
                         </button>
                     </div>
-                </section>
+                </motion.section>
 
                 {/* Integrations */}
-                <section className="mb-10">
-                    <h2 className="text-heading-md mb-4">Integrations</h2>
-                    <div className="space-y-6">
-                        <div className="card p-6 space-y-6">
-                            <div className="flex flex-wrap items-start justify-between gap-4">
-                                <div className="space-y-2">
-                                    <p className="text-heading-sm">Recommended data setup</p>
-                                    <p className="text-body-sm text-[var(--text-muted)]">
-                                        Activities sync automatically via Strava. Health metrics come from a Garmin export ZIP.
-                                    </p>
-                                </div>
-                                <span className={`badge ${setupComplete ? 'badge-accent' : 'badge-warning'}`}>
-                                    {authRequired ? 'Sign in required' : setupComplete ? 'Ready' : 'Recommended'}
-                                </span>
+                <motion.section
+                    className="mb-10"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.2 }}
+                >
+                    <h2 className="v2-heading-md mb-4">Integrations</h2>
+                    <div className="v2-card p-6 space-y-6">
+                        <div className="flex flex-wrap items-start justify-between gap-4">
+                            <div className="space-y-2">
+                                <p className="v2-heading-sm">Recommended data setup</p>
+                                <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                    Activities sync automatically via Strava. Health metrics come from a Garmin export ZIP.
+                                </p>
                             </div>
-
-                            {authRequired && (
-                                <div className="text-body-sm text-[var(--text-muted)]">
-                                    Sign in to connect integrations and view sync status.
-                                </div>
-                            )}
-
-                            <div className="grid gap-4">
-                                <div className="flex items-start gap-4 rounded-xl border border-[var(--border-base)] bg-[var(--bg-muted)] p-4">
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--bg-elevated)] text-data">
-                                        1
-                                    </div>
-                                    <div className="space-y-1">
-                                        <p className="font-semibold">Link Garmin → Strava</p>
-                                        <p className="text-body-sm text-[var(--text-muted)]">
-                                            Garmin Connect app → Settings → Connected Apps → Strava → Enable.
-                                        </p>
-                                        <p className="text-caption">We can’t verify this step yet—just do it once.</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-start gap-4 rounded-xl border border-[var(--border-base)] p-4">
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--bg-muted)] text-data">
-                                        2
-                                    </div>
-                                    <div className="flex-1 space-y-2">
-                                        <div className="flex flex-wrap items-center justify-between gap-3">
-                                            <div>
-                                                <p className="font-semibold">Connect Strava to The Long Game</p>
-                                                <p className="text-body-sm text-[var(--text-muted)]">
-                                                    Runs will appear automatically after each sync.
-                                                </p>
-                                            </div>
-                                            <span className={`badge ${stravaConnected ? 'badge-accent' : 'badge-error'}`}>
-                                                {stravaAuthRequired ? 'Sign in required' : stravaConnected ? 'Connected' : 'Not connected'}
-                                            </span>
-                                        </div>
-                                        <div className="text-body-sm text-[var(--text-muted)]">
-                                            {stravaConnected
-                                                ? `Strava athlete: ${stravaStatus?.stravaAthleteId ?? 'linked'}`
-                                                : 'Connect Strava to enable automatic activity sync.'}
-                                        </div>
-                                        {stravaStatus?.lastActivityAt && (
-                                            <p className="text-body-sm text-[var(--text-muted)]">
-                                                Last activity sync: {new Date(stravaStatus.lastActivityAt).toLocaleString()}
-                                            </p>
-                                        )}
-                                        <p className="text-caption">
-                                            Missing runs? Use “Sync now” to pull the last 90 days from Strava.
-                                        </p>
-                                        {isLocalhost && (
-                                            <p className="text-caption text-[var(--text-muted)]">
-                                                Strava OAuth only works on the production domain. Open the production site to connect.
-                                            </p>
-                                        )}
-                                        <div className="flex flex-wrap gap-3">
-                                            <button
-                                                className="btn btn-primary"
-                                                onClick={handleStravaConnect}
-                                                disabled={stravaBusy || authRequired || stravaConnected || isLocalhost}
-                                            >
-                                                Connect Strava
-                                            </button>
-                                            <button
-                                                className="btn btn-secondary"
-                                                onClick={handleStravaSyncNow}
-                                                disabled={stravaBusy || authRequired || !stravaConnected}
-                                            >
-                                                Sync now
-                                            </button>
-                                            <button
-                                                className="btn btn-ghost"
-                                                onClick={handleStravaDisconnect}
-                                                disabled={stravaBusy || authRequired || !stravaConnected}
-                                            >
-                                                Disconnect
-                                            </button>
-                                        </div>
-                                        {stravaMessage && (
-                                            <p className="text-body-sm text-[var(--text-muted)]">{stravaMessage}</p>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="flex items-start gap-4 rounded-xl border border-[var(--border-base)] p-4">
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--bg-muted)] text-data">
-                                        3
-                                    </div>
-                                    <div className="flex-1 space-y-2">
-                                        <div className="flex flex-wrap items-center justify-between gap-3">
-                                            <div>
-                                                <p className="font-semibold">Import Garmin health data (ZIP)</p>
-                                                <p className="text-body-sm text-[var(--text-muted)]">
-                                                    This fills sleep, HRV, stress, and Body Battery history.
-                                                </p>
-                                            </div>
-                                            <span className={`badge ${hasHealthData ? 'badge-accent' : 'badge-warning'}`}>
-                                                {hasHealthData ? 'Imported' : 'Needed'}
-                                            </span>
-                                        </div>
-                                        <input
-                                            type="file"
-                                            accept=".zip,application/zip"
-                                            className="input"
-                                            disabled={authRequired || importBusy}
-                                            onChange={(event) => {
-                                                const file = event.target.files?.[0];
-                                                if (file) {
-                                                    void handleGarminExportImport(file);
-                                                    event.currentTarget.value = '';
-                                                }
-                                            }}
-                                        />
-                                        <p className="text-caption">
-                                            Garmin Connect web → Account Settings → Export Data. Re-export weekly for fresh readiness.
-                                        </p>
-                                        {garminStatus?.lastHealthDate && (
-                                            <p className="text-body-sm text-[var(--text-muted)]">
-                                                Last health import: {garminStatus.lastHealthDate}
-                                            </p>
-                                        )}
-                                        {importMessage && (
-                                            <p className="text-body-sm text-[var(--text-muted)]">{importMessage}</p>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="rounded-xl border border-[var(--border-base)] bg-[var(--bg-muted)] p-4 text-body-sm text-[var(--text-muted)]">
-                                Tip: After each workout, open Garmin Connect to sync your watch. Strava forwards new activities automatically.
-                            </div>
-
-                            <div className="grid gap-4 sm:grid-cols-2">
-                                <div className="card card-muted p-4 space-y-2">
-                                    <p className="text-label">Activities (automatic)</p>
-                                    <p className="text-body-sm text-[var(--text-muted)]">
-                                        Distance, pace, splits, and heart rate from Strava.
-                                    </p>
-                                    <p className="text-body-sm">
-                                        {stravaConnected ? 'Strava connected and listening for syncs.' : 'Connect Strava to enable auto sync.'}
-                                    </p>
-                                </div>
-                                <div className="card card-muted p-4 space-y-2">
-                                    <p className="text-label">Health metrics</p>
-                                    <p className="text-body-sm text-[var(--text-muted)]">
-                                        Sleep, HRV, stress, and Body Battery from Garmin export.
-                                    </p>
-                                    <p className="text-body-sm">
-                                        {hasHealthData
-                                            ? `Health data imported through ${garminStatus?.lastHealthDate ?? 'recent export'}.`
-                                            : 'Upload a Garmin export ZIP to backfill health data.'}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <details className="rounded-xl border border-[var(--border-base)] p-4">
-                                <summary className="font-semibold cursor-pointer">Troubleshooting</summary>
-                                <div className="mt-4 space-y-3">
-                                    <div className="space-y-2">
-                                        <label className="text-label block mb-2">Manual FIT upload</label>
-                                        <input
-                                            type="file"
-                                            accept=".fit"
-                                            className="input"
-                                            disabled={authRequired}
-                                            onChange={(event) => {
-                                                const file = event.target.files?.[0];
-                                                if (file) {
-                                                    void handleFitUpload(file);
-                                                    event.currentTarget.value = '';
-                                                }
-                                            }}
-                                        />
-                                        <p className="text-caption">Use this if a run doesn’t show up automatically.</p>
-                                        {garminMessage && (
-                                            <p className="text-body-sm text-[var(--text-muted)]">{garminMessage}</p>
-                                        )}
-                                    </div>
-                                </div>
-                            </details>
+                            <span className={`v2-badge ${setupComplete ? 'v2-badge-accent' : ''}`}>
+                                {authRequired ? 'Sign in required' : setupComplete ? 'Ready' : 'Recommended'}
+                            </span>
                         </div>
-                    </div>
-                </section>
 
-                {/* Appearance */}
-                <section className="mb-10">
-                    <h2 className="text-heading-md mb-4">Appearance</h2>
-                    <div className="card p-6">
-                        <Toggle
-                            checked={darkMode}
-                            onChange={setDarkMode}
-                            label="Dark Mode"
-                            description="Use dark theme"
-                        />
-                    </div>
-                </section>
+                        {/* Step 1: Garmin → Strava */}
+                        <div className="v2-card p-4 flex items-start gap-4" style={{ background: 'var(--v2-bg-elevated)' }}>
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center v2-mono" style={{ background: 'var(--v2-bg-hover)' }}>1</div>
+                            <div className="space-y-1">
+                                <p className="v2-heading-sm">Link Garmin → Strava</p>
+                                <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                    Garmin Connect app → Settings → Connected Apps → Strava → Enable.
+                                </p>
+                            </div>
+                        </div>
 
-                {/* Equipment */}
-                <section className="mb-10">
-                    <h2 className="text-heading-md mb-4">Equipment</h2>
-                    <div className="card p-6">
-                        <p className="text-body-sm text-[var(--text-muted)] mb-4">
-                            We'll customize strength workouts based on your equipment.
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                            {['Barbell', 'Dumbbells', 'Kettlebells', 'Pull-up Bar'].map((eq) => (
-                                <span
-                                    key={eq}
-                                    className="badge"
-                                    style={{
-                                        backgroundColor: 'var(--domain-strength-tint)',
-                                        color: 'var(--color-strength)'
+                        {/* Step 2: Strava */}
+                        <div className="v2-card p-4 flex items-start gap-4">
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center v2-mono" style={{ background: 'var(--v2-bg-elevated)' }}>2</div>
+                            <div className="flex-1 space-y-3">
+                                <div className="flex flex-wrap items-center justify-between gap-3">
+                                    <div>
+                                        <p className="v2-heading-sm">Connect Strava to The Long Game</p>
+                                        <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                            Runs will appear automatically after each sync.
+                                        </p>
+                                    </div>
+                                    <span className={`v2-badge ${stravaConnected ? 'v2-badge-accent' : ''}`} style={!stravaConnected ? { background: 'var(--v2-error-subtle)', color: 'var(--v2-error)' } : {}}>
+                                        {stravaAuthRequired ? 'Sign in required' : stravaConnected ? 'Connected' : 'Not connected'}
+                                    </span>
+                                </div>
+                                <div className="flex flex-wrap gap-3">
+                                    <button
+                                        className="v2-btn v2-btn-primary v2-btn-sm"
+                                        onClick={handleStravaConnect}
+                                        disabled={stravaBusy || authRequired || stravaConnected || isLocalhost}
+                                    >
+                                        Connect Strava
+                                    </button>
+                                    <button
+                                        className="v2-btn v2-btn-secondary v2-btn-sm"
+                                        onClick={handleStravaSyncNow}
+                                        disabled={stravaBusy || authRequired || !stravaConnected}
+                                    >
+                                        Sync now
+                                    </button>
+                                    <button
+                                        className="v2-btn v2-btn-ghost v2-btn-sm"
+                                        onClick={handleStravaDisconnect}
+                                        disabled={stravaBusy || authRequired || !stravaConnected}
+                                    >
+                                        Disconnect
+                                    </button>
+                                </div>
+                                {stravaMessage && (
+                                    <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>{stravaMessage}</p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Step 3: Garmin Health */}
+                        <div className="v2-card p-4 flex items-start gap-4">
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center v2-mono" style={{ background: 'var(--v2-bg-elevated)' }}>3</div>
+                            <div className="flex-1 space-y-3">
+                                <div className="flex flex-wrap items-center justify-between gap-3">
+                                    <div>
+                                        <p className="v2-heading-sm">Import Garmin health data (ZIP)</p>
+                                        <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                            This fills sleep, HRV, stress, and Body Battery history.
+                                        </p>
+                                    </div>
+                                    <span className={`v2-badge ${hasHealthData ? 'v2-badge-accent' : ''}`}>
+                                        {hasHealthData ? 'Imported' : 'Needed'}
+                                    </span>
+                                </div>
+                                <input
+                                    type="file"
+                                    accept=".zip,application/zip"
+                                    className="v2-input"
+                                    disabled={authRequired || importBusy}
+                                    onChange={(event) => {
+                                        const file = event.target.files?.[0];
+                                        if (file) {
+                                            void handleGarminExportImport(file);
+                                            event.currentTarget.value = '';
+                                        }
                                     }}
-                                >
-                                    {eq}
-                                </span>
-                            ))}
-                            <button className="badge hover:bg-[var(--bg-subtle)]">
-                                + Add
-                            </button>
+                                />
+                                {importMessage && (
+                                    <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>{importMessage}</p>
+                                )}
+                            </div>
                         </div>
                     </div>
-                </section>
+                </motion.section>
 
                 {/* Account */}
-                <section className="mb-10">
-                    <h2 className="text-heading-md mb-4">Account</h2>
-                    <div className="card p-6 space-y-3">
-                        <p className="text-body-sm text-[var(--text-muted)]">
+                <motion.section
+                    className="mb-10"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.3 }}
+                >
+                    <h2 className="v2-heading-md mb-4">Account</h2>
+                    <div className="v2-card p-6 space-y-3">
+                        <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
                             Sign out on this device if you are done with setup.
                         </p>
                         <button
-                            className={`btn btn-secondary w-full ${signOutBusy ? 'btn-loading' : ''}`}
+                            className="v2-btn v2-btn-secondary w-full"
                             onClick={handleSignOut}
                             disabled={signOutBusy}
                         >
                             {signOutBusy ? 'Signing out...' : 'Sign out'}
                         </button>
                     </div>
-                </section>
+                </motion.section>
 
                 {/* Danger Zone */}
-                <section>
-                    <h2 className="text-heading-md mb-4 text-[var(--color-error)]">Danger Zone</h2>
-                    <div className="card p-6" style={{ borderColor: 'var(--color-error)' }}>
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.4 }}
+                >
+                    <h2 className="v2-heading-md mb-4" style={{ color: 'var(--v2-error)' }}>Danger Zone</h2>
+                    <div className="v2-card p-6" style={{ borderColor: 'var(--v2-error)' }}>
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="font-semibold">Delete Account</p>
-                                <p className="text-body-sm text-[var(--text-muted)]">Permanently delete your account and data</p>
+                                <p className="v2-heading-sm">Delete Account</p>
+                                <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>Permanently delete your account and data</p>
                             </div>
-                            <button className="btn btn-sm btn-destructive">
+                            <button className="v2-btn v2-btn-sm" style={{ background: 'var(--v2-error)', color: 'white' }}>
                                 Delete
                             </button>
                         </div>
                     </div>
-                </section>
+                </motion.section>
             </main>
         </div>
     );
@@ -712,7 +600,7 @@ export default function SettingsPage() {
 function formatConnectError(provider: string, error: string) {
     const label = provider === 'strava' ? 'Strava' : 'Device';
     if (error === 'missing_config') {
-        return `${label} isn’t configured yet. Add the ${label.toUpperCase()} client ID, secret, and redirect URL, then try again.`;
+        return `${label} isn't configured yet. Add the ${label.toUpperCase()} client ID, secret, and redirect URL, then try again.`;
     }
     if (error === 'unauthorized') {
         return `Sign in to connect ${label}, then try again.`;
@@ -721,7 +609,7 @@ function formatConnectError(provider: string, error: string) {
         return `${label} connection expired. Try connecting again.`;
     }
     if (error === 'connect_failed') {
-        return `We couldn’t start the ${label} connection. Try again in a moment.`;
+        return `We couldn't start the ${label} connection. Try again in a moment.`;
     }
-    return `We couldn’t start the ${label} connection.`;
+    return `We couldn't start the ${label} connection.`;
 }

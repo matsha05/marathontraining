@@ -9,7 +9,7 @@ import {
     PHILOSOPHIES,
     FOUNDATION_LAYERS,
 } from '@/domain/philosophy/types';
-import { getOverrideWarnings } from '@/domain/philosophy/recommendation';
+import { getOverrideWarnings, isPhilosophyAvailableForDistance } from '@/domain/philosophy/recommendation';
 import { PhilosophyCard } from './PhilosophyCard';
 
 interface RecommendationScreenProps {
@@ -30,7 +30,11 @@ export function RecommendationScreen({
     const [showConfirmOverride, setShowConfirmOverride] = useState(false);
 
     const primary = PHILOSOPHIES[recommendation.primary];
-    const alternatives = Object.values(PHILOSOPHIES).filter(p => p.id !== recommendation.primary);
+    // Only show alternatives that can actually deliver plans for this distance
+    const alternatives = Object.values(PHILOSOPHIES).filter(p =>
+        p.id !== recommendation.primary &&
+        isPhilosophyAvailableForDistance(p.id, answers.targetDistance)
+    );
 
     const handleSelectAlternative = (philosophy: TrainingPhilosophy) => {
         setSelectedOverride(philosophy);

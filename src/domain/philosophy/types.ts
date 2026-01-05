@@ -9,7 +9,7 @@
 // CORE TYPES
 // =============================================================================
 
-export type TrainingPhilosophy = 'hansons' | 'higdon' | 'pfitzinger';
+export type TrainingPhilosophy = 'hansons' | 'higdon' | 'pfitzinger' | 'daniels';
 
 export interface PhilosophyMetadata {
     id: TrainingPhilosophy;
@@ -171,6 +171,50 @@ export const PHILOSOPHIES: Record<TrainingPhilosophy, PhilosophyMetadata> = {
         },
         alwaysIncluded: 'All paces powered by Jack Daniels VDOT. 80/20 intensity via Seiler. Durability work via Dicharry. Mobility via Starrett. Strength for running economy.',
     },
+
+    daniels: {
+        id: 'daniels',
+        name: 'Jack Daniels',
+        tagline: 'VDOT Precision',
+        color: '#8b5cf6',
+        runDays: '5-7 days/week (2 quality)',
+        longRunCap: '25% of weekly volume',
+        coreBeliefs: [
+            'Every workout has a specific physiological purpose',
+            'Intensity is precisely calculated from current fitness (VDOT)',
+            'Two quality days per week maximize adaptation with recovery',
+        ],
+        methodology: {
+            summary: 'Dr. Jack Daniels is one of the most decorated running coaches in history. His VDOT system calculates individualized paces from race performance. The 2Q (2 Quality) approach delivers exactly 2 hard sessions per week with flexible easy days.',
+            keyPrinciples: [
+                'VDOT-based pacing: Every pace zone calculated from your current race fitness.',
+                '2 Quality days: One long run with work, one interval/tempo session.',
+                'Easy days are truly easy: Fill remaining volume with E pace running.',
+                '4-phase periodization: Base → Rep → Interval → Final Quality.',
+            ],
+            typicalWeek: [
+                'Monday: Easy (E pace)',
+                'Tuesday: Quality #1 (I or T session)',
+                'Wednesday: Easy (E pace)',
+                'Thursday: Easy or off',
+                'Friday: Easy (E pace)',
+                'Saturday: Strides or recovery',
+                'Sunday: Quality #2 (Long run with M/T work)',
+            ],
+            bestFor: [
+                'Runners who want precision pacing',
+                'Those with busy schedules (2 key workouts)',
+                'Advanced runners targeting PRs at any distance',
+                'Athletes who understand training science',
+            ],
+            challenges: [
+                'Requires accurate VDOT (race or time trial needed)',
+                '24-week plans needed for 5K/10K distance',
+                'Less structure on easy days (self-discipline required)',
+            ],
+        },
+        alwaysIncluded: 'All paces powered by Jack Daniels VDOT. 80/20 intensity via Seiler. Durability work via Dicharry. Mobility via Starrett. Strength for running economy.',
+    },
 };
 
 // =============================================================================
@@ -214,9 +258,12 @@ export type DaysPerWeek = 3 | 4 | 5 | 6;
 export type Experience = 'beginner' | 'intermediate' | 'advanced';
 export type CurrentMileage = 'under_20' | '20_40' | 'over_40';
 export type Mindset = 'rest_focus' | 'consistency' | 'push_limits';
+export type RaceTiming = 'specific' | 'soon' | 'no_race';
 
 export interface QuizAnswers {
     targetDistance: TargetDistance | null;
+    raceTiming: RaceTiming | null;
+    raceDate: string | null; // ISO date if timing === 'specific'
     daysPerWeek: DaysPerWeek | null;
     experience: Experience | null;
     currentMileage: CurrentMileage | null;
@@ -225,6 +272,8 @@ export interface QuizAnswers {
 
 export const INITIAL_QUIZ_ANSWERS: QuizAnswers = {
     targetDistance: null,
+    raceTiming: null,
+    raceDate: null,
     daysPerWeek: null,
     experience: null,
     currentMileage: null,

@@ -2,13 +2,16 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { useLandingNav } from "../useLandingNav";
 
 /**
- * Week Landing Page
+ * Week Polished Landing Page
  * 
- * Hero: Just "The Long Game" + the week preview
- * Scroll: Detailed methodology sections for each coach
+ * Same as Week but with:
+ * - Staggered fade-in animations on hero
+ * - Subtle radial glow behind week grid
+ * - Hover states on day cards
  */
 
 export default function WeekLanding() {
@@ -17,9 +20,14 @@ export default function WeekLanding() {
     return (
         <div className="min-h-screen bg-[#08080a] text-white">
             {/* Title Badge */}
-            <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[60] px-3 py-1 bg-white/5 border border-white/10 rounded-full">
+            <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1, duration: 0.5 }}
+                className="fixed top-4 left-1/2 -translate-x-1/2 z-[60] px-3 py-1 bg-white/5 border border-white/10 rounded-full"
+            >
                 <span className="text-[10px] text-white/40 uppercase tracking-widest font-mono">Week</span>
-            </div>
+            </motion.div>
 
             {/* Nav */}
             <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-5">
@@ -40,19 +48,42 @@ export default function WeekLanding() {
                 </div>
             </nav>
 
-            {/* Hero - Big text + Week preview */}
-            <section className="min-h-screen flex flex-col items-center justify-center px-6 relative">
-                <div className="text-center w-full max-w-4xl">
-                    {/* Big title */}
-                    <h1 className="text-5xl md:text-7xl font-light text-white/90 mb-4 tracking-tight">
-                        The Long Game
-                    </h1>
-                    <p className="text-lg text-white/30 mb-12">
-                        Training, structured.
-                    </p>
+            {/* Hero - Big text + Week preview with animations */}
+            <section className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden">
+                {/* Subtle radial glow behind content */}
+                <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                        background: 'radial-gradient(800px circle at 50% 55%, rgba(25, 227, 140, 0.04) 0%, transparent 60%)',
+                    }}
+                />
 
-                    {/* Week Grid - exact same as before */}
-                    <div className="max-w-3xl mx-auto mb-12">
+                <div className="text-center w-full max-w-4xl relative z-10">
+                    {/* Big title - staggered */}
+                    <motion.h1
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        className="text-5xl md:text-7xl font-light text-white/90 mb-4 tracking-tight"
+                    >
+                        The Long Game
+                    </motion.h1>
+                    <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.35, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        className="text-lg text-white/30 mb-12"
+                    >
+                        Training, structured.
+                    </motion.p>
+
+                    {/* Week Grid - staggered with subtle delay */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5, duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        className="max-w-3xl mx-auto mb-12"
+                    >
                         <p className="text-xs text-white/20 mb-4 font-mono">
                             Week 8 · Build Phase · 42 miles
                         </p>
@@ -66,12 +97,16 @@ export default function WeekLanding() {
                                 { day: "S", type: "run", label: "5mi Easy", sub: "8:32/mi", strength: false },
                                 { day: "S", type: "long", label: "14mi Long", sub: "8:45/mi", strength: false },
                             ].map((d, i) => (
-                                <div
+                                <motion.div
                                     key={i}
+                                    initial={{ opacity: 0, y: 15 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.6 + (i * 0.05), duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
                                     className={`
-                                        p-4 rounded-lg text-center
+                                        p-4 rounded-lg text-center transition-all duration-200
+                                        hover:bg-white/[0.06] hover:scale-[1.02]
                                         ${d.type === "rest" ? "bg-white/[0.02]" : "bg-white/[0.04]"}
-                                        ${d.type === "long" ? "bg-[#19e38c]/10" : ""}
+                                        ${d.type === "long" ? "bg-[#19e38c]/10 hover:bg-[#19e38c]/15" : ""}
                                     `}
                                 >
                                     <p className="text-[10px] text-white/30 mb-3">{d.day}</p>
@@ -86,24 +121,35 @@ export default function WeekLanding() {
                                             <p className="text-[10px] text-[#3a6bff]">+ Strength</p>
                                         </div>
                                     )}
-                                </div>
+                                </motion.div>
                             ))}
                         </div>
-                    </div>
+                    </motion.div>
 
-                    {/* CTA */}
-                    <Link
-                        href="/auth"
-                        className="inline-block px-6 py-3 bg-white text-black text-sm font-medium rounded-lg hover:bg-white/90 transition-colors"
+                    {/* CTA - last to animate */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 1.0, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
                     >
-                        Build yours
-                    </Link>
+                        <Link
+                            href="/auth"
+                            className="inline-block px-6 py-3 bg-white text-black text-sm font-medium rounded-lg hover:bg-white/90 hover:scale-[1.02] transition-all duration-200"
+                        >
+                            Build yours
+                        </Link>
+                    </motion.div>
                 </div>
 
                 {/* Scroll indicator */}
-                <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 1.3, duration: 0.5 }}
+                    className="absolute bottom-8 left-1/2 -translate-x-1/2"
+                >
                     <p className="text-[10px] text-white/20 uppercase tracking-widest">Scroll</p>
-                </div>
+                </motion.div>
             </section>
 
             {/* === RUNNING SCIENCE — PLAN STRUCTURE === */}
@@ -474,7 +520,7 @@ export default function WeekLanding() {
             <section className="px-6 py-24 bg-white/[0.01]">
                 <div className="max-w-3xl mx-auto text-center">
                     <p className="text-xs text-white/40 uppercase tracking-widest mb-4">Any Distance</p>
-                    <h2 className="text-4xl md:text-5xl font-light text-white/80 mb-4">Base building to Ultra.</h2>
+                    <h2 className="text-4xl md:text-5xl font-light text-white/80 mb-4">Base building to 50K.</h2>
                     <p className="text-lg text-white/40 mb-8">
                         Race on the calendar or just building fitness. We'll meet you where you are.
                     </p>

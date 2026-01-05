@@ -3,20 +3,14 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { AppHeader } from '@/components/ui/AppHeader';
 import { usePlan } from '@/domain/plan/context';
 import { TrainingPlan, WeekPlan, TrainingPhase } from '@/domain/plan/types';
+import { motion } from 'framer-motion';
 
 /**
- * Training Plan View
- *
- * V2: Wired to real plan data from usePlan() hook
- * No more mock data!
+ * Training Plan View V2
+ * Week aesthetic: Dark, atmospheric, light typography
  */
-
-// =============================================================================
-// TYPES
-// =============================================================================
 
 interface PhaseDisplay {
     name: string;
@@ -33,13 +27,8 @@ interface WeekDisplay {
     cutback?: boolean;
 }
 
-// =============================================================================
-// HELPER FUNCTIONS
-// =============================================================================
-
 function formatPhaseDisplay(plan: TrainingPlan, currentWeekNum: number): PhaseDisplay[] {
     if (!plan.phases || plan.phases.length === 0) {
-        // Generate phases from weeks if not available
         const phaseMap = new Map<TrainingPhase, { start: number; end: number }>();
 
         for (const week of plan.weeks) {
@@ -98,7 +87,6 @@ function formatPhaseDisplay(plan: TrainingPlan, currentWeekNum: number): PhaseDi
 }
 
 function formatWeekDisplay(weeks: WeekPlan[], currentWeekNum: number): WeekDisplay[] {
-    // Show a window of weeks around current (±3)
     const startWeek = Math.max(1, currentWeekNum - 2);
     const endWeek = Math.min(weeks.length, currentWeekNum + 5);
 
@@ -122,16 +110,11 @@ function getWeeksUntilRace(raceDate: string | undefined): number | null {
     return Math.ceil(diffMs / (1000 * 60 * 60 * 24 * 7));
 }
 
-// =============================================================================
-// PLAN PAGE
-// =============================================================================
-
 export default function PlanPage() {
     const router = useRouter();
     const { status, plan, currentWeek } = usePlan();
     const [selectedWeek, setSelectedWeek] = useState<number | null>(null);
 
-    // Compute derived data
     const phases = useMemo(() => {
         if (!plan) return [];
         return formatPhaseDisplay(plan, currentWeek || 1);
@@ -144,7 +127,6 @@ export default function PlanPage() {
 
     const weeksUntilRace = plan?.raceDate ? getWeeksUntilRace(plan.raceDate) : null;
 
-    // Set initial selected week
     if (selectedWeek === null && currentWeek) {
         setSelectedWeek(currentWeek);
     }
@@ -152,13 +134,17 @@ export default function PlanPage() {
     // Loading state
     if (status === 'loading') {
         return (
-            <div className="min-h-screen landing-shell">
-                <AppHeader backHref="/dashboard" title="Training Plan" />
-                <main className="container-page py-10">
-                    <div className="animate-pulse space-y-6">
-                        <div className="h-20 bg-[var(--bg-muted)] rounded-xl" />
-                        <div className="h-60 bg-[var(--bg-muted)] rounded-xl" />
-                        <div className="h-40 bg-[var(--bg-muted)] rounded-xl" />
+            <div className="v2-root min-h-screen">
+                <header className="v2-nav sticky top-0 z-50">
+                    <div className="v2-container flex items-center justify-between py-4">
+                        <Link href="/dashboard" className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>← Back</Link>
+                        <span className="v2-heading-sm">Training Plan</span>
+                    </div>
+                </header>
+                <main className="v2-container py-10">
+                    <div className="space-y-6">
+                        <div className="v2-skeleton" style={{ height: '80px', borderRadius: '12px' }} />
+                        <div className="v2-skeleton" style={{ height: '200px', borderRadius: '12px' }} />
                     </div>
                 </main>
             </div>
@@ -168,15 +154,20 @@ export default function PlanPage() {
     // No plan state
     if (!plan) {
         return (
-            <div className="min-h-screen landing-shell">
-                <AppHeader backHref="/dashboard" title="Training Plan" />
-                <main className="container-page py-10">
-                    <div className="card p-10 text-center">
-                        <h2 className="text-heading-md mb-4">No Training Plan</h2>
-                        <p className="text-body-sm text-[var(--text-muted)] mb-6">
+            <div className="v2-root min-h-screen">
+                <header className="v2-nav sticky top-0 z-50">
+                    <div className="v2-container flex items-center justify-between py-4">
+                        <Link href="/dashboard" className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>← Back</Link>
+                        <span className="v2-heading-sm">Training Plan</span>
+                    </div>
+                </header>
+                <main className="v2-container py-10">
+                    <div className="v2-card p-10 text-center">
+                        <h2 className="v2-heading-md mb-4">No Training Plan</h2>
+                        <p className="v2-body-sm mb-6" style={{ color: 'var(--v2-text-muted)' }}>
                             Complete onboarding to generate your personalized training plan.
                         </p>
-                        <Link href="/onboarding" className="btn btn-gradient">
+                        <Link href="/onboarding" className="v2-btn v2-btn-primary">
                             Get Started
                         </Link>
                     </div>
@@ -185,136 +176,161 @@ export default function PlanPage() {
         );
     }
 
-    // Calculate plan stats
     const totalQualitySessions = plan.weeks.reduce((sum, w) => sum + w.keyWorkouts, 0);
     const totalStrengthSessions = plan.weeks.reduce((sum, w) =>
         sum + w.days.filter(d => d.strengthWorkout).length, 0
     );
 
     return (
-        <div className="min-h-screen landing-shell">
-            <AppHeader
-                backHref="/dashboard"
-                title="Training Plan"
-                rightContent={
+        <div className="v2-root min-h-screen">
+            {/* Header */}
+            <header className="v2-nav sticky top-0 z-50">
+                <div className="v2-container flex items-center justify-between py-4">
+                    <div className="flex items-center gap-4">
+                        <Link href="/dashboard" className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>← Back</Link>
+                        <span className="v2-heading-sm">Training Plan</span>
+                    </div>
                     <div className="flex items-center gap-2">
-                        <span className="text-label">
-                            {plan.raceName || `${plan.goalDistance.toUpperCase()} Training`}
-                        </span>
+                        <span className="v2-label">{plan.raceName || `${plan.goalDistance.toUpperCase()} Training`}</span>
                         {weeksUntilRace !== null && weeksUntilRace > 0 && (
                             <>
-                                <span className="text-[var(--text-subtle)]">•</span>
-                                <span className="text-body-sm text-[var(--color-accent)]">
-                                    {weeksUntilRace} weeks away
-                                </span>
+                                <span className="v2-mono" style={{ fontSize: '10px', color: 'var(--v2-text-subtle)' }}>•</span>
+                                <span className="v2-body-sm v2-accent">{weeksUntilRace} weeks away</span>
                             </>
                         )}
                     </div>
-                }
-            />
+                </div>
+            </header>
 
-            <main className="container-page py-10">
+            <main className="v2-container py-10">
                 {/* Phase Timeline */}
-                <section className="mb-10">
-                    <h2 className="text-heading-md mb-4">Training Phases</h2>
-
+                <motion.section
+                    className="mb-10"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4 }}
+                >
+                    <h2 className="v2-heading-md mb-4">Training Phases</h2>
                     <div className="flex gap-2 overflow-x-auto pb-2">
-                        {phases.map((phase) => (
-                            <div
+                        {phases.map((phase, i) => (
+                            <motion.div
                                 key={phase.name}
-                                className={`flex-1 min-w-[100px] p-4 rounded-xl border transition-all ${phase.status === 'current'
-                                    ? 'bg-[var(--color-accent)] text-black border-transparent'
-                                    : phase.status === 'completed'
-                                        ? 'bg-[var(--bg-muted)] border-transparent opacity-60'
-                                        : 'bg-[var(--bg-elevated)] border-[var(--border-base)]'
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3, delay: i * 0.05 }}
+                                className={`flex-1 min-w-[100px] p-4 rounded-xl transition-all ${phase.status === 'current'
+                                        ? 'v2-card-accent'
+                                        : phase.status === 'completed'
+                                            ? 'v2-card opacity-60'
+                                            : 'v2-card'
                                     }`}
+                                style={{
+                                    background: phase.status === 'current' ? 'var(--v2-bg-active)' : 'var(--v2-bg-elevated)',
+                                    borderColor: phase.status === 'current' ? 'var(--v2-accent)' : 'var(--v2-border)',
+                                }}
                             >
-                                <p className="font-semibold">{phase.name}</p>
-                                <p className={`text-body-sm ${phase.status === 'current' ? 'text-black/70' : 'text-[var(--text-muted)]'}`}>
+                                <p className="v2-heading-sm">{phase.name}</p>
+                                <p className="v2-body-sm" style={{ color: phase.status === 'current' ? 'var(--v2-text-secondary)' : 'var(--v2-text-muted)' }}>
                                     {phase.weeks.includes('-') ? `Weeks ${phase.weeks}` : `Week ${phase.weeks}`}
                                 </p>
-                            </div>
+                            </motion.div>
                         ))}
                     </div>
-                </section>
+                </motion.section>
 
                 {/* Weekly Overview */}
-                <section className="mb-10">
-                    <h2 className="text-heading-md mb-4">Weekly Plan</h2>
-
+                <motion.section
+                    className="mb-10"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.1 }}
+                >
+                    <h2 className="v2-heading-md mb-4">Weekly Plan</h2>
                     <div className="space-y-3">
-                        {weeks.map((week) => (
-                            <Link
+                        {weeks.map((week, i) => (
+                            <motion.div
                                 key={week.number}
-                                href={`/plan/week/${week.number}`}
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    setSelectedWeek(week.number);
-                                }}
-                                className={`card p-5 block cursor-pointer transition-all ${selectedWeek === week.number ? 'border-[var(--color-accent)]' : ''
-                                    } ${week.isCurrent ? 'ring-2 ring-[var(--color-accent)] ring-offset-2 ring-offset-[var(--bg-base)]' : ''}`}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.3, delay: 0.15 + i * 0.05 }}
                             >
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-xl bg-[var(--bg-muted)] flex items-center justify-center font-bold">
-                                            W{week.number}
+                                <Link
+                                    href={`/plan/week/${week.number}`}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        setSelectedWeek(week.number);
+                                    }}
+                                    className={`v2-card v2-card-interactive p-5 block ${selectedWeek === week.number ? 'v2-card-selected' : ''
+                                        } ${week.isCurrent ? 'ring-2 ring-[var(--v2-accent)] ring-offset-2 ring-offset-[var(--v2-bg-base)]' : ''}`}
+                                >
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-4">
+                                            <div
+                                                className="w-12 h-12 rounded-xl flex items-center justify-center v2-mono"
+                                                style={{ background: 'var(--v2-bg-hover)', fontWeight: 600 }}
+                                            >
+                                                W{week.number}
+                                            </div>
+                                            <div>
+                                                <p className="v2-heading-sm flex items-center gap-2">
+                                                    Week {week.number}
+                                                    {week.isCurrent && <span className="v2-badge v2-badge-accent">Current</span>}
+                                                    {week.cutback && <span className="v2-badge">Cutback</span>}
+                                                </p>
+                                                <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>{week.phase} Phase</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="font-semibold">
-                                                Week {week.number}
-                                                {week.isCurrent && <span className="ml-2 badge badge-accent">Current</span>}
-                                                {week.cutback && <span className="ml-2 badge badge-warning">Cutback</span>}
-                                            </p>
-                                            <p className="text-body-sm text-[var(--text-muted)]">{week.phase} Phase</p>
-                                        </div>
-                                    </div>
 
-                                    <div className="flex items-center gap-8 text-center">
-                                        <div>
-                                            <p className="text-heading-lg text-data">{week.mileage}</p>
-                                            <p className="text-caption text-[var(--text-muted)]">miles</p>
+                                        <div className="flex items-center gap-8 text-center">
+                                            <div>
+                                                <p className="v2-heading-md v2-mono">{week.mileage}</p>
+                                                <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--v2-text-muted)' }}>miles</p>
+                                            </div>
+                                            <div>
+                                                <p className="v2-heading-md v2-mono">{week.quality}</p>
+                                                <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--v2-text-muted)' }}>quality</p>
+                                            </div>
+                                            <svg className="w-5 h-5" style={{ color: 'var(--v2-text-subtle)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                            </svg>
                                         </div>
-                                        <div>
-                                            <p className="text-heading-lg text-data">{week.quality}</p>
-                                            <p className="text-caption text-[var(--text-muted)]">quality</p>
-                                        </div>
-                                        <svg className="w-5 h-5 text-[var(--text-subtle)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                        </svg>
                                     </div>
-                                </div>
-                            </Link>
+                                </Link>
+                            </motion.div>
                         ))}
                     </div>
-                </section>
+                </motion.section>
 
                 {/* Plan Stats */}
-                <section>
-                    <h2 className="text-heading-md mb-4">Plan Overview</h2>
-
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.2 }}
+                >
+                    <h2 className="v2-heading-md mb-4">Plan Overview</h2>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="card p-5">
-                            <p className="text-display-md text-data mb-1">{plan.totalWeeks}</p>
-                            <p className="text-label mb-1">Weeks</p>
-                            <p className="text-caption text-[var(--text-muted)]">Total plan length</p>
+                        <div className="v2-card p-5">
+                            <p className="v2-heading-lg v2-mono mb-1">{plan.totalWeeks}</p>
+                            <p className="v2-label mb-1">Weeks</p>
+                            <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--v2-text-muted)' }}>Total plan length</p>
                         </div>
-                        <div className="card p-5">
-                            <p className="text-display-md text-data mb-1">{plan.peakMileage}</p>
-                            <p className="text-label mb-1">Peak Mi</p>
-                            <p className="text-caption text-[var(--text-muted)]">Week {plan.peakWeek}</p>
+                        <div className="v2-card p-5">
+                            <p className="v2-heading-lg v2-mono mb-1">{plan.peakMileage}</p>
+                            <p className="v2-label mb-1">Peak Mi</p>
+                            <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--v2-text-muted)' }}>Week {plan.peakWeek}</p>
                         </div>
-                        <div className="card p-5">
-                            <p className="text-display-md text-data mb-1">{totalQualitySessions}</p>
-                            <p className="text-label mb-1">Quality</p>
-                            <p className="text-caption text-[var(--text-muted)]">Total sessions</p>
+                        <div className="v2-card p-5">
+                            <p className="v2-heading-lg v2-mono mb-1">{totalQualitySessions}</p>
+                            <p className="v2-label mb-1">Quality</p>
+                            <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--v2-text-muted)' }}>Total sessions</p>
                         </div>
-                        <div className="card p-5">
-                            <p className="text-display-md text-data mb-1">{totalStrengthSessions}</p>
-                            <p className="text-label mb-1">Strength</p>
-                            <p className="text-caption text-[var(--text-muted)]">Total sessions</p>
+                        <div className="v2-card p-5">
+                            <p className="v2-heading-lg v2-mono mb-1">{totalStrengthSessions}</p>
+                            <p className="v2-label mb-1">Strength</p>
+                            <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--v2-text-muted)' }}>Total sessions</p>
                         </div>
                     </div>
-                </section>
+                </motion.section>
             </main>
         </div>
     );

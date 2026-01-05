@@ -1,9 +1,10 @@
 'use client';
 
 /**
- * THE LONG GAME - Onboarding Screens: Safety
+ * THE LONG GAME - Onboarding Screens: Safety V2
  * 
  * Current pain, pain details, injury history, injury details
+ * Week aesthetic: Dark, atmospheric, light typography
  */
 
 import {
@@ -114,7 +115,7 @@ export function PainDetailsScreen({
             <div className="space-y-6">
                 {/* Location */}
                 <div>
-                    <label className="text-label block mb-2">What area is affected?</label>
+                    <label className="v2-label block mb-2">What area is affected?</label>
                     <OptionGrid columns={2}>
                         {INJURY_LOCATIONS.map((location) => (
                             <OptionButton
@@ -129,7 +130,7 @@ export function PainDetailsScreen({
 
                 {/* Severity */}
                 <div>
-                    <label className="text-label block mb-2">How bad is it?</label>
+                    <label className="v2-label block mb-2">How bad is it?</label>
                     <OptionGrid>
                         {PAIN_SEVERITY_OPTIONS.map((option) => (
                             <OptionButton
@@ -259,7 +260,7 @@ export function InjuryDetailsScreen({
             </OptionGrid>
 
             {selectedPrehab && (
-                <p className="text-body-sm text-[var(--text-muted)] mt-6">
+                <p className="v2-body-sm mt-6" style={{ color: 'var(--v2-text-muted)' }}>
                     We&apos;ll include targeted prehab work: <strong>{selectedPrehab}</strong>
                 </p>
             )}

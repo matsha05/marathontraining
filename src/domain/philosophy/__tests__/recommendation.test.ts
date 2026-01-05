@@ -115,10 +115,10 @@ describe('Philosophy Recommendation Algorithm', () => {
     });
 
     // =========================================================================
-    // RACE FLOW: Days ≤ 4 → Always Higdon
+    // RACE FLOW: Days ≤ 4 → Higdon or Daniels (low-day structures)
     // =========================================================================
-    describe('Race Flow - Days ≤ 4 → Higdon', () => {
-        it('3 days → Higdon (only coach supporting 3 days)', () => {
+    describe('Race Flow - Days ≤ 4 → Higdon or Daniels', () => {
+        it('3 days + advanced → Daniels or Higdon (2Q or accessible structure)', () => {
             const result = calculateRecommendation(makeAnswers({
                 targetDistance: 'marathon',
                 daysPerWeek: 3,
@@ -126,10 +126,11 @@ describe('Philosophy Recommendation Algorithm', () => {
                 currentMileage: 'over_40',
                 mindset: 'push_limits',
             }));
-            expect(result.primary).toBe('higdon');
+            // Both Higdon and Daniels support 3-4 days
+            expect(['higdon', 'daniels']).toContain(result.primary);
         });
 
-        it('4 days → Higdon (only coach supporting 4 days)', () => {
+        it('4 days + intermediate → Higdon (Daniels requires advanced)', () => {
             const result = calculateRecommendation(makeAnswers({
                 targetDistance: '10k',
                 daysPerWeek: 4,
@@ -381,7 +382,7 @@ describe('Philosophy Recommendation Algorithm', () => {
             });
         });
 
-        it('Days ≤ 4 always returns Higdon regardless of other inputs', () => {
+        it('Days ≤ 4 always returns Higdon or Daniels (low-day-compatible structures)', () => {
             const days = [3, 4] as const;
             const experiences = ['beginner', 'intermediate', 'advanced'] as const;
 
@@ -394,12 +395,13 @@ describe('Philosophy Recommendation Algorithm', () => {
                         currentMileage: 'over_40',
                         mindset: 'push_limits',
                     }));
-                    expect(result.primary).toBe('higdon');
+                    // Hansons and Pfitz require 5-6 days
+                    expect(['higdon', 'daniels']).toContain(result.primary);
                 });
             });
         });
 
-        it('Beginner always returns Higdon or Hansons (never Pfitz)', () => {
+        it('Beginner always returns Higdon or Hansons (never Pfitz or Daniels)', () => {
             const days = [3, 4, 5, 6] as const;
             const mindsets = ['rest_focus', 'consistency', 'push_limits'] as const;
 
@@ -412,8 +414,9 @@ describe('Philosophy Recommendation Algorithm', () => {
                         currentMileage: 'over_40',
                         mindset: m,
                     }));
-                    // Beginner cannot get Pfitz (experience gate)
+                    // Beginner cannot get Pfitz or Daniels (experience gate)
                     expect(result.primary).not.toBe('pfitzinger');
+                    expect(result.primary).not.toBe('daniels');
                 });
             });
         });

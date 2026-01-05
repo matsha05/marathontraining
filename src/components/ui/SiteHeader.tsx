@@ -11,8 +11,8 @@ import type { User } from '@supabase/supabase-js';
 /**
  * SiteHeader - Premium header for marketing/landing pages
  * 
+ * V2 Design System - Dark atmospheric aesthetic
  * Includes: logo, nav links, theme toggle, auth CTAs
- * Shows different UI when user is logged in
  */
 
 interface SiteHeaderProps {
@@ -46,20 +46,29 @@ export function SiteHeader({ isDark, onToggleTheme, hideAuth = false }: SiteHead
     }, []);
 
     return (
-        <header className="sticky top-0 left-0 right-0 z-50 glass border-b border-[var(--border-muted)]">
-            <div className="container-page h-[var(--header-height)] flex items-center justify-between">
+        <header
+            className="sticky top-0 left-0 right-0 z-50 border-b"
+            style={{
+                background: 'rgba(8, 8, 10, 0.8)',
+                backdropFilter: 'blur(12px)',
+                borderColor: 'var(--v2-border)'
+            }}
+        >
+            <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
                 {/* Left - Logo */}
                 <Link href="/" className="flex items-center gap-3 group">
-                    <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center group-hover:scale-105 transition-transform">
                         <Image
                             src="/icon-192.png"
                             alt="The Long Game"
-                            width={40}
-                            height={40}
-                            className="object-cover"
+                            width={32}
+                            height={32}
+                            className="object-cover opacity-70"
                         />
                     </div>
-                    <span className="text-heading-sm font-semibold tracking-tight">The Long Game</span>
+                    <span className="text-sm font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
+                        The Long Game
+                    </span>
                 </Link>
 
                 {/* Right - Nav + Actions */}
@@ -68,9 +77,21 @@ export function SiteHeader({ isDark, onToggleTheme, hideAuth = false }: SiteHead
                     <nav className="hidden md:flex items-center gap-6">
                         <Link
                             href="/methodology"
-                            className="text-body-sm text-[var(--text-muted)] hover:text-[var(--text-base)] transition-colors"
+                            className="text-xs transition-colors"
+                            style={{ color: 'var(--v2-text-muted)' }}
+                            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--v2-text-secondary)'}
+                            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--v2-text-muted)'}
                         >
                             Methodology
+                        </Link>
+                        <Link
+                            href="/philosophy"
+                            className="text-xs transition-colors"
+                            style={{ color: 'var(--v2-text-muted)' }}
+                            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--v2-text-secondary)'}
+                            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--v2-text-muted)'}
+                        >
+                            Find Your Coach
                         </Link>
                     </nav>
 
@@ -78,29 +99,32 @@ export function SiteHeader({ isDark, onToggleTheme, hideAuth = false }: SiteHead
                     {onToggleTheme && (
                         <button
                             onClick={onToggleTheme}
-                            className="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-[var(--bg-muted)] transition-colors"
+                            className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors"
+                            style={{ color: 'var(--v2-text-muted)' }}
                             aria-label="Toggle theme"
                         >
                             {isDark ? (
-                                <SunIcon size={18} className="text-[var(--text-muted)]" />
+                                <SunIcon size={18} />
                             ) : (
-                                <MoonIcon size={18} className="text-[var(--text-muted)]" />
+                                <MoonIcon size={18} />
                             )}
                         </button>
                     )}
 
-                    {/* Auth CTAs - show different UI based on login state */}
+                    {/* Auth CTAs */}
                     {!hideAuth && !loading && (
                         <div className="flex items-center gap-3">
                             {user ? (
-                                // Logged in - show Dashboard button
-                                <Link href="/dashboard" className="btn btn-gradient">
+                                <Link href="/dashboard" className="v2-btn v2-btn-primary v2-btn-sm">
                                     Dashboard
                                 </Link>
                             ) : (
-                                // Not logged in - single entry point
-                                <Link href="/auth" className="btn btn-gradient">
-                                    Get Started
+                                <Link
+                                    href="/auth"
+                                    className="text-xs transition-colors"
+                                    style={{ color: 'white' }}
+                                >
+                                    Get Started →
                                 </Link>
                             )}
                         </div>

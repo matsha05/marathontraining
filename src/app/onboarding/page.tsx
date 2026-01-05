@@ -232,10 +232,10 @@ function OnboardingContent() {
 
         // Check for philosophy selected from quiz (before auth)
         const selectedPhilosophy = localStorage.getItem('selected-philosophy');
-        if (selectedPhilosophy && ['hansons', 'higdon', 'pfitzinger'].includes(selectedPhilosophy)) {
+        if (selectedPhilosophy && ['hansons', 'higdon', 'pfitzinger', 'daniels'].includes(selectedPhilosophy)) {
             setData(prev => ({
                 ...prev,
-                trainingPhilosophy: selectedPhilosophy as 'hansons' | 'higdon' | 'pfitzinger'
+                trainingPhilosophy: selectedPhilosophy as 'hansons' | 'higdon' | 'pfitzinger' | 'daniels'
             }));
             localStorage.removeItem('selected-philosophy'); // Clear after use
         }
@@ -301,17 +301,17 @@ function OnboardingContent() {
     // Resume prompt
     if (showResumePrompt && savedProgress) {
         return (
-            <div className="min-h-screen landing-shell flex items-center justify-center px-6 py-12">
-                <div className="card p-8 text-center max-w-md w-full">
-                    <h1 className="text-display-sm mb-4">Welcome back!</h1>
-                    <p className="text-body-md text-[var(--text-muted)] mb-8">
+            <div className="v2-root min-h-screen flex items-center justify-center px-6 py-12">
+                <div className="v2-card p-8 text-center max-w-md w-full">
+                    <h1 className="v2-heading-md mb-4">Welcome back!</h1>
+                    <p className="v2-body-md mb-8" style={{ color: 'var(--v2-text-muted)' }}>
                         You have saved progress. Would you like to continue where you left off?
                     </p>
                     <div className="space-y-3">
-                        <button onClick={handleResume} className="btn btn-gradient btn-lg w-full">
+                        <button onClick={handleResume} className="v2-btn v2-btn-primary v2-btn-lg w-full">
                             Continue where I left off
                         </button>
-                        <button onClick={handleStartFresh} className="btn btn-secondary w-full">
+                        <button onClick={handleStartFresh} className="v2-btn v2-btn-secondary w-full">
                             Start fresh
                         </button>
                     </div>
@@ -672,10 +672,10 @@ function OnboardingContent() {
 // Loading fallback for Suspense
 function OnboardingLoading() {
     return (
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="v2-root min-h-screen flex items-center justify-center">
             <div className="text-center">
-                <div className="w-12 h-12 border-2 border-[var(--color-accent)] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                <p className="text-body-sm text-[var(--text-muted)]">Loading...</p>
+                <div className="w-12 h-12 border-2 rounded-full animate-spin mx-auto mb-4" style={{ borderColor: 'var(--v2-accent)', borderTopColor: 'transparent' }} />
+                <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>Loading...</p>
             </div>
         </div>
     );

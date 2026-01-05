@@ -1,9 +1,10 @@
 'use client';
 
 /**
- * THE LONG GAME - Onboarding Screens: Identity
+ * THE LONG GAME - Onboarding Screens: Identity V2
  * 
  * Welcome, Name, Demographics screens
+ * Week aesthetic: Dark, atmospheric, light typography
  */
 
 import {
@@ -32,40 +33,49 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
     return (
         <QuestionScreen showBack={false}>
             <div className="text-center">
-                <h1 className="text-display-md md:text-display-lg mb-4">
-                    The <span className="gradient-text">Long Game</span>
+                <h1 className="v2-heading-xl mb-4">
+                    The <span className="v2-accent">Long Game</span>
                 </h1>
-                <p className="text-body-lg text-[var(--text-muted)] mb-2">
+                <p className="v2-body-lg mb-2" style={{ color: 'var(--v2-text-muted)' }}>
                     Training plans built on decades of coaching science.
                 </p>
-                <p className="text-body-md text-[var(--text-subtle)] mb-12">
+                <p className="v2-body-md mb-12" style={{ color: 'var(--v2-text-subtle)' }}>
                     Not AI slop. Not generic templates.<br />
                     Real methodology from real coaches.
                 </p>
 
                 <button
                     onClick={onContinue}
-                    className="btn btn-gradient btn-lg px-12"
+                    className="v2-btn v2-btn-primary v2-btn-lg px-12"
                 >
                     Get Started
                 </button>
 
-                <div className="proof-row">
-                    <div className="proof-chip">
-                        <p className="text-label text-[var(--color-accent)]">Trusted</p>
-                        <p className="text-body-sm">2,400+ athletes trained</p>
+                <div className="flex flex-wrap justify-center gap-4 mt-12">
+                    <div
+                        className="v2-card px-4 py-3 text-center"
+                        style={{ background: 'var(--v2-bg-elevated)' }}
+                    >
+                        <p className="v2-label v2-accent">Trusted</p>
+                        <p className="v2-body-sm">2,400+ athletes trained</p>
                     </div>
-                    <div className="proof-chip">
-                        <p className="text-label text-[var(--color-strength)]">Built on</p>
-                        <p className="text-body-sm">12 coach-backed standards</p>
+                    <div
+                        className="v2-card px-4 py-3 text-center"
+                        style={{ background: 'var(--v2-bg-elevated)' }}
+                    >
+                        <p className="v2-label" style={{ color: 'var(--v2-secondary)' }}>Built on</p>
+                        <p className="v2-body-sm">12 coach-backed standards</p>
                     </div>
-                    <div className="proof-chip">
-                        <p className="text-label text-[var(--color-durability)]">Sync ready</p>
-                        <p className="text-body-sm">Garmin export + Strava</p>
+                    <div
+                        className="v2-card px-4 py-3 text-center"
+                        style={{ background: 'var(--v2-bg-elevated)' }}
+                    >
+                        <p className="v2-label" style={{ color: 'var(--v2-tertiary)' }}>Sync ready</p>
+                        <p className="v2-body-sm">Garmin export + Strava</p>
                     </div>
                 </div>
 
-                <p className="text-caption text-[var(--text-subtle)] mt-6">
+                <p className="v2-mono mt-6" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
                     Takes about 3 minutes
                 </p>
             </div>
@@ -153,7 +163,7 @@ export function DemographicsScreen({
             <div className="space-y-6">
                 {/* Age */}
                 <div>
-                    <label className="text-label block mb-2">Age</label>
+                    <label className="v2-label block mb-2">Age</label>
                     <TextInput
                         type="number"
                         value={data.age?.toString() ?? ''}
@@ -166,7 +176,7 @@ export function DemographicsScreen({
 
                 {/* Sex */}
                 <div>
-                    <label className="text-label block mb-2">Biological sex</label>
+                    <label className="v2-label block mb-2">Biological sex</label>
                     <OptionGrid columns={2}>
                         <OptionButton
                             label="Male"

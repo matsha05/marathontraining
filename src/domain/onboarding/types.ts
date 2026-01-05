@@ -164,7 +164,7 @@ export interface OnboardingData {
     // Phase 8: Preferences
     trainingIntensity: TrainingIntensity | null;
     includeStrength: boolean | null;
-    trainingPhilosophy: 'hansons' | 'higdon' | 'pfitzinger' | null;
+    trainingPhilosophy: 'hansons' | 'higdon' | 'pfitzinger' | 'daniels' | null;
 
     // Phase 9: Readiness
     readinessStatus: ReadinessStatus | null;

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Instrument_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
+import "./globals-v2.css";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
