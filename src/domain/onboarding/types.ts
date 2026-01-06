@@ -10,9 +10,9 @@
 // =============================================================================
 
 export type OnboardingStep =
-    // Phase 1: Welcome & Philosophy
+    // Phase 1: Welcome & Qualification
     | 'welcome'
-    | 'philosophy'
+    | 'mile-gate'  // Can you run 1 mile without stopping?
 
     // Phase 2: Identity
     | 'name'
@@ -27,7 +27,6 @@ export type OnboardingStep =
     | 'calibration-method'
     | 'race-input'
     | 'easy-pace-input'
-
     | 'manual-vo2max'
     | 'hard-effort-input'
     | 'estimation-flow'
@@ -48,11 +47,13 @@ export type OnboardingStep =
     | 'injury-history'
     | 'injury-details'
 
-    // Phase 8: Preferences
+    // Phase 8: Preferences & Mindset
     | 'training-intensity'
+    | 'training-mindset'  // rest-focus / consistency / push-limits
     | 'strength-training'
 
-    // Phase 9: Readiness & Generation
+    // Phase 9: Coach Selection & Generation
+    | 'coach-reveal'  // Show recommended coach based on collected data
     | 'readiness-check'
     | 'generating'
     | 'complete';
@@ -94,6 +95,8 @@ export type InjuryLocation =
     | 'other';
 
 export type TrainingIntensity = 'conservative' | 'moderate' | 'aggressive';
+
+export type TrainingMindset = 'rest_focus' | 'consistency' | 'push_limits';
 
 export type ReadinessStatus = 'ready' | 'needs_base' | 'timeline_short';
 
@@ -164,8 +167,12 @@ export interface OnboardingData {
 
     // Phase 8: Preferences
     trainingIntensity: TrainingIntensity | null;
+    trainingMindset: TrainingMindset | null;
     includeStrength: boolean | null;
     trainingPhilosophy: 'hansons' | 'higdon' | 'pfitzinger' | 'daniels' | null;
+
+    // Phase 1: Qualification
+    canRunMile: boolean | null;
 
     // Phase 9: Readiness
     readinessStatus: ReadinessStatus | null;
@@ -225,8 +232,12 @@ export const INITIAL_ONBOARDING_DATA: OnboardingData = {
 
     // Preferences
     trainingIntensity: null,
+    trainingMindset: null,
     includeStrength: null,
     trainingPhilosophy: null,
+
+    // Qualification
+    canRunMile: null,
 
     // Readiness
     readinessStatus: null,
@@ -247,9 +258,10 @@ export function getNextStep(
 ): OnboardingStep {
     switch (currentStep) {
         case 'welcome':
-            return 'philosophy';
+            return 'mile-gate';
 
-        case 'philosophy':
+        case 'mile-gate':
+            // If they can't run a mile, don't proceed (handled by screen)
             return 'name';
 
         case 'name':
@@ -317,9 +329,15 @@ export function getNextStep(
             return 'training-intensity';
 
         case 'training-intensity':
+            return 'training-mindset';
+
+        case 'training-mindset':
             return 'strength-training';
 
         case 'strength-training':
+            return 'coach-reveal';
+
+        case 'coach-reveal':
             return 'readiness-check';
 
         case 'readiness-check':
@@ -345,11 +363,11 @@ export function getPreviousStep(
         case 'welcome':
             return null; // Can't go back from welcome
 
-        case 'philosophy':
+        case 'mile-gate':
             return 'welcome';
 
         case 'name':
-            return 'philosophy';
+            return 'mile-gate';
 
         case 'demographics':
             return 'name';
@@ -417,11 +435,17 @@ export function getPreviousStep(
         case 'training-intensity':
             return data.hasRecentInjury ? 'injury-details' : 'injury-history';
 
-        case 'strength-training':
+        case 'training-mindset':
             return 'training-intensity';
 
-        case 'readiness-check':
+        case 'strength-training':
+            return 'training-mindset';
+
+        case 'coach-reveal':
             return 'strength-training';
+
+        case 'readiness-check':
+            return 'coach-reveal';
 
         case 'generating':
             return 'readiness-check';
@@ -440,7 +464,7 @@ export function getPreviousStep(
 
 const STEP_PROGRESS: Record<OnboardingStep, number> = {
     'welcome': 0,
-    'philosophy': 3,
+    'mile-gate': 3,
     'name': 6,
     'demographics': 10,
     'training-goal': 15,
@@ -454,17 +478,19 @@ const STEP_PROGRESS: Record<OnboardingStep, number> = {
     'estimation-flow': 30,
     'vdot-reveal': 40,
 
-    'weekly-mileage': 50,
-    'runs-per-week': 55,
-    'longest-run': 60,
-    'available-days': 65,
-    'long-run-day': 70,
-    'current-pain': 75,
-    'pain-details': 77,
-    'injury-history': 80,
-    'injury-details': 82,
-    'training-intensity': 85,
-    'strength-training': 90,
+    'weekly-mileage': 45,
+    'runs-per-week': 50,
+    'longest-run': 55,
+    'available-days': 60,
+    'long-run-day': 65,
+    'current-pain': 70,
+    'pain-details': 72,
+    'injury-history': 75,
+    'injury-details': 77,
+    'training-intensity': 80,
+    'training-mindset': 83,
+    'strength-training': 86,
+    'coach-reveal': 90,
     'readiness-check': 95,
     'generating': 98,
     'complete': 100,
@@ -545,8 +571,8 @@ export function isStepComplete(step: OnboardingStep, data: OnboardingData): bool
         case 'welcome':
             return true;
 
-        case 'philosophy':
-            return data.trainingPhilosophy !== null;
+        case 'mile-gate':
+            return data.canRunMile === true;
 
         case 'name':
             return data.name.trim().length >= 2;
@@ -618,8 +644,14 @@ export function isStepComplete(step: OnboardingStep, data: OnboardingData): bool
         case 'training-intensity':
             return data.trainingIntensity !== null;
 
+        case 'training-mindset':
+            return data.trainingMindset !== null;
+
         case 'strength-training':
             return data.includeStrength !== null;
+
+        case 'coach-reveal':
+            return data.trainingPhilosophy !== null;
 
         case 'readiness-check':
             return true;

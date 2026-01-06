@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { AppHeader } from '@/components/ui/AppHeader';
+import { SiteHeader } from '@/components/ui/SiteHeader';
 import { handleMissedWorkout, MissedWorkoutDecision } from '@/domain/plan-generator/missed-workout-handler';
 import { usePlan } from '@/domain/plan/context';
 import { useAuth } from '@/domain/auth/context';
@@ -29,8 +29,17 @@ function getZonePace(
 function estimateDuration(distanceMiles: number, paceSecondsPerMile: number): string {
     const totalSeconds = distanceMiles * paceSecondsPerMile;
     const minutes = Math.round(totalSeconds / 60);
-    return `~${minutes} min`;
+    return `${minutes} min`;
 }
+
+// Human-readable zone names
+const ZONE_NAMES: Record<TrainingZone, string> = {
+    E: 'Easy Pace',
+    M: 'Marathon Pace',
+    T: 'Threshold Pace',
+    I: 'Interval Pace',
+    R: 'Repetition Pace',
+};
 
 // =============================================================================
 // WORKOUT DETAIL PAGE
@@ -130,7 +139,7 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
     if (loading) {
         return (
             <div className="min-h-screen" style={{ background: 'var(--v2-bg-deep)', color: 'var(--v2-text-primary)' }}>
-                <AppHeader backHref="/dashboard" />
+                <SiteHeader />
                 <main className="max-w-3xl mx-auto px-6 py-10">
                     <div className="animate-pulse space-y-6">
                         <div className="h-24 rounded-xl" style={{ background: 'var(--v2-bg-elevated)' }} />
@@ -146,7 +155,7 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
     if (!workout || !workout.runWorkout) {
         return (
             <div className="min-h-screen" style={{ background: 'var(--v2-bg-deep)', color: 'var(--v2-text-primary)' }}>
-                <AppHeader backHref="/dashboard" />
+                <SiteHeader />
                 <main className="max-w-3xl mx-auto px-6 py-10">
                     <div className="v2-card p-10 text-center">
                         <h2 className="text-xl font-light mb-4" style={{ color: 'var(--v2-text-primary)' }}>Rest Day</h2>
@@ -182,12 +191,21 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
 
     return (
         <div className="min-h-screen" style={{ background: 'var(--v2-bg-deep)', color: 'var(--v2-text-primary)' }}>
-            <AppHeader
-                backHref="/dashboard"
-                rightContent={<span className="v2-label">{phase} • Week {weekNumber}</span>}
-            />
+            <SiteHeader />
 
-            <main className="max-w-3xl mx-auto px-6 py-10">
+            <main className="max-w-3xl mx-auto px-6 pt-24 pb-10">
+                {/* THE DATE - Like a Journal Entry */}
+                <div className="text-center mb-8">
+                    <p className="v2-date-hero">
+                        {(() => {
+                            const date = new Date(workout.date + 'T12:00:00');
+                            const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+                            const monthDay = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+                            return `${dayName}, ${monthDay}`;
+                        })()}
+                    </p>
+                </div>
+
                 {/* Phase Progress Banner */}
                 <PhaseBanner
                     phase={(weekPlan?.phase || 'build') as 'base' | 'build' | 'peak' | 'taper'}
@@ -200,106 +218,168 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
                     ) : 'higdon'}
                 />
 
-                {/* Workout Header */}
-                <div className="mb-8">
-                    <div className="flex items-start justify-between mb-4">
-                        <div>
-                            <div
-                                className="inline-block px-3 py-1 rounded-lg mb-3"
-                                style={{
-                                    background: 'var(--v2-accent-subtle)',
-                                    color: 'var(--v2-accent)'
-                                }}
-                            >
-                                <span className="text-[10px] uppercase tracking-wider font-medium">{run.type.replace(/_/g, ' ')}</span>
-                            </div>
-                            <h1 className="text-3xl font-light" style={{ color: 'var(--v2-text-primary)' }}>{run.name}</h1>
+                {/* TODAY'S WORKOUT - Crystal Clear */}
+                <div className="mb-10">
+                    {/* Main Headline */}
+                    <div className="text-center mb-8">
+                        <div className="v2-badge v2-badge-accent inline-block mb-4">
+                            <span className="v2-label">{run.type.replace(/_/g, ' ')}</span>
                         </div>
 
-                        <div className="text-right">
-                            <p className="text-2xl font-mono" style={{ color: 'var(--v2-accent)' }}>{run.totalDistance}</p>
-                            <p className="text-[10px] uppercase" style={{ color: 'var(--v2-text-muted)' }}>miles</p>
+                        <h1 className="v2-heading-lg mb-6">
+                            {run.name}
+                        </h1>
+
+                        {/* THE KEY NUMBERS - Clear & Bold */}
+                        <div className="flex items-center justify-center gap-8 text-center">
+                            <div>
+                                <p className="v2-metric-hero v2-metric-hero-accent">
+                                    {run.totalDistance}
+                                </p>
+                                <p className="v2-metric-label mt-1">miles</p>
+                            </div>
+                            <div className="v2-heading-md" style={{ color: 'var(--v2-text-subtle)' }}>≈</div>
+                            <div>
+                                <p className="v2-metric-hero v2-metric-hero-muted">
+                                    {run.estimatedDuration}
+                                </p>
+                                <p className="v2-metric-label mt-1">minutes</p>
+                            </div>
                         </div>
                     </div>
 
-                    <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
-                        ~{run.estimatedDuration} min total
-                    </p>
+                    {/* Simple Effort Instruction */}
+                    <div
+                        className="p-6 rounded-2xl text-center"
+                        style={{ background: 'var(--v2-bg-elevated)', border: '1px solid var(--v2-border)' }}
+                    >
+                        <p className="text-lg mb-2" style={{ color: 'var(--v2-text-secondary)' }}>
+                            Run at <strong style={{ color: 'var(--v2-accent)' }}>
+                                {run.segments[0]?.pace === 'E' ? 'Easy Pace'
+                                    : run.segments[0]?.pace === 'M' ? 'Marathon Pace'
+                                        : run.segments[0]?.pace === 'T' ? 'Threshold Pace'
+                                            : run.segments[0]?.pace === 'I' ? 'Interval Pace'
+                                                : run.segments[0]?.pace === 'R' ? 'Repetition Pace'
+                                                    : 'Comfortable Pace'}
+                            </strong>
+                        </p>
+                        <p className="text-2xl font-mono" style={{ color: 'var(--v2-accent)' }}>
+                            {getPaceForZone(run.segments[0]?.pace || 'E', paces)}/mile
+                        </p>
+                        {run.segments[0]?.pace === 'E' && (
+                            <p className="text-sm mt-3" style={{ color: 'var(--v2-text-muted)' }}>
+                                Should feel conversational — if you can&apos;t talk, slow down
+                            </p>
+                        )}
+                    </div>
                 </div>
 
-                {/* Workout Structure */}
-                <section className="mb-8">
-                    <h2 className="v2-label mb-4">Workout Structure</h2>
+                {/* Workout Structure - Only show for complex workouts with multiple segments or intervals */}
+                {(run.segments.length > 1 || ['interval', 'tempo', 'quality', 'speed', 'threshold', 'tempo_run', 'vo2max'].some(t => run.type.toLowerCase().includes(t))) && (
+                    <section className="mb-8">
+                        <h2 className="v2-label mb-4">Workout Breakdown</h2>
 
-                    <div className="space-y-3">
-                        {run.segments.map((segment, index) => {
-                            const isMain = segment.type === 'main';
-                            const pace = segment.pace ? getZonePace(segment.pace, paces) : '';
-                            const avgPace = segment.pace === 'E'
-                                ? (paces.easy.min + paces.easy.max) / 2
-                                : segment.pace === 'T' ? paces.threshold
-                                    : segment.pace === 'I' ? paces.interval
-                                        : segment.pace === 'M' ? paces.marathon
-                                            : paces.easy.max;
-                            const duration = segment.distance
-                                ? estimateDuration(segment.distance, avgPace)
-                                : `~${segment.duration || 10} min`;
+                        <div className="space-y-3">
+                            {run.segments.map((segment, index) => {
+                                const isMain = segment.type === 'main';
+                                const pace = segment.pace ? getZonePace(segment.pace, paces) : '';
+                                const zoneName = segment.pace ? ZONE_NAMES[segment.pace] : '';
+                                const avgPace = segment.pace === 'E'
+                                    ? (paces.easy.min + paces.easy.max) / 2
+                                    : segment.pace === 'T' ? paces.threshold
+                                        : segment.pace === 'I' ? paces.interval
+                                            : segment.pace === 'M' ? paces.marathon
+                                                : paces.easy.max;
 
-                            return (
-                                <div
-                                    key={index}
-                                    className={`v2-card p-5 ${isMain ? 'border-l-4' : ''}`}
-                                    style={isMain ? { borderLeftColor: 'var(--v2-accent)' } : {}}
-                                >
-                                    <div className="flex items-center justify-between mb-2">
-                                        <div className="flex items-center gap-3">
-                                            <div
-                                                className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold"
-                                                style={isMain
-                                                    ? { background: 'var(--v2-accent)', color: '#04110b' }
-                                                    : { background: 'var(--v2-bg-elevated)', color: 'var(--v2-text-muted)' }
-                                                }
-                                            >
-                                                {index + 1}
+                                // Calculate duration based on distance OR use provided duration
+                                const durationMins = segment.distance
+                                    ? Math.round(segment.distance * avgPace / 60)
+                                    : segment.duration || 10;
+
+                                // More descriptive segment labeling
+                                const segmentLabel = segment.type === 'warmup' ? 'Warm-up'
+                                    : segment.type === 'cooldown' ? 'Cool-down'
+                                        : segment.type === 'main' ? 'Main Set'
+                                            : segment.type.charAt(0).toUpperCase() + segment.type.slice(1);
+
+                                // Descriptive distance text
+                                const distanceText = segment.distance
+                                    ? `${segment.distance} ${segment.distance === 1 ? 'mile' : 'miles'}`
+                                    : '';
+
+                                return (
+                                    <div
+                                        key={index}
+                                        className={`v2-card p-5 ${isMain ? 'border-l-4' : ''}`}
+                                        style={isMain ? { borderLeftColor: 'var(--v2-accent)' } : {}}
+                                    >
+                                        <div className="flex items-start justify-between gap-4">
+                                            <div className="flex-1">
+                                                {/* Segment Label */}
+                                                <p className="font-medium mb-1" style={{ color: isMain ? 'var(--v2-accent)' : 'var(--v2-text-secondary)' }}>
+                                                    {segmentLabel}
+                                                </p>
+
+                                                {/* Pace Zone - spelled out */}
+                                                {zoneName && (
+                                                    <p className="text-sm mb-2" style={{ color: 'var(--v2-text-muted)' }}>
+                                                        {zoneName}
+                                                    </p>
+                                                )}
+
+                                                {/* Description or distance */}
+                                                {segment.description ? (
+                                                    <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                                        {segment.description}
+                                                    </p>
+                                                ) : distanceText && (
+                                                    <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                                        {distanceText}
+                                                    </p>
+                                                )}
                                             </div>
-                                            <div>
-                                                <p className="font-medium capitalize" style={{ color: 'var(--v2-text-secondary)' }}>{segment.type}</p>
-                                                <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
-                                                    {segment.description || `${segment.distance || ''} mi`}
+
+                                            {/* Right side - Pace & Duration */}
+                                            <div className="text-right shrink-0">
+                                                {/* Target Pace */}
+                                                {pace && (
+                                                    <p className="font-mono font-semibold text-lg" style={{ color: isMain ? 'var(--v2-accent)' : 'var(--v2-text-secondary)' }}>
+                                                        {pace}/mi
+                                                    </p>
+                                                )}
+
+                                                {/* Heart Rate Zone - clearer format */}
+                                                {maxHR && segment.pace && (() => {
+                                                    const hrZone = paceZoneToHRZone(segment.pace, maxHR);
+                                                    return (
+                                                        <p className="text-xs mt-1 flex items-center justify-end gap-1" style={{ color: 'var(--v2-text-subtle)' }}>
+                                                            <HeartIcon size={10} />
+                                                            <span>{hrZone.min}-{hrZone.max} bpm</span>
+                                                        </p>
+                                                    );
+                                                })()}
+
+                                                {/* Duration - with context */}
+                                                <p className="text-xs mt-1" style={{ color: 'var(--v2-text-muted)' }}>
+                                                    ~{durationMins} min
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="text-right">
-                                            <p
-                                                className={`font-mono font-semibold ${isMain ? 'text-lg' : ''}`}
-                                                style={{ color: isMain ? 'var(--v2-accent)' : 'var(--v2-text-secondary)' }}
-                                            >
-                                                {pace}{segment.pace !== 'E' ? '/mi' : ''}
-                                            </p>
-                                            {maxHR && segment.pace && (() => {
-                                                const hrZone = paceZoneToHRZone(segment.pace, maxHR);
-                                                return (
-                                                    <p className="text-[10px] flex items-center gap-1" style={{ color: 'var(--v2-text-subtle)' }}>
-                                                        <HeartIcon size={10} />
-                                                        <span className="v2-mono">Z{hrZone.zone}</span>
-                                                        <span style={{ color: 'var(--v2-text-muted)' }}>({hrZone.min}-{hrZone.max})</span>
-                                                    </p>
-                                                );
-                                            })()}
-                                            <p className="text-[10px]" style={{ color: 'var(--v2-text-muted)' }}>{duration}</p>
-                                        </div>
-                                    </div>
 
-                                    {isMain && run.purpose && (
-                                        <p className="text-sm rounded-lg p-3" style={{ background: 'var(--v2-bg-elevated)', color: 'var(--v2-text-muted)' }}>
-                                            💡 {run.purpose}
-                                        </p>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-                </section>
+                                        {isMain && run.purpose && (
+                                            <p className="text-sm rounded-lg p-3 mt-3 flex items-start gap-2" style={{ background: 'var(--v2-bg-elevated)', color: 'var(--v2-text-muted)' }}>
+                                                <svg className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'var(--v2-accent)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                                </svg>
+                                                {run.purpose}
+                                            </p>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </section>
+                )}
 
                 {/* Coaching Context - WHY this workout */}
                 <section className="mb-8">
@@ -403,11 +483,11 @@ function WorkoutLoggingModal({
     const [saving, setSaving] = useState(false);
 
     const feelOptions = [
-        { value: 1, label: 'Struggled', emoji: '😫', description: 'Way harder than expected' },
-        { value: 2, label: 'Tough', emoji: '😓', description: 'Harder than it should be' },
-        { value: 3, label: 'Right', emoji: '😌', description: 'Effort matched the workout' },
-        { value: 4, label: 'Strong', emoji: '💪', description: 'Felt easier than expected' },
-        { value: 5, label: 'Crushing', emoji: '🔥', description: 'Could\'ve done more' },
+        { value: 1, label: 'Struggled', description: 'Way harder than expected' },
+        { value: 2, label: 'Tough', description: 'Harder than it should be' },
+        { value: 3, label: 'Right', description: 'Effort matched the workout' },
+        { value: 4, label: 'Strong', description: 'Felt easier than expected' },
+        { value: 5, label: 'Crushing', description: 'Could\'ve done more' },
     ];
 
     const handleSubmit = async () => {
@@ -487,9 +567,9 @@ function WorkoutLoggingModal({
                         <p className="v2-label mb-3">Did you complete it?</p>
                         <div className="grid grid-cols-3 gap-2">
                             {[
-                                { value: 'full', label: 'Full', emoji: '✅' },
-                                { value: 'partial', label: 'Partial', emoji: '🔶' },
-                                { value: 'skipped', label: 'Skipped', emoji: '⏭️' },
+                                { value: 'full', label: 'Full' },
+                                { value: 'partial', label: 'Partial' },
+                                { value: 'skipped', label: 'Skipped' },
                             ].map((option) => (
                                 <button
                                     key={option.value}
@@ -500,7 +580,27 @@ function WorkoutLoggingModal({
                                         background: completed === option.value ? 'var(--v2-accent-subtle)' : 'transparent'
                                     }}
                                 >
-                                    <span className="text-2xl block mb-1">{option.emoji}</span>
+                                    <div className="w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center" style={{
+                                        background: option.value === 'full' ? 'var(--v2-accent-subtle)' :
+                                            option.value === 'partial' ? 'rgba(251, 191, 36, 0.15)' :
+                                                'var(--v2-bg-inset)'
+                                    }}>
+                                        {option.value === 'full' && (
+                                            <svg className="w-4 h-4" style={{ color: 'var(--v2-accent)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        )}
+                                        {option.value === 'partial' && (
+                                            <svg className="w-4 h-4" style={{ color: '#fbbf24' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M20 12H4" />
+                                            </svg>
+                                        )}
+                                        {option.value === 'skipped' && (
+                                            <svg className="w-4 h-4" style={{ color: 'var(--v2-text-muted)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 5l7 7-7 7M6 5l7 7-7 7" />
+                                            </svg>
+                                        )}
+                                    </div>
                                     <span className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>{option.label}</span>
                                 </button>
                             ))}
@@ -522,7 +622,12 @@ function WorkoutLoggingModal({
                                             background: feelRating === option.value ? 'var(--v2-accent-subtle)' : 'transparent'
                                         }}
                                     >
-                                        <span className="text-2xl">{option.emoji}</span>
+                                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium" style={{
+                                            background: feelRating === option.value ? 'var(--v2-accent)' : 'var(--v2-bg-inset)',
+                                            color: feelRating === option.value ? 'var(--v2-bg-deep)' : 'var(--v2-text-muted)'
+                                        }}>
+                                            {option.value}
+                                        </div>
                                         <div>
                                             <p className="font-medium" style={{ color: 'var(--v2-text-secondary)' }}>{option.label}</p>
                                             <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>{option.description}</p>

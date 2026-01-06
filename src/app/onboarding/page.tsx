@@ -14,7 +14,6 @@ import { useRouter } from 'next/navigation';
 import { ProgressBar } from '@/components/onboarding/ui';
 import { createPlanFromOnboarding, savePlan } from '@/domain/plan/service';
 
-// Types and utilities
 import {
     OnboardingStep,
     OnboardingData,
@@ -36,6 +35,7 @@ import {
     InjuryLocation,
     PainSeverity,
     TrainingIntensity,
+    TrainingMindset,
     ReadinessStatus,
 } from '@/domain/onboarding/types';
 
@@ -43,8 +43,7 @@ import { EXPERIENCE_LEVELS, RACE_RECENCY_OPTIONS } from '@/domain/onboarding/con
 import { calculateVdotFromRace, vdotFromVO2max } from '@/domain/vdot/vdot-estimator';
 
 // Screen components
-import { WelcomeScreen, NameScreen, DemographicsScreen } from '@/components/onboarding/screens/identity';
-import { PhilosophyScreen } from '@/components/onboarding/screens/philosophy';
+import { WelcomeScreen, MileGateScreen, NameScreen, DemographicsScreen } from '@/components/onboarding/screens/identity';
 import { TrainingGoalScreen, RaceDetailsScreen, FitnessDurationScreen } from '@/components/onboarding/screens/goal';
 import {
     CalibrationMethodScreen,
@@ -70,7 +69,9 @@ import {
 } from '@/components/onboarding/screens/safety';
 import {
     TrainingIntensityScreen,
+    TrainingMindsetScreen,
     StrengthTrainingScreen,
+    CoachRevealScreen,
     ReadinessCheckScreen,
     GeneratingScreen,
     CompleteScreen,
@@ -354,13 +355,12 @@ function OnboardingContent() {
                     <WelcomeScreen onContinue={goToNext} />
                 )}
 
-                {/* PHILOSOPHY - Full premium quiz experience */}
-                {step === 'philosophy' && (
-                    <PhilosophyScreen
-                        onSelect={(philosophy) => {
-                            setData(prev => ({ ...prev, trainingPhilosophy: philosophy }));
-                            goToNext();
-                        }}
+                {/* MILE GATE - Can you run 1 mile? */}
+                {step === 'mile-gate' && (
+                    <MileGateScreen
+                        value={data.canRunMile}
+                        onChange={(canRunMile) => setData(prev => ({ ...prev, canRunMile }))}
+                        onContinue={goToNext}
                         onBack={goBack}
                     />
                 )}
@@ -595,6 +595,15 @@ function OnboardingContent() {
                     />
                 )}
 
+                {step === 'training-mindset' && (
+                    <TrainingMindsetScreen
+                        value={data.trainingMindset}
+                        onChange={(mindset) => setData(prev => ({ ...prev, trainingMindset: mindset as TrainingMindset }))}
+                        onContinue={goToNext}
+                        onBack={goBack}
+                    />
+                )}
+
                 {step === 'strength-training' && (
                     <StrengthTrainingScreen
                         value={data.includeStrength}
@@ -603,6 +612,19 @@ function OnboardingContent() {
                         onBack={goBack}
                     />
                 )}
+
+                {/* COACH REVEAL - The payoff moment */}
+                {step === 'coach-reveal' && (
+                    <CoachRevealScreen
+                        data={data}
+                        onConfirm={(philosophy) => {
+                            setData(prev => ({ ...prev, trainingPhilosophy: philosophy }));
+                            goToNext();
+                        }}
+                        onBack={goBack}
+                    />
+                )}
+
 
                 {step === 'readiness-check' && (
                     <ReadinessCheckScreen

@@ -3,7 +3,7 @@
 /**
  * THE LONG GAME - Onboarding Screens: Identity V2
  * 
- * Welcome, Name, Demographics screens
+ * Welcome, MileGate, Name, Demographics screens
  * Week aesthetic: Dark, atmospheric, light typography
  */
 
@@ -151,6 +151,103 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
                 </motion.p>
             </div>
         </div>
+    );
+}
+
+
+// =============================================================================
+// MILE GATE SCREEN - Can you run 1 mile without stopping?
+// =============================================================================
+
+interface MileGateScreenProps {
+    value: boolean | null;
+    onChange: (canRun: boolean | null) => void;
+    onContinue: () => void;
+    onBack: () => void;
+}
+
+export function MileGateScreen({ value, onChange, onContinue, onBack }: MileGateScreenProps) {
+    // Calculate selection state BEFORE any early returns to avoid TypeScript narrowing issues
+    const isYesSelected = value === true;
+    const isNoSelected = value === false;
+    const showNotReady = isNoSelected;
+
+    useKeyboardNavigation({
+        onEnter: isYesSelected ? onContinue : undefined,
+        onBack,
+        onNumber: (num) => {
+            if (num === 1) {
+                onChange(true);
+                // Auto-advance on "yes"
+                setTimeout(() => onContinue(), 150);
+            }
+            if (num === 2) onChange(false);
+        },
+    });
+
+    if (showNotReady) {
+        return (
+            <QuestionScreen onBack={() => onChange(null)}>
+                <QuestionHeader
+                    title="Build your foundation first"
+                />
+
+                <div className="space-y-6 text-center">
+                    <p className="v2-body-md" style={{ color: 'var(--v2-text-muted)' }}>
+                        Our training plans assume you can run continuously.
+                        The Couch to 5K program is perfect for building up to that point.
+                    </p>
+
+                    <div className="v2-card p-6 text-left" style={{ borderColor: 'var(--v2-border)' }}>
+                        <p className="v2-label mb-2">Recommended: Couch to 5K (C25K)</p>
+                        <p className="v2-body-sm mb-4" style={{ color: 'var(--v2-text-muted)' }}>
+                            A proven 9-week walk/run program that gradually builds you up to running 3 miles without stopping.
+                        </p>
+                        <a
+                            href="https://c25k.com/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="v2-btn v2-btn-primary"
+                        >
+                            Start C25K Program
+                        </a>
+                    </div>
+
+                    <p className="v2-body-sm" style={{ color: 'var(--v2-text-subtle)' }}>
+                        Once you can run 1 mile, come back and we'll build your training plan!
+                    </p>
+                </div>
+            </QuestionScreen>
+        );
+    }
+
+    return (
+        <QuestionScreen onBack={onBack}>
+            <QuestionHeader
+                title="Quick check first"
+                subtitle="Can you run 1 mile without stopping?"
+            />
+
+            <div className="space-y-3">
+                <OptionButton
+                    label="Yes, I can run a mile"
+                    description="Great! Let's find your training approach."
+                    shortcut="1"
+                    selected={isYesSelected}
+                    onClick={() => {
+                        onChange(true);
+                        setTimeout(() => onContinue(), 150);
+                    }}
+                />
+                <OptionButton
+                    label="Not yet"
+                    description="That's okay — we'll point you in the right direction."
+                    shortcut="2"
+                    selected={isNoSelected}
+                    onClick={() => onChange(false)}
+                />
+            </div>
+        </QuestionScreen>
     );
 }
 

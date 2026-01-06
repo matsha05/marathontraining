@@ -19,6 +19,7 @@ import { motion } from 'framer-motion';
 import { PacesCard } from '@/components/paces/PacesCard';
 import { RecalibrationModal } from '@/components/vdot/RecalibrationModal';
 import { DurabilityStatusCard } from '@/components/durability';
+import { SiteHeader } from '@/components/ui/SiteHeader';
 
 /**
  * THE LONG GAME - Dashboard V2
@@ -334,22 +335,10 @@ export default function DashboardPage() {
 
     return (
         <div className="v2-root min-h-screen">
-            {/* Header */}
-            <header className="v2-nav sticky top-0 z-50">
-                <div className="v2-container flex items-center justify-between py-4">
-                    <Link href="/" className="v2-nav-logo">The Long Game</Link>
-                    <nav className="flex items-center gap-4">
-                        <Link href="/settings" className="v2-nav-link">Settings</Link>
-                        {streak > 0 && (
-                            <span className="v2-badge v2-badge-accent flex items-center gap-1">
-                                <FlameIcon size={12} /> {streak} day streak
-                            </span>
-                        )}
-                    </nav>
-                </div>
-            </header>
+            {/* Use shared SiteHeader for consistency */}
+            <SiteHeader hideAuth />
 
-            <main className="v2-container py-10">
+            <main className="v2-container py-10" style={{ paddingTop: 'calc(var(--v2-space-10) + 64px)' }}>
                 {/* Greeting + Readiness */}
                 <motion.div
                     className="mb-10"
@@ -575,7 +564,6 @@ export default function DashboardPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.32 }}
                 >
-                    <h2 className="v2-heading-md mb-4">Durability</h2>
                     <DurabilityStatusCard
                         isQualityDay={isQualityDay}
                     // TODO: Wire up to actual assessment data once persisted

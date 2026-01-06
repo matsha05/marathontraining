@@ -3,7 +3,8 @@
 /**
  * THE LONG GAME - Onboarding Screens: Preferences & Completion V2
  * 
- * Training intensity, strength training, readiness check, generating, complete
+ * Training intensity, training mindset, strength training, coach reveal,
+ * readiness check, generating, complete
  * Week aesthetic: Dark, atmospheric, light typography
  */
 
@@ -22,6 +23,7 @@ import {
 import {
     OnboardingData,
     TrainingIntensity,
+    TrainingMindset,
     ReadinessStatus,
     clearOnboardingProgress,
 } from '@/domain/onboarding/types';
@@ -76,6 +78,80 @@ export function TrainingIntensityScreen({
                         selected={value === option.value}
                         onClick={() => onChange(option.value as TrainingIntensity)}
                         recommended={option.recommended}
+                    />
+                ))}
+            </OptionGrid>
+
+            <ContinueButton
+                onClick={onContinue}
+                disabled={value === null}
+            />
+        </QuestionScreen>
+    );
+}
+
+// =============================================================================
+// TRAINING MINDSET SCREEN
+// =============================================================================
+
+const MINDSET_OPTIONS: Array<{ value: TrainingMindset; label: string; description: string }> = [
+    {
+        value: 'rest_focus',
+        label: 'I need built-in rest',
+        description: 'Structure my recovery — I need guardrails to keep me from overdoing it.',
+    },
+    {
+        value: 'consistency',
+        label: 'I thrive on consistency',
+        description: 'Daily routine keeps me going — I\'d rather run 6 easy days than 4 hard ones.',
+    },
+    {
+        value: 'push_limits',
+        label: 'I want to push limits',
+        description: 'Challenge drives me — I\'m motivated by hard workouts and PRs.',
+    },
+];
+
+interface TrainingMindsetScreenProps {
+    value: TrainingMindset | null;
+    onChange: (mindset: TrainingMindset) => void;
+    onContinue: () => void;
+    onBack: () => void;
+}
+
+export function TrainingMindsetScreen({
+    value,
+    onChange,
+    onContinue,
+    onBack
+}: TrainingMindsetScreenProps) {
+    useKeyboardNavigation({
+        onEnter: value !== null ? onContinue : undefined,
+        onBack,
+        onNumber: (num) => {
+            const option = MINDSET_OPTIONS[num - 1];
+            if (option) {
+                onChange(option.value);
+            }
+        },
+    });
+
+    return (
+        <QuestionScreen onBack={onBack}>
+            <QuestionHeader
+                title="Which resonates more with you?"
+                subtitle="Your psychology shapes what you'll stick with."
+            />
+
+            <OptionGrid>
+                {MINDSET_OPTIONS.map((option, index) => (
+                    <OptionButton
+                        key={option.value}
+                        label={option.label}
+                        description={option.description}
+                        shortcut={String(index + 1)}
+                        selected={value === option.value}
+                        onClick={() => onChange(option.value)}
                     />
                 ))}
             </OptionGrid>
@@ -148,6 +224,126 @@ export function StrengthTrainingScreen({
                 onClick={onContinue}
                 disabled={value === null}
             />
+        </QuestionScreen>
+    );
+}
+
+// =============================================================================
+// COACH REVEAL SCREEN - The payoff moment
+// =============================================================================
+
+interface CoachRevealScreenProps {
+    data: OnboardingData;
+    onConfirm: (philosophy: 'hansons' | 'higdon' | 'pfitzinger' | 'daniels') => void;
+    onBack: () => void;
+}
+
+export function CoachRevealScreen({ data, onConfirm, onBack }: CoachRevealScreenProps) {
+    // Import recommendation logic
+    const { calculateRecommendation } = require('@/domain/philosophy/recommendation');
+    const { PHILOSOPHIES } = require('@/domain/philosophy/types');
+
+    // Map onboarding data to quiz answers format
+    const mapMileageToQuizFormat = (weeklyMiles: number | null): 'under_20' | '20_40' | 'over_40' | null => {
+        if (weeklyMiles === null) return null;
+        if (weeklyMiles < 20) return 'under_20';
+        if (weeklyMiles <= 40) return '20_40';
+        return 'over_40';
+    };
+
+    const mapMindsetToQuizFormat = (mindset: TrainingMindset | null) => mindset;
+
+    const mapGoalToDistance = (goal: OnboardingData['trainingGoal']): '5k' | '10k' | 'half' | 'marathon' | 'base' | null => {
+        if (goal === 'general') return 'base';
+        return goal;
+    };
+
+    const quizAnswers = {
+        targetDistance: mapGoalToDistance(data.trainingGoal),
+        raceTiming: data.raceDate ? 'specific' : 'no_race',
+        raceDate: data.raceDate || null,
+        daysPerWeek: data.availableDays as 3 | 4 | 5 | 6 | null,
+        experience: null, // Will be inferred from mileage
+        currentMileage: mapMileageToQuizFormat(data.weeklyMiles),
+        mindset: mapMindsetToQuizFormat(data.trainingMindset),
+    };
+
+    const recommendation = calculateRecommendation(quizAnswers);
+    const coach = PHILOSOPHIES[recommendation.primary];
+
+    useKeyboardNavigation({
+        onEnter: () => onConfirm(recommendation.primary),
+        onBack,
+    });
+
+    return (
+        <QuestionScreen onBack={onBack}>
+            <div className="text-center">
+                {/* Coach reveal hero */}
+                <div
+                    className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+                    style={{
+                        background: `linear-gradient(135deg, ${coach.color}20 0%, ${coach.color}40 100%)`,
+                        border: `2px solid ${coach.color}`
+                    }}
+                >
+                    <span className="text-3xl font-light" style={{ color: coach.color }}>
+                        {coach.name[0]}
+                    </span>
+                </div>
+
+                <h1 className="v2-heading-lg mb-2">Your Coach: {coach.name}</h1>
+                <p className="v2-body-md mb-6" style={{ color: coach.color }}>
+                    {coach.tagline}
+                </p>
+            </div>
+
+            {/* Reasoning summary */}
+            <div className="v2-card p-5 mb-6">
+                <p className="v2-label mb-3">Why {coach.name}?</p>
+                <ul className="space-y-2">
+                    {recommendation.reasoning.slice(0, 3).map((reason: string, i: number) => (
+                        <li key={i} className="v2-body-sm flex items-start gap-2" style={{ color: 'var(--v2-text-muted)' }}>
+                            <span style={{ color: coach.color }}>•</span>
+                            <span>{reason}</span>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+
+            {/* Plan preview */}
+            <div className="v2-card p-5 mb-8">
+                <p className="v2-label mb-3">Your Plan Structure</p>
+                <div className="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                        <p className="v2-body-lg font-medium">{coach.runDays}</p>
+                        <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>Run days</p>
+                    </div>
+                    <div>
+                        <p className="v2-body-lg font-medium">{coach.longRunCap}</p>
+                        <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>Long run</p>
+                    </div>
+                    <div>
+                        <p className="v2-body-lg font-medium">{data.weeklyMiles || '?'}+</p>
+                        <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>Peak MPW</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Warnings if any */}
+            {recommendation.warnings.length > 0 && (
+                <WarningBanner title="Heads up">
+                    {recommendation.warnings[0]}
+                </WarningBanner>
+            )}
+
+            <button
+                onClick={() => onConfirm(recommendation.primary)}
+                className="v2-btn v2-btn-primary v2-btn-lg w-full"
+                style={{ background: coach.color }}
+            >
+                Continue with {coach.name}
+            </button>
         </QuestionScreen>
     );
 }

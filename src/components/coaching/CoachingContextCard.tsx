@@ -25,27 +25,27 @@ import type { WorkoutType, TrainingPhase } from '@/domain/plan/types';
 const COACH_BRANDING: Record<CoachPhilosophy, {
     name: string;
     color: string;
-    icon: string;
+    initials: string;
 }> = {
     higdon: {
         name: 'Hal Higdon',
         color: '#4A90D9',
-        icon: '📘',
+        initials: 'HH',
     },
     hansons: {
         name: 'Hansons',
         color: '#E74C3C',
-        icon: '🔥',
+        initials: 'HM',
     },
     pfitzinger: {
         name: 'Pfitzinger',
         color: '#27AE60',
-        icon: '🧬',
+        initials: 'PP',
     },
     daniels: {
         name: 'Daniels',
         color: '#9B59B6',
-        icon: '⚗️',
+        initials: 'JD',
     },
 };
 
@@ -92,7 +92,12 @@ export function CoachingContextCard({
                 >
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <span className="text-xl">{branding.icon}</span>
+                            <div
+                                className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold"
+                                style={{ background: `${branding.color}20`, color: branding.color }}
+                            >
+                                {branding.initials}
+                            </div>
                             <div>
                                 <p className="text-sm font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
                                     Why this workout?
@@ -132,7 +137,12 @@ export function CoachingContextCard({
             }}
         >
             <div className="flex items-center gap-3 mb-4">
-                <span className="text-2xl">{branding.icon}</span>
+                <div
+                    className="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold"
+                    style={{ background: `${branding.color}20`, color: branding.color }}
+                >
+                    {branding.initials}
+                </div>
                 <div>
                     <p className="text-sm font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
                         Coach&apos;s Perspective
@@ -200,8 +210,11 @@ function ContextContent({
                     className="p-3 rounded-lg"
                     style={{ background: 'var(--v2-bg-deep)' }}
                 >
-                    <p className="text-xs font-medium mb-1" style={{ color: 'var(--v2-text-muted)' }}>
-                        💡 Pro Tip
+                    <p className="text-xs font-medium mb-1 flex items-center gap-1.5" style={{ color: 'var(--v2-text-muted)' }}>
+                        <svg className="w-3.5 h-3.5" style={{ color: branding.color }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                        Pro Tip
                     </p>
                     <p className="text-sm italic" style={{ color: 'var(--v2-text-secondary)' }}>
                         &quot;{context.coachTip}&quot;

@@ -259,6 +259,39 @@
     color: var(--v2-text-subtle);
 }
 
+/* Date Hero - For prominent date displays (e.g., workout journal headers) */
+.v2-date-hero {
+    font-size: var(--v2-text-2xl);
+    font-weight: 300;
+    letter-spacing: var(--v2-tracking-widest);
+    text-transform: uppercase;
+    color: var(--v2-text-secondary);
+}
+
+/* Metric Hero - For large prominent numbers */
+.v2-metric-hero {
+    font-size: clamp(2.5rem, 6vw, var(--v2-text-5xl));
+    font-weight: 300;
+    line-height: 1;
+}
+
+.v2-metric-hero-accent {
+    color: var(--v2-accent);
+}
+
+.v2-metric-hero-muted {
+    color: var(--v2-text-secondary);
+}
+
+/* Metric Label - For labels below hero metrics */
+.v2-metric-label {
+    font-size: var(--v2-text-xs);
+    font-weight: 400;
+    letter-spacing: var(--v2-tracking-wide);
+    text-transform: uppercase;
+    color: var(--v2-text-muted);
+}
+
 /* =============================================================================
    CARD SYSTEM
    ============================================================================= */
@@ -901,6 +934,10 @@ a:focus-visible {
     right: 0;
     z-index: 50;
     padding: var(--v2-space-5) var(--v2-space-6);
+    background: rgba(4, 17, 11, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--v2-border);
 }
 
 .v2-nav-inner {

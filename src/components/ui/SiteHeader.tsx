@@ -93,15 +93,6 @@ export function SiteHeader({ isDark, onToggleTheme, hideAuth = false }: SiteHead
                         >
                             Browse
                         </Link>
-                        <Link
-                            href="/philosophy"
-                            className="text-sm transition-colors"
-                            style={{ color: 'var(--v2-text-muted)' }}
-                            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--v2-text-secondary)'}
-                            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--v2-text-muted)'}
-                        >
-                            Find Your Coach
-                        </Link>
                     </nav>
 
                     {/* Theme Toggle */}
