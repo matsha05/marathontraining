@@ -104,23 +104,42 @@ function selectHigdonTier(input: TierSelectionInput): TierSelectionResult {
 function selectHansonsTier(input: TierSelectionInput): TierSelectionResult {
     const mileageValue = getMileageValue(input.currentMileage);
     const warnings: string[] = [];
+    let tier: string;
+    let displayName: string;
 
-    // Hansons only has marathon plans
-    if (input.distance !== 'marathon') {
-        warnings.push(`Hansons only supports marathon. You selected ${input.distance}.`);
+    // Hansons supports half marathon and marathon
+    if (input.distance === 'half') {
+        // Half marathon tiers: beginner (< 25 mpw) or advanced (>= 25 mpw)
+        tier = mileageValue < 25 ? 'hansons_half_beginner' : 'hansons_half_advanced';
+        displayName = `Hansons Half Marathon ${mileageValue < 25 ? 'Beginner' : 'Advanced'}`;
+
+        if (mileageValue < 15) {
+            warnings.push('Hansons Half Beginner assumes ~15-20 mpw base. Build up first.');
+        }
+    } else if (input.distance === 'marathon') {
+        // Marathon tiers: beginner (< 30 mpw) or advanced (>= 30 mpw)
+        tier = mileageValue < 30 ? 'hansons_beginner' : 'hansons_advanced';
+        displayName = `Hansons Marathon ${mileageValue < 30 ? 'Beginner' : 'Advanced'}`;
+
+        if (mileageValue < 20) {
+            warnings.push('Hansons Marathon Beginner assumes ~20 mpw base. Build up first.');
+        }
+    } else {
+        // Hansons only supports half and marathon
+        tier = 'hansons_beginner';
+        displayName = 'Hansons Marathon Beginner';
+        warnings.push(`Hansons only supports Half Marathon and Marathon. You selected ${input.distance}. Defaulting to Marathon Beginner.`);
     }
 
-    // Beginner: < 30 mpw, Advanced: >= 30 mpw
-    const tier = mileageValue < 30 ? 'hansons_beginner' : 'hansons_advanced';
-
-    if (mileageValue < 20) {
-        warnings.push('Hansons Beginner assumes ~20 mpw base. Consider building up first.');
+    // Hansons requires 6 days per week - this is core to the method
+    if (input.daysPerWeek < 6) {
+        warnings.push(`Hansons requires 6 days/week (cumulative fatigue philosophy). You have ${input.daysPerWeek} days available.`);
     }
 
     return {
         tier,
         philosophy: 'hansons',
-        displayName: `Hansons Marathon ${tier.includes('beginner') ? 'Beginner' : 'Advanced'}`,
+        displayName,
         warnings,
     };
 }
@@ -274,16 +293,6 @@ function selectDanielsTier(input: TierSelectionInput): TierSelectionResult {
  */
 export function selectPlanTier(input: TierSelectionInput): TierSelectionResult {
     const { philosophy, distance } = input;
-
-    // Handle ultra (should be blocked upstream, but defensive)
-    if (distance === 'ultra') {
-        return {
-            tier: 'marathon_novice_1',
-            philosophy: 'higdon',
-            displayName: 'Hal Higdon Marathon Novice 1',
-            warnings: ['Ultra plans not yet available. Defaulting to marathon.'],
-        };
-    }
 
     switch (philosophy) {
         case 'higdon':

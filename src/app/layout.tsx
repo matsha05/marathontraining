@@ -3,6 +3,7 @@ import { Space_Grotesk, Instrument_Sans, IBM_Plex_Mono } from "next/font/google"
 import "./globals.css";
 import "./globals-v2.css";
 import { SyncStatusIndicator } from "@/components/ui/OfflineIndicator";
+import { Providers } from "@/components/ui/Providers";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -68,7 +69,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`dark ${spaceGrotesk.variable} ${instrumentSans.variable} ${plexMono.variable}`}>
       <body>
-        {children}
+        <Providers>
+          {children}
+        </Providers>
         <SyncStatusIndicator />
       </body>
     </html>

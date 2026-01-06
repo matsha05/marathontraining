@@ -12,7 +12,7 @@ import {
     DaysPerWeek,
 } from '@/domain/philosophy/types';
 import { getOverrideWarnings, isPhilosophyAvailableForDistance } from '@/domain/philosophy/recommendation';
-import { getPersonalizedPhilosophyCard, getDistanceSpecificPrinciples, getTypicalWeek } from '@/domain/philosophy/personalized-card';
+import { getPersonalizedPhilosophyCard, getDistanceSpecificPrinciples } from '@/domain/philosophy/personalized-card';
 import { PhilosophyCard } from './PhilosophyCard';
 import { matchCoachesToUser } from '@/domain/philosophy/coach-matcher';
 
@@ -55,12 +55,6 @@ export function RecommendationScreen({
         [recommendation.primary, answers.targetDistance]
     );
 
-    // Get distance/tier-specific typical week
-    const personalizedTypicalWeek = useMemo(() => {
-        const tier = personalizedPrimary.adjustedTier || 'intermediate';
-        return getTypicalWeek(recommendation.primary, answers.targetDistance || 'marathon', tier);
-    }, [recommendation.primary, answers.targetDistance, personalizedPrimary.adjustedTier]);
-
     // Convert mileage string to number for coach matcher
     const mileageToNumber = (mileage: CurrentMileage | null): number => {
         if (!mileage) return 20;
@@ -86,10 +80,22 @@ export function RecommendationScreen({
                 answers.targetDistance === 'marathon' ? 'Marathon' :
                     answers.targetDistance === 'base' ? 'Base Building' : 'Plan';
 
-    // Only show alternatives that are eligible based on coach matcher
-    const alternatives = Object.values(PHILOSOPHIES).filter(p =>
-        p.id !== recommendation.primary &&
-        coachMatch.eligibleCoaches.includes(p.id)
+    // Only show alternatives that are eligible based on coach matcher (memoized)
+    const alternatives = useMemo(() =>
+        Object.values(PHILOSOPHIES).filter(p =>
+            p.id !== recommendation.primary &&
+            coachMatch.eligibleCoaches.includes(p.id)
+        ),
+        [recommendation.primary, coachMatch.eligibleCoaches]
+    );
+
+    // Memoize personalized data for alternatives to avoid computing in render loop
+    const alternativePersonalizations = useMemo(() =>
+        alternatives.reduce((acc, alt) => {
+            acc[alt.id] = getPersonalizedPhilosophyCard(alt.id, answers);
+            return acc;
+        }, {} as Record<TrainingPhilosophy, ReturnType<typeof getPersonalizedPhilosophyCard>>),
+        [alternatives, answers]
     );
 
     const handleSelectAlternative = (philosophy: TrainingPhilosophy) => {
@@ -162,8 +168,22 @@ export function RecommendationScreen({
                         </div>
                     )}
 
-                    {/* Full methodology display */}
-                    <PhilosophyCard philosophy={selectedPhilosophy} expanded />
+                    {/* Full methodology display - personalized for the selected override */}
+                    {(() => {
+                        const overridePersonalized = getPersonalizedPhilosophyCard(selectedOverride, answers);
+                        return (
+                            <PhilosophyCard
+                                philosophy={selectedPhilosophy}
+                                expanded
+                                personalizedTypicalWeek={overridePersonalized.personalizedTypicalWeek}
+                                personalizedRunDays={overridePersonalized.personalizedRunDays}
+                                personalizedLongRunCap={overridePersonalized.personalizedLongRunCap}
+                                personalizedDuration={overridePersonalized.personalizedDuration}
+                                personalizedKeyWorkouts={overridePersonalized.personalizedKeyWorkouts}
+                                userDistance={distanceLabel}
+                            />
+                        );
+                    })()}
 
                     {/* Foundation reminder */}
                     <div className="v2-card mt-8 p-5">
@@ -248,7 +268,7 @@ export function RecommendationScreen({
                         personalizedDuration={personalizedPrimary.personalizedDuration}
                         personalizedKeyWorkouts={personalizedPrimary.personalizedKeyWorkouts}
                         personalizedPrinciples={personalizedPrinciples}
-                        personalizedTypicalWeek={personalizedTypicalWeek}
+                        personalizedTypicalWeek={personalizedPrimary.personalizedTypicalWeek}
                         userDistance={distanceLabel}
                     />
 
@@ -377,17 +397,30 @@ export function RecommendationScreen({
                             animate={{ opacity: 1, height: 'auto' }}
                             className="space-y-6 mt-6"
                         >
-                            {alternatives.map((alt) => (
-                                <div key={alt.id}>
-                                    <PhilosophyCard philosophy={alt} expanded />
-                                    <button
-                                        onClick={() => handleSelectAlternative(alt.id)}
-                                        className="v2-btn v2-btn-secondary w-full mt-4"
-                                    >
-                                        Choose {alt.name} instead
-                                    </button>
-                                </div>
-                            ))}
+                            {alternatives.map((alt) => {
+                                // Use memoized personalized data
+                                const altPersonalized = alternativePersonalizations[alt.id];
+                                return (
+                                    <div key={alt.id}>
+                                        <PhilosophyCard
+                                            philosophy={alt}
+                                            expanded
+                                            personalizedTypicalWeek={altPersonalized.personalizedTypicalWeek}
+                                            personalizedRunDays={altPersonalized.personalizedRunDays}
+                                            personalizedLongRunCap={altPersonalized.personalizedLongRunCap}
+                                            personalizedDuration={altPersonalized.personalizedDuration}
+                                            personalizedKeyWorkouts={altPersonalized.personalizedKeyWorkouts}
+                                            userDistance={distanceLabel}
+                                        />
+                                        <button
+                                            onClick={() => handleSelectAlternative(alt.id)}
+                                            className="v2-btn v2-btn-secondary w-full mt-4"
+                                        >
+                                            Choose {alt.name} instead
+                                        </button>
+                                    </div>
+                                );
+                            })}
 
                             {/* Excluded coaches with reasons */}
                             {coachMatch.excludedCoaches.length > 0 && (

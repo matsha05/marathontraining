@@ -739,7 +739,8 @@ export function generateHansonsPlan(
         createdAt: new Date().toISOString(),
         athleteName: input.name,
         vdot: input.vdot,
-        goalDistance: 'marathon',
+        // Set goalDistance based on tier: half marathon tiers get 'half', others get 'marathon'
+        goalDistance: tier.includes('_half_') ? 'half' : 'marathon',
         raceName: input.raceName,
         raceDate: input.raceDate,
         weeks,

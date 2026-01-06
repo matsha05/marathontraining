@@ -65,7 +65,7 @@ export default function LandingPage() {
             Training, structured.
           </motion.p>
 
-          {/* Week Grid - staggered with subtle delay */}
+          {/* Week Grid - staggered with subtle delay - horizontally scrollable on mobile */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -75,47 +75,50 @@ export default function LandingPage() {
             <p className="text-xs mb-4 font-mono" style={{ color: 'var(--v2-text-ghost)' }}>
               Week 8 · Build Phase · 42 miles
             </p>
-            <div className="grid grid-cols-7 gap-1">
-              {[
-                { day: "M", type: "run", label: "5mi Easy", sub: "8:32/mi", strength: true },
-                { day: "T", type: "run", label: "6×800m", sub: "VO2", strength: false },
-                { day: "W", type: "rest", label: "Rest", sub: "", strength: false },
-                { day: "T", type: "run", label: "6mi Tempo", sub: "7:15/mi", strength: true },
-                { day: "F", type: "run", label: "4mi Easy", sub: "8:45/mi", strength: false },
-                { day: "S", type: "run", label: "5mi Easy", sub: "8:32/mi", strength: false },
-                { day: "S", type: "long", label: "14mi Long", sub: "8:45/mi", strength: false },
-              ].map((d, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 + (i * 0.05), duration: 0.4, ease }}
-                  className="p-4 rounded-lg text-center transition-all duration-200"
-                  style={{
-                    background: d.type === "long"
-                      ? 'var(--v2-accent-subtle)'
-                      : d.type === "rest"
-                        ? 'var(--v2-bg-elevated)'
-                        : 'var(--v2-bg-hover)',
-                  }}
-                >
-                  <p className="text-[10px] mb-3" style={{ color: 'var(--v2-text-subtle)' }}>{d.day}</p>
-                  <p
-                    className="text-sm mb-1"
-                    style={{ color: d.type === "rest" ? 'var(--v2-text-ghost)' : 'var(--v2-text-secondary)' }}
+            {/* Scroll container for mobile */}
+            <div className="overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+              <div className="grid grid-cols-7 gap-2 min-w-[560px] md:min-w-0">
+                {[
+                  { day: "M", type: "run", label: "5mi Easy", sub: "8:32/mi", strength: true },
+                  { day: "T", type: "run", label: "6×800m", sub: "VO2", strength: false },
+                  { day: "W", type: "rest", label: "Rest", sub: "", strength: false },
+                  { day: "T", type: "run", label: "6mi Tempo", sub: "7:15/mi", strength: true },
+                  { day: "F", type: "run", label: "4mi Easy", sub: "8:45/mi", strength: false },
+                  { day: "S", type: "run", label: "5mi Easy", sub: "8:32/mi", strength: false },
+                  { day: "S", type: "long", label: "14mi Long", sub: "8:45/mi", strength: false },
+                ].map((d, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 + (i * 0.05), duration: 0.4, ease }}
+                    className="p-4 rounded-lg text-center transition-all duration-200"
+                    style={{
+                      background: d.type === "long"
+                        ? 'var(--v2-accent-subtle)'
+                        : d.type === "rest"
+                          ? 'var(--v2-bg-elevated)'
+                          : 'var(--v2-bg-hover)',
+                    }}
                   >
-                    {d.label}
-                  </p>
-                  {d.sub && (
-                    <p className="text-[10px] font-mono" style={{ color: 'var(--v2-text-subtle)' }}>{d.sub}</p>
-                  )}
-                  {d.strength && (
-                    <div className="mt-2 pt-2" style={{ borderTop: '1px solid var(--v2-border)' }}>
-                      <p className="text-[10px]" style={{ color: 'var(--v2-secondary)' }}>+ Strength</p>
-                    </div>
-                  )}
-                </motion.div>
-              ))}
+                    <p className="text-[10px] mb-3" style={{ color: 'var(--v2-text-subtle)' }}>{d.day}</p>
+                    <p
+                      className="text-sm mb-1 whitespace-nowrap"
+                      style={{ color: d.type === "rest" ? 'var(--v2-text-ghost)' : 'var(--v2-text-secondary)' }}
+                    >
+                      {d.label}
+                    </p>
+                    {d.sub && (
+                      <p className="text-[10px] font-mono" style={{ color: 'var(--v2-text-subtle)' }}>{d.sub}</p>
+                    )}
+                    {d.strength && (
+                      <div className="mt-2 pt-2" style={{ borderTop: '1px solid var(--v2-border)' }}>
+                        <p className="text-[10px]" style={{ color: 'var(--v2-secondary)' }}>+ Strength</p>
+                      </div>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </motion.div>
 

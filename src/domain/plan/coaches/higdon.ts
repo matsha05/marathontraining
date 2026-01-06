@@ -455,68 +455,20 @@ const LONG_RUN_CAPS: Record<HigdonDistance, number> = {
 };
 
 /**
- * Generate Higdon-style long run progression.
- * Handles all distances with appropriate caps.
+ * Get the EXACT Higdon long run progression.
+ * Uses literal arrays extracted from halhigdon.com - no approximations.
+ *
+ * @deprecated Use getHigdonLongRunProgression from './higdon-data' for exact data.
+ * This wrapper exists for backwards compatibility.
  */
 export function generateHigdonLongRunProgression(
     tier: HigdonTier,
-    totalWeeks: number
+    _totalWeeks: number
 ): number[] {
-    const config = HIGDON_TIER_CONFIGS[tier];
-    const progression: number[] = [];
-    const distance = config.distance;
-    const cap = LONG_RUN_CAPS[distance];
-    const isTimeBasedPlan =
-        config.peakLongRunMinutes !== undefined && config.peakLongRunMiles === undefined;
-
-    let currentDistance = START_DISTANCES[tier];
-    const increment = isTimeBasedPlan ? 5 : 1;
-
-    for (let week = 1; week <= totalWeeks; week++) {
-        const phase = getHigdonPhase(tier, week, totalWeeks);
-
-        // Marathon 20-miler weeks
-        if (distance === 'marathon' && config.twentyMilerWeeks?.includes(week)) {
-            progression.push(20);
-            currentDistance = 20;
-            continue;
-        }
-
-        // Tune-up race week - typically shorter (replaces long run)
-        if (isTuneUpRaceWeek(tier, week)) {
-            progression.push(0); // Race replaces long run
-            continue;
-        }
-
-        // Taper weeks
-        if (phase === 'taper') {
-            const tapering = getTaperLongRun(tier, week, totalWeeks);
-            progression.push(tapering);
-            continue;
-        }
-
-        // Stepback week
-        if (isHigdonStepbackWeek(tier, week, totalWeeks, phase)) {
-            const reduction = getStepbackReduction(week);
-            const stepbackDistance = Math.round(
-                currentDistance * (1 - reduction.longRunReduction)
-            );
-            progression.push(Math.max(stepbackDistance, START_DISTANCES[tier]));
-            continue;
-        }
-
-        // Week 1: use starting distance, no increment
-        if (week === 1) {
-            progression.push(currentDistance);
-            continue;
-        }
-
-        // Normal progression: +1 mile/5min per week (capped)
-        currentDistance = Math.min(currentDistance + increment, cap);
-        progression.push(currentDistance);
-    }
-
-    return progression;
+    // Import exact data from higdon-data.ts
+    // This replaces the previous algorithmic generation with exact week-by-week values
+    const { getHigdonLongRunProgression } = require('./higdon-data');
+    return getHigdonLongRunProgression(tier);
 }
 
 /**
@@ -756,3 +708,125 @@ export const HIGDON_DAYS_BY_DISTANCE: Record<HigdonDistance, number> = {
     base: 4,    // Base Novice is 4 days
 };
 
+// =============================================================================
+// COACHING EXPLANATIONS (Higdon Voice)
+// =============================================================================
+
+export interface HigdonWorkoutExplanation {
+    title: string;
+    description: string;
+    why: string;
+    feel: string;
+    coachTip?: string;
+}
+
+/**
+ * Coaching explanations in Hal Higdon's authentic voice.
+ * Source: halhigdon.com + research/higdon-master.md
+ */
+export const HIGDON_COACHING_EXPLANATIONS: Record<string, HigdonWorkoutExplanation> = {
+    easy: {
+        title: 'Easy Run',
+        description: 'Comfortable, conversational pace.',
+        why: 'Easy running builds your aerobic base without accumulating significant fatigue. It\'s the foundation of every training program.',
+        feel: 'You should be able to hold a full conversation. If you can\'t talk, slow down.',
+        coachTip: 'Don\'t worry about pace. Focus on time on your feet and enjoying the run.',
+    },
+    long_run: {
+        title: 'Long Run',
+        description: 'The cornerstone of distance training.',
+        why: 'Long runs teach your body to burn fat, build mental toughness, and prepare your legs for race day.',
+        feel: 'Run 30-90 seconds per mile slower than marathon pace. Walking breaks are encouraged.',
+        coachTip: 'The purpose is time on your feet, not speed. Slow down and finish feeling good.',
+    },
+    tempo: {
+        title: 'Tempo Run',
+        description: 'A controlled, moderately hard effort.',
+        why: 'Tempo runs improve your lactate threshold - the pace you can sustain without accumulating fatigue.',
+        feel: 'Start easy, build to near 10K effort, hold for 6-8 minutes, then ease back.',
+        coachTip: 'The "peak" effort is brief. This isn\'t a race simulation.',
+    },
+    hills: {
+        title: 'Hill Repeats',
+        description: 'Hard up, easy down.',
+        why: 'Hills build leg strength and running power without the impact stress of track intervals.',
+        feel: 'Run up hard (not all-out), jog/walk down for full recovery.',
+        coachTip: 'Find a hill about 1/4 mile long. Use a 3:1 ratio of up to recovery time.',
+    },
+    intervals: {
+        title: '800m Intervals',
+        description: 'Track repeats at faster than marathon pace.',
+        why: 'Intervals improve VO2max and running economy at faster speeds.',
+        feel: 'Faster than marathon pace, but not all-out. 400m recovery jog between.',
+        coachTip: 'Match your goal marathon time: for a 3:10 marathon, run 800s in 3:10.',
+    },
+    cross_train: {
+        title: 'Cross Training',
+        description: 'Any aerobic exercise other than running.',
+        why: 'Maintains fitness while giving your running muscles a break. Reduces injury risk.',
+        feel: 'Keep it easy - 30-60 minutes. Swimming, cycling, walking all work.',
+        coachTip: 'Avoid sports with sudden or sideways movements.',
+    },
+    rest: {
+        title: 'Rest Day',
+        description: 'Complete rest from training.',
+        why: 'Rest is when your muscles rebuild and adapt. It\'s essential, not optional.',
+        feel: 'Take the day completely off. Your body is getting stronger.',
+    },
+    pace_run: {
+        title: 'Pace Run',
+        description: 'Running at your goal marathon pace.',
+        why: 'Teaches your body what race rhythm feels like and builds confidence.',
+        feel: 'Moderate - faster than easy but definitely not hard. Controlled.',
+        coachTip: 'Don\'t force pace runs. If they don\'t feel sustainable, you\'re going too fast.',
+    },
+    fast_finish: {
+        title: '3/1 Long Run',
+        description: 'Long run with a faster finish.',
+        why: 'Teaches you to run faster on tired legs - exactly what the marathon requires.',
+        feel: 'First 3/4 easy, then pick up to "steady" for the final 1/4. Not race pace.',
+        coachTip: 'Do this pattern at most once every 3 weeks. It\'s fatiguing.',
+    },
+};
+
+export interface HigdonPhaseExplanation {
+    title: string;
+    description: string;
+    focus: string;
+}
+
+/**
+ * Phase explanations for Higdon plans.
+ */
+export const HIGDON_PHASE_EXPLANATIONS: Record<string, HigdonPhaseExplanation> = {
+    base: {
+        title: 'Base Phase',
+        description: 'Building your aerobic foundation.',
+        focus: 'Easy running, building weekly mileage gradually. No quality sessions yet.',
+    },
+    build: {
+        title: 'Build Phase',
+        description: 'Adding quality and longer runs.',
+        focus: 'Increasing long run distance, introducing tempo and pace runs. Building toward peak.',
+    },
+    peak: {
+        title: 'Peak Phase',
+        description: 'Highest training load.',
+        focus: 'Your 20-milers happen here. This is the hard work phase. Trust the process.',
+    },
+    taper: {
+        title: 'Taper Phase',
+        description: 'Reducing volume before race day.',
+        focus: 'Your body absorbs the training. Mileage drops dramatically. Arrive fresh.',
+    },
+};
+
+/**
+ * Stepback week explanation - a key Higdon concept.
+ */
+export const HIGDON_STEPBACK_EXPLANATION = {
+    title: 'Stepback Week',
+    summary: 'Every third week, long run distance drops significantly.',
+    why: 'Stepback weeks allow your body to absorb training stress before the next push. They\'re not weakness - they\'re how you avoid overtraining.',
+    pattern: 'Build → Build → Recover → Build → Build → Recover',
+};

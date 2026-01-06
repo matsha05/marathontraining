@@ -50,7 +50,8 @@ const PLAN_DETAILS: Record<string, PlanInfo[]> = {
         { coach: 'pfitzinger', distance: 'marathon', weeks: '12-18', peakMileage: '55-85+', daysPerWeek: '5-6', difficulty: 'advanced', description: 'Advanced Marathoning protocols' },
     ],
     hansons: [
-        { coach: 'hansons', distance: 'marathon', weeks: '18', peakMileage: '57', daysPerWeek: '6', difficulty: 'advanced', description: 'Cumulative fatigue, 16mi long run cap' },
+        { coach: 'hansons', distance: 'half', weeks: '18', peakMileage: '42-50', daysPerWeek: '6', difficulty: 'intermediate', description: 'Cumulative fatigue, 12-14mi long run cap' },
+        { coach: 'hansons', distance: 'marathon', weeks: '18', peakMileage: '57-62', daysPerWeek: '6', difficulty: 'advanced', description: 'Cumulative fatigue, 16mi long run cap' },
     ],
     higdon: [
         { coach: 'higdon', distance: '5k', weeks: '8', peakMileage: '15-25', daysPerWeek: '3-4', difficulty: 'beginner', description: 'Gentle introduction to racing' },

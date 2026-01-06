@@ -6,11 +6,12 @@ import { AppHeader } from '@/components/ui/AppHeader';
 import { handleMissedWorkout, MissedWorkoutDecision } from '@/domain/plan-generator/missed-workout-handler';
 import { usePlan } from '@/domain/plan/context';
 import { useAuth } from '@/domain/auth/context';
-import { DayPlan, Workout, TrainingZone } from '@/domain/plan/types';
+import { DayPlan, Workout, TrainingZone, WorkoutType } from '@/domain/plan/types';
 import { WorkoutSkeleton } from '@/components/ui/Skeleton';
 import { formatPace, formatPaceRange, getPaceForZone, formatDuration } from '@/lib/format';
 import { paceZoneToHRZone, estimateMaxHR } from '@/domain/hr/zones';
 import { HeartIcon } from '@/components/ui/heart';
+import { CoachingContextCard, PhaseBanner } from '@/components/coaching';
 
 /**
  * Workout Detail Page
@@ -187,6 +188,18 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
             />
 
             <main className="max-w-3xl mx-auto px-6 py-10">
+                {/* Phase Progress Banner */}
+                <PhaseBanner
+                    phase={(weekPlan?.phase || 'build') as 'base' | 'build' | 'peak' | 'taper'}
+                    weekNumber={weekNumber}
+                    totalWeeks={plan?.weeks.length || 18}
+                    coach={run.coachSource ? (
+                        run.coachSource.toLowerCase().includes('hansons') ? 'hansons' :
+                            run.coachSource.toLowerCase().includes('pfitz') ? 'pfitzinger' :
+                                run.coachSource.toLowerCase().includes('daniels') ? 'daniels' : 'higdon'
+                    ) : 'higdon'}
+                />
+
                 {/* Workout Header */}
                 <div className="mb-8">
                     <div className="flex items-start justify-between mb-4">
@@ -288,7 +301,16 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
                     </div>
                 </section>
 
-                {/* Coach Notes */}
+                {/* Coaching Context - WHY this workout */}
+                <section className="mb-8">
+                    <h2 className="v2-label mb-4">Why This Workout</h2>
+                    <CoachingContextCard
+                        workoutType={run.type as WorkoutType}
+                        coachSource={run.coachSource}
+                    />
+                </section>
+
+                {/* Coach Notes (if present) */}
                 {run.notes && (
                     <section className="mb-8">
                         <h2 className="v2-label mb-4">Coach Notes</h2>

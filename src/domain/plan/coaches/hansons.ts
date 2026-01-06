@@ -21,7 +21,11 @@ import { TrainingPhase } from '../types';
 // TYPES
 // =============================================================================
 
-export type HansonsTier = 'hansons_beginner' | 'hansons_advanced';
+export type HansonsTier =
+    | 'hansons_beginner'
+    | 'hansons_advanced'
+    | 'hansons_half_beginner'
+    | 'hansons_half_advanced';
 
 export type HansonsPhase = 'base' | 'speed' | 'strength' | 'taper';
 
@@ -47,7 +51,13 @@ export interface HansonsTierConfig {
     durationWeeks: 18;
     runDays: 6;
     restDays: 1;
-    longRunCap: 16;
+    /** 
+     * Long run cap varies by distance:
+     * - Half Marathon Beginner: 12 miles
+     * - Half Marathon Advanced: 14 miles
+     * - Marathon (both tiers): 16 miles
+     */
+    longRunCap: 12 | 14 | 16;
     peakWeeklyMileage: number;
     phases: {
         base: number[];
@@ -87,6 +97,42 @@ export const HANSONS_TIER_CONFIGS: Record<HansonsTier, HansonsTierConfig> = {
         restDays: 1,
         longRunCap: 16,
         peakWeeklyMileage: 61.5,
+        phases: {
+            base: [1],
+            speed: [2, 3, 4, 5, 6, 7, 8, 9, 10],
+            strength: [11, 12, 13, 14, 15, 16, 17],
+            taper: [18],
+        },
+        speedPhaseStart: 2,
+        strengthPhaseStart: 11,
+    },
+    // Half Marathon Beginner: 18 weeks, 12mi long run cap, 42mpw peak
+    // Source: research/27-hansons-half-marathon.md
+    hansons_half_beginner: {
+        tier: 'hansons_half_beginner',
+        durationWeeks: 18,
+        runDays: 6,
+        restDays: 1,
+        longRunCap: 12,
+        peakWeeklyMileage: 42,
+        phases: {
+            base: [1, 2, 3, 4, 5],
+            speed: [6, 7, 8, 9, 10],
+            strength: [11, 12, 13, 14, 15, 16],
+            taper: [17, 18],
+        },
+        speedPhaseStart: 6,
+        strengthPhaseStart: 11,
+    },
+    // Half Marathon Advanced: 18 weeks, 14mi long run cap, 50mpw peak
+    // Source: research/27-hansons-half-marathon.md
+    hansons_half_advanced: {
+        tier: 'hansons_half_advanced',
+        durationWeeks: 18,
+        runDays: 6,
+        restDays: 1,
+        longRunCap: 14,
+        peakWeeklyMileage: 50,
         phases: {
             base: [1],
             speed: [2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -178,6 +224,27 @@ const ADVANCED_STRENGTH_WORKOUTS: Record<number, HansonsStrengthWorkout> = {
     17: { reps: 6, distance: '1 mile', distanceMiles: 1, pace: 'MP-10s', recovery: '400m jog', totalMiles: 10.5 },
 };
 
+// Half Marathon Strength Workouts - uses 10K pace (NOT MP-10s like marathon)
+// Source: research/27-hansons-half-marathon.md
+const HALF_BEGINNER_STRENGTH_WORKOUTS: Record<number, HansonsStrengthWorkout> = {
+    11: { reps: 4, distance: '1 mile', distanceMiles: 1, pace: '10K', recovery: '400m jog', totalMiles: 7 },
+    12: { reps: 3, distance: '1.5 miles', distanceMiles: 1.5, pace: '10K', recovery: '600m jog', totalMiles: 8 },
+    13: { reps: 4, distance: '1 mile', distanceMiles: 1, pace: '10K', recovery: '400m jog', totalMiles: 7.5 },
+    14: { reps: 3, distance: '1.5 miles', distanceMiles: 1.5, pace: '10K', recovery: '600m jog', totalMiles: 8 },
+    15: { reps: 4, distance: '1 mile', distanceMiles: 1, pace: '10K', recovery: '400m jog', totalMiles: 7.5 },
+    16: { reps: 3, distance: '1.5 miles', distanceMiles: 1.5, pace: '10K', recovery: '600m jog', totalMiles: 8 },
+};
+
+const HALF_ADVANCED_STRENGTH_WORKOUTS: Record<number, HansonsStrengthWorkout> = {
+    11: { reps: 5, distance: '1 mile', distanceMiles: 1, pace: '10K', recovery: '400m jog', totalMiles: 9 },
+    12: { reps: 4, distance: '1.5 miles', distanceMiles: 1.5, pace: '10K', recovery: '600m jog', totalMiles: 10 },
+    13: { reps: 5, distance: '1 mile', distanceMiles: 1, pace: '10K', recovery: '400m jog', totalMiles: 9 },
+    14: { reps: 3, distance: '2 miles', distanceMiles: 2, pace: '10K', recovery: '800m jog', totalMiles: 10 },
+    15: { reps: 4, distance: '1.5 miles', distanceMiles: 1.5, pace: '10K', recovery: '600m jog', totalMiles: 9.5 },
+    16: { reps: 5, distance: '1 mile', distanceMiles: 1, pace: '10K', recovery: '400m jog', totalMiles: 9 },
+    17: { reps: 3, distance: '2 miles', distanceMiles: 2, pace: '10K', recovery: '800m jog', totalMiles: 9 },
+};
+
 // =============================================================================
 // TEMPO PROGRESSION (Marathon Pace)
 // =============================================================================
@@ -210,6 +277,45 @@ const ADVANCED_LONG_RUNS = [
     8, 8, 10, 8, 12, 10, 14, 10, 15, 10,
     16, 10, 16, 10, 16, 10, 8, 26.2
 ];
+
+// Half Marathon long run progressions (alternating 12/10 and 14/10)
+// Source: research/27-hansons-half-marathon.md
+const HALF_BEGINNER_LONG_RUNS = [
+    4, 4, 5, 5, 6, 6, 8, 8, 10, 10,
+    10, 12, 10, 12, 10, 12, 6, 13.1
+];
+
+const HALF_ADVANCED_LONG_RUNS = [
+    6, 6, 7, 8, 10, 12, 10, 12, 10, 12,
+    10, 14, 10, 14, 10, 14, 8, 13.1
+];
+
+// Half Marathon weekly mileage (from official PDFs)
+const HALF_BEGINNER_WEEKLY_MILEAGE = [
+    10, 12, 17, 18, 21, 27, 31, 32, 36, 37,
+    40, 42, 40, 42, 40, 42, 36, 31.1
+];
+
+const HALF_ADVANCED_WEEKLY_MILEAGE = [
+    17, 33, 34, 36, 40, 44, 41, 46, 41, 47,
+    45, 49, 47, 50, 48, 50, 44, 37.1
+];
+
+// Half Marathon tempo progressions (at HMP - Half Marathon Pace)
+const HALF_BEGINNER_TEMPO_MILES: Record<number, number> = {
+    6: 3, 7: 3, 8: 3,
+    9: 4, 10: 4,
+    11: 4, 12: 4, 13: 5, 14: 5,
+    15: 5, 16: 5, 17: 4,
+};
+
+const HALF_ADVANCED_TEMPO_MILES: Record<number, number> = {
+    2: 3, 3: 3, 4: 3,
+    5: 4, 6: 4, 7: 4,
+    8: 5, 9: 5, 10: 5,
+    11: 6, 12: 6, 13: 6, 14: 7,
+    15: 7, 16: 7, 17: 5,
+};
 
 // =============================================================================
 // MICROCYCLE TEMPLATES
@@ -258,6 +364,19 @@ export const HANSONS_MICROCYCLES: Record<HansonsTier, Record<HansonsPhase, Hanso
         strength: HANSONS_SOS_MICROCYCLE,
         taper: HANSONS_TAPER_MICROCYCLE,
     },
+    // Half marathon uses same structure but tempo is at HMP (Half Marathon Pace)
+    hansons_half_beginner: {
+        base: HANSONS_BASE_MICROCYCLE,
+        speed: HANSONS_SOS_MICROCYCLE, // Same structure, tempo notes differ
+        strength: HANSONS_SOS_MICROCYCLE,
+        taper: { ...HANSONS_TAPER_MICROCYCLE, sun: { type: 'long_run', notes: 'Race week: HALF MARATHON' } },
+    },
+    hansons_half_advanced: {
+        base: HANSONS_BASE_MICROCYCLE,
+        speed: HANSONS_SOS_MICROCYCLE,
+        strength: HANSONS_SOS_MICROCYCLE,
+        taper: { ...HANSONS_TAPER_MICROCYCLE, sun: { type: 'long_run', notes: 'Race week: HALF MARATHON' } },
+    },
 };
 
 // =============================================================================
@@ -293,28 +412,42 @@ export function toTrainingPhase(hansonsPhase: HansonsPhase): TrainingPhase {
 
 /**
  * Get the speed workout for a given week (5K-10K pace intervals).
+ * Same workouts used for both marathon and half marathon.
  */
 export function getHansonsSpeedWorkout(
     tier: HansonsTier,
     weekNumber: number
 ): HansonsSpeedWorkout | null {
-    const workouts = tier === 'hansons_beginner'
-        ? BEGINNER_SPEED_WORKOUTS
-        : ADVANCED_SPEED_WORKOUTS;
-    return workouts[weekNumber] ?? null;
+    // Speed workouts use same 5K-10K intervals for both marathon and half
+    // Beginner variants use beginner data, advanced variants use advanced data
+    switch (tier) {
+        case 'hansons_beginner':
+        case 'hansons_half_beginner':
+            return BEGINNER_SPEED_WORKOUTS[weekNumber] ?? null;
+        case 'hansons_advanced':
+        case 'hansons_half_advanced':
+            return ADVANCED_SPEED_WORKOUTS[weekNumber] ?? null;
+    }
 }
 
 /**
- * Get the strength workout for a given week (MP-10s intervals).
+ * Get the strength workout for a given week.
+ * Marathon uses MP-10s pace, Half Marathon uses 10K pace.
  */
 export function getHansonsStrengthWorkout(
     tier: HansonsTier,
     weekNumber: number
 ): HansonsStrengthWorkout | null {
-    const workouts = tier === 'hansons_beginner'
-        ? BEGINNER_STRENGTH_WORKOUTS
-        : ADVANCED_STRENGTH_WORKOUTS;
-    return workouts[weekNumber] ?? null;
+    switch (tier) {
+        case 'hansons_beginner':
+            return BEGINNER_STRENGTH_WORKOUTS[weekNumber] ?? null;
+        case 'hansons_advanced':
+            return ADVANCED_STRENGTH_WORKOUTS[weekNumber] ?? null;
+        case 'hansons_half_beginner':
+            return HALF_BEGINNER_STRENGTH_WORKOUTS[weekNumber] ?? null;
+        case 'hansons_half_advanced':
+            return HALF_ADVANCED_STRENGTH_WORKOUTS[weekNumber] ?? null;
+    }
 }
 
 /**
@@ -343,8 +476,16 @@ export function getHansonsTuesdayWorkout(
  * Get tempo run distance for a given week.
  */
 export function getHansonsTempoMiles(tier: HansonsTier, weekNumber: number): number {
-    const tempos = tier === 'hansons_beginner' ? BEGINNER_TEMPO_MILES : ADVANCED_TEMPO_MILES;
-    return tempos[weekNumber] ?? 0;
+    switch (tier) {
+        case 'hansons_beginner':
+            return BEGINNER_TEMPO_MILES[weekNumber] ?? 0;
+        case 'hansons_advanced':
+            return ADVANCED_TEMPO_MILES[weekNumber] ?? 0;
+        case 'hansons_half_beginner':
+            return HALF_BEGINNER_TEMPO_MILES[weekNumber] ?? 0;
+        case 'hansons_half_advanced':
+            return HALF_ADVANCED_TEMPO_MILES[weekNumber] ?? 0;
+    }
 }
 
 // =============================================================================
@@ -355,15 +496,29 @@ export function getHansonsTempoMiles(tier: HansonsTier, weekNumber: number): num
  * Generate the complete long run progression for a Hansons plan.
  */
 export function generateHansonsLongRunProgression(tier: HansonsTier): number[] {
-    return tier === 'hansons_beginner' ? [...BEGINNER_LONG_RUNS] : [...ADVANCED_LONG_RUNS];
+    switch (tier) {
+        case 'hansons_beginner':
+            return [...BEGINNER_LONG_RUNS];
+        case 'hansons_advanced':
+            return [...ADVANCED_LONG_RUNS];
+        case 'hansons_half_beginner':
+            return [...HALF_BEGINNER_LONG_RUNS];
+        case 'hansons_half_advanced':
+            return [...HALF_ADVANCED_LONG_RUNS];
+    }
 }
 
 /**
  * Get long run distance for a specific week.
  */
 export function getHansonsLongRunMiles(tier: HansonsTier, weekNumber: number): number {
-    const progression = tier === 'hansons_beginner' ? BEGINNER_LONG_RUNS : ADVANCED_LONG_RUNS;
-    return progression[weekNumber - 1] ?? 0;
+    const progressionMap: Record<HansonsTier, number[]> = {
+        hansons_beginner: BEGINNER_LONG_RUNS,
+        hansons_advanced: ADVANCED_LONG_RUNS,
+        hansons_half_beginner: HALF_BEGINNER_LONG_RUNS,
+        hansons_half_advanced: HALF_ADVANCED_LONG_RUNS,
+    };
+    return progressionMap[tier][weekNumber - 1] ?? 0;
 }
 
 /**
@@ -384,15 +539,26 @@ export function isAlternatingShortLongRun(tier: HansonsTier, weekNumber: number)
  * Get the prescribed weekly mileage for a given week.
  */
 export function getHansonsWeeklyMileage(tier: HansonsTier, weekNumber: number): number {
-    const mileage = tier === 'hansons_beginner' ? BEGINNER_WEEKLY_MILEAGE : ADVANCED_WEEKLY_MILEAGE;
-    return mileage[weekNumber - 1] ?? 0;
+    const mileageMap: Record<HansonsTier, number[]> = {
+        hansons_beginner: BEGINNER_WEEKLY_MILEAGE,
+        hansons_advanced: ADVANCED_WEEKLY_MILEAGE,
+        hansons_half_beginner: HALF_BEGINNER_WEEKLY_MILEAGE,
+        hansons_half_advanced: HALF_ADVANCED_WEEKLY_MILEAGE,
+    };
+    return mileageMap[tier][weekNumber - 1] ?? 0;
 }
 
 /**
  * Generate the complete weekly mileage progression.
  */
 export function generateHansonsWeeklyMileageProgression(tier: HansonsTier): number[] {
-    return tier === 'hansons_beginner' ? [...BEGINNER_WEEKLY_MILEAGE] : [...ADVANCED_WEEKLY_MILEAGE];
+    const mileageMap: Record<HansonsTier, number[]> = {
+        hansons_beginner: BEGINNER_WEEKLY_MILEAGE,
+        hansons_advanced: ADVANCED_WEEKLY_MILEAGE,
+        hansons_half_beginner: HALF_BEGINNER_WEEKLY_MILEAGE,
+        hansons_half_advanced: HALF_ADVANCED_WEEKLY_MILEAGE,
+    };
+    return [...mileageMap[tier]];
 }
 
 // =============================================================================
@@ -544,3 +710,112 @@ export const HANSONS_ELIGIBILITY: CoachEligibility = {
     },
 };
 
+// =============================================================================
+// COACHING EXPLANATIONS (Hansons Voice)
+// =============================================================================
+
+export interface HansonsWorkoutExplanation {
+    title: string;
+    description: string;
+    why: string;
+    feel: string;
+    coachTip?: string;
+}
+
+/**
+ * Coaching explanations in the Hansons voice.
+ * Use these to populate workout detail pages and methodology sections.
+ */
+export const HANSONS_COACHING_EXPLANATIONS: Record<HansonsDayType, HansonsWorkoutExplanation> = {
+    easy_run: {
+        title: 'Easy Run',
+        description: 'Run at a conversational pace. If you can\'t hold a conversation, slow down.',
+        why: 'Easy runs build your aerobic base without accumulating stress. They allow you to recover from SOS days while still adding beneficial volume.',
+        feel: 'Relaxed, conversational. You should be able to chat without gasping.',
+        coachTip: 'The most common mistake is running easy days too fast. This steals energy from your SOS days. Easy means easy.',
+    },
+    long_run: {
+        title: 'Long Run',
+        description: 'Your 16-miler on tired legs is harder than a 20-miler on fresh legs. That\'s the point.',
+        why: 'Long runs teach your body to burn fat, build time on feet, and simulate race conditions. Because you\'re running on yesterday\'s miles, the last 10 miles of your 16-miler feel like the last 10 miles of a marathon.',
+        feel: 'Controlled, patient. 30-90 seconds per mile slower than marathon pace.',
+        coachTip: 'Don\'t obsess over the 20-miler. Research shows aerobic adaptations diminish significantly after ~2.5 hours. Our 16-miler on fatigued legs is physiologically equivalent.',
+    },
+    tempo: {
+        title: 'Tempo Run',
+        description: 'Thursday tempo runs are the heart of this program. You\'re practicing exactly race pace.',
+        why: 'Tempo runs teach your body to sustain goal marathon pace under fatigue. You\'re building the metabolic and mental pathways to hold pace when everything wants you to slow down.',
+        feel: 'Challenging but sustainable. This is race pace, not harder, not easier.',
+        coachTip: 'Tempo progression builds from 5 miles to 10 miles at goal pace. By the end of the plan, you\'ll have done multiple 10-mile tempo runs. That confidence is priceless on race day.',
+    },
+    speed_intervals: {
+        title: 'Speed Intervals',
+        description: 'Short, sharp intervals at 5K-10K pace with jog recovery.',
+        why: 'Speed work develops your VO2max, running economy, and ability to clear lactate. It makes race pace feel easier by training at harder intensities.',
+        feel: 'Hard but controlled. These should feel fast but not all-out.',
+        coachTip: 'The pace is between your current 5K and 10K race pace. Recovery jogs (not rest) maintain the aerobic training effect.',
+    },
+    strength_intervals: {
+        title: 'Strength Intervals',
+        description: 'Longer repeats at marathon pace minus 10 seconds per mile.',
+        why: 'Strength workouts are marathon-specific. We\'re building the "muscle memory" to hold pace when everything in your body wants to slow down. Tempo + Strength + Long Run = the marathon simulation trifecta.',
+        feel: 'Strong, sustainable effort. Slightly faster than marathon pace but you could hold it for a long time if needed.',
+        coachTip: 'MP-10s means 10 seconds per mile faster than your goal marathon pace. This teaches your body that marathon pace is actually "easy" by comparison.',
+    },
+    rest: {
+        title: 'Rest Day',
+        description: 'One day per week, you don\'t run. But you still move.',
+        why: 'Rest allows muscular repair and mental recovery. But complete inactivity isn\'t better than active recovery.',
+        feel: 'Refreshed, recovered. Use this day to stay loose without impact.',
+        coachTip: 'Swimming, cycling, elliptical, yoga - anything that gives your legs a break while keeping blood flowing. We put the rest day midweek, not adjacent to the long run.',
+    },
+    cross_train: {
+        title: 'Cross-Training',
+        description: 'Non-impact aerobic activity for 30-60 minutes.',
+        why: 'Cross-training maintains aerobic fitness while giving your running muscles a break. It\'s active recovery that keeps you ready for tomorrow.',
+        feel: 'Easy, flowy. Heart rate up but not stressful.',
+        coachTip: 'Swimming, cycling, elliptical are best. Avoid sports with sudden direction changes.',
+    },
+};
+
+/**
+ * Phase-specific coaching explanations.
+ */
+export const HANSONS_PHASE_EXPLANATIONS: Record<HansonsPhase, { title: string; description: string; focus: string }> = {
+    base: {
+        title: 'Base Phase',
+        description: 'Building your foundation with easy miles.',
+        focus: 'Establish consistent running habit. All easy running, no quality sessions yet. We\'re preparing your body for what\'s coming.',
+    },
+    speed: {
+        title: 'Speed Phase',
+        description: 'Developing VO2max and leg turnover.',
+        focus: 'Tuesday intervals at 5K-10K pace. Long runs begin building. We\'re teaching your body to run fast before we teach it to run long.',
+    },
+    strength: {
+        title: 'Strength Phase',
+        description: 'Marathon-specific conditioning.',
+        focus: 'Tuesday intervals shift to MP-10s (strength). Tempo runs lengthen toward 10 miles. Long runs peak at 16 miles on alternating weeks. This is where the marathon is won.',
+    },
+    taper: {
+        title: 'Taper Phase',
+        description: 'Sharpening for race day.',
+        focus: 'Volume drops but intensity stays. We maintain sharpness while allowing full recovery. Trust the hay is in the barn.',
+    },
+};
+
+/**
+ * The "Why 16?" explanation - a core Hansons philosophy concept.
+ */
+export const HANSONS_WHY_16_EXPLANATION = {
+    title: 'Why We Cap Long Runs at 16 Miles',
+    summary: 'A 16-mile run as part of an overall program that accumulates fatigue is physiologically equivalent to - or better than - a 20-mile run done by a runner who rests before and after it.',
+    details: [
+        'Research shows aerobic adaptations diminish significantly after ~2.5-3 hours',
+        'Running 16 miles in the Hansons system happens on fatigued legs',
+        'The last 10 miles of your 16-miler feel like the last 10 miles of a marathon',
+        'Injury risk increases dramatically beyond 16 miles',
+        'You preserve energy for consistent quality throughout the week, not just one "big" workout',
+    ],
+    source: 'Luke Humphrey, "Hansons Marathon Method"',
+};

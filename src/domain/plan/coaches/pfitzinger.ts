@@ -713,3 +713,141 @@ export const PFITZ_ELIGIBILITY: CoachEligibility = {
     },
 };
 
+// =============================================================================
+// COACHING EXPLANATIONS (Pfitzinger Voice)
+// =============================================================================
+
+export interface PfitzWorkoutExplanation {
+    title: string;
+    description: string;
+    why: string;
+    feel: string;
+    coachTip?: string;
+}
+
+/**
+ * Coaching explanations in the Pfitzinger voice.
+ * Use these to populate workout detail pages and methodology sections.
+ */
+export const PFITZ_COACHING_EXPLANATIONS: Record<PfitzDayType, PfitzWorkoutExplanation> = {
+    rest: {
+        title: 'Rest Day',
+        description: 'Complete rest from running. May include light stretching or walking.',
+        why: 'Recovery days allow your muscles and connective tissues to repair and strengthen. Training adaptation happens during rest, not during the workout itself.',
+        feel: 'Refreshed, recovered. Resist the urge to "sneak in" extra miles.',
+        coachTip: 'If you feel you need more rest days than scheduled, that\'s valuable feedback about your recovery capacity.',
+    },
+    recovery: {
+        title: 'Recovery Run',
+        description: 'Very easy running, 2+ minutes per mile slower than marathon pace.',
+        why: 'Recovery runs promote blood flow to tired muscles without adding significant stress. They help clear metabolic waste and prepare you for the next quality session.',
+        feel: 'Almost embarrassingly easy. You should feel like you could run forever.',
+        coachTip: 'The biggest mistake runners make is running recovery days too fast. This steals from your hard days.',
+    },
+    general_aerobic: {
+        title: 'General Aerobic',
+        description: 'Easy running with strides at the end. Building your aerobic base.',
+        why: 'General aerobic runs develop the cardiovascular system that powers your marathon. Strides add neuromuscular stimulus without significant fatigue.',
+        feel: 'Comfortable, conversational. The strides should feel smooth and controlled.',
+        coachTip: 'Do 6-8 strides of 100m at the end. Accelerate to 5K pace, hold briefly, decelerate. Full recovery between.',
+    },
+    medium_long: {
+        title: 'Medium-Long Run (MLR)',
+        description: 'Your second most important weekly workout. 10-15 miles at endurance pace.',
+        why: 'The MLR adds significant endurance stimulus without the recovery cost of a full 20-miler. It\'s the unsung hero of marathon preparation.',
+        feel: 'Steady, sustainable. Same effort as your easy runs, just longer.',
+        coachTip: 'Don\'t turn this into a tempo run or mini-long run. The value is in the additional easy volume.',
+    },
+    long_run: {
+        title: 'Long Run',
+        description: 'The cornerstone of marathon training. 45-90 seconds slower than marathon pace.',
+        why: 'Long runs teach your body to burn fat for fuel, build mental toughness, and prepare your legs for the unique stress of 26.2 miles.',
+        feel: 'Controlled, patient. Resist the urge to push pace early. You should feel strong through 15 miles.',
+        coachTip: 'Start conservative. The last 5 miles should feel challenging but manageable. If you\'re struggling at mile 12, you started too fast.',
+    },
+    long_run_mp: {
+        title: 'Long Run with Marathon Pace',
+        description: 'Long run with a significant portion at your goal marathon pace.',
+        why: 'MP long runs are race rehearsals. You\'re teaching your body exactly what race day feels like, building both physiological and mental race confidence.',
+        feel: 'The easy portion should feel easy. The MP portion should feel like race effort - sustainable but purposeful.',
+        coachTip: 'Run the first miles easy, then transition to MP. The final 14-mile @ MP long run is your marathon dress rehearsal.',
+    },
+    lactate_threshold: {
+        title: 'Lactate Threshold',
+        description: 'Tempo running at 15K-Half Marathon pace. 20-45 minutes at LT.',
+        why: 'LT training raises the pace you can sustain before lactate accumulates. As your LT improves, marathon pace feels progressively easier.',
+        feel: 'Comfortably hard. You can speak in short sentences but not hold a conversation.',
+        coachTip: 'LT pace is roughly 25-30 seconds per mile faster than your goal marathon pace. It should feel sustainable for 40-60 minutes if you had to.',
+    },
+    vo2max: {
+        title: 'VO2max Intervals',
+        description: 'Hard intervals at 5K race pace. 600m-1600m repeats with jog recovery.',
+        why: 'VO2max training improves your body\'s ability to use oxygen at high intensities. This "sharpens" your fitness in the final weeks before the race.',
+        feel: 'Hard but controlled. These should feel significantly faster than tempo but not all-out.',
+        coachTip: 'VO2max work appears in the Race Prep phase, not throughout training. It\'s the finishing touch, not the foundation.',
+    },
+    tune_up_race: {
+        title: 'Tune-Up Race',
+        description: '8K-Half Marathon race as part of training. A hard workout with race excitement.',
+        why: 'Tune-up races serve multiple purposes: fitness check, race routine practice, mental confidence builder, and a very hard workout you couldn\'t replicate in training.',
+        feel: 'Race effort! Go for a good time. This is the one day you can push.',
+        coachTip: 'Run these races at your current fitness, not at a target pace. They tell you where you are, not where you want to be.',
+    },
+};
+
+/**
+ * Phase-specific coaching explanations.
+ */
+export const PFITZ_PHASE_EXPLANATIONS: Record<PfitzPhase, { title: string; description: string; focus: string }> = {
+    endurance: {
+        title: 'Endurance Phase',
+        description: 'Building your aerobic base.',
+        focus: 'Establish consistent mileage, introduce LT running, build toward peak volume. The aerobic engine you build now powers your marathon.',
+    },
+    lactate_threshold: {
+        title: 'Lactate Threshold Phase',
+        description: 'Peak mileage and longest tempo sessions.',
+        focus: 'This is the hard work phase. You\'re pushing your lactate threshold higher so marathon pace feels easier on race day.',
+    },
+    race_prep: {
+        title: 'Race Preparation Phase',
+        description: 'Sharpening for race day.',
+        focus: 'VO2max intervals, tune-up races, and your final 20-miler with 14 miles @ MP. You\'re sharpening the blade you\'ve already forged.',
+    },
+    taper: {
+        title: 'Taper Phase',
+        description: 'Reduce volume, maintain intensity, arrive fresh.',
+        focus: 'The hay is in the barn. Trust your training. Reduce volume dramatically but keep some intensity to stay sharp.',
+    },
+};
+
+/**
+ * The MLR explanation - a signature Pfitz concept.
+ */
+export const PFITZ_MLR_EXPLANATION = {
+    title: 'The Medium-Long Run: Marathon Training\'s Secret Weapon',
+    summary: 'The MLR is your second most important weekly workout. It builds endurance without the recovery cost of a true long run.',
+    details: [
+        '10-15 miles at the same easy pace as your regular runs',
+        'Done midweek (usually Wednesday) to break up the training week',
+        'Allows you to accumulate more weekly mileage without excessive fatigue',
+        'Provides a second significant aerobic stimulus beyond just the Sunday long run',
+        'Critical for runners moving up to higher-mileage plans',
+    ],
+    source: 'Pete Pfitzinger, "Advanced Marathoning"',
+};
+
+/**
+ * The MP Long Run explanation - another signature Pfitz concept.
+ */
+export const PFITZ_MP_LONG_RUN_EXPLANATION = {
+    title: 'Marathon Pace Long Runs: The Dress Rehearsal',
+    summary: 'By running 8-14 miles at marathon pace within your long run, you\'re teaching your body exactly what race day feels like.',
+    progression: [
+        { week: 'Early training', distance: 8, context: 'Introduction to MP running' },
+        { week: 'Mid training', distance: 10, context: 'Building race-specific endurance' },
+        { week: 'Peak training', distance: 12, context: 'Extended race simulation' },
+        { week: 'Final preparation', distance: 14, context: 'Full dress rehearsal' },
+    ],
+    source: 'Pete Pfitzinger, "Advanced Marathoning"',
+};

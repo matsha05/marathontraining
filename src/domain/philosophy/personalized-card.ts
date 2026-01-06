@@ -32,7 +32,6 @@ const LONG_RUN_CAPS: Record<TrainingPhilosophy, Record<TargetDistance, string>> 
         '10k': '5.5 miles',     // research/21 line 277
         'half': '10 miles',     // research/21 lines 374, 410, 518
         'marathon': '20 miles', // COACHSPEC & research/14
-        'ultra': '30 miles',    // research/15
         'base': '8 miles',      // research/21 line 32
     },
     hansons: {
@@ -40,7 +39,6 @@ const LONG_RUN_CAPS: Record<TrainingPhilosophy, Record<TargetDistance, string>> 
         '10k': 'N/A',
         'half': 'N/A',
         'marathon': '16 miles', // research/22 line 10
-        'ultra': 'N/A',
         'base': 'N/A',
     },
     pfitzinger: {
@@ -48,7 +46,6 @@ const LONG_RUN_CAPS: Record<TrainingPhilosophy, Record<TargetDistance, string>> 
         '10k': '11 miles',      // research/25 line 93
         'half': '14-19 miles',  // research/25 lines 107-171
         'marathon': '20-22 miles', // research/23 lines 11, 99, 103
-        'ultra': 'N/A',
         'base': 'N/A',
     },
     daniels: {
@@ -56,7 +53,6 @@ const LONG_RUN_CAPS: Record<TrainingPhilosophy, Record<TargetDistance, string>> 
         '10k': '10-12 miles',   // research/26
         'half': 'N/A',
         'marathon': '18 miles', // research/26 line 50
-        'ultra': 'N/A',
         'base': 'N/A',
     },
 };
@@ -101,6 +97,13 @@ const PLAN_SPECS: Record<TrainingPhilosophy, Partial<Record<TargetDistance, Part
         },
     },
     hansons: {
+        'half': {
+            // Hansons Half Marathon - uses HMP for tempo, 10K for strength
+            // Source: research/27-hansons-half-marathon.md
+            beginner: { minDays: 6, typicalDays: '6', planDuration: '18 weeks', keyWorkouts: ['Speed intervals', 'Tempo at HMP', 'Long run (12mi cap)'] },
+            intermediate: { minDays: 6, typicalDays: '6', planDuration: '18 weeks', keyWorkouts: ['Speed intervals', 'Tempo at HMP', 'Long run (12mi cap)'] },
+            advanced: { minDays: 6, typicalDays: '6', planDuration: '18 weeks', keyWorkouts: ['5K-10K intervals', 'Tempo at HMP', 'Long run (14mi cap)', '10K pace work'] },
+        },
         'marathon': {
             beginner: { minDays: 6, typicalDays: '6', planDuration: '18 weeks', keyWorkouts: ['Speed intervals', 'Tempo at MP', 'Long run (16mi cap)'] },
             intermediate: { minDays: 6, typicalDays: '6', planDuration: '18 weeks', keyWorkouts: ['Speed intervals', 'Tempo at MP', 'Long run (16mi cap)'] },
@@ -233,6 +236,22 @@ const TYPICAL_WEEKS: Record<TrainingPhilosophy, Partial<Record<TargetDistance, P
                 'F: Easy', 'S: Easy (pre-long)', 'Su: Long run (16mi cap)'
             ],
         },
+        'half': {
+            // Half marathon uses HMP (Half Marathon Pace) for tempo, 10K pace for strength
+            // Source: research/27-hansons-half-marathon.md
+            beginner: [
+                'M: Easy', 'T: Speed intervals (5K-10K)', 'W: Rest/XT', 'Th: Tempo at HMP',
+                'F: Easy', 'S: Easy', 'Su: Long run (12mi cap)'
+            ],
+            intermediate: [
+                'M: Easy', 'T: Speed intervals (5K-10K)', 'W: Rest/XT', 'Th: Tempo at HMP',
+                'F: Easy', 'S: Easy', 'Su: Long run (12mi cap)'
+            ],
+            advanced: [
+                'M: Easy', 'T: Strength intervals (10K)', 'W: Rest/XT', 'Th: Tempo at HMP',
+                'F: Easy', 'S: Easy', 'Su: Long run (14mi cap)'
+            ],
+        },
     },
     pfitzinger: {
         '5k': {
@@ -319,6 +338,9 @@ export interface PersonalizedPhilosophyCard extends PhilosophyMetadata {
     personalizedLongRunCap: string;
     personalizedDuration: string;
     personalizedKeyWorkouts: string[];
+    personalizedTypicalWeek: string[];
+    // The actual tier being used (may differ from requested due to day constraints)
+    effectiveTier: Experience;
     // Adjustment context (when tier was auto-downgraded)
     tierAdjusted: boolean;
     adjustedTier: Experience | null;
@@ -395,8 +417,19 @@ export function getPersonalizedPhilosophyCard(
 ): PersonalizedPhilosophyCard {
     const basePhilosophy = PHILOSOPHIES[coach];
     const distance = answers.targetDistance || 'marathon';
-    const preferredExperience = answers.experience || 'intermediate';
     const userDays = answers.daysPerWeek || 4;
+
+    // Infer experience from mileage when not explicitly provided (quiz removed experience question)
+    let preferredExperience: Experience;
+    if (answers.experience) {
+        preferredExperience = answers.experience;
+    } else if (answers.currentMileage === 'under_20') {
+        preferredExperience = 'beginner';
+    } else if (answers.currentMileage === 'over_40') {
+        preferredExperience = 'advanced';
+    } else {
+        preferredExperience = 'intermediate'; // 20-40 mpw
+    }
 
     // Get verified data for this combination
     const longRunCap = LONG_RUN_CAPS[coach][distance] || basePhilosophy.longRunCap;
@@ -425,12 +458,18 @@ export function getPersonalizedPhilosophyCard(
         duration = 'Variable';
     }
 
+    // Get the typical week for this coach/distance/tier
+    const typicalWeek = TYPICAL_WEEKS[coach]?.[distance]?.[effectiveTier]
+        || PHILOSOPHIES[coach].methodology.typicalWeek;
+
     return {
         ...basePhilosophy,
         personalizedRunDays: actualDays,
         personalizedLongRunCap: longRunCap,
         personalizedDuration: duration,
         personalizedKeyWorkouts: keyWorkouts,
+        personalizedTypicalWeek: typicalWeek,
+        effectiveTier,
         tierAdjusted: tierResult.adjusted,
         adjustedTier: tierResult.adjusted ? effectiveTier : null,
         adjustmentReason: tierResult.reason,
@@ -467,7 +506,6 @@ function getDistanceLabel(distance: TargetDistance): string {
         case '10k': return '10K';
         case 'half': return 'half marathon';
         case 'marathon': return 'marathon';
-        case 'ultra': return 'ultra';
         case 'base': return 'base fitness';
         default: return 'race';
     }
@@ -476,8 +514,9 @@ function getDistanceLabel(distance: TargetDistance): string {
 /**
  * Get the typical week schedule for a coach/distance/tier combination.
  * Returns research-verified week structure, falling back to static data if not found.
+ * NOTE: This is now private - use PersonalizedPhilosophyCard.personalizedTypicalWeek instead
  */
-export function getTypicalWeek(
+function getTypicalWeek(
     coach: TrainingPhilosophy,
     distance: TargetDistance,
     tier: Experience
@@ -487,21 +526,24 @@ export function getTypicalWeek(
 }
 
 /**
- * Get minimum days required for a distance with any coach.
- * Uses Higdon as the floor since they support the lowest day counts.
+ * Get minimum days required for a distance across ALL coaches.
+ * Returns the lowest minDays from any coach that supports this distance.
  */
 export function getMinDaysForDistance(distance: TargetDistance): number {
-    // Check all coaches and find the minimum days for this distance
-    const higdonSpec = PLAN_SPECS.higdon?.[distance];
-    if (higdonSpec) {
-        // Find lowest minDays across all tiers
-        const allMinDays = Object.values(higdonSpec)
-            .map(spec => spec?.minDays || 99)
-            .filter(d => d < 99);
-        if (allMinDays.length > 0) {
-            return Math.min(...allMinDays);
+    let minDays = 99;
+
+    // Check all coaches and all tiers
+    for (const coach of Object.keys(PLAN_SPECS) as TrainingPhilosophy[]) {
+        const distanceSpec = PLAN_SPECS[coach]?.[distance];
+        if (distanceSpec) {
+            for (const tierSpec of Object.values(distanceSpec)) {
+                if (tierSpec?.minDays && tierSpec.minDays < minDays) {
+                    minDays = tierSpec.minDays;
+                }
+            }
         }
     }
-    // Default fallback
-    return 4;
+
+    // Default fallback if no data found
+    return minDays < 99 ? minDays : 4;
 }

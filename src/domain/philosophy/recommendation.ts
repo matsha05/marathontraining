@@ -12,8 +12,20 @@ import {
     QuizAnswers,
     PhilosophyRecommendation,
     TargetDistance,
+    Experience,
+    CurrentMileage,
 } from './types';
 import { getMinDaysForDistance } from './personalized-card';
+
+/**
+ * Infer experience level from weekly mileage.
+ * Used when experience question is not asked in the quiz.
+ */
+function inferExperienceFromMileage(mileage: CurrentMileage | null): Experience {
+    if (mileage === 'under_20') return 'beginner';
+    if (mileage === 'over_40') return 'advanced';
+    return 'intermediate'; // 20-40 or null
+}
 
 /**
  * Calculate philosophy recommendation from quiz answers.
@@ -34,7 +46,7 @@ export function calculateRecommendation(answers: QuizAnswers): PhilosophyRecomme
     // The experience question was removed - we now infer it from weekly mileage
     // ==========================================================================
     let effectiveExperience = answers.experience;
-    if (!effectiveExperience || effectiveExperience === 'unsure') {
+    if (!effectiveExperience) {
         if (answers.currentMileage === 'under_20') {
             effectiveExperience = 'beginner';
         } else if (answers.currentMileage === '20_40') {
@@ -143,7 +155,7 @@ export function calculateRecommendation(answers: QuizAnswers): PhilosophyRecomme
     if (answers.targetDistance !== null) {
         if (answers.targetDistance === '5k' || answers.targetDistance === '10k') {
             scores.higdon += 1;
-            if (pfitzAvailable && answers.experience === 'advanced') {
+            if (pfitzAvailable && workingAnswers.experience === 'advanced') {
                 scores.pfitzinger += 1; // Speed focus for advanced short-distance
             }
             if (danielsAvailable) {
@@ -154,9 +166,6 @@ export function calculateRecommendation(answers: QuizAnswers): PhilosophyRecomme
             if (danielsAvailable) {
                 scores.daniels += 1; // 2Q marathon is strong option
             }
-        } else if (answers.targetDistance === 'ultra') {
-            scores.higdon += 2; // Gradual volume build critical for ultra
-            reasoning.push(`For ultra training, gradual volume build is key.`);
         }
     }
 
@@ -295,6 +304,9 @@ export function getOverrideWarnings(
 ): string[] {
     if (selected === recommended) return [];
 
+    // Infer experience from mileage (same as calculateRecommendation)
+    const effectiveExperience = answers.experience || inferExperienceFromMileage(answers.currentMileage);
+
     const warnings: string[] = [];
 
     // Hansons with incompatible distance or limited days
@@ -306,7 +318,7 @@ export function getOverrideWarnings(
         if (answers.daysPerWeek !== null && answers.daysPerWeek < 6) {
             warnings.push(`Hansons is designed for 6 days/week. You said ${answers.daysPerWeek}. We'll adapt, but you may need to add days or accept modified structure.`);
         }
-        if (answers.experience === 'beginner') {
+        if (effectiveExperience === 'beginner') {
             warnings.push('Beginners often benefit from more rest days. Hansons is doable but demanding.');
         }
     }
@@ -316,25 +328,25 @@ export function getOverrideWarnings(
         if (answers.currentMileage === 'under_20') {
             warnings.push('Pfitzinger programs start at 55 miles/week. Your current base (<20) would need significant build-up first.');
         }
-        if (answers.currentMileage === '20_40' && answers.experience === 'beginner') {
+        if (answers.currentMileage === '20_40' && effectiveExperience === 'beginner') {
             warnings.push('Pfitzinger is designed for experienced runners with high mileage backgrounds. Consider building your base first.');
         }
     }
 
     // Higdon for competitive runners
     if (selected === 'higdon') {
-        if (answers.experience === 'advanced' && answers.currentMileage === 'over_40') {
+        if (effectiveExperience === 'advanced' && answers.currentMileage === 'over_40') {
             warnings.push('Higdon\'s lower frequency may undertrain runners with your experience and base. Consider Daniels, Hansons, or Pfitzinger for PR potential.');
         }
     }
 
     // Daniels for non-advanced runners or unsupported distances
     if (selected === 'daniels') {
-        // HARD BLOCK: No Daniels plans for half or ultra
-        if (answers.targetDistance === 'half' || answers.targetDistance === 'ultra') {
-            warnings.push(`Daniels only offers 5K, 10K, and Marathon plans. We don't have a ${answers.targetDistance === 'half' ? 'Half Marathon' : 'Ultra'} plan for this methodology.`);
+        // HARD BLOCK: No Daniels plans for half
+        if (answers.targetDistance === 'half') {
+            warnings.push("Daniels only offers 5K, 10K, and Marathon plans. We don't have a Half Marathon plan for this methodology.");
         }
-        if (answers.experience !== 'advanced') {
+        if (effectiveExperience !== 'advanced') {
             warnings.push('Daniels\' VDOT precision approach is designed for advanced runners. The workouts assume you understand training zones and can pace yourself accurately.');
         }
         if (answers.targetDistance === '5k' || answers.targetDistance === '10k') {
@@ -362,7 +374,6 @@ function getDistanceLabel(distance: TargetDistance | null): string {
         '10k': '10K',
         'half': 'half marathon',
         'marathon': 'marathon',
-        'ultra': 'ultra',
         'base': 'general fitness',
     };
     return labels[distance];
@@ -377,18 +388,14 @@ function getDistanceLabel(distance: TargetDistance | null): string {
  * |----------|--------|---------|------------|---------|
  * | 5K       | ✅     | ❌      | ✅ FRR     | ✅      |
  * | 10K      | ✅     | ❌      | ✅ FRR     | ✅      |
- * | Half     | ✅     | ❌      | ✅ FRR     | ❌      |
+ * | Half     | ✅     | ✅      | ✅ FRR     | ❌      |
  * | Marathon | ✅     | ✅      | ✅ AM      | ✅      |
- * | Ultra    | ❌     | ❌      | ❌         | ❌      |
  * | Base     | ✅     | ❌      | ❌         | ❌      |
  */
 export function isPhilosophyAvailableForDistance(
     philosophy: TrainingPhilosophy,
     distance: TargetDistance | null
 ): boolean {
-    // Ultra: No one supports ultra yet
-    if (distance === 'ultra') return false;
-
     // Base: Only Higdon
     if (distance === 'base') {
         return philosophy === 'higdon';
@@ -396,9 +403,9 @@ export function isPhilosophyAvailableForDistance(
 
     if (distance === null) return true;
 
-    // Hansons: Only marathon (no half, despite earlier claim)
+    // Hansons: Half Marathon and Marathon
     if (philosophy === 'hansons') {
-        return distance === 'marathon';
+        return distance === 'half' || distance === 'marathon';
     }
 
     // Daniels: Only 5K, 10K, marathon (NO half)

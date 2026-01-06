@@ -247,7 +247,6 @@ function formatDistance(distance: TargetDistance): string {
         case 'half': return 'Half Marathon';
         case 'marathon': return 'Marathon';
         case 'base': return 'Base Building';
-        case 'ultra': return 'Ultra';
         default: return distance;
     }
 }

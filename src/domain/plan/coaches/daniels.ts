@@ -839,3 +839,131 @@ export const DANIELS_ELIGIBILITY: CoachEligibility = {
     },
 };
 
+// =============================================================================
+// COACHING EXPLANATIONS (Daniels Voice)
+// =============================================================================
+
+export interface DanielsIntensityExplanation {
+    title: string;
+    abbreviation: DanielsIntensity;
+    description: string;
+    why: string;
+    feel: string;
+    effortLevel: string;
+    coachTip?: string;
+}
+
+/**
+ * Coaching explanations for the five Daniels intensities.
+ * Use these to populate workout detail pages and methodology sections.
+ */
+export const DANIELS_INTENSITY_EXPLANATIONS: Record<DanielsIntensity, DanielsIntensityExplanation> = {
+    E: {
+        title: 'Easy Pace',
+        abbreviation: 'E',
+        description: 'Relaxed, conversational running. The foundation of all training.',
+        why: 'Easy running builds your aerobic engine without accumulating significant stress. It allows you to recover from quality sessions while still improving your cardiovascular system.',
+        feel: 'Relaxed, comfortable. You should be able to speak in complete sentences.',
+        effortLevel: '59-74% VDOT',
+        coachTip: 'If you can\'t speak comfortably, slow down. The biggest mistake runners make is going too fast on easy days.',
+    },
+    M: {
+        title: 'Marathon Pace',
+        abbreviation: 'M',
+        description: 'Your goal marathon race pace. Used sparingly in training.',
+        why: 'M pace teaches your body and brain what marathon rhythm feels like. It builds confidence and race-specific economy.',
+        feel: 'Moderate, controlled. Faster than easy but definitely not hard.',
+        effortLevel: '75-84% VDOT',
+        coachTip: 'M pace is a frequent "gray zone trap." Too much weekly volume at M steals freshness for true quality sessions.',
+    },
+    T: {
+        title: 'Threshold Pace',
+        abbreviation: 'T',
+        description: '"Comfortably hard" - the pace you could sustain for about an hour.',
+        why: 'Threshold running improves your body\'s ability to clear lactate. It\'s the key to improving endurance and raising the pace you can sustain.',
+        feel: 'Strong but controlled. You can speak in short phrases, not full conversation.',
+        effortLevel: '83-88% VDOT',
+        coachTip: 'T pace should feel sustainable for 40-60 minutes if you had to. If you\'re suffering after 20 minutes, you\'re going too fast.',
+    },
+    I: {
+        title: 'Interval Pace',
+        abbreviation: 'I',
+        description: 'Hard intervals designed to improve aerobic power (VO2max).',
+        why: 'I pace training makes your body function at or near VO2max. It\'s the most direct way to improve your aerobic power.',
+        feel: 'Hard, focused. You can speak in single words, not phrases.',
+        effortLevel: '95-100% VDOT',
+        coachTip: 'If you can\'t hold I pace by rep 3, something is wrong: inflated VDOT, recovery too hard, or too fatigued to train.',
+    },
+    R: {
+        title: 'Repetition Pace',
+        abbreviation: 'R',
+        description: 'Fast, controlled running for speed and running economy.',
+        why: 'R pace develops leg speed, running mechanics, and economy at faster-than-race speeds. It\'s about quality of movement, not suffering.',
+        feel: 'Fast but controlled. Not all-out - you should maintain form.',
+        effortLevel: '105-110% VDOT',
+        coachTip: 'Full recovery between reps is essential. If recovery is too short, R becomes sloppy anaerobic work.',
+    },
+};
+
+/**
+ * Phase-specific coaching explanations for 4-phase plans.
+ */
+export const DANIELS_PHASE_EXPLANATIONS: Record<DanielsPhase, { title: string; description: string; focus: string }> = {
+    base: {
+        title: 'Phase I: Foundation',
+        description: 'Building your aerobic base.',
+        focus: 'Easy running, strides, and long runs. No quality sessions yet. We\'re building the foundation that will support everything else.',
+    },
+    repetition: {
+        title: 'Phase II: Repetition',
+        description: 'Developing speed and running economy.',
+        focus: 'R pace work teaches your body to run fast efficiently. 200s, 400s, and short fast repeats with full recovery.',
+    },
+    interval: {
+        title: 'Phase III: Interval',
+        description: 'Building aerobic power (VO2max).',
+        focus: 'I pace work is the core of this phase. Combined with threshold running, you\'re building the engine and the ability to sustain pace.',
+    },
+    competition: {
+        title: 'Phase IV: Competition',
+        description: 'Sharpening for race day.',
+        focus: 'The hay is in the barn. Reduced load, maintained intensity, races replace workouts. Arrive fresh and sharp.',
+    },
+};
+
+/**
+ * The VDOT explanation - a core Daniels concept.
+ */
+export const DANIELS_VDOT_EXPLANATION = {
+    title: 'VDOT: Your Personal Training Key',
+    summary: 'VDOT is your "effective VO2max" - a single number derived from race performance that determines all your training paces.',
+    details: [
+        'VDOT accounts for running economy, not just raw aerobic capacity',
+        'Two runners with the same lab VO2max can have different VDOTs',
+        'Use your most recent race (10K or longer preferred) to calculate VDOT',
+        'All five training paces (E, M, T, I, R) are derived from your VDOT',
+        'Adjust VDOT conservatively at the start of a training cycle',
+    ],
+    formula: 'VDOT = VO2(velocity) / f(time)',
+    source: 'Dr. Jack Daniels, "Daniels\' Running Formula"',
+};
+
+/**
+ * The 2Q structure explanation - signature Daniels concept for marathon.
+ */
+export const DANIELS_2Q_EXPLANATION = {
+    title: 'The 2Q Marathon Plan',
+    summary: 'Two quality workouts per week, with all other days as easy running. Simple structure, powerful results.',
+    structure: {
+        q1: 'Sunday long run with quality components (M, T, or mixed)',
+        q2: 'Midweek quality session (I, R, T combinations)',
+        easy: 'All other days are easy running - truly easy',
+    },
+    philosophy: [
+        'Quality over quantity - two well-executed sessions beat four mediocre ones',
+        'Easy days must be truly easy to support quality efforts',
+        'Long runs include race-specific elements (M pace, T segments)',
+        'Progressive VDOT adjustment through the training cycle',
+    ],
+    source: 'Dr. Jack Daniels, "Daniels\' Running Formula"',
+};

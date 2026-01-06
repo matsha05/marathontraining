@@ -65,23 +65,7 @@ export {
     getMovementsForPhase,
 } from './interference-matrix';
 
-// Ultra training engine
-export {
-    LONG_RUN_CAPS_HOURS,
-    WEEKEND_TOTAL_CAPS_HOURS,
-    getB2BConfig,
-    getB2BFrequency,
-    meetsB2BGates,
-    calculateB2BSplit,
-    getUphillMinutesTarget,
-    getWeeklyVertTarget,
-    getFuelingTargets,
-    getGutTrainingRamp,
-    getNightTrainingConfig,
-    getWalkingStrategy,
-    getUltraPhaseWeeks,
-    isDurationIncreaseAllowed,
-} from './ultra-engine';
+// NOTE: Ultra training engine removed (Jan 2026) - ultra distance no longer supported
 
 // Strength training engine
 export {

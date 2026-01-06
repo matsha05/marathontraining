@@ -225,7 +225,7 @@ export function createPlanFromOnboarding(
     const philosophy = onboardingData.trainingPhilosophy ?? 'higdon';
     const tierInput: TierSelectionInput = {
         philosophy: philosophy as 'higdon' | 'hansons' | 'pfitzinger' | 'daniels',
-        distance: inputResult.data.goalDistance as 'base' | '5k' | '10k' | 'half' | 'marathon' | 'ultra',
+        distance: inputResult.data.goalDistance as 'base' | '5k' | '10k' | 'half' | 'marathon',
         experience: mapExperience(onboardingData),
         currentMileage: mapCurrentMileage(onboardingData),
         daysPerWeek: inputResult.data.availableDays,
