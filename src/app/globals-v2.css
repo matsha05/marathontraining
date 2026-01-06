@@ -353,6 +353,18 @@
 .v2-btn-sm {
     padding: var(--v2-space-2) var(--v2-space-4);
     font-size: var(--v2-text-xs);
+    min-height: 2rem;
+    /* 32px on desktop */
+}
+
+/* Mobile: Ensure touch targets are at least 44px */
+@media (max-width: 768px) {
+    .v2-btn-sm {
+        min-height: 2.75rem;
+        /* 44px on mobile */
+        padding: var(--v2-space-3) var(--v2-space-4);
+        font-size: var(--v2-text-sm);
+    }
 }
 
 .v2-btn-lg {

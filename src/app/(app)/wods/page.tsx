@@ -148,11 +148,14 @@ export default function WodLibraryPage() {
     // Filter WODs
     let filteredWods = [...WOD_LIBRARY];
 
-    // Equipment filter
+    // Equipment filter - with defensive check for valid tier
+    const tierConfig = EQUIPMENT_TIERS[equipmentTier];
     if (equipmentTier === "bodyweight") {
-        filteredWods = filteredWods.filter(wod => wod.equipmentNeeded.length === 0);
-    } else if (equipmentTier !== "all") {
-        const availableEquipment = [...EQUIPMENT_TIERS[equipmentTier].equipment];
+        filteredWods = filteredWods.filter(wod =>
+            wod.equipmentNeeded && wod.equipmentNeeded.length === 0
+        );
+    } else if (equipmentTier !== "all" && tierConfig) {
+        const availableEquipment = [...tierConfig.equipment];
         filteredWods = filterByEquipment(filteredWods, availableEquipment);
     }
 
@@ -383,6 +386,8 @@ function WodCard({ wod, index, isFavorite, isExpanded, onToggleFavorite, onToggl
                         background: 'var(--v2-bg-hover)',
                         color: 'var(--v2-text-secondary)'
                     }}
+                    aria-expanded={isExpanded}
+                    aria-label={`${wod.name} scaling options - ${isExpanded ? 'collapse' : 'expand'}`}
                 >
                     {isExpanded ? 'Show Less ▲' : 'Show Scaling Options ▼'}
                 </button>

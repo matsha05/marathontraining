@@ -193,6 +193,8 @@ export default function PlansPage() {
                                             <button
                                                 onClick={() => setExpandedCoach(isExpanded ? null : coachId)}
                                                 className="w-full p-6 text-left flex items-start justify-between gap-4 transition-colors hover:bg-[var(--v2-bg-hover)]"
+                                                aria-expanded={isExpanded}
+                                                aria-label={`${coach?.name || coachId} training plans - ${isExpanded ? 'collapse' : 'expand'}`}
                                             >
                                                 <div>
                                                     <div className="flex items-center gap-3 mb-2">

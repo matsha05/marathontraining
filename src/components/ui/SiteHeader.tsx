@@ -77,7 +77,7 @@ export function SiteHeader({ isDark, onToggleTheme, hideAuth = false }: SiteHead
                     <nav className="hidden md:flex items-center gap-6">
                         <Link
                             href="/methodology"
-                            className="text-xs transition-colors"
+                            className="text-sm transition-colors"
                             style={{ color: 'var(--v2-text-muted)' }}
                             onMouseEnter={(e) => e.currentTarget.style.color = 'var(--v2-text-secondary)'}
                             onMouseLeave={(e) => e.currentTarget.style.color = 'var(--v2-text-muted)'}
@@ -86,7 +86,7 @@ export function SiteHeader({ isDark, onToggleTheme, hideAuth = false }: SiteHead
                         </Link>
                         <Link
                             href="/browse"
-                            className="text-xs transition-colors"
+                            className="text-sm transition-colors"
                             style={{ color: 'var(--v2-text-muted)' }}
                             onMouseEnter={(e) => e.currentTarget.style.color = 'var(--v2-text-secondary)'}
                             onMouseLeave={(e) => e.currentTarget.style.color = 'var(--v2-text-muted)'}
@@ -95,7 +95,7 @@ export function SiteHeader({ isDark, onToggleTheme, hideAuth = false }: SiteHead
                         </Link>
                         <Link
                             href="/philosophy"
-                            className="text-xs transition-colors"
+                            className="text-sm transition-colors"
                             style={{ color: 'var(--v2-text-muted)' }}
                             onMouseEnter={(e) => e.currentTarget.style.color = 'var(--v2-text-secondary)'}
                             onMouseLeave={(e) => e.currentTarget.style.color = 'var(--v2-text-muted)'}
@@ -131,7 +131,7 @@ export function SiteHeader({ isDark, onToggleTheme, hideAuth = false }: SiteHead
                                 <>
                                     <Link
                                         href="/auth"
-                                        className="text-xs transition-colors"
+                                        className="text-sm transition-colors"
                                         style={{ color: 'var(--v2-text-muted)' }}
                                         onMouseEnter={(e) => e.currentTarget.style.color = 'var(--v2-text-secondary)'}
                                         onMouseLeave={(e) => e.currentTarget.style.color = 'var(--v2-text-muted)'}
@@ -140,7 +140,7 @@ export function SiteHeader({ isDark, onToggleTheme, hideAuth = false }: SiteHead
                                     </Link>
                                     <Link
                                         href="/onboarding"
-                                        className="text-xs transition-colors"
+                                        className="text-sm transition-colors"
                                         style={{ color: 'white' }}
                                     >
                                         Get Started →

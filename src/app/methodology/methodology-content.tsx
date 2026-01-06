@@ -130,24 +130,30 @@ export function MethodologyContent() {
                         return (
                             <section
                                 key={coach.id}
-                                className="px-6 py-12 cursor-pointer transition-colors hover:bg-white/[0.02]"
+                                className="px-6 py-12"
                                 style={{ borderTop: '1px solid var(--v2-border)' }}
-                                onClick={() => setExpandedId(isExpanded ? null : coach.id)}
                             >
                                 <div className="max-w-3xl mx-auto">
-                                    <div className="flex items-start justify-between gap-4">
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-3 mb-3">
-                                                <div className="w-2 h-2 rounded-full" style={{ background: color }} />
-                                                <h3 className="text-xl font-light" style={{ color: 'var(--v2-text-primary)' }}>{coach.name}</h3>
-                                                <span className="text-xs uppercase tracking-wider" style={{ color: 'var(--v2-text-subtle)' }}>{coach.keyConceptShort}</span>
+                                    <button
+                                        onClick={() => setExpandedId(isExpanded ? null : coach.id)}
+                                        className="w-full text-left transition-colors hover:bg-white/[0.02] rounded-lg -mx-4 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--v2-accent)] focus:ring-offset-2 focus:ring-offset-[var(--v2-bg-deep)]"
+                                        aria-expanded={isExpanded}
+                                        aria-label={`${coach.name} methodology - ${isExpanded ? 'collapse' : 'expand'}`}
+                                    >
+                                        <div className="flex items-start justify-between gap-4">
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-3 mb-3">
+                                                    <div className="w-2 h-2 rounded-full" style={{ background: color }} />
+                                                    <h3 className="text-xl font-light" style={{ color: 'var(--v2-text-primary)' }}>{coach.name}</h3>
+                                                    <span className="text-xs uppercase tracking-wider" style={{ color: 'var(--v2-text-subtle)' }}>{coach.keyConceptShort}</span>
+                                                </div>
+                                                <p className="text-sm" style={{ color: 'var(--v2-text-tertiary)' }}>{coach.keyConceptFull}</p>
                                             </div>
-                                            <p className="text-sm" style={{ color: 'var(--v2-text-tertiary)' }}>{coach.keyConceptFull}</p>
+                                            <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} className="p-2 rounded-lg" style={{ background: 'var(--v2-bg-elevated)' }}>
+                                                <ChevronDown className="w-4 h-4" style={{ color: 'var(--v2-text-muted)' }} />
+                                            </motion.div>
                                         </div>
-                                        <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} className="p-2 rounded-lg" style={{ background: 'var(--v2-bg-elevated)' }}>
-                                            <ChevronDown className="w-4 h-4" style={{ color: 'var(--v2-text-muted)' }} />
-                                        </motion.div>
-                                    </div>
+                                    </button>
                                     <AnimatePresence>
                                         {isExpanded && (
                                             <motion.div

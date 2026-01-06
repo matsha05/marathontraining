@@ -323,10 +323,11 @@ export function getAvailableWodsForPhase(phase: TrainingPhase): WodWorkout[] {
 export function filterByEquipment(wods: WodWorkout[], available: string[]): WodWorkout[] {
     if (available.length === 0) {
         // No equipment = bodyweight only
-        return wods.filter(wod => wod.equipmentNeeded.length === 0);
+        return wods.filter(wod => !wod.equipmentNeeded || wod.equipmentNeeded.length === 0);
     }
 
     return wods.filter(wod =>
+        !wod.equipmentNeeded || wod.equipmentNeeded.length === 0 ||
         wod.equipmentNeeded.every(eq => available.includes(eq))
     );
 }

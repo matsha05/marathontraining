@@ -263,8 +263,9 @@ function AuthForm() {
 
                     <form onSubmit={handleSendOtp} className="space-y-4">
                         <div className="v2-form-group">
-                            <label className="v2-form-label">EMAIL</label>
+                            <label htmlFor="auth-email" className="v2-form-label">EMAIL</label>
                             <input
+                                id="auth-email"
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -274,6 +275,7 @@ function AuthForm() {
                                 className="v2-input"
                                 autoComplete="email"
                                 autoFocus
+                                aria-describedby={errorMessage ? "auth-error" : undefined}
                             />
                         </div>
 
@@ -304,13 +306,14 @@ function AuthForm() {
                                 onChange={(e) => handleOtpChange(index, e.target.value)}
                                 onKeyDown={(e) => handleOtpKeyDown(index, e)}
                                 disabled={loadingAction === 'verify'}
-                                className="w-10 h-12 text-center text-lg font-semibold rounded-lg transition-all"
+                                className="w-10 h-12 text-center text-lg font-semibold rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-[var(--v2-accent)]"
                                 style={{
                                     background: 'var(--v2-bg-elevated)',
                                     border: '1px solid var(--v2-border)',
                                     color: 'var(--v2-text-primary)',
                                 }}
                                 autoFocus={index === 0}
+                                aria-label={`Digit ${index + 1} of ${OTP_LENGTH}`}
                             />
                         ))}
                     </div>
@@ -357,7 +360,13 @@ function AuthForm() {
                 </p>
             )}
             {errorMessage && (
-                <p className="text-center v2-body-sm mt-2" style={{ color: 'var(--v2-error)' }}>
+                <p
+                    id="auth-error"
+                    className="text-center v2-body-sm mt-2"
+                    style={{ color: 'var(--v2-error)' }}
+                    role="alert"
+                    aria-live="polite"
+                >
                     {errorMessage}
                 </p>
             )}
