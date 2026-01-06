@@ -10,7 +10,7 @@
  * - Plan creation and refresh actions
  * - Automatic persistence sync (Supabase + localStorage)
  *
- * V2: Updated to use async Supabase repository
+ * V3: Uses shared AuthContext for auth state (no duplicate subscriptions)
  */
 
 import {
@@ -19,6 +19,7 @@ import {
     useState,
     useEffect,
     useCallback,
+    useRef,
     ReactNode,
 } from 'react';
 import { TrainingPlan, WeekPlan, DayPlan } from '@/domain/plan/types';
@@ -33,6 +34,7 @@ import {
     PlanServiceError,
 } from '@/domain/plan/service';
 import { OnboardingData } from '@/domain/onboarding/types';
+import { useAuth } from '@/domain/auth/context';
 
 // =============================================================================
 // CONTEXT STATE TYPES
@@ -123,41 +125,58 @@ export function PlanProvider({ children }: PlanProviderProps) {
     }, []);
 
     // ==========================================================================
-    // LOAD ON MOUNT
+    // AUTH-AWARE PLAN LOADING (Elite Pattern)
     // ==========================================================================
+    // 
+    // The simplest, most bulletproof approach:
+    // - Load ONCE when auth first becomes 'authenticated'
+    // - Clear on logout (and reset so next login loads again)
+    // - Never automatically reload - use refreshPlan() for that
+    //
+    // This avoids all race conditions and dependency array complexity.
+
+    const { status: authStatus } = useAuth();
+    const hasTriggeredLoad = useRef(false);
 
     useEffect(() => {
-        let cancelled = false;
+        // When authenticated for the first time, trigger load
+        if (authStatus === 'authenticated' && !hasTriggeredLoad.current) {
+            hasTriggeredLoad.current = true;
 
-        const loadPlanAsync = async () => {
-            setStatus('loading');
+            const doLoad = async () => {
+                setStatus('loading');
 
-            const result = await loadPlan();
+                const result = await loadPlan();
 
-            if (cancelled) return;
+                if (result.success && result.data) {
+                    setPlan(result.data);
+                    computeDerivedState(result.data);
+                    setStatus('ready');
+                } else if (result.success && !result.data) {
+                    setStatus('idle');
+                } else if (!result.success) {
+                    setError({
+                        code: result.error.code as PlanServiceError['code'],
+                        message: result.error.message,
+                    });
+                    setStatus('error');
+                }
+            };
 
-            if (result.success && result.data) {
-                setPlan(result.data);
-                computeDerivedState(result.data);
-                setStatus('ready');
-            } else if (result.success && !result.data) {
-                // No plan found
-                setStatus('idle');
-            } else if (!result.success) {
-                setError({
-                    code: result.error.code as PlanServiceError['code'],
-                    message: result.error.message,
-                });
-                setStatus('error');
-            }
-        };
+            doLoad();
+        }
 
-        loadPlanAsync();
+        // On logout, clear plan and reset the trigger
+        if (authStatus === 'unauthenticated') {
+            hasTriggeredLoad.current = false;
+            setPlan(null);
+            computeDerivedState(null);
+            setStatus('idle');
+        }
+    }, [authStatus, computeDerivedState]);
 
-        return () => {
-            cancelled = true;
-        };
-    }, [computeDerivedState]);
+
+
 
     // ==========================================================================
     // ACTIONS

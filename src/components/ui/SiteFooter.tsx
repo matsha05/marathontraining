@@ -6,7 +6,7 @@ import Link from 'next/link';
  * SiteFooter - Minimal, elegant footer for site-wide use
  * 
  * V3 Design System - Consistent with header styling
- * Single line, clean, Apple-tier minimalism
+ * Links match the Explore menu for consistency across the site
  */
 
 export function SiteFooter() {
@@ -27,8 +27,29 @@ export function SiteFooter() {
                         © {currentYear} The Long Game. All rights reserved.
                     </p>
 
-                    {/* Links */}
-                    <nav className="flex items-center gap-6">
+                    {/* Primary nav - matches Explore menu */}
+                    <nav className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
+                        <Link
+                            href="/wods"
+                            className="v3-body-xs transition-colors hover:opacity-70"
+                            style={{ color: 'var(--text-muted)' }}
+                        >
+                            WODs
+                        </Link>
+                        <Link
+                            href="/browse"
+                            className="v3-body-xs transition-colors hover:opacity-70"
+                            style={{ color: 'var(--text-muted)' }}
+                        >
+                            Training Plans
+                        </Link>
+                        <Link
+                            href="/durability"
+                            className="v3-body-xs transition-colors hover:opacity-70"
+                            style={{ color: 'var(--text-muted)' }}
+                        >
+                            Durability
+                        </Link>
                         <Link
                             href="/methodology"
                             className="v3-body-xs transition-colors hover:opacity-70"
@@ -36,17 +57,28 @@ export function SiteFooter() {
                         >
                             Methodology
                         </Link>
+                    </nav>
+
+                    {/* Legal links */}
+                    <nav className="flex items-center gap-4">
                         <Link
-                            href="/browse"
+                            href="/privacy"
                             className="v3-body-xs transition-colors hover:opacity-70"
-                            style={{ color: 'var(--text-muted)' }}
+                            style={{ color: 'var(--text-subtle)' }}
                         >
-                            Browse Plans
+                            Privacy
+                        </Link>
+                        <Link
+                            href="/terms"
+                            className="v3-body-xs transition-colors hover:opacity-70"
+                            style={{ color: 'var(--text-subtle)' }}
+                        >
+                            Terms
                         </Link>
                         <a
                             href="mailto:support@thelonggame.run"
                             className="v3-body-xs transition-colors hover:opacity-70"
-                            style={{ color: 'var(--text-muted)' }}
+                            style={{ color: 'var(--text-subtle)' }}
                         >
                             Contact
                         </a>

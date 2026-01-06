@@ -14,8 +14,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { AppHeader } from "@/components/ui/AppHeader";
-import { Footer } from "@/components/ui/Footer";
+import { SiteHeader as AppHeader } from "@/components/ui/SiteHeader";
 import { WOD_LIBRARY, filterByEquipment } from "@/domain/plan/wod-library";
 import { WodWorkout, WodType } from "@/domain/plan/types";
 import { createSupabaseBrowserClient } from "@/infrastructure/supabase";
@@ -289,8 +288,6 @@ export default function WodLibraryPage() {
                     </div>
                 )}
             </main>
-
-            <Footer />
         </div>
     );
 }
@@ -304,105 +301,169 @@ interface WodCardProps {
     onToggleExpand: () => void;
 }
 
+// Fatigue level colors and labels
+const FATIGUE_STYLES = {
+    green: { bg: 'var(--v3-green)', label: 'Low Impact', emoji: '🟢' },
+    yellow: { bg: 'var(--v3-yellow)', label: 'Moderate', emoji: '🟡' },
+    red: { bg: 'var(--v3-red)', label: 'High Impact', emoji: '🔴' },
+};
+
+// Phase restriction labels
+const PHASE_LABELS = {
+    base_only: { label: 'BASE Only', color: 'var(--v3-yellow)' },
+    taper_safe: { label: 'Taper Safe ✓', color: 'var(--v3-green)' },
+    all: { label: '', color: '' }, // No badge needed
+};
+
 function WodCard({ wod, index, isFavorite, isExpanded, onToggleFavorite, onToggleExpand }: WodCardProps) {
     const typeInfo = WOD_TYPE_LABELS[wod.type];
+    const fatigueInfo = FATIGUE_STYLES[wod.fatigueLevel || 'green'];
+    const phaseInfo = PHASE_LABELS[wod.phaseRestriction || 'all'];
+
+    // Equipment list - always show bodyweight as a badge too
+    const equipmentList = wod.equipmentNeeded.length === 0
+        ? ['bodyweight']
+        : wod.equipmentNeeded;
 
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 * index, duration: 0.4, ease }}
-            className="rounded-xl overflow-hidden"
+            className="rounded-xl overflow-hidden flex flex-col"
             style={{
                 background: 'var(--bg-elevated)',
-                border: '1px solid var(--border-base)'
+                border: '1px solid var(--border-base)',
+                borderLeft: `4px solid ${typeInfo.color}`,
+                minHeight: '280px', // Fixed minimum height for consistency
             }}
         >
             {/* Header */}
-            <div className="p-4">
-                <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                        <h3 className="text-sm font-medium mb-1">{wod.name}</h3>
-                        <div className="flex items-center gap-2">
-                            <span
-                                className="text-[10px] px-2 py-0.5 rounded-full font-medium"
-                                style={{
-                                    background: `${typeInfo.color}20`,
-                                    color: typeInfo.color
-                                }}
-                            >
-                                {typeInfo.label}
-                            </span>
-                            <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-                                {wod.timeDomain} min
-                            </span>
-                        </div>
-                    </div>
+            <div className="p-4 flex-1">
+                {/* Top row: Name + Favorite */}
+                <div className="flex items-start justify-between mb-2">
+                    <h3 className="text-sm font-medium leading-tight pr-2">{wod.name}</h3>
                     <button
                         onClick={onToggleFavorite}
-                        className="text-xl hover:scale-110 transition-transform"
+                        className="text-xl hover:scale-110 transition-transform shrink-0"
                         style={{ color: isFavorite ? 'var(--v3-yellow)' : 'var(--text-muted)' }}
+                        aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                     >
                         {isFavorite ? '★' : '☆'}
                     </button>
                 </div>
+
+                {/* Badges row: Type, Duration, Fatigue, Phase */}
+                <div className="flex flex-wrap items-center gap-1.5 mb-3">
+                    {/* Type badge */}
+                    <span
+                        className="text-[10px] px-2 py-0.5 rounded-full font-medium"
+                        style={{
+                            background: `${typeInfo.color}20`,
+                            color: typeInfo.color
+                        }}
+                    >
+                        {typeInfo.label}
+                    </span>
+
+                    {/* Duration */}
+                    <span
+                        className="text-[10px] px-2 py-0.5 rounded-full"
+                        style={{ background: 'var(--bg-muted)', color: 'var(--text-muted)' }}
+                    >
+                        {wod.timeDomain} min
+                    </span>
+
+                    {/* Fatigue indicator */}
+                    <span
+                        className="text-[10px] px-2 py-0.5 rounded-full"
+                        style={{
+                            background: `${fatigueInfo.bg}15`,
+                            color: fatigueInfo.bg
+                        }}
+                        title={`${fatigueInfo.label} - Run interference level`}
+                    >
+                        {fatigueInfo.emoji} {fatigueInfo.label}
+                    </span>
+
+                    {/* Phase restriction (if applicable) */}
+                    {phaseInfo.label && (
+                        <span
+                            className="text-[10px] px-2 py-0.5 rounded-full font-medium"
+                            style={{
+                                background: `${phaseInfo.color}20`,
+                                color: phaseInfo.color
+                            }}
+                        >
+                            {phaseInfo.label}
+                        </span>
+                    )}
+                </div>
+
+                {/* Focus - what this workout develops */}
+                {wod.focus && (
+                    <p className="text-xs mb-2" style={{ color: 'var(--color-accent)' }}>
+                        {wod.focus}
+                    </p>
+                )}
 
                 {/* Format */}
                 <p className="text-xs font-mono mb-3" style={{ color: 'var(--text-muted)' }}>
                     {wod.format}
                 </p>
 
-                {/* Movements preview */}
-                <div className="space-y-1 mb-3">
-                    {wod.movements.slice(0, 3).map((movement, i) => (
-                        <p key={i} className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                {/* Movements preview - show up to 4 */}
+                <div className="space-y-0.5 mb-3">
+                    {wod.movements.slice(0, 4).map((movement, i) => (
+                        <p key={i} className="text-[11px]" style={{ color: 'var(--text-muted)' }}>
                             • {movement.name}: {movement.reps}
                         </p>
                     ))}
-                    {wod.movements.length > 3 && (
-                        <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                            +{wod.movements.length - 3} more...
+                    {wod.movements.length > 4 && (
+                        <p className="text-[11px]" style={{ color: 'var(--text-subtle)' }}>
+                            +{wod.movements.length - 4} more movements
                         </p>
                     )}
                 </div>
 
-                {/* Equipment */}
-                {wod.equipmentNeeded.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-3">
-                        {wod.equipmentNeeded.map(eq => (
-                            <span
-                                key={eq}
-                                className="text-[10px] px-2 py-0.5 rounded"
-                                style={{ background: 'var(--bg-muted)', color: 'var(--text-muted)' }}
-                            >
-                                {eq.replace(/_/g, ' ')}
-                            </span>
-                        ))}
-                    </div>
-                )}
-                {wod.equipmentNeeded.length === 0 && (
-                    <span
-                        className="text-[10px] px-2 py-0.5 rounded inline-block mb-3"
-                        style={{ background: 'var(--v3-green)20', color: 'var(--v3-green)' }}
-                    >
-                        Bodyweight
-                    </span>
-                )}
+                {/* Equipment badges */}
+                <div className="flex flex-wrap gap-1 mb-3">
+                    {equipmentList.map(eq => (
+                        <span
+                            key={eq}
+                            className="text-[9px] px-1.5 py-0.5 rounded"
+                            style={{
+                                background: eq === 'bodyweight' ? 'var(--v3-green)20' : 'var(--bg-muted)',
+                                color: eq === 'bodyweight' ? 'var(--v3-green)' : 'var(--text-muted)'
+                            }}
+                        >
+                            {eq.replace(/_/g, ' ')}
+                        </span>
+                    ))}
+                </div>
 
-                {/* Expand button */}
-                <button
-                    onClick={onToggleExpand}
-                    className="text-xs w-full py-2 rounded-lg transition-colors"
-                    style={{
-                        background: 'var(--bg-muted)',
-                        color: 'var(--text-muted)'
-                    }}
-                    aria-expanded={isExpanded}
-                    aria-label={`${wod.name} scaling options - ${isExpanded ? 'collapse' : 'expand'}`}
-                >
-                    {isExpanded ? 'Show Less ▲' : 'Show Scaling Options ▼'}
-                </button>
+                {/* Run protection info */}
+                {wod.runProtectionHours && (
+                    <p className="text-[10px] mb-2" style={{ color: 'var(--text-subtle)' }}>
+                        ⏱ Safe {wod.runProtectionHours}h+ before quality runs
+                    </p>
+                )}
             </div>
+
+            {/* Expand button - always at bottom */}
+            <button
+                onClick={onToggleExpand}
+                className="text-xs w-full py-2.5 transition-colors border-t"
+                style={{
+                    background: 'var(--bg-muted)',
+                    color: 'var(--text-muted)',
+                    borderColor: 'var(--border-base)'
+                }}
+                aria-expanded={isExpanded}
+                aria-label={`${wod.name} details - ${isExpanded ? 'collapse' : 'expand'}`}
+            >
+                {isExpanded ? 'Hide Details ▲' : 'Show Details ▼'}
+            </button>
 
             {/* Expanded content */}
             {isExpanded && (
@@ -411,54 +472,61 @@ function WodCard({ wod, index, isFavorite, isExpanded, onToggleFavorite, onToggl
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
                     className="px-4 pb-4"
-                    style={{ borderTop: '1px solid var(--border-base)' }}
+                    style={{ borderTop: '1px solid var(--border-base)', background: 'var(--bg-base)' }}
                 >
-                    <div className="pt-4 space-y-3">
-                        {/* Full movements */}
+                    <div className="pt-4 space-y-4">
+                        {/* Full movements list */}
                         <div>
-                            <h4 className="text-xs font-medium mb-2" style={{ color: 'var(--text-muted)' }}>
-                                All Movements
+                            <h4 className="text-xs font-medium mb-2" style={{ color: 'var(--text-base)' }}>
+                                Complete Workout
                             </h4>
-                            {wod.movements.map((movement, i) => (
-                                <p key={i} className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>
-                                    • {movement.name}: {movement.reps}
-                                    {movement.notes && <span style={{ color: 'var(--text-muted)' }}> ({movement.notes})</span>}
-                                </p>
-                            ))}
+                            <div className="space-y-1">
+                                {wod.movements.map((movement, i) => (
+                                    <div key={i} className="flex justify-between text-xs">
+                                        <span style={{ color: 'var(--text-base)' }}>
+                                            {movement.name}
+                                        </span>
+                                        <span style={{ color: 'var(--text-muted)' }}>
+                                            {movement.reps}
+                                            {movement.notes && ` (${movement.notes})`}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
 
                         {/* Scaling options */}
                         {wod.scalingOptions && (
-                            <div className="space-y-2">
-                                <h4 className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>
-                                    Scaling Options
+                            <div>
+                                <h4 className="text-xs font-medium mb-2" style={{ color: 'var(--text-base)' }}>
+                                    Scaling Tiers
                                 </h4>
-                                <div className="rounded-lg p-3" style={{ background: 'var(--bg-base)' }}>
-                                    <p className="text-xs mb-1">
-                                        <span className="font-medium" style={{ color: 'var(--color-accent)' }}>Rx: </span>
-                                        <span style={{ color: 'var(--text-muted)' }}>{wod.scalingOptions.rx}</span>
-                                    </p>
-                                    <p className="text-xs mb-1">
-                                        <span className="font-medium" style={{ color: 'var(--v3-yellow)' }}>Scaled: </span>
-                                        <span style={{ color: 'var(--text-muted)' }}>{wod.scalingOptions.scaled}</span>
-                                    </p>
-                                    <p className="text-xs">
-                                        <span className="font-medium" style={{ color: 'var(--v3-green)' }}>Beginner: </span>
-                                        <span style={{ color: 'var(--text-muted)' }}>{wod.scalingOptions.beginner}</span>
-                                    </p>
+                                <div className="space-y-2">
+                                    <div className="rounded-lg p-2.5" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--color-accent)30' }}>
+                                        <span className="text-[10px] font-semibold" style={{ color: 'var(--color-accent)' }}>Rx</span>
+                                        <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{wod.scalingOptions.rx}</p>
+                                    </div>
+                                    <div className="rounded-lg p-2.5" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--v3-yellow)30' }}>
+                                        <span className="text-[10px] font-semibold" style={{ color: 'var(--v3-yellow)' }}>Scaled</span>
+                                        <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{wod.scalingOptions.scaled}</p>
+                                    </div>
+                                    <div className="rounded-lg p-2.5" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--v3-green)30' }}>
+                                        <span className="text-[10px] font-semibold" style={{ color: 'var(--v3-green)' }}>Beginner</span>
+                                        <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{wod.scalingOptions.beginner}</p>
+                                    </div>
                                 </div>
                             </div>
                         )}
 
-                        {/* Notes */}
+                        {/* Coach notes */}
                         {wod.notes && wod.notes.length > 0 && (
-                            <div>
-                                <h4 className="text-xs font-medium mb-1" style={{ color: 'var(--text-muted)' }}>
+                            <div className="rounded-lg p-3" style={{ background: 'var(--bg-elevated)', borderLeft: '3px solid var(--color-accent)' }}>
+                                <h4 className="text-[10px] font-medium mb-1" style={{ color: 'var(--color-accent)' }}>
                                     Coach Notes
                                 </h4>
                                 {wod.notes.map((note, i) => (
-                                    <p key={i} className="text-xs italic" style={{ color: 'var(--text-muted)' }}>
-                                        "{note}"
+                                    <p key={i} className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                                        {note}
                                     </p>
                                 ))}
                             </div>

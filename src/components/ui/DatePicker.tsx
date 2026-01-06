@@ -13,6 +13,16 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 
+/**
+ * Parse a YYYY-MM-DD string as LOCAL time (not UTC).
+ * This avoids the timezone bug where "2026-05-25" becomes May 24th
+ * in timezones behind UTC.
+ */
+function parseDateLocal(dateString: string): Date {
+    const [year, month, day] = dateString.split('-').map(Number);
+    return new Date(year, month - 1, day);
+}
+
 interface DatePickerProps {
     value: string; // YYYY-MM-DD format
     onChange: (date: string) => void;
@@ -37,8 +47,8 @@ export function DatePicker({
 }: DatePickerProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [viewDate, setViewDate] = useState(() => {
-        if (value) return new Date(value);
-        if (minDate) return new Date(minDate);
+        if (value) return parseDateLocal(value);
+        if (minDate) return parseDateLocal(minDate);
         return new Date();
     });
     const containerRef = useRef<HTMLDivElement>(null);
@@ -67,7 +77,7 @@ export function DatePicker({
         }
     }, [isOpen]);
 
-    const minDateObj = minDate ? new Date(minDate) : null;
+    const minDateObj = minDate ? parseDateLocal(minDate) : null;
 
     const goToPrevMonth = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -113,7 +123,7 @@ export function DatePicker({
 
         // Current month days
         const today = new Date();
-        const selectedDate = value ? new Date(value) : null;
+        const selectedDate = value ? parseDateLocal(value) : null;
 
         for (let day = 1; day <= daysInMonth; day++) {
             const date = new Date(year, month, day);
@@ -147,9 +157,9 @@ export function DatePicker({
         return days;
     };
 
-    // Format display value
+    // Format display value - parse as local to avoid timezone shift
     const displayValue = value
-        ? new Date(value).toLocaleDateString('en-US', {
+        ? parseDateLocal(value).toLocaleDateString('en-US', {
             month: 'short',
             day: 'numeric',
             year: 'numeric',

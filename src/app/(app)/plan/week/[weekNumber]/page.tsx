@@ -6,8 +6,7 @@ import Link from 'next/link';
 import { usePlan } from '@/domain/plan/context';
 import { formatPace, getDayName } from '@/lib/format';
 import { CheckIcon } from '@/components/ui/check';
-import { AppHeader } from '@/components/ui/AppHeader';
-import { Footer } from '@/components/ui/Footer';
+import { AppHeader } from '@/components/ui/SiteHeader';
 import { motion } from 'framer-motion';
 
 /**
@@ -312,8 +311,6 @@ export default function WeekDetailPage() {
                     ) : <div />}
                 </motion.div>
             </main>
-
-            <Footer variant="app" />
         </div>
     );
 }

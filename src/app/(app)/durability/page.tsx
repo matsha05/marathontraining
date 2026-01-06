@@ -41,7 +41,7 @@ import {
     ChevronDown,
     ChevronUp,
 } from 'lucide-react';
-import { AppHeader } from '@/components/ui/AppHeader';
+import { AppHeader } from '@/components/ui/SiteHeader';
 import {
     PrescriptionModuleCard,
     PrescriptionSummaryHeader,
@@ -178,11 +178,11 @@ export default function DurabilityPage() {
                                 </p>
                             </div>
 
-                            {/* Mode selection */}
+                            {/* Mode selection - equal height cards with buttons at bottom */}
                             <div className="grid gap-4 md:grid-cols-2">
                                 <button
                                     onClick={() => setMode('quick')}
-                                    className="v3-card p-6 text-left hover:border-[var(--color-accent)] transition-colors"
+                                    className="v3-card p-6 text-left hover:border-[var(--color-accent)] transition-colors flex flex-col h-full"
                                 >
                                     <div className="flex items-center gap-3 mb-3">
                                         <Zap size={28} className="text-[var(--color-accent)]" />
@@ -191,19 +191,19 @@ export default function DurabilityPage() {
                                     <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>
                                         Daily readiness scan. 3 key tests in ~2 minutes.
                                     </p>
-                                    <ul className="text-xs space-y-1" style={{ color: 'var(--text-subtle)' }}>
+                                    <ul className="text-xs space-y-1 flex-1" style={{ color: 'var(--text-subtle)' }}>
                                         <li>• Toe Yoga (foot control)</li>
                                         <li>• Single Leg Balance</li>
                                         <li>• Squat Shape</li>
                                     </ul>
-                                    <div className="mt-4 v3-btn v3-btn-primary w-full">
+                                    <div className="mt-auto pt-4 v3-btn v3-btn-primary w-full">
                                         Start Quick Check
                                     </div>
                                 </button>
 
                                 <button
                                     onClick={() => setMode('full')}
-                                    className="v3-card p-6 text-left hover:border-[var(--color-accent)] transition-colors"
+                                    className="v3-card p-6 text-left hover:border-[var(--color-accent)] transition-colors flex flex-col h-full"
                                 >
                                     <div className="flex items-center gap-3 mb-3">
                                         <ClipboardList size={28} className="text-[var(--color-accent)]" />
@@ -212,26 +212,43 @@ export default function DurabilityPage() {
                                     <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>
                                         Complete durability screen. 12 tests in ~10 minutes.
                                     </p>
-                                    <ul className="text-xs space-y-1" style={{ color: 'var(--text-subtle)' }}>
+                                    <ul className="text-xs space-y-1 flex-1" style={{ color: 'var(--text-subtle)' }}>
                                         <li>• Foot, ankle, hip, spine</li>
                                         <li>• Strength & mobility gates</li>
                                         <li>• Personalized prescription</li>
                                     </ul>
-                                    <div className="mt-4 v3-btn v3-btn-secondary w-full">
+                                    <div className="mt-auto pt-4 v3-btn v3-btn-secondary w-full">
                                         Start Full Assessment
                                     </div>
                                 </button>
                             </div>
 
-                            {/* Philosophy note */}
-                            <div className="v3-card p-5" style={{ borderColor: 'var(--color-accent-subtle)' }}>
-                                <p className="text-xs uppercase tracking-widest mb-2" style={{ color: 'var(--color-accent)' }}>
-                                    THE DICHARRY PRINCIPLE
-                                </p>
-                                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                                    "Running injuries are often a skill and control problem, not just a mobility problem.
-                                    If you can't hit baseline positions cleanly, your body compensates under load."
-                                </p>
+                            {/* Philosophy notes - both coaches */}
+                            <div className="grid gap-4 md:grid-cols-2 mt-2">
+                                <div className="v3-card p-5 flex flex-col" style={{ borderLeft: '3px solid var(--color-coach-dicharry)' }}>
+                                    <p className="text-xs uppercase tracking-widest mb-3" style={{ color: 'var(--color-coach-dicharry)' }}>
+                                        JAY DICHARRY
+                                    </p>
+                                    <p className="text-sm italic flex-1" style={{ color: 'var(--text-muted)' }}>
+                                        "Running injuries are often a skill and control problem, not just a mobility problem.
+                                        If you can't hit baseline positions cleanly, your body compensates under load."
+                                    </p>
+                                    <p className="text-xs mt-3" style={{ color: 'var(--text-subtle)' }}>
+                                        — Running Rewired
+                                    </p>
+                                </div>
+                                <div className="v3-card p-5 flex flex-col" style={{ borderLeft: '3px solid var(--color-coach-starrett)' }}>
+                                    <p className="text-xs uppercase tracking-widest mb-3" style={{ color: 'var(--color-coach-starrett)' }}>
+                                        KELLY STARRETT
+                                    </p>
+                                    <p className="text-sm italic flex-1" style={{ color: 'var(--text-muted)' }}>
+                                        "If you want to be a lifelong runner, you need to be able to pass these basic standards.
+                                        They're not advanced—they're the minimum."
+                                    </p>
+                                    <p className="text-xs mt-3" style={{ color: 'var(--text-subtle)' }}>
+                                        — Ready to Run
+                                    </p>
+                                </div>
                             </div>
                         </motion.div>
                     )}

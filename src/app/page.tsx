@@ -12,8 +12,8 @@ import { colors } from "@/lib/design-tokens";
  * THE LONG GAME - Landing Page
  * 
  * V3 Design System - Uses centralized design-tokens.ts
- * Anti-marketing ethos: middleware redirects logged-in users to dashboard.
- * This page only renders for unauthenticated visitors.
+ * Logged-in users stay here but see "Dashboard" in the header nav.
+ * No forced redirects - better UX to let users choose their path.
  */
 
 // Animation ease curve - typed for Framer Motion

@@ -35,7 +35,7 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
     useKeyboardNavigation({ onEnter: onContinue });
 
     return (
-        <div className="v2-root min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden"
+        <div className="v3-root min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden"
             style={{ background: 'var(--bg-base)' }}>
             {/* Subtle radial glow behind content */}
             <div
@@ -136,7 +136,7 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
                 >
                     <button
                         onClick={onContinue}
-                        className="v2-btn v2-btn-primary v2-btn-lg px-12"
+                        className="v3-btn v3-btn-primary v3-btn-lg px-12"
                     >
                         Let's Go
                     </button>
@@ -147,7 +147,7 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1.2, duration: 0.5 }}
-                    className="v2-mono mt-8"
+                    className="v3-mono mt-8"
                     style={{ fontSize: '11px', color: 'var(--text-subtle)' }}
                 >
                     Takes about 3 minutes
@@ -196,27 +196,27 @@ export function MileGateScreen({ value, onChange, onContinue, onBack }: MileGate
                 />
 
                 <div className="space-y-6 text-center">
-                    <p className="v2-body-md" style={{ color: 'var(--text-muted)' }}>
+                    <p className="v3-body-md" style={{ color: 'var(--text-muted)' }}>
                         Our training plans assume you can run continuously.
                         The Couch to 5K program is perfect for building up to that point.
                     </p>
 
-                    <div className="v2-card p-6 text-left" style={{ borderColor: 'var(--border-base)' }}>
-                        <p className="v2-label mb-2">Recommended: Couch to 5K (C25K)</p>
-                        <p className="v2-body-sm mb-4" style={{ color: 'var(--text-muted)' }}>
+                    <div className="v3-card p-6 text-left" style={{ borderColor: 'var(--border-base)' }}>
+                        <p className="v3-label mb-2">Recommended: Couch to 5K (C25K)</p>
+                        <p className="v3-body-sm mb-4" style={{ color: 'var(--text-muted)' }}>
                             A proven 9-week walk/run program that gradually builds you up to running 3 miles without stopping.
                         </p>
                         <a
                             href="https://c25k.com/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="v2-btn v2-btn-primary"
+                            className="v3-btn v3-btn-primary"
                         >
                             Start C25K Program
                         </a>
                     </div>
 
-                    <p className="v2-body-sm" style={{ color: 'var(--text-subtle)' }}>
+                    <p className="v3-body-sm" style={{ color: 'var(--text-subtle)' }}>
                         Once you can run 1 mile, come back and we'll build your training plan!
                     </p>
                 </div>
@@ -335,7 +335,7 @@ export function DemographicsScreen({
             <div className="space-y-6">
                 {/* Age */}
                 <div>
-                    <label className="v2-label block mb-2">Age</label>
+                    <label className="v3-label block mb-2">Age</label>
                     <TextInput
                         type="number"
                         value={data.age?.toString() ?? ''}
@@ -348,7 +348,7 @@ export function DemographicsScreen({
 
                 {/* Sex */}
                 <div>
-                    <label className="v2-label block mb-2">Biological sex</label>
+                    <label className="v3-label block mb-2">Biological sex</label>
                     <OptionGrid columns={2}>
                         <OptionButton
                             label="Male"

@@ -34,6 +34,15 @@ export const WOD_LIBRARY: WodWorkout[] = [
         ],
         equipmentNeeded: ['sled', 'ski_erg', 'dumbbells'],
         notes: ['Goal: steady breathing, no leg burn', 'Low impact, low eccentric'],
+        fatigueLevel: 'green',
+        phaseRestriction: 'all',
+        runProtectionHours: 12,
+        focus: 'Aerobic capacity + core stability',
+        scalingOptions: {
+            rx: '6 rounds: 30m sled, 250m ski, 40m carry',
+            scaled: '6 rounds: 20m sled, 200m ski, 30m carry, 75s rest',
+            beginner: '6 rounds: 15m sled, 150m ski, 20m carry, 90s rest',
+        },
     },
     {
         id: 'zone2-mixed-modal',
@@ -49,6 +58,15 @@ export const WOD_LIBRARY: WodWorkout[] = [
         ],
         equipmentNeeded: ['bike_erg', 'rings', 'kettlebell'],
         notes: ['Never sprint. Stay conversational.'],
+        fatigueLevel: 'green',
+        phaseRestriction: 'all',
+        runProtectionHours: 8,
+        focus: 'Zone 2 engine + upper body endurance',
+        scalingOptions: {
+            rx: 'AMRAP 30: 12 cal, 12 ring rows, 12 push-ups, 50m carry',
+            scaled: 'AMRAP 30: 10 cal, 10 reps, 40m carry',
+            beginner: 'AMRAP 20-25: 8 cal, 8-10 reps, 30m carry',
+        },
     },
     {
         id: 'emom30-engine',
@@ -63,6 +81,15 @@ export const WOD_LIBRARY: WodWorkout[] = [
         ],
         equipmentNeeded: ['rower', 'kettlebell'],
         notes: ['This should feel like aerobic work, not a metcon death spiral'],
+        fatigueLevel: 'green',
+        phaseRestriction: 'all',
+        runProtectionHours: 12,
+        focus: 'Aerobic base + posterior chain + core',
+        scalingOptions: {
+            rx: 'EMOM 30: 12 cal row, 12 KB swings, 45s plank',
+            scaled: 'EMOM 30: 10 cal, 10 swings, 40s plank',
+            beginner: 'EMOM 24: 200m row, KB deadlift 10, 30s plank',
+        },
     },
     {
         id: 'carry-density',
@@ -76,6 +103,15 @@ export const WOD_LIBRARY: WodWorkout[] = [
         ],
         equipmentNeeded: ['dumbbells', 'kettlebells'],
         notes: ['Go heavy enough that grip is challenged, but posture stays perfect'],
+        fatigueLevel: 'green',
+        phaseRestriction: 'all',
+        runProtectionHours: 12,
+        focus: 'Grip strength + trunk stability + work capacity',
+        scalingOptions: {
+            rx: 'E5MOM x5: 200m farmer carry',
+            scaled: 'E5MOM x5: 150m carry',
+            beginner: 'E5MOM x5: 100m or 1:30 carry',
+        },
     },
     {
         id: 'upper-metcon-engine',
@@ -91,6 +127,15 @@ export const WOD_LIBRARY: WodWorkout[] = [
         ],
         equipmentNeeded: ['ski_erg', 'pull_up_bar'],
         notes: ['Keep ski pace controlled so limiter is upper-body stamina, not legs'],
+        fatigueLevel: 'green',
+        phaseRestriction: 'all',
+        runProtectionHours: 6,
+        focus: 'Upper body engine + trunk stability',
+        scalingOptions: {
+            rx: 'AMRAP 18: 10 cal ski, 6-10 strict pull-ups, 10-15 HRPU, 30s hollow',
+            scaled: 'AMRAP 18: 8 cal, banded pull-ups 6-10, 8-12 HRPU, 20s hollow',
+            beginner: 'AMRAP 15: 6 cal bike, ring rows 8-10, incline push-ups 8-10, dead bug 20',
+        },
     },
 
     // -------------------------------------------------------------------------
@@ -110,6 +155,15 @@ export const WOD_LIBRARY: WodWorkout[] = [
         ],
         equipmentNeeded: ['bike_erg', 'dumbbells', 'pull_up_bar'],
         notes: ['Upper work is done during the 2:00 easy or immediately after each block'],
+        fatigueLevel: 'green',
+        phaseRestriction: 'all',
+        runProtectionHours: 24,
+        focus: 'Lactate threshold + upper body accessory',
+        scalingOptions: {
+            rx: '3 sets: 8:00 bike @RPE 7-8, 6-10 strict pull-ups, 8-12 DB press',
+            scaled: '3 sets: 6:00 bike, banded pull-ups 6-10, lighter press',
+            beginner: '3 sets: 5:00 bike @RPE 6-7, ring rows 10, seated DB press 10',
+        },
     },
     {
         id: 'row-vo2',
@@ -123,6 +177,15 @@ export const WOD_LIBRARY: WodWorkout[] = [
         ],
         equipmentNeeded: ['rower'],
         notes: ['Optional: add 6 strict pull-ups after each hard rep if you stay composed'],
+        fatigueLevel: 'green',
+        phaseRestriction: 'all',
+        runProtectionHours: 24,
+        focus: 'VO2 max development on low-impact machine',
+        scalingOptions: {
+            rx: '6 rounds: 2:00 hard, 2:00 easy',
+            scaled: '6 rounds: 1:30 hard, 2:00 easy',
+            beginner: '6 rounds: 1:00 strong, 2:00 easy',
+        },
     },
     {
         id: 'sled-controlled',
@@ -136,6 +199,15 @@ export const WOD_LIBRARY: WodWorkout[] = [
         ],
         equipmentNeeded: ['sled'],
         notes: ['Hard but not sloppy. No grinding to failure.', 'Excellent in build phase when you want intensity without impact'],
+        fatigueLevel: 'green',
+        phaseRestriction: 'all',
+        runProtectionHours: 12,
+        focus: 'Concentric-only leg power + threshold capacity',
+        scalingOptions: {
+            rx: '6 rounds: 45s hard, 75s rest',
+            scaled: '6 rounds: 40s hard, 80s rest',
+            beginner: '6 rounds: 30s moderate, 90s rest',
+        },
     },
 
     // -------------------------------------------------------------------------
@@ -153,6 +225,15 @@ export const WOD_LIBRARY: WodWorkout[] = [
         ],
         equipmentNeeded: ['bike_erg'],
         notes: ['Stop if power drops noticeably', 'This should not create soreness'],
+        fatigueLevel: 'green',
+        phaseRestriction: 'all',
+        runProtectionHours: 12,
+        focus: 'Neuromuscular power + fast-twitch recruitment',
+        scalingOptions: {
+            rx: '10 rounds: 12s all-out, 1:48 easy',
+            scaled: '10 rounds: 10s hard, 1:50 easy',
+            beginner: '8 rounds: 8s hard, 1:52 easy',
+        },
     },
 
     // -------------------------------------------------------------------------
@@ -171,6 +252,15 @@ export const WOD_LIBRARY: WodWorkout[] = [
         ],
         equipmentNeeded: ['trap_bar', 'dumbbells', 'bike_erg'],
         notes: ['Peak phase: reduce to 2x3 deadlift and skip accessories if needed'],
+        fatigueLevel: 'yellow',
+        phaseRestriction: 'all',
+        runProtectionHours: 24,
+        focus: 'Strength maintenance + posterior chain + upper push',
+        scalingOptions: {
+            rx: '4x3 trap bar DL @RPE 7-8, 3x6 DB bench, 10min flush',
+            scaled: '3x3 DL @RPE 6-7, 3x6 bench, 8min flush',
+            beginner: '3x5 KB DL, 3x8 incline DB press, 6min flush',
+        },
     },
     {
         id: 'primer-neural',
@@ -185,10 +275,14 @@ export const WOD_LIBRARY: WodWorkout[] = [
         ],
         equipmentNeeded: ['barbell', 'pull_up_bar', 'rower'],
         notes: ['No soreness allowed. Stop well short of fatigue.'],
+        fatigueLevel: 'green',
+        phaseRestriction: 'taper_safe',
+        runProtectionHours: 18,
+        focus: 'Neural priming + power maintenance (low DOMS risk)',
         scalingOptions: {
-            rx: 'As written',
-            scaled: '4 x 3 front squat, strict pull-up (unweighted)',
-            beginner: 'Goblet squat 4 x 5, ring row 4 x 8',
+            rx: '5x2 front squat, 4x4 weighted pull-up, 6min flush',
+            scaled: '4x3 front squat, strict pull-ups (unweighted)',
+            beginner: '4x5 goblet squat, ring rows 4x8',
         },
     },
 
@@ -210,10 +304,14 @@ export const WOD_LIBRARY: WodWorkout[] = [
         ],
         equipmentNeeded: [],
         notes: ['Bodyweight only', 'Scale burpees to step-back if protecting running'],
+        fatigueLevel: 'yellow',
+        phaseRestriction: 'base_only',
+        runProtectionHours: 48,
+        focus: 'Full-body conditioning (higher DOMS risk for legs)',
         scalingOptions: {
-            rx: 'As written',
-            scaled: '30/25/20/15/8',
-            beginner: '20/15/10/8/5 + half burpees',
+            rx: '50-40-30-20-10 for time',
+            scaled: '30-25-20-15-8',
+            beginner: '20-15-10-8-5 + step-back burpees',
         },
     },
     {
@@ -231,6 +329,15 @@ export const WOD_LIBRARY: WodWorkout[] = [
         ],
         equipmentNeeded: ['jump_rope'],
         notes: ['If no jump rope, substitute 30 Jumping Jacks per set'],
+        fatigueLevel: 'green',
+        phaseRestriction: 'all',
+        runProtectionHours: 24,
+        focus: 'Footwork + core stability + aerobic base',
+        scalingOptions: {
+            rx: 'AMRAP 20: 50 singles, 15 V-ups, 20 hollow rocks, 50 singles, 45s plank',
+            scaled: 'AMRAP 20: 30 singles, 10 V-ups, 15 rocks, 30 singles, 30s plank',
+            beginner: 'AMRAP 15: 20 singles or jumping jacks, dead bug 10, 20s plank',
+        },
     },
 ];
 

@@ -205,6 +205,11 @@ export interface WodWorkout {
         scaled: string;
         beginner: string;
     };
+    // Rich metadata from research (17-wod-engine-master.md)
+    fatigueLevel?: 'green' | 'yellow' | 'red'; // Run interference level
+    phaseRestriction?: 'base_only' | 'taper_safe' | 'all'; // When this WOD is appropriate
+    runProtectionHours?: number; // Min hours before quality/long run
+    focus?: string; // What this workout develops
 }
 
 export interface WodMovement {

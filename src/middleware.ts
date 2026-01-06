@@ -46,10 +46,10 @@ export async function middleware(request: NextRequest) {
     const isAuthRoute = pathname === '/auth' || pathname === '/login' || pathname === '/signup';
     const isLandingPage = pathname === '/';
 
-    // Anti-marketing: Logged-in users hitting landing → go straight to dashboard
-    if (user && isLandingPage) {
-        return NextResponse.redirect(new URL('/dashboard', request.url));
-    }
+    // Landing page: Let logged-in users stay on landing
+    // They will see the "Dashboard" nav link in header
+    // No forced redirect - better UX to let them choose
+    // (Previously: auto-redirect to /dashboard, which caused redirect loops)
 
     // Protected routes: require auth
     if (!user && isProtected) {

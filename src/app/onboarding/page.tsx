@@ -41,6 +41,7 @@ import {
 
 import { EXPERIENCE_LEVELS, RACE_RECENCY_OPTIONS } from '@/domain/onboarding/constants';
 import { calculateVdotFromRace, vdotFromVO2max } from '@/domain/vdot/vdot-estimator';
+import { useAuth } from '@/domain/auth/context';
 
 // Screen components
 import { WelcomeScreen, MileGateScreen, NameScreen, DemographicsScreen } from '@/components/onboarding/screens/identity';
@@ -213,64 +214,93 @@ function formatConnectError(provider: string | null, error: string | null): stri
 // MAIN ONBOARDING PAGE
 // =============================================================================
 
+/**
+ * Onboarding State Machine
+ * 
+ * Single `phase` state replaces multiple booleans.
+ * Uses shared AuthProvider from root for auth state.
+ */
+type OnboardingPhase =
+    | 'initializing'    // Waiting for auth + checking for existing plan
+    | 'has-plan'        // User has a plan (show "You already have a plan" guard)
+    | 'resume-prompt'   // User has saved progress (show resume/start-fresh picker)
+    | 'active';         // Onboarding in progress
+
 function OnboardingContent() {
     const searchParams = useSearchParams();
+    const router = useRouter();
+    const { status: authStatus } = useAuth();
+
+    // ==========================================================================
+    // STATE MACHINE - Single source of truth for which UI to show
+    // ==========================================================================
+
+    const [phase, setPhase] = useState<OnboardingPhase>('initializing');
     const [step, setStep] = useState<OnboardingStep>('welcome');
     const [data, setData] = useState<OnboardingData>(INITIAL_ONBOARDING_DATA);
-    const [mounted, setMounted] = useState(false);
-    const [authChecked, setAuthChecked] = useState(false);
-    const [showResumePrompt, setShowResumePrompt] = useState(false);
     const [savedProgress, setSavedProgress] = useState<{ step: OnboardingStep; data: OnboardingData } | null>(null);
+    const [generationError, setGenerationError] = useState<string | null>(null);
+
+    // URL params for connection errors
     const connectProvider = searchParams.get('connect');
     const connectError = searchParams.get('error');
     const connectErrorMessage = formatConnectError(connectProvider, connectError);
-    const [planGenerated, setPlanGenerated] = useState(false);
-    const [generationError, setGenerationError] = useState<string | null>(null);
-    const [hasExistingPlan, setHasExistingPlan] = useState(false);
-    const router = useRouter();
 
-    // Check for existing plan on mount
-    // Note: Middleware handles auth redirect - we just need to check for plans
+    // ==========================================================================
+    // INITIALIZATION - Runs once when auth is ready
+    // ==========================================================================
+
     useEffect(() => {
-        async function checkForExistingPlan() {
-            // Use the service function from repository
-            const { hasPlanV2 } = await import('@/domain/plan/repository');
-            const planExists = await hasPlanV2();
+        // Wait for auth to be determined
+        if (authStatus === 'loading') return;
 
-            if (planExists) {
-                setHasExistingPlan(true);
+        async function initialize() {
+            try {
+                // 1. Check if user has an existing plan
+                const { hasPlanV2 } = await import('@/domain/plan/repository');
+                const planExists = await hasPlanV2();
+
+                if (planExists) {
+                    // Clear any stale onboarding progress
+                    clearOnboardingProgress();
+                    setPhase('has-plan');
+                    return;
+                }
+
+                // 2. Check for saved onboarding progress
+                const saved = loadOnboardingProgress();
+                if (saved && saved.step !== 'welcome' && saved.step !== 'complete') {
+                    setSavedProgress(saved);
+                    setPhase('resume-prompt');
+                    return;
+                }
+
+                // 3. No existing plan, no saved progress - start fresh
+                setPhase('active');
+            } catch (error) {
+                console.error('Onboarding initialization error:', error);
+                // On error, just start the flow fresh
+                setPhase('active');
             }
-
-            setAuthChecked(true);
         }
 
-        checkForExistingPlan();
-    }, []);
+        initialize();
+    }, [authStatus]);
 
+    // ==========================================================================
+    // SAVE PROGRESS (only when actively onboarding)
+    // ==========================================================================
 
-    // Load saved progress on mount (only after auth confirmed)
     useEffect(() => {
-        if (!authChecked) return;
-
-        setMounted(true);
-
-        // Philosophy is now integrated into onboarding flow - no localStorage handoff needed
-
-        const saved = loadOnboardingProgress();
-        if (saved && saved.step !== 'welcome' && saved.step !== 'complete') {
-            setSavedProgress(saved);
-            setShowResumePrompt(true);
-        }
-    }, [authChecked]);
-
-    // Save progress on every change
-    useEffect(() => {
-        if (mounted && step !== 'welcome' && step !== 'generating' && step !== 'complete') {
+        if (phase === 'active' && step !== 'welcome' && step !== 'generating' && step !== 'complete') {
             saveOnboardingProgress(step, data);
         }
-    }, [step, data, mounted]);
+    }, [phase, step, data]);
 
-    // Navigation handlers
+    // ==========================================================================
+    // NAVIGATION HANDLERS
+    // ==========================================================================
+
     const goToNext = useCallback(() => {
         const nextStep = getNextStep(step, data);
 
@@ -296,21 +326,34 @@ function OnboardingContent() {
         }
     }, [step, data]);
 
+    // Resume saved progress
     const handleResume = () => {
         if (savedProgress) {
             setStep(savedProgress.step);
             setData(savedProgress.data);
         }
-        setShowResumePrompt(false);
+        setPhase('active');
     };
 
+    // Start fresh (discard saved progress)
     const handleStartFresh = () => {
-        setShowResumePrompt(false);
+        clearOnboardingProgress();
         setSavedProgress(null);
+        setPhase('active');
     };
 
-    // Show loading while checking auth or mounting
-    if (!authChecked || !mounted) {
+    // User wants to create new plan despite having one
+    const handleCreateNewPlan = () => {
+        clearOnboardingProgress();
+        setPhase('active');
+    };
+
+    // ==========================================================================
+    // RENDER BASED ON PHASE
+    // ==========================================================================
+
+    // Phase 1: Initializing (waiting for auth + plan check)
+    if (phase === 'initializing') {
         return (
             <div className="v3-root min-h-screen flex items-center justify-center">
                 <div className="text-center">
@@ -321,30 +364,8 @@ function OnboardingContent() {
         );
     }
 
-    // Resume prompt
-    if (showResumePrompt && savedProgress) {
-        return (
-            <div className="v3-root min-h-screen flex items-center justify-center px-6 py-12">
-                <div className="v3-card p-8 text-center max-w-md w-full">
-                    <h1 className="v3-heading-md mb-4">Welcome back!</h1>
-                    <p className="v3-body-md mb-8" style={{ color: 'var(--text-muted)' }}>
-                        You have saved progress. Would you like to continue where you left off?
-                    </p>
-                    <div className="space-y-3">
-                        <button onClick={handleResume} className="v3-btn v3-btn-primary v3-btn-lg w-full">
-                            Continue where I left off
-                        </button>
-                        <button onClick={handleStartFresh} className="v3-btn v3-btn-secondary w-full">
-                            Start fresh
-                        </button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    // Existing plan guard - prevent accidental re-onboarding
-    if (hasExistingPlan && step === 'welcome') {
+    // Phase 2: User has existing plan
+    if (phase === 'has-plan') {
         return (
             <div className="v3-root min-h-screen flex items-center justify-center px-6 py-12">
                 <div className="v3-card p-8 text-center max-w-md w-full">
@@ -366,7 +387,7 @@ function OnboardingContent() {
                             View Current Plan
                         </button>
                         <button
-                            onClick={() => setHasExistingPlan(false)}
+                            onClick={handleCreateNewPlan}
                             className="v3-btn v3-btn-secondary w-full"
                         >
                             Create New Plan
@@ -376,6 +397,30 @@ function OnboardingContent() {
             </div>
         );
     }
+
+    // Phase 3: Resume prompt
+    if (phase === 'resume-prompt' && savedProgress) {
+        return (
+            <div className="v3-root min-h-screen flex items-center justify-center px-6 py-12">
+                <div className="v3-card p-8 text-center max-w-md w-full">
+                    <h1 className="v3-heading-md mb-4">Welcome back!</h1>
+                    <p className="v3-body-md mb-8" style={{ color: 'var(--text-muted)' }}>
+                        You have saved progress. Would you like to continue where you left off?
+                    </p>
+                    <div className="space-y-3">
+                        <button onClick={handleResume} className="v3-btn v3-btn-primary v3-btn-lg w-full">
+                            Continue where I left off
+                        </button>
+                        <button onClick={handleStartFresh} className="v3-btn v3-btn-secondary w-full">
+                            Start fresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Phase 4: Active onboarding (falls through from all other phases)
 
     const progress = getStepProgress(step);
 
@@ -719,7 +764,6 @@ function OnboardingContent() {
                             // 3. Save the training plan
                             const saveResult = await savePlan(result.data);
                             if (saveResult.success) {
-                                setPlanGenerated(true);
                                 goToNext();
                             } else {
                                 setGenerationError('Failed to save your plan. Please try again.');

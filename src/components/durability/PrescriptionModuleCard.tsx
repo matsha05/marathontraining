@@ -214,6 +214,26 @@ export function PrescriptionModuleCard({
                                                         )}
                                                     </div>
 
+                                                    {/* Coaching Cues - from Dicharry/Starrett */}
+                                                    {exercise.cues && exercise.cues.length > 0 && (
+                                                        <div
+                                                            className="mb-2 p-2 rounded-lg text-xs"
+                                                            style={{
+                                                                background: 'var(--bg-muted)',
+                                                                borderLeft: '2px solid var(--color-accent)',
+                                                            }}
+                                                        >
+                                                            <p className="font-medium mb-1" style={{ color: 'var(--text-muted)' }}>
+                                                                Coaching Cues:
+                                                            </p>
+                                                            <ul className="space-y-0.5" style={{ color: 'var(--text-subtle)' }}>
+                                                                {exercise.cues.map((cue, i) => (
+                                                                    <li key={i} className="pl-2">• {cue}</li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    )}
+
                                                     {/* Notes */}
                                                     {exercise.notes && (
                                                         <p
@@ -246,6 +266,44 @@ export function PrescriptionModuleCard({
                                     );
                                 })}
                             </div>
+
+                            {/* Stop Rules / Safety */}
+                            {module.stopRules && module.stopRules.length > 0 && (
+                                <div
+                                    className="mt-4 p-3 rounded-lg text-xs"
+                                    style={{
+                                        background: 'rgba(239, 68, 68, 0.08)',
+                                        border: '1px solid rgba(239, 68, 68, 0.2)',
+                                    }}
+                                >
+                                    <p className="font-medium mb-1" style={{ color: '#ef4444' }}>
+                                        ⚠️ Stop if:
+                                    </p>
+                                    <ul style={{ color: 'var(--text-muted)' }}>
+                                        {module.stopRules.map((rule, i) => (
+                                            <li key={i}>• {rule}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                            {/* Frequency / Progression / Regression */}
+                            {(module.frequencyGuidance || module.progression || module.regression) && (
+                                <div
+                                    className="mt-3 grid gap-2 text-xs"
+                                    style={{ color: 'var(--text-muted)' }}
+                                >
+                                    {module.frequencyGuidance && (
+                                        <p><span className="font-medium">When:</span> {module.frequencyGuidance}</p>
+                                    )}
+                                    {module.progression && (
+                                        <p><span className="font-medium">Level up:</span> {module.progression}</p>
+                                    )}
+                                    {module.regression && (
+                                        <p><span className="font-medium">Scale down:</span> {module.regression}</p>
+                                    )}
+                                </div>
+                            )}
 
                             {/* Source attribution */}
                             <div

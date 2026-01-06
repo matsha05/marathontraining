@@ -209,7 +209,14 @@ export default function DashboardPage() {
     }, [status, plan, athleteId, user, authStatus]);
 
     // Redirect to onboarding if no plan
+    // Safety checks:
+    // - Only redirect when status is DEFINITIVELY 'idle' (plan load complete, no plan found)
+    // - Never redirect while 'loading' (plan load in progress)
+    // - Only redirect when authenticated (middleware handles unauthenticated)
     useEffect(() => {
+        // Don't redirect while loading - wait for definitive answer
+        if (status === 'loading') return;
+
         if (status === 'idle' && !plan && authStatus === 'authenticated') {
             const timer = setTimeout(() => {
                 router.push('/onboarding');
