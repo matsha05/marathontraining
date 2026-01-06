@@ -71,13 +71,13 @@ export default function LandingShowcase() {
     }, [selectedIndex]);
 
     return (
-        <div className="v2-root min-h-screen" style={{ background: 'var(--v2-bg-deep)', color: 'var(--v2-text-primary)' }}>
+        <div className="v2-root min-h-screen" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>
             {/* Subtle grid background */}
             <div
                 className="fixed inset-0 pointer-events-none opacity-[0.02]"
                 style={{
-                    backgroundImage: `linear-gradient(var(--v2-border) 1px, transparent 1px),
-                                      linear-gradient(90deg, var(--v2-border) 1px, transparent 1px)`,
+                    backgroundImage: `linear-gradient(var(--border-base) 1px, transparent 1px),
+                                      linear-gradient(90deg, var(--border-base) 1px, transparent 1px)`,
                     backgroundSize: '60px 60px'
                 }}
             />
@@ -86,7 +86,7 @@ export default function LandingShowcase() {
             <header
                 className="sticky top-0 z-50 backdrop-blur-xl"
                 style={{
-                    borderBottom: '1px solid var(--v2-border)',
+                    borderBottom: '1px solid var(--border-base)',
                     background: 'rgba(8, 8, 10, 0.8)'
                 }}
             >
@@ -104,13 +104,13 @@ export default function LandingShowcase() {
                         <div>
                             <h1
                                 className="text-sm font-semibold tracking-tight"
-                                style={{ color: 'var(--v2-text-primary)' }}
+                                style={{ color: 'var(--text-base)' }}
                             >
                                 The Long Game
                             </h1>
                             <p
                                 className="text-[10px] uppercase tracking-widest"
-                                style={{ color: 'var(--v2-text-muted)' }}
+                                style={{ color: 'var(--text-muted)' }}
                             >
                                 Design Showcase
                             </p>
@@ -120,14 +120,14 @@ export default function LandingShowcase() {
                     <div className="flex items-center gap-6">
                         <span
                             className="text-xs font-mono"
-                            style={{ color: 'var(--v2-text-subtle)' }}
+                            style={{ color: 'var(--text-subtle)' }}
                         >
                             {LANDING_OPTIONS.length} variations
                         </span>
                         <Link
                             href="/"
                             className="text-xs transition-colors"
-                            style={{ color: 'var(--v2-text-tertiary)' }}
+                            style={{ color: 'var(--text-muted)' }}
                         >
                             ← Back to App
                         </Link>
@@ -141,37 +141,37 @@ export default function LandingShowcase() {
                 <div className="mb-16">
                     <p
                         className="text-[10px] uppercase tracking-[0.2em] mb-4 font-mono"
-                        style={{ color: 'var(--v2-text-subtle)' }}
+                        style={{ color: 'var(--text-subtle)' }}
                     >
                         Internal Design Directory
                     </p>
                     <h2
                         className="text-4xl md:text-5xl font-bold tracking-tight mb-4"
-                        style={{ color: 'var(--v2-text-primary)' }}
+                        style={{ color: 'var(--text-base)' }}
                     >
                         Landing Page Options
                     </h2>
                     <p
                         className="text-lg max-w-2xl mb-4"
-                        style={{ color: 'var(--v2-text-muted)' }}
+                        style={{ color: 'var(--text-muted)' }}
                     >
                         Browse different design directions for the landing experience.
                         Click any card to preview the full page.
                     </p>
                     <div
                         className="flex items-center gap-4 text-xs font-mono"
-                        style={{ color: 'var(--v2-text-ghost)' }}
+                        style={{ color: 'var(--text-subtle)' }}
                     >
                         <span className="flex items-center gap-1.5">
                             <kbd
                                 className="px-1.5 py-0.5 rounded"
-                                style={{ background: 'var(--v2-bg-elevated)', border: '1px solid var(--v2-border-hover)' }}
+                                style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-base-hover)' }}
                             >
                                 ←
                             </kbd>
                             <kbd
                                 className="px-1.5 py-0.5 rounded"
-                                style={{ background: 'var(--v2-bg-elevated)', border: '1px solid var(--v2-border-hover)' }}
+                                style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-base-hover)' }}
                             >
                                 →
                             </kbd>
@@ -180,7 +180,7 @@ export default function LandingShowcase() {
                         <span className="flex items-center gap-1.5">
                             <kbd
                                 className="px-1.5 py-0.5 rounded"
-                                style={{ background: 'var(--v2-bg-elevated)', border: '1px solid var(--v2-border-hover)' }}
+                                style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-base-hover)' }}
                             >
                                 ↵
                             </kbd>
@@ -201,7 +201,7 @@ export default function LandingShowcase() {
                                 className="group relative block outline-none transition-all duration-200"
                                 style={{
                                     borderRadius: 'var(--v2-radius-xl)',
-                                    boxShadow: isSelected ? `0 0 0 2px var(--v2-accent), 0 0 0 4px var(--v2-bg-deep)` : 'none'
+                                    boxShadow: isSelected ? `0 0 0 2px var(--color-accent), 0 0 0 4px var(--bg-base)` : 'none'
                                 }}
                                 onMouseEnter={() => {
                                     setHoveredId(option.id);
@@ -213,8 +213,8 @@ export default function LandingShowcase() {
                                 <div
                                     className="relative overflow-hidden rounded-2xl border transition-all duration-300"
                                     style={{
-                                        background: 'var(--v2-bg-deep)',
-                                        borderColor: isSelected ? 'var(--v2-accent)' : 'var(--v2-border)',
+                                        background: 'var(--bg-base)',
+                                        borderColor: isSelected ? 'var(--color-accent)' : 'var(--border-base)',
                                     }}
                                 >
                                     {/* Card Content */}
@@ -224,24 +224,24 @@ export default function LandingShowcase() {
                                             <div>
                                                 <h3
                                                     className="text-xl font-semibold mb-1 tracking-tight"
-                                                    style={{ color: 'var(--v2-text-primary)' }}
+                                                    style={{ color: 'var(--text-base)' }}
                                                 >
                                                     {option.name}
                                                 </h3>
                                                 <p
                                                     className="text-[10px] uppercase tracking-widest font-mono"
-                                                    style={{ color: 'var(--v2-text-subtle)' }}
+                                                    style={{ color: 'var(--text-subtle)' }}
                                                 >
                                                     {option.aesthetic}
                                                 </p>
                                             </div>
                                             <div
                                                 className="w-8 h-8 rounded-lg border flex items-center justify-center transition-all duration-300"
-                                                style={{ borderColor: 'var(--v2-border-hover)' }}
+                                                style={{ borderColor: 'var(--border-base-hover)' }}
                                             >
                                                 <svg
                                                     className="w-4 h-4 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                                                    style={{ color: 'var(--v2-text-muted)' }}
+                                                    style={{ color: 'var(--text-muted)' }}
                                                     fill="none"
                                                     viewBox="0 0 24 24"
                                                     stroke="currentColor"
@@ -254,7 +254,7 @@ export default function LandingShowcase() {
                                         {/* Description */}
                                         <p
                                             className="text-sm leading-relaxed mb-6"
-                                            style={{ color: 'var(--v2-text-tertiary)' }}
+                                            style={{ color: 'var(--text-muted)' }}
                                         >
                                             {option.description}
                                         </p>
@@ -266,8 +266,8 @@ export default function LandingShowcase() {
                                                     key={tag}
                                                     className="px-2.5 py-1 text-[10px] uppercase tracking-wider rounded-full font-mono"
                                                     style={{
-                                                        color: 'var(--v2-text-subtle)',
-                                                        border: '1px solid var(--v2-border-hover)'
+                                                        color: 'var(--text-subtle)',
+                                                        border: '1px solid var(--border-base-hover)'
                                                     }}
                                                 >
                                                     {tag}
@@ -280,7 +280,7 @@ export default function LandingShowcase() {
                                     <div
                                         className="absolute bottom-0 left-0 right-0 h-px transition-opacity duration-300"
                                         style={{
-                                            background: `linear-gradient(90deg, transparent, var(--v2-accent), transparent)`,
+                                            background: `linear-gradient(90deg, transparent, var(--color-accent), transparent)`,
                                             opacity: hoveredId === option.id || isSelected ? 1 : 0
                                         }}
                                     />
@@ -293,26 +293,26 @@ export default function LandingShowcase() {
                 {/* Footer Note */}
                 <div
                     className="mt-16 pt-12"
-                    style={{ borderTop: '1px solid var(--v2-border)' }}
+                    style={{ borderTop: '1px solid var(--border-base)' }}
                 >
                     <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                         <div>
                             <p
                                 className="text-xs font-mono mb-2"
-                                style={{ color: 'var(--v2-text-subtle)' }}
+                                style={{ color: 'var(--text-subtle)' }}
                             >
                                 Design feedback? Iterate on any variation.
                             </p>
                             <p
                                 className="text-xs"
-                                style={{ color: 'var(--v2-text-ghost)' }}
+                                style={{ color: 'var(--text-subtle)' }}
                             >
                                 These designs evolve based on your preferences and feedback.
                             </p>
                         </div>
                         <div
                             className="text-[10px] font-mono"
-                            style={{ color: 'var(--v2-text-ghost)' }}
+                            style={{ color: 'var(--text-subtle)' }}
                         >
                             Last updated: {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                         </div>

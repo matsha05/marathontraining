@@ -1,6 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Metric } from "@/components/ui/Metric";
+import { ProgressRing } from "@/components/ui/ProgressRing";
+import { ProgressBar } from "@/components/ui/ProgressBar";
+import { Badge } from "@/components/ui/Badge";
+import { StatCard } from "@/components/ui/StatCard";
+import { StepIndicator } from "@/components/ui/StepIndicator";
 
 /**
  * Design System V3 — Complete Showcase
@@ -10,7 +17,7 @@ import { useState } from "react";
  */
 
 export default function DesignSystemShowcase() {
-    const [theme, setTheme] = useState<"dark" | "light">("dark");
+    const [theme, setTheme] = useState<"dark" | "light">("light");
     const [locale, setLocale] = useState<"en" | "de" | "ja">("en");
     const [showModal, setShowModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -131,8 +138,27 @@ export default function DesignSystemShowcase() {
         setTimeout(() => setIsLoading(false), 2000);
     };
 
+    // Sync theme with document.documentElement for CSS variable switching
+    useEffect(() => {
+        if (theme === "dark") {
+            document.documentElement.classList.add("dark");
+        } else {
+            document.documentElement.classList.remove("dark");
+        }
+        // Cleanup: restore original state when component unmounts
+        return () => {
+            document.documentElement.classList.remove("dark");
+        };
+    }, [theme]);
+
     return (
-        <div style={{ background: c.bgDeep, color: c.textPrimary, minHeight: "100vh" }}>
+        <div
+            className={`${theme === "dark" ? "dark" : ""} min-h-screen`}
+            style={{
+                backgroundColor: "var(--bg-base)",
+                color: "var(--text-base)"
+            }}
+        >
             {/* Header */}
             <header
                 style={{
@@ -196,6 +222,54 @@ export default function DesignSystemShowcase() {
                                 </span>
                             </div>
                         ))}
+                    </div>
+                </Section>
+
+                {/* =================================================================
+                   SECTION 1B: FONT COMPARISON
+                   ================================================================= */}
+                <Section title="Font Comparison" subtitle="Finding the perfect typeface for athletic precision" c={c}>
+                    <div style={{ display: "grid", gap: 32 }}>
+                        {/* Large metric comparison - 6 fonts in 2 rows */}
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+                            {[
+                                { name: "Sora", family: "var(--font-sora)", comment: "Athletic Precision" },
+                                { name: "DM Sans", family: "var(--font-dm-sans)", comment: "Clean Minimal" },
+                                { name: "Onest", family: "var(--font-onest)", comment: "Tech Precision" },
+                                { name: "Inter", family: "var(--font-inter)", comment: "Industry Standard" },
+                                { name: "Geist Sans", family: "var(--geist-font)", comment: "Vercel Modern" },
+                                { name: "Instrument", family: "var(--font-instrument)", comment: "Original" },
+                            ].map(font => (
+                                <div key={font.name} style={{ padding: 20, borderRadius: 16, background: c.bgElevated, border: `1px solid ${c.border}` }}>
+                                    <p style={{ fontSize: 12, color: c.textMuted, marginBottom: 2 }}>{font.name}</p>
+                                    <p style={{ fontSize: 10, color: c.textSubtle, marginBottom: 12 }}>{font.comment}</p>
+                                    <p style={{ fontFamily: font.family, fontSize: 48, fontWeight: 300, color: c.accent, lineHeight: 1 }}>4:32</p>
+                                    <p style={{ fontFamily: font.family, fontSize: 20, fontWeight: 500, marginTop: 12, marginBottom: 6 }}>Easy Run</p>
+                                    <p style={{ fontFamily: font.family, fontSize: 14, color: c.textSecondary }}>8 miles recovery</p>
+                                </div>
+                            ))}
+                        </div>
+                        {/* Readability at small sizes */}
+                        <div style={{ padding: 24, borderRadius: 16, background: c.bgElevated, border: `1px solid ${c.border}` }}>
+                            <p style={{ fontSize: 14, fontWeight: 500, marginBottom: 16 }}>Small Size Readability (Outdoor Glanceability)</p>
+                            <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 16 }}>
+                                {[
+                                    { name: "Sora", family: "var(--font-sora)" },
+                                    { name: "DM Sans", family: "var(--font-dm-sans)" },
+                                    { name: "Onest", family: "var(--font-onest)" },
+                                    { name: "Inter", family: "var(--font-inter)" },
+                                    { name: "Geist", family: "var(--geist-font)" },
+                                    { name: "Instrument", family: "var(--font-instrument)" },
+                                ].map(font => (
+                                    <div key={font.name}>
+                                        <p style={{ fontSize: 11, color: c.textMuted, marginBottom: 8 }}>{font.name}</p>
+                                        <p style={{ fontFamily: font.family, fontSize: 14, marginBottom: 4 }}>9:27/mi</p>
+                                        <p style={{ fontFamily: font.family, fontSize: 12, color: c.textSecondary, marginBottom: 4 }}>142 bpm</p>
+                                        <p style={{ fontFamily: font.family, fontSize: 10, color: c.textTertiary }}>+120 ft</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </Section>
 
@@ -462,6 +536,97 @@ export default function DesignSystemShowcase() {
                 </Section>
 
                 {/* =================================================================
+                   SECTION 14: AVATARS
+                   ================================================================= */}
+                <Section title="Avatars" subtitle="User identity in header and profiles" c={c}>
+                    <div style={{ display: "flex", gap: 24, alignItems: "flex-end", flexWrap: "wrap" }}>
+                        {/* Small (Header) */}
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                            <div style={{
+                                width: 32, height: 32, borderRadius: "50%",
+                                background: `linear-gradient(135deg, ${c.accent}, ${c.strength})`,
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                fontSize: 14, fontWeight: 600, color: c.bgDeep
+                            }}>
+                                MS
+                            </div>
+                            <span style={{ fontSize: 12, color: c.textMuted, marginTop: 8 }}>32px (Header)</span>
+                        </div>
+                        {/* Medium */}
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                            <div style={{
+                                width: 44, height: 44, borderRadius: "50%",
+                                background: `linear-gradient(135deg, ${c.accent}, ${c.strength})`,
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                fontSize: 18, fontWeight: 600, color: c.bgDeep
+                            }}>
+                                MS
+                            </div>
+                            <span style={{ fontSize: 12, color: c.textMuted, marginTop: 8 }}>44px (Touch)</span>
+                        </div>
+                        {/* Large (Profile) */}
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                            <div style={{
+                                width: 64, height: 64, borderRadius: "50%",
+                                background: `linear-gradient(135deg, ${c.accent}, ${c.strength})`,
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                fontSize: 24, fontWeight: 600, color: c.bgDeep
+                            }}>
+                                MS
+                            </div>
+                            <span style={{ fontSize: 12, color: c.textMuted, marginTop: 8 }}>64px (Profile)</span>
+                        </div>
+                        {/* With image placeholder */}
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                            <div style={{
+                                width: 44, height: 44, borderRadius: "50%",
+                                background: c.bgElevated,
+                                border: `1px solid ${c.border}`,
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                            }}>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={c.textMuted} strokeWidth="2">
+                                    <circle cx="12" cy="8" r="4" />
+                                    <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
+                                </svg>
+                            </div>
+                            <span style={{ fontSize: 12, color: c.textMuted, marginTop: 8 }}>No Photo</span>
+                        </div>
+                    </div>
+
+                    {/* Character Avatars */}
+                    <div style={{ marginTop: 32 }}>
+                        <p style={{ fontSize: 14, fontWeight: 500, marginBottom: 16 }}>Character Avatars (Selectable)</p>
+                        <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+                            {[
+                                { name: "Runner", src: "/avatars/avatar_runner_green.png" },
+                                { name: "Strength", src: "/avatars/avatar_runner_blue.png" },
+                                { name: "Mobility", src: "/avatars/avatar_runner_purple.png" },
+                                { name: "Trail", src: "/avatars/avatar_trail_runner.png" },
+                                { name: "Sprinter", src: "/avatars/avatar_sprinter.png" },
+                                { name: "Marathon", src: "/avatars/avatar_marathon.png" },
+                            ].map(avatar => (
+                                <div key={avatar.name} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                                    <motion.div
+                                        whileHover={{ scale: 1.1 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        style={{
+                                            width: 64, height: 64, borderRadius: "50%",
+                                            overflow: "hidden", cursor: "pointer",
+                                            border: `2px solid ${c.border}`,
+                                            transition: "border-color 0.2s"
+                                        }}
+                                    >
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img src={avatar.src} alt={avatar.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                    </motion.div>
+                                    <span style={{ fontSize: 11, color: c.textMuted, marginTop: 8 }}>{avatar.name}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </Section>
+
+                {/* =================================================================
                    SECTION 14: SAMPLE WORKOUT CARD
                    ================================================================= */}
                 <Section title="Sample Component" subtitle="All tokens applied" c={c}>
@@ -478,6 +643,121 @@ export default function DesignSystemShowcase() {
                             </span>
                         </div>
                         <p style={{ fontSize: 16, lineHeight: 1.5, color: c.textTertiary }}>{samples.body[locale]}</p>
+                    </div>
+                </Section>
+
+                {/* =================================================================
+                   SECTION 15: V3 COMPONENTS (NEW)
+                   ================================================================= */}
+                <Section title="V3 Components" subtitle="New primitives for design system coverage" c={c}>
+                    {/* Metric Component */}
+                    <div style={{ marginBottom: 32 }}>
+                        <h4 style={{ fontSize: 14, fontWeight: 500, marginBottom: 16, color: c.textSecondary }}>Metric (Numeric Data Display)</h4>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 24, alignItems: "baseline" }}>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                                <span style={{ fontSize: 10, color: c.textSubtle }}>xl</span>
+                                <Metric value="4:32" unit="/mi" size="xl" color="accent" />
+                            </div>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                                <span style={{ fontSize: 10, color: c.textSubtle }}>lg</span>
+                                <Metric value="26.2" unit="mi" size="lg" color="default" />
+                            </div>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                                <span style={{ fontSize: 10, color: c.textSubtle }}>md</span>
+                                <Metric value="142" unit="bpm" size="md" color="muted" />
+                            </div>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                                <span style={{ fontSize: 10, color: c.textSubtle }}>sm</span>
+                                <Metric value="65" unit="%" size="sm" color="success" />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Badge Component */}
+                    <div style={{ marginBottom: 32 }}>
+                        <h4 style={{ fontSize: 14, fontWeight: 500, marginBottom: 16, color: c.textSecondary }}>Badge (Status Labels)</h4>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+                            <Badge variant="default">Default</Badge>
+                            <Badge variant="accent">Current Week</Badge>
+                            <Badge variant="success">Completed</Badge>
+                            <Badge variant="warning">Skipped</Badge>
+                            <Badge variant="error">Missed</Badge>
+                            <Badge variant="running">Running</Badge>
+                            <Badge variant="strength">Strength</Badge>
+                            <Badge variant="durability">Durability</Badge>
+                        </div>
+                    </div>
+
+                    {/* Progress Ring Component */}
+                    <div style={{ marginBottom: 32 }}>
+                        <h4 style={{ fontSize: 14, fontWeight: 500, marginBottom: 16, color: c.textSecondary }}>ProgressRing (Circular Progress)</h4>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 32, alignItems: "flex-end" }}>
+                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+                                <ProgressRing percent={85} size={80} showLabel />
+                                <span style={{ fontSize: 10, color: c.textSubtle }}>80px</span>
+                            </div>
+                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+                                <ProgressRing percent={65} size={64} showLabel color="accent" />
+                                <span style={{ fontSize: 10, color: c.textSubtle }}>64px</span>
+                            </div>
+                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+                                <ProgressRing percent={50} size={48} showLabel color="success" />
+                                <span style={{ fontSize: 10, color: c.textSubtle }}>48px success</span>
+                            </div>
+                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+                                <ProgressRing percent={30} size={40} color="warning" showLabel />
+                                <span style={{ fontSize: 10, color: c.textSubtle }}>40px warning</span>
+                            </div>
+                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+                                <ProgressRing percent={100} size={56} showCheckOnComplete color="accent" />
+                                <span style={{ fontSize: 10, color: c.textSubtle }}>Complete</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Progress Bar Component */}
+                    <div style={{ marginBottom: 32 }}>
+                        <h4 style={{ fontSize: 14, fontWeight: 500, marginBottom: 16, color: c.textSecondary }}>ProgressBar (Linear Progress)</h4>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 16, maxWidth: 400 }}>
+                            <ProgressBar percent={65} showLabel label="Phase Progress" />
+                            <ProgressBar percent={85} size="lg" color="success" showLabel />
+                            <ProgressBar percent={40} size="sm" color="muted" />
+                        </div>
+                    </div>
+
+                    {/* StatCard Component */}
+                    <div style={{ marginBottom: 32 }}>
+                        <h4 style={{ fontSize: 14, fontWeight: 500, marginBottom: 16, color: c.textSecondary }}>StatCard (Compact Stats)</h4>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 12 }}>
+                            <StatCard
+                                value="42.5"
+                                unit="mi"
+                                label="This Week"
+                                color="accent"
+                            />
+                            <StatCard
+                                value="4:32:00"
+                                label="Long Run"
+                                size="sm"
+                            />
+                            <StatCard
+                                value="65"
+                                unit="%"
+                                label="Completion"
+                                color="accent"
+                                trend={{ value: "+5%", direction: "up" }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* StepIndicator Component */}
+                    <div>
+                        <h4 style={{ fontSize: 14, fontWeight: 500, marginBottom: 16, color: c.textSecondary }}>StepIndicator (Onboarding Progress)</h4>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 16, maxWidth: 400 }}>
+                            <StepIndicator totalSteps={5} currentStep={3} showNumbers />
+                            <StepIndicator totalSteps={4} currentStep={1} size="lg" />
+                            <StepIndicator totalSteps={6} currentStep={6} size="sm" />
+                        </div>
                     </div>
                 </Section>
             </main>

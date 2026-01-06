@@ -149,27 +149,27 @@ export function Modal({
                     ${className}
                 `}
                 style={{
-                    background: 'var(--v2-bg-deep)',
-                    border: '1px solid var(--v2-border)',
+                    background: 'var(--bg-base)',
+                    border: '1px solid var(--border-base)',
                 }}
             >
                 {/* Header */}
                 {title && (
                     <div
                         className="flex items-center justify-between px-6 py-4"
-                        style={{ borderBottom: '1px solid var(--v2-border)' }}
+                        style={{ borderBottom: '1px solid var(--border-base)' }}
                     >
                         <h2
                             id="modal-title"
                             className="text-xl font-light"
-                            style={{ color: 'var(--v2-text-primary)' }}
+                            style={{ color: 'var(--text-base)' }}
                         >
                             {title}
                         </h2>
                         <button
                             onClick={onClose}
                             className="p-2 rounded-lg hover:bg-white/5 transition-colors"
-                            style={{ color: 'var(--v2-text-muted)' }}
+                            style={{ color: 'var(--text-muted)' }}
                             aria-label="Close modal"
                         >
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -217,12 +217,12 @@ export function ConfirmModal({
     const confirmColors = {
         danger: 'var(--v2-error)',
         warning: '#f1c40f',
-        default: 'var(--v2-accent)',
+        default: 'var(--color-accent)',
     };
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm">
-            <p className="mb-6" style={{ color: 'var(--v2-text-muted)' }}>
+            <p className="mb-6" style={{ color: 'var(--text-muted)' }}>
                 {message}
             </p>
 

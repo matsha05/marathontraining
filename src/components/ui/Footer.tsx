@@ -20,7 +20,7 @@ export function Footer({ variant = 'landing' }: FooterProps) {
     return (
         <footer
             className="px-6 py-6 border-t"
-            style={{ borderColor: 'var(--v2-border)' }}
+            style={{ borderColor: 'var(--border-base)' }}
         >
             <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
                 {/* Brand + Copyright */}
@@ -34,7 +34,7 @@ export function Footer({ variant = 'landing' }: FooterProps) {
                             className="object-cover"
                         />
                     </div>
-                    <span className="text-[10px]" style={{ color: 'var(--v2-text-muted)' }}>
+                    <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
                         © {currentYear} The Long Game
                     </span>
                 </div>
@@ -44,14 +44,14 @@ export function Footer({ variant = 'landing' }: FooterProps) {
                     <Link
                         href="/privacy"
                         className="text-[10px] transition-colors hover:opacity-80"
-                        style={{ color: 'var(--v2-text-muted)' }}
+                        style={{ color: 'var(--text-muted)' }}
                     >
                         Privacy
                     </Link>
                     <Link
                         href="/terms"
                         className="text-[10px] transition-colors hover:opacity-80"
-                        style={{ color: 'var(--v2-text-muted)' }}
+                        style={{ color: 'var(--text-muted)' }}
                     >
                         Terms
                     </Link>
@@ -59,7 +59,7 @@ export function Footer({ variant = 'landing' }: FooterProps) {
                         <Link
                             href="/methodology"
                             className="text-[10px] transition-colors hover:opacity-80"
-                            style={{ color: 'var(--v2-text-muted)' }}
+                            style={{ color: 'var(--text-muted)' }}
                         >
                             Methodology
                         </Link>

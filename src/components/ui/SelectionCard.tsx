@@ -39,7 +39,7 @@ export function SelectionCard({
         running: 'var(--v2-running)',
         strength: 'var(--v2-strength)',
         durability: 'var(--v2-durability)',
-        accent: 'var(--v2-accent)',
+        accent: 'var(--color-accent)',
     };
 
     const sizeClasses = {
@@ -57,9 +57,9 @@ export function SelectionCard({
             disabled={disabled}
             className={`w-full ${sizeClasses[size]} rounded-xl text-left transition-all border`}
             style={{
-                background: selected ? selectedColor : 'var(--v2-bg-elevated)',
-                borderColor: selected ? 'transparent' : 'var(--v2-border)',
-                color: selected ? '#000' : 'var(--v2-text-secondary)',
+                background: selected ? selectedColor : 'var(--bg-elevated)',
+                borderColor: selected ? 'transparent' : 'var(--border-base)',
+                color: selected ? '#000' : 'var(--text-muted)',
                 opacity: disabled ? 0.5 : 1,
                 cursor: disabled ? 'not-allowed' : 'pointer',
             }}
@@ -72,7 +72,7 @@ export function SelectionCard({
                         <p
                             className="text-sm"
                             style={{
-                                color: selected ? 'rgba(0,0,0,0.7)' : 'var(--v2-text-muted)'
+                                color: selected ? 'rgba(0,0,0,0.7)' : 'var(--text-muted)'
                             }}
                         >
                             {description}

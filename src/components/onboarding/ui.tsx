@@ -22,10 +22,10 @@ interface ProgressBarProps {
 
 export function ProgressBar({ progress }: ProgressBarProps) {
     return (
-        <div className="fixed top-0 left-0 right-0 h-1 z-50" style={{ background: 'var(--v2-bg-elevated)' }}>
+        <div className="fixed top-0 left-0 right-0 h-1 z-50" style={{ background: 'var(--bg-elevated)' }}>
             <motion.div
                 className="h-full"
-                style={{ background: 'var(--v2-accent)' }}
+                style={{ background: 'var(--color-accent)' }}
                 initial={{ width: 0 }}
                 animate={{ width: `${progress}%` }}
                 transition={{ duration: 0.3, ease: 'easeOut' }}
@@ -64,7 +64,7 @@ export function QuestionScreen({
                     <button
                         onClick={onBack}
                         className="flex items-center gap-1 mb-8 transition-colors group"
-                        style={{ color: 'var(--v2-text-muted)' }}
+                        style={{ color: 'var(--text-muted)' }}
                     >
                         <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                         <span className="v2-body-sm">Back</span>
@@ -91,7 +91,7 @@ export function QuestionHeader({ title, subtitle, tooltip }: QuestionHeaderProps
         <div className="mb-8">
             <h1 className="v2-heading-lg mb-3">{title}</h1>
             {subtitle && (
-                <p className="v2-body-md" style={{ color: 'var(--v2-text-muted)' }}>{subtitle}</p>
+                <p className="v2-body-md" style={{ color: 'var(--text-muted)' }}>{subtitle}</p>
             )}
             {tooltip && <TooltipExpander tooltip={tooltip} />}
         </div>
@@ -111,12 +111,12 @@ export function TooltipExpander({ tooltip }: TooltipExpanderProps) {
         <details className="mt-4 group">
             <summary
                 className="flex items-center gap-2 v2-body-sm cursor-pointer transition-colors"
-                style={{ color: 'var(--v2-text-subtle)' }}
+                style={{ color: 'var(--text-subtle)' }}
             >
                 <Info className="w-4 h-4" />
                 <span>{tooltip.title}</span>
             </summary>
-            <div className="mt-3 pl-6 v2-body-sm leading-relaxed" style={{ color: 'var(--v2-text-muted)' }}>
+            <div className="mt-3 pl-6 v2-body-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                 <p>{tooltip.content}</p>
                 {tooltip.coach && tooltip.coachLink && (
                     <a
@@ -165,13 +165,13 @@ export function OptionButton({
             disabled={disabled}
             className="w-full p-4 rounded-xl border text-left transition-all"
             style={{
-                background: selected ? 'var(--v2-accent)' : 'var(--v2-bg-elevated)',
+                background: selected ? 'var(--color-accent)' : 'var(--bg-elevated)',
                 borderColor: selected
                     ? 'transparent'
                     : warning
                         ? 'var(--v2-warning)'
-                        : 'var(--v2-border)',
-                color: selected ? 'var(--v2-bg-base)' : 'var(--v2-text-primary)',
+                        : 'var(--border-base)',
+                color: selected ? 'var(--v2-bg-base)' : 'var(--text-base)',
                 opacity: disabled ? 0.6 : 1,
                 cursor: disabled ? 'not-allowed' : 'pointer',
             }}
@@ -183,14 +183,14 @@ export function OptionButton({
                         style={{
                             fontSize: '11px',
                             background: selected ? 'rgba(0,0,0,0.2)' : 'var(--v2-bg-base)',
-                            color: selected ? 'var(--v2-bg-base)' : 'var(--v2-text-muted)',
+                            color: selected ? 'var(--v2-bg-base)' : 'var(--text-muted)',
                         }}
                     >
                         {shortcut}
                     </span>
                 )}
                 {icon && (
-                    <span style={{ color: selected ? 'var(--v2-bg-base)' : 'var(--v2-text-muted)' }}>
+                    <span style={{ color: selected ? 'var(--v2-bg-base)' : 'var(--text-muted)' }}>
                         {icon}
                     </span>
                 )}
@@ -202,8 +202,8 @@ export function OptionButton({
                                 className="v2-mono px-2 py-0.5 rounded-full"
                                 style={{
                                     fontSize: '10px',
-                                    background: 'var(--v2-accent-subtle)',
-                                    color: 'var(--v2-accent)'
+                                    background: 'var(--color-accent-subtle)',
+                                    color: 'var(--color-accent)'
                                 }}
                             >
                                 Recommended
@@ -213,7 +213,7 @@ export function OptionButton({
                     {description && (
                         <p
                             className="v2-body-sm mt-0.5"
-                            style={{ color: selected ? 'rgba(0,0,0,0.7)' : 'var(--v2-text-subtle)' }}
+                            style={{ color: selected ? 'rgba(0,0,0,0.7)' : 'var(--text-subtle)' }}
                         >
                             {description}
                         </p>
@@ -294,7 +294,7 @@ export function TextInput({
                     style={{ fontSize: '18px' }}
                 />
                 {suffix && (
-                    <span className="v2-body-md" style={{ color: 'var(--v2-text-muted)' }}>{suffix}</span>
+                    <span className="v2-body-md" style={{ color: 'var(--text-muted)' }}>{suffix}</span>
                 )}
             </div>
             {error && (
@@ -344,7 +344,7 @@ export function TimeInput({
                             className="v2-input w-16 text-center"
                             style={{ fontSize: '18px' }}
                         />
-                        <span className="v2-heading-md" style={{ color: 'var(--v2-text-muted)' }}>:</span>
+                        <span className="v2-heading-md" style={{ color: 'var(--text-muted)' }}>:</span>
                     </>
                 )}
                 <input
@@ -357,7 +357,7 @@ export function TimeInput({
                     className="v2-input w-20 text-center"
                     style={{ fontSize: '18px' }}
                 />
-                <span className="v2-heading-md" style={{ color: 'var(--v2-text-muted)' }}>:</span>
+                <span className="v2-heading-md" style={{ color: 'var(--text-muted)' }}>:</span>
                 <input
                     type="number"
                     value={seconds ?? ''}
@@ -503,20 +503,20 @@ export function CollapsibleInstructions({ title, steps, tips }: CollapsibleInstr
         >
             <summary
                 className="cursor-pointer v2-heading-sm transition-colors"
-                style={{ color: 'var(--v2-text-primary)' }}
+                style={{ color: 'var(--text-base)' }}
             >
                 {title}
             </summary>
             <div className="mt-4 space-y-4">
                 <ol className="space-y-2">
                     {steps.map((step, i) => (
-                        <li key={i} className="flex gap-3 v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                        <li key={i} className="flex gap-3 v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                             <span
                                 className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center v2-mono"
                                 style={{
                                     fontSize: '10px',
-                                    background: 'var(--v2-accent-subtle)',
-                                    color: 'var(--v2-accent)',
+                                    background: 'var(--color-accent-subtle)',
+                                    color: 'var(--color-accent)',
                                     fontWeight: 500,
                                 }}
                             >
@@ -527,11 +527,11 @@ export function CollapsibleInstructions({ title, steps, tips }: CollapsibleInstr
                     ))}
                 </ol>
                 {tips && tips.length > 0 && (
-                    <div className="pt-3" style={{ borderTop: '1px solid var(--v2-border)' }}>
+                    <div className="pt-3" style={{ borderTop: '1px solid var(--border-base)' }}>
                         <p className="v2-label mb-2">Tips</p>
                         <ul className="space-y-1">
                             {tips.map((tip, i) => (
-                                <li key={i} className="v2-body-sm flex items-start gap-2" style={{ color: 'var(--v2-text-muted)' }}>
+                                <li key={i} className="v2-body-sm flex items-start gap-2" style={{ color: 'var(--text-muted)' }}>
                                     <span className="v2-accent">•</span>
                                     <span>{tip}</span>
                                 </li>
@@ -563,7 +563,7 @@ export function WarningBanner({ title, children }: WarningBannerProps) {
             }}
         >
             <p className="v2-heading-sm mb-1" style={{ color: 'var(--v2-warning)' }}>{title}</p>
-            <div className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+            <div className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                 {children}
             </div>
         </div>
@@ -589,7 +589,7 @@ export function SuccessBanner({ title, children }: SuccessBannerProps) {
             }}
         >
             <p className="v2-heading-sm mb-1" style={{ color: 'var(--v2-success)' }}>{title}</p>
-            <div className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+            <div className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                 {children}
             </div>
         </div>

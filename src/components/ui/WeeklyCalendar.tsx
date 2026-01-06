@@ -47,11 +47,11 @@ export function WeeklyCalendar({ days, weekLabel, onDayClick }: WeeklyCalendarPr
                         className="text-center py-3 rounded-xl transition-all"
                         style={{
                             background: day.status === 'today'
-                                ? 'var(--v2-accent)'
+                                ? 'var(--color-accent)'
                                 : day.status === 'completed'
-                                    ? 'var(--v2-bg-elevated)'
+                                    ? 'var(--bg-elevated)'
                                     : 'transparent',
-                            color: day.status === 'today' ? '#000' : 'var(--v2-text-secondary)',
+                            color: day.status === 'today' ? '#000' : 'var(--text-muted)',
                             opacity: day.status === 'rest' ? 0.5 : 1,
                             cursor: day.status === 'rest' ? 'default' : 'pointer',
                         }}
@@ -59,7 +59,7 @@ export function WeeklyCalendar({ days, weekLabel, onDayClick }: WeeklyCalendarPr
                         <p className="v2-label mb-1">{day.day}</p>
                         <p
                             className="text-[10px]"
-                            style={{ color: day.status === 'today' ? 'rgba(0,0,0,0.7)' : 'var(--v2-text-muted)' }}
+                            style={{ color: day.status === 'today' ? 'rgba(0,0,0,0.7)' : 'var(--text-muted)' }}
                         >
                             {day.status === 'rest' ? '—' : day.label}
                         </p>
@@ -67,7 +67,7 @@ export function WeeklyCalendar({ days, weekLabel, onDayClick }: WeeklyCalendarPr
                         {day.status === 'completed' && (
                             <div
                                 className="w-5 h-5 rounded-full mx-auto mt-2 flex items-center justify-center"
-                                style={{ background: 'var(--v2-accent)' }}
+                                style={{ background: 'var(--color-accent)' }}
                             >
                                 <CheckIcon size={12} className="text-black" />
                             </div>

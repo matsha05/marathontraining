@@ -197,19 +197,19 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: Pa
                 <div>
                     <h2 className="v2-heading-md mb-1">Your Training Zones</h2>
                     <div className="flex items-center gap-2">
-                        <span className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                        <span className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                             VDOT {vdot}
                         </span>
                         {calculatedMaxHR && (
                             <>
-                                <span style={{ color: 'var(--v2-text-subtle)' }}>•</span>
+                                <span style={{ color: 'var(--text-subtle)' }}>•</span>
                                 <button
                                     onClick={() => {
                                         setHRInput(String(calculatedMaxHR));
                                         setShowHREditor(true);
                                     }}
                                     className="v2-body-sm flex items-center gap-1 transition-colors hover:underline"
-                                    style={{ color: 'var(--v2-text-muted)' }}
+                                    style={{ color: 'var(--text-muted)' }}
                                     title="Click to update your max HR"
                                 >
                                     <HeartIcon size={12} />
@@ -238,13 +238,13 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: Pa
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         className="mb-6 p-4 rounded-lg border"
-                        style={{ background: 'var(--v2-bg-elevated)', borderColor: 'var(--v2-border)' }}
+                        style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-base)' }}
                     >
                         <div className="flex items-center gap-2 mb-3">
                             <HeartIcon size={16} className="v2-accent" />
                             <span className="v2-heading-sm">Update Max Heart Rate</span>
                         </div>
-                        <p className="v2-body-sm mb-4" style={{ color: 'var(--v2-text-muted)' }}>
+                        <p className="v2-body-sm mb-4" style={{ color: 'var(--text-muted)' }}>
                             The default (220 - age) is a rough estimate. For accuracy, use your highest HR from an all-out effort like a 5K race or uphill sprint.
                         </p>
                         <div className="flex gap-2">
@@ -257,7 +257,7 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: Pa
                                 min="120"
                                 max="220"
                             />
-                            <span className="v2-body-sm self-center" style={{ color: 'var(--v2-text-muted)' }}>bpm</span>
+                            <span className="v2-body-sm self-center" style={{ color: 'var(--text-muted)' }}>bpm</span>
                             <button
                                 onClick={() => {
                                     const val = parseInt(hrInput);
@@ -287,12 +287,12 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: Pa
                     <div
                         key={zone.name}
                         className="flex items-center justify-between py-3 border-b"
-                        style={{ borderColor: 'var(--v2-border)' }}
+                        style={{ borderColor: 'var(--border-base)' }}
                     >
                         <div className="flex-1">
                             <div className="flex items-center gap-2">
                                 <span className="v2-body-md font-medium">{zone.name}</span>
-                                <span className="v2-body-xs" style={{ color: 'var(--v2-text-muted)' }}>
+                                <span className="v2-body-xs" style={{ color: 'var(--text-muted)' }}>
                                     {zone.description}
                                 </span>
                             </div>
@@ -300,7 +300,7 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: Pa
                         <div className="text-right">
                             <span className="v2-mono v2-body-md">{zone.pace}/mi</span>
                             {zone.hrRange && (
-                                <div className="v2-body-xs flex items-center justify-end gap-1" style={{ color: 'var(--v2-text-subtle)' }}>
+                                <div className="v2-body-xs flex items-center justify-end gap-1" style={{ color: 'var(--text-subtle)' }}>
                                     <HeartIcon size={10} />
                                     {zone.hrRange}
                                 </div>
@@ -312,13 +312,13 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: Pa
 
             {/* Race Predictions */}
             <div>
-                <h3 className="v2-heading-sm mb-4" style={{ color: 'var(--v2-text-secondary)' }}>
+                <h3 className="v2-heading-sm mb-4" style={{ color: 'var(--text-muted)' }}>
                     Predicted Race Times
                 </h3>
                 <div className="grid grid-cols-4 gap-4">
                     {Object.entries(raceTimes).map(([distance, time]) => (
                         <div key={distance} className="text-center">
-                            <div className="v2-body-xs mb-1" style={{ color: 'var(--v2-text-muted)' }}>
+                            <div className="v2-body-xs mb-1" style={{ color: 'var(--text-muted)' }}>
                                 {distance}
                             </div>
                             <div className="v2-mono v2-body-md font-medium">
@@ -335,8 +335,8 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: Pa
                     className="mt-6 p-4 rounded-lg"
                     style={{ background: 'var(--v2-bg-inset)' }}
                 >
-                    <p className="v2-body-sm flex items-start gap-2" style={{ color: 'var(--v2-text-muted)' }}>
-                        <svg className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'var(--v2-accent)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <p className="v2-body-sm flex items-start gap-2" style={{ color: 'var(--text-muted)' }}>
+                        <svg className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'var(--color-accent)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                         </svg>
                         <span><strong>Tip:</strong> When pace and HR conflict, trust HR for easy runs (heat/fatigue matter), trust pace for intervals (HR lags effort).</span>

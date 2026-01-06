@@ -254,10 +254,10 @@ export function EasyPaceInputScreen({
                     onMinutesChange={(m) => onPaceChange(m, data.easyPaceSeconds)}
                     onSecondsChange={(s) => onPaceChange(data.easyPaceMinutes, s)}
                 />
-                <p style={{ color: 'var(--v2-text-muted)' }}>per mile</p>
+                <p style={{ color: 'var(--text-muted)' }}>per mile</p>
             </div>
 
-            <p className="v2-body-sm mt-4" style={{ color: 'var(--v2-text-subtle)' }}>
+            <p className="v2-body-sm mt-4" style={{ color: 'var(--text-subtle)' }}>
                 This should feel like you could chat with a friend.<br />
                 If you&apos;re breathing hard, that&apos;s not easy pace.
             </p>
@@ -321,10 +321,10 @@ export function ManualVo2maxInputScreen({
                 suffix="VO2max"
             />
 
-            <p className="mt-4 v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+            <p className="mt-4 v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                 Most runners fall between 30 and 70. We use this to set your training paces.
             </p>
-            <p className="mt-2 v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+            <p className="mt-2 v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                 Update your VO2max every 4-6 weeks or after a race in Settings.
             </p>
 
@@ -423,16 +423,16 @@ export function HardEffortInputScreen({
                                 onClick={() => onEffortLevelChange(level)}
                                 className="w-10 h-10 rounded-lg border transition-all"
                                 style={{
-                                    background: data.effortLevel === level ? 'var(--v2-accent)' : 'var(--v2-bg-elevated)',
-                                    borderColor: data.effortLevel === level ? 'transparent' : 'var(--v2-border)',
-                                    color: data.effortLevel === level ? 'var(--v2-bg-base)' : 'var(--v2-text-primary)',
+                                    background: data.effortLevel === level ? 'var(--color-accent)' : 'var(--bg-elevated)',
+                                    borderColor: data.effortLevel === level ? 'transparent' : 'var(--border-base)',
+                                    color: data.effortLevel === level ? 'var(--v2-bg-base)' : 'var(--text-base)',
                                 }}
                             >
                                 {level}
                             </button>
                         ))}
                     </div>
-                    <p className="v2-mono mt-2" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
+                    <p className="v2-mono mt-2" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
                         10 = absolute max effort, 6 = comfortably hard
                     </p>
                 </div>
@@ -561,7 +561,7 @@ export function VdotRevealScreen({
             <QuestionScreen onBack={onBack}>
                 <div className="text-center py-12">
                     <Loader2 className="w-8 h-8 animate-spin mx-auto v2-accent" />
-                    <p className="mt-4" style={{ color: 'var(--v2-text-muted)' }}>Calculating your VDOT...</p>
+                    <p className="mt-4" style={{ color: 'var(--text-muted)' }}>Calculating your VDOT...</p>
                 </div>
             </QuestionScreen>
         );
@@ -581,7 +581,7 @@ export function VdotRevealScreen({
             <div className="text-center mb-6">
                 <p className="v2-label v2-accent mb-2">Your VDOT</p>
                 <div className="v2-heading-xl v2-mono mb-2">{data.vdot}</div>
-                <p style={{ color: 'var(--v2-text-muted)' }}>
+                <p style={{ color: 'var(--text-muted)' }}>
                     {percentileInfo.label} • Top {100 - percentileInfo.percentile}% of recreational runners
                 </p>
                 {data.vdotConfidence === 'low' && (
@@ -593,7 +593,7 @@ export function VdotRevealScreen({
 
             {/* What is VDOT? Explainer */}
             <div className="p-4 rounded-xl mb-4" style={{ background: 'var(--v2-bg-inset)' }}>
-                <p className="v2-label mb-2" style={{ color: 'var(--v2-text-muted)' }}>What is VDOT?</p>
+                <p className="v2-label mb-2" style={{ color: 'var(--text-muted)' }}>What is VDOT?</p>
                 <p className="v2-body-sm leading-relaxed">
                     VDOT is your &quot;running fitness score&quot; developed by legendary coach Jack Daniels.
                     It&apos;s calculated from your race performance and accounts for both your aerobic capacity
@@ -605,7 +605,7 @@ export function VdotRevealScreen({
             <SuccessBanner title={`Predicts a ~${marathonHours}:${marathonMins.toString().padStart(2, '0')} marathon`}>
                 This gives us the data we need to set your training zones perfectly.
             </SuccessBanner>
-            <p className="mt-4 v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+            <p className="mt-4 v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                 You can update VO2max anytime in Settings → Fitness and we&apos;ll adjust your plan.
             </p>
 
@@ -619,7 +619,7 @@ export function VdotRevealScreen({
                             <span style={{ fontWeight: 500 }}>Easy</span>
                             <span className="v2-mono">{formatPace(paces.easy.min)} - {formatPace(paces.easy.max)}/mi</span>
                         </div>
-                        <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
+                        <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
                             Recovery runs, warm-ups, cool-downs. You should be able to hold a conversation comfortably.
                             This builds your aerobic base without taxing your body.
                         </p>
@@ -631,7 +631,7 @@ export function VdotRevealScreen({
                             <span style={{ fontWeight: 500 }}>Marathon Pace</span>
                             <span className="v2-mono">{formatPace(paces.marathon)}/mi</span>
                         </div>
-                        <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
+                        <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
                             Your predicted race-day pace. Feels &quot;comfortably hard&quot; — sustainable for 26.2 miles but
                             requires focus. Tempo blocks at this pace teach your body to hold it.
                         </p>
@@ -643,7 +643,7 @@ export function VdotRevealScreen({
                             <span style={{ fontWeight: 500 }}>Tempo (Threshold)</span>
                             <span className="v2-mono">{formatPace(paces.threshold)}/mi</span>
                         </div>
-                        <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
+                        <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
                             &quot;Comfortably hard&quot; — you can hold this for 20-40 minutes. Trains your body to clear
                             lactate efficiently, raising the pace you can sustain before your legs give out.
                         </p>
@@ -655,7 +655,7 @@ export function VdotRevealScreen({
                             <span style={{ fontWeight: 500 }}>Interval</span>
                             <span className="v2-mono">{formatPace(paces.interval)}/mi</span>
                         </div>
-                        <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
+                        <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
                             Hard, short repeats (400m–1 mile). Builds VO2max — your maximum aerobic capacity.
                             These are the workouts that genuinely hurt, but they make you faster.
                         </p>

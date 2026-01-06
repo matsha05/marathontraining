@@ -67,7 +67,7 @@ export function AppHeader({
             style={{
                 background: 'rgba(8, 8, 10, 0.8)',
                 backdropFilter: 'blur(12px)',
-                borderColor: 'var(--v2-border)'
+                borderColor: 'var(--border-base)'
             }}
         >
             <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -77,7 +77,7 @@ export function AppHeader({
                         <Link
                             href={backHref}
                             className="flex items-center gap-2 transition-colors"
-                            style={{ color: 'var(--v2-text-muted)' }}
+                            style={{ color: 'var(--text-muted)' }}
                         >
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -95,7 +95,7 @@ export function AppHeader({
                                     className="object-cover opacity-70"
                                 />
                             </div>
-                            <span className="text-sm font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
+                            <span className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
                                 {title || 'The Long Game'}
                             </span>
                         </Link>
@@ -108,10 +108,10 @@ export function AppHeader({
                     {isLoggedIn && streak !== undefined && streak > 0 && (
                         <div
                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-                            style={{ background: 'var(--v2-accent-subtle)' }}
+                            style={{ background: 'var(--color-accent-subtle)' }}
                         >
-                            <FlameIcon size={18} style={{ color: 'var(--v2-accent)' }} />
-                            <span className="text-sm font-bold" style={{ color: 'var(--v2-accent)' }}>{streak}</span>
+                            <FlameIcon size={18} style={{ color: 'var(--color-accent)' }} />
+                            <span className="text-sm font-bold" style={{ color: 'var(--color-accent)' }}>{streak}</span>
                         </div>
                     )}
 
@@ -124,18 +124,18 @@ export function AppHeader({
                             <Link
                                 href="/methodology"
                                 className="text-sm transition-colors"
-                                style={{ color: 'var(--v2-text-muted)' }}
-                                onMouseEnter={(e) => e.currentTarget.style.color = 'var(--v2-text-secondary)'}
-                                onMouseLeave={(e) => e.currentTarget.style.color = 'var(--v2-text-muted)'}
+                                style={{ color: 'var(--text-muted)' }}
+                                onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
+                                onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
                             >
                                 Methodology
                             </Link>
                             <Link
                                 href="/browse"
                                 className="text-sm transition-colors"
-                                style={{ color: 'var(--v2-text-muted)' }}
-                                onMouseEnter={(e) => e.currentTarget.style.color = 'var(--v2-text-secondary)'}
-                                onMouseLeave={(e) => e.currentTarget.style.color = 'var(--v2-text-muted)'}
+                                style={{ color: 'var(--text-muted)' }}
+                                onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
+                                onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
                             >
                                 Browse
                             </Link>
@@ -150,7 +150,7 @@ export function AppHeader({
                                 <Link
                                     href="/settings"
                                     className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors"
-                                    style={{ color: 'var(--v2-text-muted)' }}
+                                    style={{ color: 'var(--text-muted)' }}
                                     aria-label="Settings"
                                 >
                                     <SettingsIcon size={22} />
@@ -162,9 +162,9 @@ export function AppHeader({
                                 <Link
                                     href="/auth"
                                     className="text-sm transition-colors"
-                                    style={{ color: 'var(--v2-text-muted)' }}
-                                    onMouseEnter={(e) => e.currentTarget.style.color = 'var(--v2-text-secondary)'}
-                                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--v2-text-muted)'}
+                                    style={{ color: 'var(--text-muted)' }}
+                                    onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
                                 >
                                     Log In
                                 </Link>

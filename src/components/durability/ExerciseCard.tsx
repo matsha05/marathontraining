@@ -41,7 +41,7 @@ export function ExerciseCard({ exercise, index, showVideo = true }: ExerciseCard
             {/* Main Exercise Header */}
             <button
                 onClick={() => hasInstructions && setExpanded(!expanded)}
-                className={`w-full p-4 flex items-start gap-4 text-left ${hasInstructions ? 'hover:bg-[var(--v2-bg-elevated)] cursor-pointer' : ''
+                className={`w-full p-4 flex items-start gap-4 text-left ${hasInstructions ? 'hover:bg-[var(--bg-elevated)] cursor-pointer' : ''
                     } transition-colors`}
             >
                 {/* Step Number */}
@@ -49,7 +49,7 @@ export function ExerciseCard({ exercise, index, showVideo = true }: ExerciseCard
                     <div
                         className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium"
                         style={{
-                            background: 'linear-gradient(135deg, var(--v2-accent), var(--v2-accent-muted))',
+                            background: 'linear-gradient(135deg, var(--color-accent), var(--color-accent-muted))',
                             color: 'white',
                         }}
                     >
@@ -63,8 +63,8 @@ export function ExerciseCard({ exercise, index, showVideo = true }: ExerciseCard
 
                     {/* Dosage */}
                     <div className="flex items-center gap-2 mb-2">
-                        <Clock size={14} className="text-[var(--v2-accent)]" />
-                        <span className="text-sm font-medium" style={{ color: 'var(--v2-accent)' }}>
+                        <Clock size={14} className="text-[var(--color-accent)]" />
+                        <span className="text-sm font-medium" style={{ color: 'var(--color-accent)' }}>
                             {exercise.dosage}
                         </span>
                     </div>
@@ -77,7 +77,7 @@ export function ExerciseCard({ exercise, index, showVideo = true }: ExerciseCard
                                 className="px-2 py-0.5 rounded-full text-xs"
                                 style={{
                                     background: 'var(--v2-gradient-glow)',
-                                    color: 'var(--v2-text-secondary)',
+                                    color: 'var(--text-muted)',
                                 }}
                             >
                                 {cue}
@@ -88,7 +88,7 @@ export function ExerciseCard({ exercise, index, showVideo = true }: ExerciseCard
 
                 {/* Expand/Collapse */}
                 {hasInstructions && (
-                    <div className="flex-shrink-0 text-[var(--v2-text-subtle)]">
+                    <div className="flex-shrink-0 text-[var(--text-subtle)]">
                         {expanded ? (
                             <ChevronUp size={20} />
                         ) : (
@@ -108,14 +108,14 @@ export function ExerciseCard({ exercise, index, showVideo = true }: ExerciseCard
                         transition={{ duration: 0.3 }}
                         className="overflow-hidden"
                     >
-                        <div className="px-4 pb-4 border-t border-[var(--v2-border)]">
+                        <div className="px-4 pb-4 border-t border-[var(--border-base)]">
                             {/* Step-by-Step Instructions */}
                             <div className="mt-4 mb-4">
                                 <div className="flex items-center gap-2 mb-3">
                                     <BookOpen size={14} className="text-[var(--v2-durability)]" />
                                     <span
                                         className="text-xs uppercase tracking-wide font-medium"
-                                        style={{ color: 'var(--v2-text-subtle)' }}
+                                        style={{ color: 'var(--text-subtle)' }}
                                     >
                                         How to Perform
                                     </span>
@@ -125,7 +125,7 @@ export function ExerciseCard({ exercise, index, showVideo = true }: ExerciseCard
                                         <li
                                             key={i}
                                             className="text-sm leading-relaxed pl-4"
-                                            style={{ color: 'var(--v2-text-secondary)' }}
+                                            style={{ color: 'var(--text-muted)' }}
                                         >
                                             {step}
                                         </li>
@@ -152,14 +152,14 @@ export function ExerciseCard({ exercise, index, showVideo = true }: ExerciseCard
                                         <Play size={18} className="text-red-500" fill="currentColor" />
                                     </div>
                                     <div className="flex-1">
-                                        <span className="text-sm font-medium" style={{ color: 'var(--v2-text-primary)' }}>
+                                        <span className="text-sm font-medium" style={{ color: 'var(--text-base)' }}>
                                             Watch Video Demo
                                         </span>
-                                        <p className="text-xs" style={{ color: 'var(--v2-text-subtle)' }}>
+                                        <p className="text-xs" style={{ color: 'var(--text-subtle)' }}>
                                             Opens in YouTube
                                         </p>
                                     </div>
-                                    <ExternalLink size={14} className="text-[var(--v2-text-subtle)]" />
+                                    <ExternalLink size={14} className="text-[var(--text-subtle)]" />
                                 </a>
                             )}
 
@@ -167,7 +167,7 @@ export function ExerciseCard({ exercise, index, showVideo = true }: ExerciseCard
                             {exercise.source && (
                                 <p
                                     className="text-xs text-center mt-3 italic"
-                                    style={{ color: 'var(--v2-text-ghost)' }}
+                                    style={{ color: 'var(--text-subtle)' }}
                                 >
                                     Source: {exercise.source}
                                 </p>

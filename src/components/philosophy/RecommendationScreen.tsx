@@ -127,14 +127,14 @@ export function RecommendationScreen({
                     <button
                         onClick={() => setShowConfirmOverride(false)}
                         className="text-sm transition-colors mb-8"
-                        style={{ color: 'var(--v2-text-subtle)' }}
+                        style={{ color: 'var(--text-subtle)' }}
                     >
                         ← Back to recommendation
                     </button>
 
                     <h1
                         className="text-3xl font-light mb-4"
-                        style={{ color: 'var(--v2-text-primary)' }}
+                        style={{ color: 'var(--text-base)' }}
                     >
                         Switching to {selectedPhilosophy.name}
                     </h1>
@@ -159,7 +159,7 @@ export function RecommendationScreen({
                                     <li
                                         key={i}
                                         className="text-sm"
-                                        style={{ color: 'var(--v2-text-tertiary)' }}
+                                        style={{ color: 'var(--text-muted)' }}
                                     >
                                         • {warning}
                                     </li>
@@ -189,15 +189,15 @@ export function RecommendationScreen({
                     <div className="v2-card mt-8 p-5">
                         <p
                             className="text-xs uppercase tracking-widest mb-4"
-                            style={{ color: 'var(--v2-text-muted)' }}
+                            style={{ color: 'var(--text-muted)' }}
                         >
                             Still included regardless
                         </p>
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                             {FOUNDATION_LAYERS.map((layer) => (
                                 <div key={layer.coach} className="text-center">
-                                    <p className="text-xs" style={{ color: 'var(--v2-text-tertiary)' }}>{layer.focus}</p>
-                                    <p className="text-[10px] mt-1" style={{ color: 'var(--v2-text-subtle)' }}>{layer.coach}</p>
+                                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{layer.focus}</p>
+                                    <p className="text-[10px] mt-1" style={{ color: 'var(--text-subtle)' }}>{layer.coach}</p>
                                 </div>
                             ))}
                         </div>
@@ -227,7 +227,7 @@ export function RecommendationScreen({
             <button
                 onClick={onBack}
                 className="fixed top-8 left-6 text-sm transition-colors"
-                style={{ color: 'var(--v2-text-subtle)' }}
+                style={{ color: 'var(--text-subtle)' }}
             >
                 ← Back
             </button>
@@ -241,13 +241,13 @@ export function RecommendationScreen({
                 >
                     <p
                         className="text-xs uppercase tracking-widest mb-3"
-                        style={{ color: 'var(--v2-text-muted)' }}
+                        style={{ color: 'var(--text-muted)' }}
                     >
                         Based on your answers
                     </p>
                     <h1
                         className="text-4xl md:text-5xl font-light"
-                        style={{ color: 'var(--v2-text-primary)' }}
+                        style={{ color: 'var(--text-base)' }}
                     >
                         We recommend
                     </h1>
@@ -282,17 +282,17 @@ export function RecommendationScreen({
                             }}
                         >
                             <div className="flex items-start gap-3">
-                                <span style={{ color: 'var(--v2-accent)', marginTop: '2px' }}>ℹ️</span>
+                                <span style={{ color: 'var(--color-accent)', marginTop: '2px' }}>ℹ️</span>
                                 <div>
                                     <p
                                         className="text-sm font-medium mb-1"
-                                        style={{ color: 'var(--v2-text-secondary)' }}
+                                        style={{ color: 'var(--text-muted)' }}
                                     >
                                         Plan adjusted to fit your schedule
                                     </p>
                                     <p
                                         className="text-sm"
-                                        style={{ color: 'var(--v2-text-tertiary)' }}
+                                        style={{ color: 'var(--text-muted)' }}
                                     >
                                         {personalizedPrimary.adjustmentReason}
                                     </p>
@@ -305,7 +305,7 @@ export function RecommendationScreen({
                     <div className="v2-card mt-6 p-5">
                         <p
                             className="text-xs uppercase tracking-widest mb-3"
-                            style={{ color: 'var(--v2-text-muted)' }}
+                            style={{ color: 'var(--text-muted)' }}
                         >
                             Why this fits you
                         </p>
@@ -314,9 +314,9 @@ export function RecommendationScreen({
                                 <li
                                     key={i}
                                     className="text-sm flex items-start gap-2"
-                                    style={{ color: 'var(--v2-text-tertiary)' }}
+                                    style={{ color: 'var(--text-muted)' }}
                                 >
-                                    <span className="mt-0.5" style={{ color: 'var(--v2-accent)' }}>✓</span>
+                                    <span className="mt-0.5" style={{ color: 'var(--color-accent)' }}>✓</span>
                                     {reason}
                                 </li>
                             ))}
@@ -337,7 +337,7 @@ export function RecommendationScreen({
                                     <li
                                         key={i}
                                         className="text-sm"
-                                        style={{ color: 'var(--v2-text-tertiary)' }}
+                                        style={{ color: 'var(--text-muted)' }}
                                     >
                                         • {warning}
                                     </li>
@@ -350,15 +350,15 @@ export function RecommendationScreen({
                     <div className="v2-card mt-6 p-5">
                         <p
                             className="text-xs uppercase tracking-widest mb-4"
-                            style={{ color: 'var(--v2-text-muted)' }}
+                            style={{ color: 'var(--text-muted)' }}
                         >
                             Also included in every plan
                         </p>
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                             {FOUNDATION_LAYERS.map((layer) => (
                                 <div key={layer.coach} className="text-center">
-                                    <p className="text-xs" style={{ color: 'var(--v2-text-tertiary)' }}>{layer.focus}</p>
-                                    <p className="text-[10px] mt-1" style={{ color: 'var(--v2-text-subtle)' }}>{layer.coach}</p>
+                                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{layer.focus}</p>
+                                    <p className="text-[10px] mt-1" style={{ color: 'var(--text-subtle)' }}>{layer.coach}</p>
                                 </div>
                             ))}
                         </div>
@@ -384,8 +384,8 @@ export function RecommendationScreen({
                         onClick={() => setShowAlternatives(!showAlternatives)}
                         className="w-full text-center text-sm transition-colors py-4"
                         style={{
-                            color: 'var(--v2-text-muted)',
-                            borderTop: '1px solid var(--v2-border)'
+                            color: 'var(--text-muted)',
+                            borderTop: '1px solid var(--border-base)'
                         }}
                     >
                         {showAlternatives ? 'Hide alternatives' : 'See other approaches'}
@@ -427,13 +427,13 @@ export function RecommendationScreen({
                                 <div
                                     className="mt-8 p-5 rounded-xl border"
                                     style={{
-                                        background: 'var(--v2-bg-elevated)',
-                                        borderColor: 'var(--v2-border)'
+                                        background: 'var(--bg-elevated)',
+                                        borderColor: 'var(--border-base)'
                                     }}
                                 >
                                     <p
                                         className="text-xs uppercase tracking-widest mb-4"
-                                        style={{ color: 'var(--v2-text-muted)' }}
+                                        style={{ color: 'var(--text-muted)' }}
                                     >
                                         Not available for your profile
                                     </p>
@@ -454,14 +454,14 @@ export function RecommendationScreen({
                                                 <div key={coach} className="flex items-start gap-3">
                                                     <span
                                                         className="text-sm mt-0.5"
-                                                        style={{ color: 'var(--v2-text-subtle)' }}
+                                                        style={{ color: 'var(--text-subtle)' }}
                                                     >
                                                         ×
                                                     </span>
                                                     <div>
                                                         <p
                                                             className="text-sm"
-                                                            style={{ color: 'var(--v2-text-tertiary)' }}
+                                                            style={{ color: 'var(--text-muted)' }}
                                                         >
                                                             {reason}
                                                         </p>
@@ -469,14 +469,14 @@ export function RecommendationScreen({
                                                             <button
                                                                 onClick={handleFixClick}
                                                                 className="text-xs mt-1.5 flex items-center gap-1.5 transition-colors hover:opacity-80"
-                                                                style={{ color: 'var(--v2-accent)' }}
+                                                                style={{ color: 'var(--color-accent)' }}
                                                             >
                                                                 <span style={{
                                                                     display: 'inline-block',
                                                                     width: '4px',
                                                                     height: '4px',
                                                                     borderRadius: '50%',
-                                                                    background: 'var(--v2-accent)'
+                                                                    background: 'var(--color-accent)'
                                                                 }} />
                                                                 {fixType === 'days' && onUpdateAnswers
                                                                     ? `Bump to ${requiredDays} days →`

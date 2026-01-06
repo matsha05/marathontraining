@@ -1,22 +1,45 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, Instrument_Sans, IBM_Plex_Mono } from "next/font/google";
+import { Instrument_Sans, IBM_Plex_Mono, Inter, Sora, DM_Sans, Onest } from "next/font/google";
+import { GeistSans, GeistMono } from "geist/font";
 import "./globals.css";
 import "./globals-v2.css";
 import { SyncStatusIndicator } from "@/components/ui/OfflineIndicator";
 import { Providers } from "@/components/ui/Providers";
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-space",
-});
 
 const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
   display: "swap",
   weight: ["400", "500", "600"],
   variable: "--font-instrument",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600"],
+  variable: "--font-inter",
+});
+
+const sora = Sora({
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600"],
+  variable: "--font-sora",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600"],
+  variable: "--font-dm-sans",
+});
+
+const onest = Onest({
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600"],
+  variable: "--font-onest",
 });
 
 const plexMono = IBM_Plex_Mono({
@@ -67,7 +90,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`dark ${spaceGrotesk.variable} ${instrumentSans.variable} ${plexMono.variable}`}>
+    <html lang="en" className={`${instrumentSans.variable} ${inter.variable} ${sora.variable} ${dmSans.variable} ${onest.variable} ${GeistSans.variable} ${GeistMono.variable} ${plexMono.variable}`}>
       <body>
         <Providers>
           {children}

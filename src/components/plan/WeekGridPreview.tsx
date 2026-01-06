@@ -41,25 +41,25 @@ export function WeekGridPreview({
                 className={`p-${compact ? '3' : '4'} rounded-lg text-center transition-all duration-200`}
                 style={{
                     background: d.type === "long"
-                        ? 'var(--v2-accent-subtle)'
+                        ? 'var(--color-accent-subtle)'
                         : d.type === "rest"
-                            ? 'var(--v2-bg-elevated)'
-                            : 'var(--v2-bg-hover)',
+                            ? 'var(--bg-elevated)'
+                            : 'var(--bg-muted)',
                 }}
             >
-                <p className="text-[10px] mb-2" style={{ color: 'var(--v2-text-subtle)' }}>{d.day}</p>
+                <p className="text-[10px] mb-2" style={{ color: 'var(--text-subtle)' }}>{d.day}</p>
                 <p
                     className={`${compact ? 'text-xs' : 'text-sm'} mb-1`}
-                    style={{ color: d.type === "rest" ? 'var(--v2-text-ghost)' : 'var(--v2-text-secondary)' }}
+                    style={{ color: d.type === "rest" ? 'var(--text-subtle)' : 'var(--text-muted)' }}
                 >
                     {d.label}
                 </p>
                 {d.sub && (
-                    <p className="text-[10px] font-mono" style={{ color: 'var(--v2-text-subtle)' }}>{d.sub}</p>
+                    <p className="text-[10px] font-mono" style={{ color: 'var(--text-subtle)' }}>{d.sub}</p>
                 )}
                 {d.strength && (
-                    <div className="mt-2 pt-2" style={{ borderTop: '1px solid var(--v2-border)' }}>
-                        <p className="text-[10px]" style={{ color: 'var(--v2-secondary)' }}>+ Strength</p>
+                    <div className="mt-2 pt-2" style={{ borderTop: '1px solid var(--border-base)' }}>
+                        <p className="text-[10px]" style={{ color: 'var(--color-strength)' }}>+ Strength</p>
                     </div>
                 )}
             </div>
@@ -83,7 +83,7 @@ export function WeekGridPreview({
     return (
         <div>
             {weekLabel && (
-                <p className="text-xs mb-3 font-mono" style={{ color: 'var(--v2-text-ghost)' }}>
+                <p className="text-xs mb-3 font-mono" style={{ color: 'var(--text-subtle)' }}>
                     {weekLabel}
                 </p>
             )}

@@ -57,13 +57,13 @@ export function Toggle({
                         <label
                             htmlFor={id}
                             className="font-medium cursor-pointer"
-                            style={{ color: 'var(--v2-text-secondary)' }}
+                            style={{ color: 'var(--text-muted)' }}
                         >
                             {label}
                         </label>
                     )}
                     {description && (
-                        <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>{description}</p>
+                        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{description}</p>
                     )}
                 </div>
             )}
@@ -83,7 +83,7 @@ export function Toggle({
                     focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
                 `}
                 style={{
-                    background: checked ? 'var(--v2-accent)' : 'var(--v2-bg-elevated)',
+                    background: checked ? 'var(--color-accent)' : 'var(--bg-elevated)',
                     opacity: disabled ? 0.5 : 1,
                     cursor: disabled ? 'not-allowed' : 'pointer',
                 }}

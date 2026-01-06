@@ -29,6 +29,7 @@ import {
     getFRRKeyWorkout,
     toTrainingPhase as frrToPhase,
     validateFRRPlan,
+    type FRRPhase,
 } from './coaches/pfitzinger-frr';
 import {
     DANIELS_TIER_CONFIGS,
@@ -38,6 +39,7 @@ import {
     toTrainingPhase as danielsToPhase,
     validateDanielsPlan,
 } from './coaches/daniels';
+import type { DanielsPhase } from './types';
 import {
     generateHigdonLongRunProgression,
     getHigdonPhase,
@@ -52,6 +54,7 @@ import {
     getHansonsWeeklyMileage,
     generateHansonsLongRunProgression,
     toTrainingPhase as hansonsToPhase,
+    type HansonsPhase,
 } from './coaches/hansons';
 import {
     PFITZ_TIER_CONFIGS,
@@ -60,6 +63,7 @@ import {
     getPfitzWeeklyMileage,
     generatePfitzLongRunProgression,
     toTrainingPhase as pfitzToPhase,
+    type PfitzPhase,
 } from './coaches/pfitzinger';
 import { HigdonTier, HIGDON_TIER_CONFIGS } from './types';
 import { generateMileageProgression, calculatePeakMileage } from './mileage';
@@ -140,9 +144,9 @@ export function generateFRRPlan(
         });
     }
 
-    // Build phase breakdown
+    // Build phase breakdown - FRRPhase maps 1:1 to TrainingPhase
     const phases = Object.entries(config.phases).map(([phaseName, weekNums]) => ({
-        phase: frrToPhase(phaseName as any) as TrainingPhase,
+        phase: frrToPhase(phaseName as FRRPhase) as TrainingPhase,
         startWeek: Math.min(...weekNums),
         endWeek: Math.max(...weekNums),
         weeks: weekNums.length,
@@ -153,7 +157,7 @@ export function generateFRRPlan(
         createdAt: new Date().toISOString(),
         athleteName: input.name,
         vdot: input.vdot,
-        goalDistance: config.distance === 'half' ? 'half' : config.distance as any,
+        goalDistance: config.distance as '5k' | '10k' | 'half' | 'marathon',
         raceName: input.raceName,
         raceDate: input.raceDate,
         weeks,
@@ -330,10 +334,10 @@ export function generateDanielsPlan(
         });
     }
 
-    // Build phase breakdown
+    // Build phase breakdown - DanielsPhase requires explicit mapping
     const phaseEntries = Object.entries(config.phases).filter(([, weeks]) => weeks.length > 0);
     const phases = phaseEntries.map(([phaseName, weekNums]) => ({
-        phase: danielsToPhase(phaseName as any) as TrainingPhase,
+        phase: danielsToPhase(phaseName as DanielsPhase) as TrainingPhase,
         startWeek: Math.min(...weekNums),
         endWeek: Math.max(...weekNums),
         weeks: weekNums.length,
@@ -724,11 +728,11 @@ export function generateHansonsPlan(
         });
     }
 
-    // Build phase breakdown
+    // Build phase breakdown - HansonsPhase requires explicit mapping
     const phaseBreakdown = Object.entries(config.phases)
         .filter(([, weeks]) => weeks.length > 0)
         .map(([phaseName, weekNums]) => ({
-            phase: hansonsToPhase(phaseName as any) as TrainingPhase,
+            phase: hansonsToPhase(phaseName as HansonsPhase) as TrainingPhase,
             startWeek: Math.min(...weekNums),
             endWeek: Math.max(...weekNums),
             weeks: weekNums.length,
@@ -905,11 +909,11 @@ export function generatePfitzAMPlan(
         });
     }
 
-    // Build phase breakdown
+    // Build phase breakdown - PfitzPhase requires explicit mapping
     const phaseBreakdown = Object.entries(config.phases)
         .filter(([, weeks]) => weeks.length > 0)
         .map(([phaseName, weekNums]) => ({
-            phase: pfitzToPhase(phaseName as any) as TrainingPhase,
+            phase: pfitzToPhase(phaseName as PfitzPhase) as TrainingPhase,
             startWeek: Math.min(...weekNums),
             endWeek: Math.max(...weekNums),
             weeks: weekNums.length,

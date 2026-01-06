@@ -29,22 +29,22 @@ const COACH_BRANDING: Record<CoachPhilosophy, {
 }> = {
     higdon: {
         name: 'Hal Higdon',
-        color: '#4A90D9',
+        color: 'var(--color-coach-higdon)',
         initials: 'HH',
     },
     hansons: {
         name: 'Hansons',
-        color: '#E74C3C',
+        color: 'var(--color-coach-hansons)',
         initials: 'HM',
     },
     pfitzinger: {
         name: 'Pfitzinger',
-        color: '#27AE60',
+        color: 'var(--color-coach-pfitzinger)',
         initials: 'PP',
     },
     daniels: {
         name: 'Daniels',
-        color: '#9B59B6',
+        color: 'var(--color-coach-daniels)',
         initials: 'JD',
     },
 };
@@ -87,7 +87,7 @@ export function CoachingContextCard({
                     className="v2-card p-4 transition-all hover:border-opacity-100"
                     style={{
                         borderColor: `${branding.color}40`,
-                        background: 'var(--v2-bg-elevated)',
+                        background: 'var(--bg-elevated)',
                     }}
                 >
                     <div className="flex items-center justify-between">
@@ -99,17 +99,17 @@ export function CoachingContextCard({
                                 {branding.initials}
                             </div>
                             <div>
-                                <p className="text-sm font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
+                                <p className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
                                     Why this workout?
                                 </p>
-                                <p className="text-xs" style={{ color: 'var(--v2-text-muted)' }}>
+                                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
                                     Based on {branding.name}
                                 </p>
                             </div>
                         </div>
                         <svg
                             className={`w-5 h-5 transition-transform ${expanded ? 'rotate-180' : ''}`}
-                            style={{ color: 'var(--v2-text-muted)' }}
+                            style={{ color: 'var(--text-muted)' }}
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -119,7 +119,7 @@ export function CoachingContextCard({
                     </div>
 
                     {expanded && (
-                        <div className="mt-4 pt-4 space-y-4" style={{ borderTop: '1px solid var(--v2-border)' }}>
+                        <div className="mt-4 pt-4 space-y-4" style={{ borderTop: '1px solid var(--border-base)' }}>
                             <ContextContent context={context} branding={branding} />
                         </div>
                     )}
@@ -133,7 +133,7 @@ export function CoachingContextCard({
             className="v2-card p-5 border-l-4"
             style={{
                 borderLeftColor: branding.color,
-                background: 'var(--v2-bg-elevated)',
+                background: 'var(--bg-elevated)',
             }}
         >
             <div className="flex items-center gap-3 mb-4">
@@ -144,7 +144,7 @@ export function CoachingContextCard({
                     {branding.initials}
                 </div>
                 <div>
-                    <p className="text-sm font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
+                    <p className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
                         Coach&apos;s Perspective
                     </p>
                     <p className="text-xs" style={{ color: branding.color }}>
@@ -176,17 +176,17 @@ function ContextContent({
                 <p className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: branding.color }}>
                     Why This Workout
                 </p>
-                <p className="text-sm leading-relaxed" style={{ color: 'var(--v2-text-secondary)' }}>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                     {context.why}
                 </p>
             </div>
 
             {/* Feel Section */}
             <div>
-                <p className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: 'var(--v2-text-muted)' }}>
+                <p className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
                     How It Should Feel
                 </p>
-                <p className="text-sm leading-relaxed" style={{ color: 'var(--v2-text-muted)' }}>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                     {context.feel}
                 </p>
             </div>
@@ -208,15 +208,15 @@ function ContextContent({
             {context.coachTip && (
                 <div
                     className="p-3 rounded-lg"
-                    style={{ background: 'var(--v2-bg-deep)' }}
+                    style={{ background: 'var(--bg-base)' }}
                 >
-                    <p className="text-xs font-medium mb-1 flex items-center gap-1.5" style={{ color: 'var(--v2-text-muted)' }}>
+                    <p className="text-xs font-medium mb-1 flex items-center gap-1.5" style={{ color: 'var(--text-muted)' }}>
                         <svg className="w-3.5 h-3.5" style={{ color: branding.color }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                         </svg>
                         Pro Tip
                     </p>
-                    <p className="text-sm italic" style={{ color: 'var(--v2-text-secondary)' }}>
+                    <p className="text-sm italic" style={{ color: 'var(--text-muted)' }}>
                         &quot;{context.coachTip}&quot;
                     </p>
                 </div>
@@ -252,11 +252,11 @@ export function PhaseBanner({ phase, weekNumber, totalWeeks, coach = 'higdon' }:
                     >
                         {context.title}
                     </span>
-                    <span className="text-xs" style={{ color: 'var(--v2-text-muted)' }}>
+                    <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
                         • Week {weekNumber} of {totalWeeks}
                     </span>
                 </div>
-                <span className="text-xs font-mono" style={{ color: 'var(--v2-text-muted)' }}>
+                <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
                     {progress}%
                 </span>
             </div>
@@ -264,7 +264,7 @@ export function PhaseBanner({ phase, weekNumber, totalWeeks, coach = 'higdon' }:
             {/* Progress bar */}
             <div
                 className="h-1 rounded-full overflow-hidden"
-                style={{ background: 'var(--v2-bg-elevated)' }}
+                style={{ background: 'var(--bg-elevated)' }}
             >
                 <div
                     className="h-full rounded-full transition-all duration-500"
@@ -276,7 +276,7 @@ export function PhaseBanner({ phase, weekNumber, totalWeeks, coach = 'higdon' }:
             </div>
 
             {/* Phase focus */}
-            <p className="text-xs mt-2" style={{ color: 'var(--v2-text-muted)' }}>
+            <p className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>
                 {context.focus}
             </p>
         </div>
@@ -293,15 +293,15 @@ interface IntensityBadgeProps {
 }
 
 const ZONE_COLORS: Record<string, string> = {
-    E: '#3498DB', // Easy - Blue
-    M: '#27AE60', // Marathon - Green  
-    T: '#F39C12', // Threshold - Orange
-    I: '#E74C3C', // Interval - Red
-    R: '#9B59B6', // Repetition - Purple
+    E: 'var(--color-zone-easy)',
+    M: 'var(--color-zone-marathon)',
+    T: 'var(--color-zone-threshold)',
+    I: 'var(--color-zone-interval)',
+    R: 'var(--color-zone-repetition)',
 };
 
 export function IntensityBadge({ zone, showTooltip = true }: IntensityBadgeProps) {
-    const color = ZONE_COLORS[zone] || 'var(--v2-text-muted)';
+    const color = ZONE_COLORS[zone] || 'var(--text-muted)';
 
     const zoneNames: Record<string, string> = {
         E: 'Easy',

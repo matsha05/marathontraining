@@ -34,14 +34,14 @@ export function generateDurabilityPrescription(results: AssessmentResults): Dura
     const prescribedModuleIds = getModulesForFailedAssessments(failedAssessments);
     const priorityModules = prescribedModuleIds
         .map(id => DURABILITY_MODULES[id])
-        .filter(Boolean);
+        .filter((m): m is DurabilityModule => m !== undefined);
 
     // Default maintenance modules for all runners
     const maintenanceModuleIds = ['glute_activation', 'core_stability', 'thoracic_mobility'];
     const maintenanceModules = maintenanceModuleIds
         .filter(id => !prescribedModuleIds.includes(id))
         .map(id => DURABILITY_MODULES[id])
-        .filter(Boolean);
+        .filter((m): m is DurabilityModule => m !== undefined);
 
     // Calculate daily time
     const dailyModules = [...priorityModules, ...maintenanceModules]
@@ -94,5 +94,5 @@ export function getDailyDurabilityModules(
     const moduleIds = prescription.weeklySchedule[dayOfWeek.toLowerCase()] || [];
     return moduleIds
         .map(id => DURABILITY_MODULES[id])
-        .filter(Boolean);
+        .filter((m): m is DurabilityModule => m !== undefined);
 }

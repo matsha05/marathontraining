@@ -90,7 +90,7 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
             const idParts = resolvedParams.id.split('-');
 
             // Try to find by date first
-            if (idParts.length >= 3 && !isNaN(parseInt(idParts[0]))) {
+            if (idParts.length >= 3 && !Number.isNaN(parseInt(idParts[0], 10))) {
                 const dateStr = `${idParts[0]}-${idParts[1]}-${idParts[2]}`;
                 for (const week of plan.weeks) {
                     const day = week.days.find(d => d.date === dateStr);
@@ -106,8 +106,8 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
             if (resolvedParams.id.startsWith('w')) {
                 const match = resolvedParams.id.match(/w(\d+)-d(\d+)/);
                 if (match) {
-                    const weekNum = parseInt(match[1]);
-                    const dayNum = parseInt(match[2]);
+                    const weekNum = parseInt(match[1], 10);
+                    const dayNum = parseInt(match[2], 10);
                     const week = plan.weeks.find(w => w.weekNumber === weekNum);
                     const day = week?.days.find(d => d.dayOfWeek === dayNum);
                     if (day) {
@@ -138,13 +138,13 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
     // Loading state
     if (loading) {
         return (
-            <div className="min-h-screen" style={{ background: 'var(--v2-bg-deep)', color: 'var(--v2-text-primary)' }}>
+            <div className="min-h-screen" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>
                 <SiteHeader />
                 <main className="max-w-3xl mx-auto px-6 py-10">
                     <div className="animate-pulse space-y-6">
-                        <div className="h-24 rounded-xl" style={{ background: 'var(--v2-bg-elevated)' }} />
-                        <div className="h-48 rounded-xl" style={{ background: 'var(--v2-bg-elevated)' }} />
-                        <div className="h-24 rounded-xl" style={{ background: 'var(--v2-bg-elevated)' }} />
+                        <div className="h-24 rounded-xl" style={{ background: 'var(--bg-elevated)' }} />
+                        <div className="h-48 rounded-xl" style={{ background: 'var(--bg-elevated)' }} />
+                        <div className="h-24 rounded-xl" style={{ background: 'var(--bg-elevated)' }} />
                     </div>
                 </main>
             </div>
@@ -154,12 +154,12 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
     // No workout found
     if (!workout || !workout.runWorkout) {
         return (
-            <div className="min-h-screen" style={{ background: 'var(--v2-bg-deep)', color: 'var(--v2-text-primary)' }}>
+            <div className="min-h-screen" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>
                 <SiteHeader />
                 <main className="max-w-3xl mx-auto px-6 py-10">
                     <div className="v2-card p-10 text-center">
-                        <h2 className="text-xl font-light mb-4" style={{ color: 'var(--v2-text-primary)' }}>Rest Day</h2>
-                        <p className="text-sm mb-6" style={{ color: 'var(--v2-text-muted)' }}>
+                        <h2 className="text-xl font-light mb-4" style={{ color: 'var(--text-base)' }}>Rest Day</h2>
+                        <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>
                             No workout scheduled. Enjoy your recovery!
                         </p>
                         <button
@@ -190,7 +190,7 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
     const weekNumber = weekPlan?.weekNumber || currentWeek || 1;
 
     return (
-        <div className="min-h-screen" style={{ background: 'var(--v2-bg-deep)', color: 'var(--v2-text-primary)' }}>
+        <div className="min-h-screen" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>
             <SiteHeader />
 
             <main className="max-w-3xl mx-auto px-6 pt-24 pb-10">
@@ -238,7 +238,7 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
                                 </p>
                                 <p className="v2-metric-label mt-1">miles</p>
                             </div>
-                            <div className="v2-heading-md" style={{ color: 'var(--v2-text-subtle)' }}>≈</div>
+                            <div className="v2-heading-md" style={{ color: 'var(--text-subtle)' }}>≈</div>
                             <div>
                                 <p className="v2-metric-hero v2-metric-hero-muted">
                                     {run.estimatedDuration}
@@ -251,10 +251,10 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
                     {/* Simple Effort Instruction */}
                     <div
                         className="p-6 rounded-2xl text-center"
-                        style={{ background: 'var(--v2-bg-elevated)', border: '1px solid var(--v2-border)' }}
+                        style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-base)' }}
                     >
-                        <p className="text-lg mb-2" style={{ color: 'var(--v2-text-secondary)' }}>
-                            Run at <strong style={{ color: 'var(--v2-accent)' }}>
+                        <p className="text-lg mb-2" style={{ color: 'var(--text-muted)' }}>
+                            Run at <strong style={{ color: 'var(--color-accent)' }}>
                                 {run.segments[0]?.pace === 'E' ? 'Easy Pace'
                                     : run.segments[0]?.pace === 'M' ? 'Marathon Pace'
                                         : run.segments[0]?.pace === 'T' ? 'Threshold Pace'
@@ -263,11 +263,11 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
                                                     : 'Comfortable Pace'}
                             </strong>
                         </p>
-                        <p className="text-2xl font-mono" style={{ color: 'var(--v2-accent)' }}>
+                        <p className="text-2xl font-mono" style={{ color: 'var(--color-accent)' }}>
                             {getPaceForZone(run.segments[0]?.pace || 'E', paces)}/mile
                         </p>
                         {run.segments[0]?.pace === 'E' && (
-                            <p className="text-sm mt-3" style={{ color: 'var(--v2-text-muted)' }}>
+                            <p className="text-sm mt-3" style={{ color: 'var(--text-muted)' }}>
                                 Should feel conversational — if you can&apos;t talk, slow down
                             </p>
                         )}
@@ -311,29 +311,29 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
                                     <div
                                         key={index}
                                         className={`v2-card p-5 ${isMain ? 'border-l-4' : ''}`}
-                                        style={isMain ? { borderLeftColor: 'var(--v2-accent)' } : {}}
+                                        style={isMain ? { borderLeftColor: 'var(--color-accent)' } : {}}
                                     >
                                         <div className="flex items-start justify-between gap-4">
                                             <div className="flex-1">
                                                 {/* Segment Label */}
-                                                <p className="font-medium mb-1" style={{ color: isMain ? 'var(--v2-accent)' : 'var(--v2-text-secondary)' }}>
+                                                <p className="font-medium mb-1" style={{ color: isMain ? 'var(--color-accent)' : 'var(--text-muted)' }}>
                                                     {segmentLabel}
                                                 </p>
 
                                                 {/* Pace Zone - spelled out */}
                                                 {zoneName && (
-                                                    <p className="text-sm mb-2" style={{ color: 'var(--v2-text-muted)' }}>
+                                                    <p className="text-sm mb-2" style={{ color: 'var(--text-muted)' }}>
                                                         {zoneName}
                                                     </p>
                                                 )}
 
                                                 {/* Description or distance */}
                                                 {segment.description ? (
-                                                    <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                                    <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                                                         {segment.description}
                                                     </p>
                                                 ) : distanceText && (
-                                                    <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                                    <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                                                         {distanceText}
                                                     </p>
                                                 )}
@@ -343,7 +343,7 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
                                             <div className="text-right shrink-0">
                                                 {/* Target Pace */}
                                                 {pace && (
-                                                    <p className="font-mono font-semibold text-lg" style={{ color: isMain ? 'var(--v2-accent)' : 'var(--v2-text-secondary)' }}>
+                                                    <p className="font-mono font-semibold text-lg" style={{ color: isMain ? 'var(--color-accent)' : 'var(--text-muted)' }}>
                                                         {pace}/mi
                                                     </p>
                                                 )}
@@ -352,7 +352,7 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
                                                 {maxHR && segment.pace && (() => {
                                                     const hrZone = paceZoneToHRZone(segment.pace, maxHR);
                                                     return (
-                                                        <p className="text-xs mt-1 flex items-center justify-end gap-1" style={{ color: 'var(--v2-text-subtle)' }}>
+                                                        <p className="text-xs mt-1 flex items-center justify-end gap-1" style={{ color: 'var(--text-subtle)' }}>
                                                             <HeartIcon size={10} />
                                                             <span>{hrZone.min}-{hrZone.max} bpm</span>
                                                         </p>
@@ -360,15 +360,15 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
                                                 })()}
 
                                                 {/* Duration - with context */}
-                                                <p className="text-xs mt-1" style={{ color: 'var(--v2-text-muted)' }}>
+                                                <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
                                                     ~{durationMins} min
                                                 </p>
                                             </div>
                                         </div>
 
                                         {isMain && run.purpose && (
-                                            <p className="text-sm rounded-lg p-3 mt-3 flex items-start gap-2" style={{ background: 'var(--v2-bg-elevated)', color: 'var(--v2-text-muted)' }}>
-                                                <svg className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'var(--v2-accent)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <p className="text-sm rounded-lg p-3 mt-3 flex items-start gap-2" style={{ background: 'var(--bg-elevated)', color: 'var(--text-muted)' }}>
+                                                <svg className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'var(--color-accent)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                                                 </svg>
                                                 {run.purpose}
@@ -394,9 +394,9 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
                 {run.notes && (
                     <section className="mb-8">
                         <h2 className="v2-label mb-4">Coach Notes</h2>
-                        <div className="v2-card p-5" style={{ background: 'var(--v2-bg-elevated)' }}>
-                            <p className="text-sm italic" style={{ color: 'var(--v2-text-muted)' }}>"{run.notes}"</p>
-                            <p className="text-[10px] mt-3" style={{ color: 'var(--v2-text-subtle)' }}>— Based on {run.coachSource}</p>
+                        <div className="v2-card p-5" style={{ background: 'var(--bg-elevated)' }}>
+                            <p className="text-sm italic" style={{ color: 'var(--text-muted)' }}>"{run.notes}"</p>
+                            <p className="text-[10px] mt-3" style={{ color: 'var(--text-subtle)' }}>— Based on {run.coachSource}</p>
                         </div>
                     </section>
                 )}
@@ -411,25 +411,25 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
                         >
                             <div className="flex items-center justify-between mb-4">
                                 <div>
-                                    <p className="font-medium" style={{ color: 'var(--v2-text-secondary)' }}>{workout.strengthWorkout.name}</p>
-                                    <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                    <p className="font-medium" style={{ color: 'var(--text-muted)' }}>{workout.strengthWorkout.name}</p>
+                                    <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                                         {workout.strengthWorkout.focus.join(' + ')}
                                     </p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="font-medium" style={{ color: 'var(--v2-text-secondary)' }}>{workout.strengthWorkout.duration} min</p>
+                                    <p className="font-medium" style={{ color: 'var(--text-muted)' }}>{workout.strengthWorkout.duration} min</p>
                                 </div>
                             </div>
 
                             <div className="space-y-2">
                                 {workout.strengthWorkout.exercises.slice(0, 4).map((ex, i) => (
                                     <div key={i} className="flex justify-between text-sm">
-                                        <span style={{ color: 'var(--v2-text-secondary)' }}>{ex.name}</span>
-                                        <span style={{ color: 'var(--v2-text-muted)' }}>{ex.sets}×{ex.reps}</span>
+                                        <span style={{ color: 'var(--text-muted)' }}>{ex.name}</span>
+                                        <span style={{ color: 'var(--text-muted)' }}>{ex.sets}×{ex.reps}</span>
                                     </div>
                                 ))}
                                 {workout.strengthWorkout.exercises.length > 4 && (
-                                    <p className="text-[10px]" style={{ color: 'var(--v2-text-muted)' }}>
+                                    <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
                                         + {workout.strengthWorkout.exercises.length - 4} more exercises
                                     </p>
                                 )}
@@ -549,13 +549,13 @@ function WorkoutLoggingModal({
             {/* Modal */}
             <div
                 className="relative w-full sm:max-w-md max-h-[90vh] overflow-auto rounded-t-3xl sm:rounded-3xl"
-                style={{ background: 'var(--v2-bg-deep)', border: '1px solid var(--v2-border)' }}
+                style={{ background: 'var(--bg-base)', border: '1px solid var(--border-base)' }}
             >
                 <div className="p-6">
                     {/* Header */}
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-light" style={{ color: 'var(--v2-text-primary)' }}>Log Workout</h2>
-                        <button onClick={onClose} style={{ color: 'var(--v2-text-muted)' }}>
+                        <h2 className="text-xl font-light" style={{ color: 'var(--text-base)' }}>Log Workout</h2>
+                        <button onClick={onClose} style={{ color: 'var(--text-muted)' }}>
                             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
@@ -576,17 +576,17 @@ function WorkoutLoggingModal({
                                     onClick={() => setCompleted(option.value as typeof completed)}
                                     className="p-4 rounded-xl border transition-all"
                                     style={{
-                                        borderColor: completed === option.value ? 'var(--v2-accent)' : 'var(--v2-border)',
-                                        background: completed === option.value ? 'var(--v2-accent-subtle)' : 'transparent'
+                                        borderColor: completed === option.value ? 'var(--color-accent)' : 'var(--border-base)',
+                                        background: completed === option.value ? 'var(--color-accent-subtle)' : 'transparent'
                                     }}
                                 >
                                     <div className="w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center" style={{
-                                        background: option.value === 'full' ? 'var(--v2-accent-subtle)' :
+                                        background: option.value === 'full' ? 'var(--color-accent-subtle)' :
                                             option.value === 'partial' ? 'rgba(251, 191, 36, 0.15)' :
                                                 'var(--v2-bg-inset)'
                                     }}>
                                         {option.value === 'full' && (
-                                            <svg className="w-4 h-4" style={{ color: 'var(--v2-accent)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg className="w-4 h-4" style={{ color: 'var(--color-accent)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                                             </svg>
                                         )}
@@ -596,12 +596,12 @@ function WorkoutLoggingModal({
                                             </svg>
                                         )}
                                         {option.value === 'skipped' && (
-                                            <svg className="w-4 h-4" style={{ color: 'var(--v2-text-muted)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg className="w-4 h-4" style={{ color: 'var(--text-muted)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 5l7 7-7 7M6 5l7 7-7 7" />
                                             </svg>
                                         )}
                                     </div>
-                                    <span className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>{option.label}</span>
+                                    <span className="text-sm" style={{ color: 'var(--text-muted)' }}>{option.label}</span>
                                 </button>
                             ))}
                         </div>
@@ -618,19 +618,19 @@ function WorkoutLoggingModal({
                                         onClick={() => setFeelRating(option.value)}
                                         className="w-full p-4 rounded-xl border text-left transition-all flex items-center gap-4"
                                         style={{
-                                            borderColor: feelRating === option.value ? 'var(--v2-accent)' : 'var(--v2-border)',
-                                            background: feelRating === option.value ? 'var(--v2-accent-subtle)' : 'transparent'
+                                            borderColor: feelRating === option.value ? 'var(--color-accent)' : 'var(--border-base)',
+                                            background: feelRating === option.value ? 'var(--color-accent-subtle)' : 'transparent'
                                         }}
                                     >
                                         <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium" style={{
-                                            background: feelRating === option.value ? 'var(--v2-accent)' : 'var(--v2-bg-inset)',
-                                            color: feelRating === option.value ? 'var(--v2-bg-deep)' : 'var(--v2-text-muted)'
+                                            background: feelRating === option.value ? 'var(--color-accent)' : 'var(--v2-bg-inset)',
+                                            color: feelRating === option.value ? 'var(--bg-base)' : 'var(--text-muted)'
                                         }}>
                                             {option.value}
                                         </div>
                                         <div>
-                                            <p className="font-medium" style={{ color: 'var(--v2-text-secondary)' }}>{option.label}</p>
-                                            <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>{option.description}</p>
+                                            <p className="font-medium" style={{ color: 'var(--text-muted)' }}>{option.label}</p>
+                                            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{option.description}</p>
                                         </div>
                                     </button>
                                 ))}

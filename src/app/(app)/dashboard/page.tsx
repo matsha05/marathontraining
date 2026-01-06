@@ -117,13 +117,13 @@ export default function DashboardPage() {
     // Handle VDOT recalibration
     const handleRecalibrate = async (newVdot: number) => {
         setDisplayVdotOverride(newVdot);
-        console.log('VDOT updated to:', newVdot);
+        // VDOT override persisted in display state; future: sync to Supabase
     };
 
     // Handle max HR update
     const handleMaxHRUpdate = (newMaxHR: number) => {
         setMaxHROverride(newMaxHR);
-        console.log('Max HR updated to:', newMaxHR);
+        // Max HR override persisted in display state; future: sync to Supabase
     };
 
     // Fetch athlete data on mount
@@ -346,7 +346,7 @@ export default function DashboardPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <p className="v2-body-sm mb-1" style={{ color: 'var(--v2-text-muted)' }}>{getGreeting()}</p>
+                    <p className="v2-body-sm mb-1" style={{ color: 'var(--text-muted)' }}>{getGreeting()}</p>
                     <h1 className="v2-heading-lg">{displayName}</h1>
                 </motion.div>
 
@@ -397,16 +397,16 @@ export default function DashboardPage() {
                                             className="w-12 h-12 rounded-xl flex items-center justify-center"
                                             style={{
                                                 backgroundColor: workout.domain === 'running'
-                                                    ? 'var(--v2-accent-subtle)'
+                                                    ? 'var(--color-accent-subtle)'
                                                     : workout.domain === 'strength'
-                                                        ? 'var(--v2-secondary-subtle)'
-                                                        : 'var(--v2-bg-elevated)',
+                                                        ? 'var(--color-strength-subtle)'
+                                                        : 'var(--bg-elevated)',
                                             }}
                                         >
                                             {workout.type === 'run' ? (
                                                 <PlayIcon size={20} className="v2-accent" />
                                             ) : workout.type === 'strength' ? (
-                                                <ChartBarIncreasingIcon size={20} style={{ color: 'var(--v2-secondary)' }} />
+                                                <ChartBarIncreasingIcon size={20} style={{ color: 'var(--color-strength)' }} />
                                             ) : (
                                                 <ActivityIcon size={20} />
                                             )}
@@ -414,14 +414,14 @@ export default function DashboardPage() {
 
                                         <div className="flex-1">
                                             <p className="v2-heading-sm">{workout.title}</p>
-                                            <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>{workout.subtitle}</p>
+                                            <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>{workout.subtitle}</p>
                                         </div>
 
                                         <div className="text-right">
-                                            <p className="v2-mono" style={{ fontSize: '12px', color: 'var(--v2-text-subtle)' }}>{workout.duration} min</p>
+                                            <p className="v2-mono" style={{ fontSize: '12px', color: 'var(--text-subtle)' }}>{workout.duration} min</p>
                                         </div>
 
-                                        <svg className="w-5 h-5" style={{ color: 'var(--v2-text-subtle)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg className="w-5 h-5" style={{ color: 'var(--text-subtle)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                         </svg>
                                     </Link>
@@ -449,7 +449,7 @@ export default function DashboardPage() {
                             <div className="v2-card p-8 text-center">
                                 <CheckIcon size={40} className="mx-auto mb-4 v2-accent" />
                                 <p className="v2-heading-sm mb-2">Rest Day</p>
-                                <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>Recovery is part of the plan. Enjoy it!</p>
+                                <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>Recovery is part of the plan. Enjoy it!</p>
                             </div>
                         )}
                     </div>
@@ -473,7 +473,7 @@ export default function DashboardPage() {
 
                             return (
                                 <div className="flex items-center gap-3">
-                                    <span className="v2-mono" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
+                                    <span className="v2-mono" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
                                         Week {currentWeek} • {currentWeekPlan?.phase.toUpperCase()} • {Math.round((currentWeekPlan?.totalMiles || 0) * 10) / 10} mi
                                     </span>
                                     {delta !== 0 && prevMiles > 0 && (
@@ -481,8 +481,8 @@ export default function DashboardPage() {
                                             className="v2-mono px-2 py-0.5 rounded-full"
                                             style={{
                                                 fontSize: '10px',
-                                                background: delta > 0 ? 'var(--v2-accent-subtle)' : 'var(--v2-bg-inset)',
-                                                color: delta > 0 ? 'var(--v2-accent)' : 'var(--v2-text-muted)'
+                                                background: delta > 0 ? 'var(--color-accent-subtle)' : 'var(--v2-bg-inset)',
+                                                color: delta > 0 ? 'var(--color-accent)' : 'var(--text-muted)'
                                             }}
                                         >
                                             {delta > 0 ? '+' : ''}{delta}% vs last week
@@ -503,19 +503,19 @@ export default function DashboardPage() {
                                 className={`v2-card text-center py-4 px-2 ${day.today ? 'v2-card-accent' : ''}`}
                                 style={{
                                     background: day.today
-                                        ? 'var(--v2-bg-active)'
+                                        ? 'var(--bg-subtle)'
                                         : day.done
-                                            ? 'var(--v2-bg-elevated)'
-                                            : 'var(--v2-bg-elevated)',
-                                    borderColor: day.today ? 'var(--v2-accent)' : undefined,
+                                            ? 'var(--bg-elevated)'
+                                            : 'var(--bg-elevated)',
+                                    borderColor: day.today ? 'var(--color-accent)' : undefined,
                                 }}
                             >
-                                <p className="v2-label mb-2" style={{ color: day.today ? 'var(--v2-accent)' : 'var(--v2-text-muted)' }}>
+                                <p className="v2-label mb-2" style={{ color: day.today ? 'var(--color-accent)' : 'var(--text-muted)' }}>
                                     {day.day}
                                 </p>
                                 <p className="v2-mono mb-1" style={{
                                     fontSize: '11px',
-                                    color: day.today ? 'var(--v2-text-primary)' : 'var(--v2-text-tertiary)'
+                                    color: day.today ? 'var(--text-base)' : 'var(--text-muted)'
                                 }}>
                                     {day.type === 'rest' ? '—' : day.label.split(' ')[0]}
                                 </p>
@@ -523,7 +523,7 @@ export default function DashboardPage() {
                                     <CheckIcon size={12} className="mx-auto v2-accent" />
                                 )}
                                 {day.today && (
-                                    <div className="w-1.5 h-1.5 rounded-full mx-auto mt-1" style={{ background: 'var(--v2-accent)' }} />
+                                    <div className="w-1.5 h-1.5 rounded-full mx-auto mt-1" style={{ background: 'var(--color-accent)' }} />
                                 )}
                             </motion.div>
                         ))}
@@ -541,15 +541,15 @@ export default function DashboardPage() {
                         <Link href="/plan" className="v2-card v2-card-interactive p-6 block">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="v2-label mb-1" style={{ color: 'var(--v2-text-muted)' }}>TRAINING PLAN</p>
+                                    <p className="v2-label mb-1" style={{ color: 'var(--text-muted)' }}>TRAINING PLAN</p>
                                     <p className="v2-heading-sm">
                                         {plan.raceName || `${plan.goalDistance.toUpperCase()} Training`}
                                     </p>
-                                    <p className="v2-body-sm mt-1" style={{ color: 'var(--v2-text-muted)' }}>
+                                    <p className="v2-body-sm mt-1" style={{ color: 'var(--text-muted)' }}>
                                         Week {currentWeek} of {plan.totalWeeks} • {currentWeekPlan?.phase.toUpperCase()} phase
                                     </p>
                                 </div>
-                                <svg className="w-6 h-6" style={{ color: 'var(--v2-text-subtle)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg className="w-6 h-6" style={{ color: 'var(--text-subtle)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                 </svg>
                             </div>
@@ -566,10 +566,8 @@ export default function DashboardPage() {
                 >
                     <DurabilityStatusCard
                         isQualityDay={isQualityDay}
-                    // TODO: Wire up to actual assessment data once persisted
-                    // lastQuickCheck={athlete?.lastQuickCheck}
-                    // lastFullAssessment={athlete?.lastFullAssessment}
-                    // failedCount={athlete?.failedAssessments?.length}
+                    // Note: lastQuickCheck, lastFullAssessment, failedCount props available
+                    // when assessment data is persisted in Supabase athletes table
                     />
                 </motion.section>
 
@@ -585,17 +583,17 @@ export default function DashboardPage() {
                         <div className="v2-card p-4 text-center">
                             <FlameIcon size={24} className="mx-auto mb-2 v2-accent" />
                             <p className="v2-heading-md v2-mono">{streak}</p>
-                            <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--v2-text-muted)' }}>Day Streak</p>
+                            <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Day Streak</p>
                         </div>
                         <div className="v2-card p-4 text-center">
                             <ChartBarIncreasingIcon size={24} className="mx-auto mb-2 v2-accent" />
                             <p className="v2-heading-md v2-mono">{displayVdot}</p>
-                            <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--v2-text-muted)' }}>VDOT</p>
+                            <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>VDOT</p>
                         </div>
                         <div className="v2-card p-4 text-center">
                             <CalendarDaysIcon size={24} className="mx-auto mb-2 v2-accent" />
                             <p className="v2-heading-md v2-mono">{plan?.totalWeeks || 0}</p>
-                            <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--v2-text-muted)' }}>Total Weeks</p>
+                            <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Total Weeks</p>
                         </div>
                     </div>
                 </motion.section>

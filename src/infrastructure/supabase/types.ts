@@ -21,9 +21,12 @@ export type Database = {
           equipment: string[]
           id: string
           name: string
+          notify_training_reminders: boolean | null
+          notify_weekly_summary: boolean | null
           running_experience_months: number
           sex: string | null
           strength_background: string
+          units: string | null
           updated_at: string
           weight_kg: number | null
         }
@@ -33,9 +36,12 @@ export type Database = {
           equipment?: string[]
           id?: string
           name: string
+          notify_training_reminders?: boolean | null
+          notify_weekly_summary?: boolean | null
           running_experience_months?: number
           sex?: string | null
           strength_background?: string
+          units?: string | null
           updated_at?: string
           weight_kg?: number | null
         }
@@ -45,9 +51,12 @@ export type Database = {
           equipment?: string[]
           id?: string
           name?: string
+          notify_training_reminders?: boolean | null
+          notify_weekly_summary?: boolean | null
           running_experience_months?: number
           sex?: string | null
           strength_background?: string
+          units?: string | null
           updated_at?: string
           weight_kg?: number | null
         }
@@ -705,7 +714,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      delete_user_account: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      restore_training_plan: {
+        Args: {
+          plan_backup: Json
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

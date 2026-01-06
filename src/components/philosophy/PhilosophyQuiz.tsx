@@ -99,21 +99,21 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
     const recommendation = step === 'result' ? calculateRecommendation(answers) : null;
 
     return (
-        <div className="v2-root min-h-screen" style={{ background: 'var(--v2-bg-deep)', color: 'var(--v2-text-primary)' }}>
+        <div className="v2-root min-h-screen" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>
             {/* Progress bar - hide on beginner gate and result */}
             {step !== 'result' && step !== 'beginner_gate' && (
                 <div className="fixed top-0 left-0 right-0 z-50">
-                    <div className="h-1" style={{ background: 'var(--v2-border)' }}>
+                    <div className="h-1" style={{ background: 'var(--border-base)' }}>
                         <motion.div
                             className="h-full"
-                            style={{ background: 'var(--v2-accent)' }}
+                            style={{ background: 'var(--color-accent)' }}
                             initial={{ width: 0 }}
                             animate={{ width: `${progress}%` }}
                             transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
                         />
                     </div>
                     <div className="v2-container py-2">
-                        <p className="v2-mono text-center" style={{ fontSize: '11px', color: 'var(--v2-text-muted)' }}>
+                        <p className="v2-mono text-center" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                             Step {currentIndex + 1} of 6
                         </p>
                     </div>
@@ -134,13 +134,13 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                         <div className="max-w-xl w-full text-center">
                             <h1
                                 className="text-3xl md:text-4xl font-light mb-4"
-                                style={{ color: 'var(--v2-text-primary)' }}
+                                style={{ color: 'var(--text-base)' }}
                             >
                                 Quick check first
                             </h1>
                             <p
                                 className="text-lg mb-8"
-                                style={{ color: 'var(--v2-text-muted)' }}
+                                style={{ color: 'var(--text-muted)' }}
                             >
                                 Can you run 1 mile without stopping?
                             </p>
@@ -153,7 +153,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                                     className="w-full v2-card v2-card-interactive p-5 text-left"
                                 >
                                     <p className="v2-heading-sm">Yes, I can run a mile</p>
-                                    <p className="v2-body-sm mt-1" style={{ color: 'var(--v2-text-muted)' }}>
+                                    <p className="v2-body-sm mt-1" style={{ color: 'var(--text-muted)' }}>
                                         Great! Let&apos;s find your training approach.
                                     </p>
                                 </button>
@@ -162,7 +162,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                                     className="w-full v2-card v2-card-interactive p-5 text-left"
                                 >
                                     <p className="v2-heading-sm">Not yet</p>
-                                    <p className="v2-body-sm mt-1" style={{ color: 'var(--v2-text-muted)' }}>
+                                    <p className="v2-body-sm mt-1" style={{ color: 'var(--text-muted)' }}>
                                         That&apos;s okay — we&apos;ll point you in the right direction.
                                     </p>
                                 </button>
@@ -182,20 +182,20 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                         <div className="max-w-xl w-full text-center">
                             <h1
                                 className="text-3xl md:text-4xl font-light mb-4"
-                                style={{ color: 'var(--v2-text-primary)' }}
+                                style={{ color: 'var(--text-base)' }}
                             >
                                 Build your foundation first
                             </h1>
                             <p
                                 className="text-lg mb-6"
-                                style={{ color: 'var(--v2-text-muted)' }}
+                                style={{ color: 'var(--text-muted)' }}
                             >
                                 Our training plans assume you can run continuously.
                                 The Couch to 5K program is perfect for building up to that point.
                             </p>
                             <div className="v2-card p-6 mb-8 text-left">
                                 <p className="v2-label mb-2">Recommended: Couch to 5K (C25K)</p>
-                                <p className="v2-body-sm mb-4" style={{ color: 'var(--v2-text-muted)' }}>
+                                <p className="v2-body-sm mb-4" style={{ color: 'var(--text-muted)' }}>
                                     A proven 9-week walk/run program that gradually builds you up to running 3 miles without stopping.
                                 </p>
                                 <a
@@ -215,7 +215,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                             </button>
                             <p
                                 className="text-sm mt-6"
-                                style={{ color: 'var(--v2-text-subtle)' }}
+                                style={{ color: 'var(--text-subtle)' }}
                             >
                                 Once you can run 1 mile, come back and we&apos;ll build your training plan!
                             </p>
@@ -288,20 +288,20 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                             <button
                                 onClick={goBack}
                                 className="fixed top-8 left-6 text-sm transition-colors"
-                                style={{ color: 'var(--v2-text-subtle)' }}
+                                style={{ color: 'var(--text-subtle)' }}
                             >
                                 ← Back
                             </button>
                             <div className="max-w-xl w-full text-center">
                                 <h1
                                     className="text-3xl md:text-4xl font-light mb-4"
-                                    style={{ color: 'var(--v2-text-primary)' }}
+                                    style={{ color: 'var(--text-base)' }}
                                 >
                                     When is your {answers.targetDistance === 'half' ? 'half marathon' : answers.targetDistance}?
                                 </h1>
                                 <p
                                     className="text-lg mb-8"
-                                    style={{ color: 'var(--v2-text-muted)' }}
+                                    style={{ color: 'var(--text-muted)' }}
                                 >
                                     We&apos;ll calculate how many weeks you have to prepare.
                                 </p>
@@ -309,7 +309,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                                     type="date"
                                     value={answers.raceDate || ''}
                                     className="v2-input text-center text-lg py-4 px-6 w-full max-w-xs mx-auto"
-                                    style={{ background: 'var(--v2-bg-elevated)', border: '1px solid var(--v2-border)' }}
+                                    style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-base)' }}
                                     min={new Date().toISOString().split('T')[0]}
                                     onChange={(e) => {
                                         if (e.target.value) {
@@ -325,10 +325,10 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                                         animate={{ opacity: 1, y: 0 }}
                                         className="mt-6"
                                     >
-                                        <p className="v2-heading-md v2-mono" style={{ color: 'var(--v2-accent)' }}>
+                                        <p className="v2-heading-md v2-mono" style={{ color: 'var(--color-accent)' }}>
                                             {weeksToRace} weeks
                                         </p>
-                                        <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                        <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                                             until race day
                                         </p>
 
@@ -363,7 +363,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                                 {!selectedDate && (
                                     <p
                                         className="text-sm mt-4"
-                                        style={{ color: 'var(--v2-text-subtle)' }}
+                                        style={{ color: 'var(--text-subtle)' }}
                                     >
                                         Pick your target race date
                                     </p>
@@ -407,7 +407,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                                 <div className="max-w-xl w-full text-center">
                                     <h1
                                         className="text-3xl md:text-4xl font-light mb-4"
-                                        style={{ color: 'var(--v2-text-primary)' }}
+                                        style={{ color: 'var(--text-base)' }}
                                     >
                                         {showTooFewDays === '2_or_fewer'
                                             ? 'We need a bit more time'
@@ -416,21 +416,21 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                                     </h1>
                                     <p
                                         className="text-lg mb-8"
-                                        style={{ color: 'var(--v2-text-muted)' }}
+                                        style={{ color: 'var(--text-muted)' }}
                                     >
                                         {showTooFewDays === '2_or_fewer'
                                             ? 'Our structured training plans require at least 3 running days per week to build fitness safely and effectively.'
                                             : 'Every marathon method we offer requires at least 4 running days per week. This isn\'t arbitrary — it\'s what the science and proven programs require.'
                                         }
                                     </p>
-                                    <div className="v2-card p-6 mb-8 text-left" style={{ borderColor: 'var(--v2-border)' }}>
+                                    <div className="v2-card p-6 mb-8 text-left" style={{ borderColor: 'var(--border-base)' }}>
                                         <p className="v2-heading-sm mb-2">
                                             {showTooFewDays === '2_or_fewer'
                                                 ? 'Can you find one more day?'
                                                 : 'Can you commit to 4 days?'
                                             }
                                         </p>
-                                        <p className="v2-body-sm mb-4" style={{ color: 'var(--v2-text-muted)' }}>
+                                        <p className="v2-body-sm mb-4" style={{ color: 'var(--text-muted)' }}>
                                             {showTooFewDays === '2_or_fewer'
                                                 ? 'Even short 20-30 minute runs count. Many people find morning runs before work, lunch runs, or runs with kids in a stroller.'
                                                 : 'Two of those days can be short easy runs (20-30 minutes). The key is consistency, not crushing volume every day.'
@@ -445,7 +445,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                                     </div>
                                     <p
                                         className="text-sm"
-                                        style={{ color: 'var(--v2-text-subtle)' }}
+                                        style={{ color: 'var(--text-subtle)' }}
                                     >
                                         {showTooFewDays === '2_or_fewer'
                                             ? 'If you truly can\'t commit to 3 days, consider building your base with casual runs until your schedule opens up.'
@@ -504,26 +504,26 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                             <button
                                 onClick={goBack}
                                 className="fixed top-8 left-6 text-sm transition-colors"
-                                style={{ color: 'var(--v2-text-subtle)' }}
+                                style={{ color: 'var(--text-subtle)' }}
                             >
                                 Back
                             </button>
                             <div className="max-w-xl w-full text-center">
                                 <h1
                                     className="text-3xl md:text-4xl font-light mb-4"
-                                    style={{ color: 'var(--v2-text-primary)' }}
+                                    style={{ color: 'var(--text-base)' }}
                                 >
                                     How many days can you RUN each week?
                                 </h1>
                                 <p
                                     className="text-lg mb-2"
-                                    style={{ color: 'var(--v2-text-muted)' }}
+                                    style={{ color: 'var(--text-muted)' }}
                                 >
                                     Just running — strength and cross-training are separate.
                                 </p>
                                 <p
                                     className="text-sm mb-8"
-                                    style={{ color: 'var(--v2-text-subtle)' }}
+                                    style={{ color: 'var(--text-subtle)' }}
                                 >
                                     You can always adjust this later if life changes.
                                 </p>
@@ -535,7 +535,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                                             className="w-full v2-card v2-card-interactive p-5 text-left"
                                         >
                                             <p className="v2-heading-sm">{option.label}</p>
-                                            <p className="v2-body-sm mt-1" style={{ color: 'var(--v2-text-muted)' }}>
+                                            <p className="v2-body-sm mt-1" style={{ color: 'var(--text-muted)' }}>
                                                 {option.description}
                                             </p>
                                         </button>

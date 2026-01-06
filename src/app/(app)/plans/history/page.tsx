@@ -94,7 +94,7 @@ function PlanCard({ plan, isActive, onRestore, isRestoring }: PlanCardProps) {
         <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`v2-card overflow-hidden ${isActive ? 'ring-2 ring-[var(--v2-accent)]' : ''}`}
+            className={`v2-card overflow-hidden ${isActive ? 'ring-2 ring-[var(--color-accent)]' : ''}`}
         >
             {/* Card Header */}
             <button
@@ -104,26 +104,26 @@ function PlanCard({ plan, isActive, onRestore, isRestoring }: PlanCardProps) {
                 <div className="flex items-center gap-4">
                     <div
                         className="w-12 h-12 rounded-xl flex items-center justify-center"
-                        style={{ background: isActive ? 'var(--v2-accent-subtle)' : 'var(--v2-bg-hover)' }}
+                        style={{ background: isActive ? 'var(--color-accent-subtle)' : 'var(--bg-muted)' }}
                     >
-                        <Calendar size={20} style={{ color: isActive ? 'var(--v2-accent)' : 'var(--v2-text-muted)' }} />
+                        <Calendar size={20} style={{ color: isActive ? 'var(--color-accent)' : 'var(--text-muted)' }} />
                     </div>
                     <div>
                         <div className="flex items-center gap-2">
                             <h3 className="v2-heading-sm">{formatPlanType(plan.plan_type)} Plan</h3>
                             {isActive && <span className="v2-badge v2-badge-accent">Active</span>}
                         </div>
-                        <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                        <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                             {formatDateRange(plan.start_date, plan.end_date)}
                         </p>
                     </div>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="text-right hidden sm:block">
-                        <p className="v2-mono" style={{ fontSize: '12px', color: 'var(--v2-text-secondary)' }}>
+                        <p className="v2-mono" style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
                             VDOT {plan.vdot_at_creation}
                         </p>
-                        <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--v2-text-muted)' }}>
+                        <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
                             {timeAgo(plan.created_at)}
                         </p>
                     </div>
@@ -131,7 +131,7 @@ function PlanCard({ plan, isActive, onRestore, isRestoring }: PlanCardProps) {
                         animate={{ rotate: isExpanded ? 180 : 0 }}
                         transition={{ duration: 0.2 }}
                     >
-                        <ChevronDown size={20} style={{ color: 'var(--v2-text-muted)' }} />
+                        <ChevronDown size={20} style={{ color: 'var(--text-muted)' }} />
                     </motion.div>
                 </div>
             </button>
@@ -145,7 +145,7 @@ function PlanCard({ plan, isActive, onRestore, isRestoring }: PlanCardProps) {
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.2 }}
                     >
-                        <div className="px-5 pb-5 border-t" style={{ borderColor: 'var(--v2-border)' }}>
+                        <div className="px-5 pb-5 border-t" style={{ borderColor: 'var(--border-base)' }}>
                             {/* Actions */}
                             {!isActive && (
                                 <div className="py-4">
@@ -167,22 +167,22 @@ function PlanCard({ plan, isActive, onRestore, isRestoring }: PlanCardProps) {
                                     <div className="v2-skeleton" style={{ height: '40px', borderRadius: '8px' }} />
                                 </div>
                             ) : workouts.length === 0 ? (
-                                <p className="v2-body-sm py-4" style={{ color: 'var(--v2-text-muted)' }}>
+                                <p className="v2-body-sm py-4" style={{ color: 'var(--text-muted)' }}>
                                     No workout data available for this plan.
                                 </p>
                             ) : (
                                 <div className="py-4 space-y-2 max-h-[300px] overflow-y-auto">
                                     <p className="v2-label mb-2">{weekNumbers.length} Weeks • {workouts.length} Workouts</p>
                                     {weekNumbers.slice(0, 5).map(weekNum => (
-                                        <div key={weekNum} className="flex items-center justify-between py-2 border-b" style={{ borderColor: 'var(--v2-border)' }}>
+                                        <div key={weekNum} className="flex items-center justify-between py-2 border-b" style={{ borderColor: 'var(--border-base)' }}>
                                             <span className="v2-mono" style={{ fontSize: '12px' }}>Week {weekNum}</span>
-                                            <span className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                            <span className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                                                 {workoutsByWeek[weekNum].length} workouts
                                             </span>
                                         </div>
                                     ))}
                                     {weekNumbers.length > 5 && (
-                                        <p className="v2-mono text-center py-2" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
+                                        <p className="v2-mono text-center py-2" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
                                             + {weekNumbers.length - 5} more weeks
                                         </p>
                                     )}
@@ -241,7 +241,7 @@ export default function PlanHistoryPage() {
             <div className="v2-root min-h-screen">
                 <header className="v2-nav sticky top-0 z-50">
                     <div className="v2-container flex items-center justify-between py-4">
-                        <Link href="/plan" className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>← Back</Link>
+                        <Link href="/plan" className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>← Back</Link>
                         <span className="v2-heading-sm">Plan History</span>
                     </div>
                 </header>
@@ -260,7 +260,7 @@ export default function PlanHistoryPage() {
             <div className="v2-root min-h-screen">
                 <header className="v2-nav sticky top-0 z-50">
                     <div className="v2-container flex items-center justify-between py-4">
-                        <Link href="/plan" className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>← Back</Link>
+                        <Link href="/plan" className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>← Back</Link>
                         <span className="v2-heading-sm">Plan History</span>
                     </div>
                 </header>
@@ -277,7 +277,7 @@ export default function PlanHistoryPage() {
         <div className="v2-root min-h-screen">
             <header className="v2-nav sticky top-0 z-50">
                 <div className="v2-container flex items-center justify-between py-4">
-                    <Link href="/plan" className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>← Back</Link>
+                    <Link href="/plan" className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>← Back</Link>
                     <span className="v2-heading-sm">Plan History</span>
                 </div>
             </header>
@@ -287,7 +287,7 @@ export default function PlanHistoryPage() {
                     <div className="v2-card p-10 text-center">
                         <div className="v2-empty-icon">📋</div>
                         <h2 className="v2-heading-md mb-2">No Plans Yet</h2>
-                        <p className="v2-body-sm mb-6" style={{ color: 'var(--v2-text-muted)' }}>
+                        <p className="v2-body-sm mb-6" style={{ color: 'var(--text-muted)' }}>
                             Complete onboarding to create your first training plan.
                         </p>
                         <Link href="/onboarding" className="v2-btn v2-btn-primary">

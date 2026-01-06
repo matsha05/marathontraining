@@ -260,7 +260,7 @@ export function InjuryDetailsScreen({
             </OptionGrid>
 
             {selectedPrehab && (
-                <p className="v2-body-sm mt-6" style={{ color: 'var(--v2-text-muted)' }}>
+                <p className="v2-body-sm mt-6" style={{ color: 'var(--text-muted)' }}>
                     We&apos;ll include targeted prehab work: <strong>{selectedPrehab}</strong>
                 </p>
             )}

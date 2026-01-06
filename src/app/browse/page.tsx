@@ -64,7 +64,7 @@ const PLAN_DETAILS: Record<string, PlanInfo[]> = {
 
 function getDifficultyColor(difficulty: 'beginner' | 'intermediate' | 'advanced') {
     switch (difficulty) {
-        case 'beginner': return 'var(--v2-accent)';
+        case 'beginner': return 'var(--color-accent)';
         case 'intermediate': return 'var(--v2-warning)';
         case 'advanced': return 'var(--v2-error)';
     }
@@ -88,7 +88,7 @@ export default function PlansPage() {
     };
 
     return (
-        <div className="v2-root min-h-screen" style={{ background: 'var(--v2-bg-deep)' }}>
+        <div className="v2-root min-h-screen" style={{ background: 'var(--bg-base)' }}>
             <SiteHeader />
 
             {/* Header */}
@@ -100,13 +100,13 @@ export default function PlansPage() {
                 >
                     <h1
                         className="text-4xl md:text-5xl font-light mb-4"
-                        style={{ color: 'var(--v2-text-primary)' }}
+                        style={{ color: 'var(--text-base)' }}
                     >
                         Training Plan Library
                     </h1>
                     <p
                         className="text-lg max-w-2xl mx-auto"
-                        style={{ color: 'var(--v2-text-muted)' }}
+                        style={{ color: 'var(--text-muted)' }}
                     >
                         Browse all available programs. Each plan is built from proven methodologies,
                         adapted to your fitness level.
@@ -131,11 +131,11 @@ export default function PlansPage() {
                                 className="px-5 py-3 rounded-xl whitespace-nowrap transition-all"
                                 style={{
                                     background: selectedDistance === distance.id
-                                        ? 'var(--v2-accent)'
-                                        : 'var(--v2-bg-elevated)',
+                                        ? 'var(--color-accent)'
+                                        : 'var(--bg-elevated)',
                                     color: selectedDistance === distance.id
                                         ? '#04110b'
-                                        : 'var(--v2-text-secondary)',
+                                        : 'var(--text-muted)',
                                     fontWeight: selectedDistance === distance.id ? 600 : 400,
                                 }}
                             >
@@ -145,7 +145,7 @@ export default function PlansPage() {
                                     style={{
                                         color: selectedDistance === distance.id
                                             ? 'rgba(4, 17, 11, 0.7)'
-                                            : 'var(--v2-text-muted)'
+                                            : 'var(--text-muted)'
                                     }}
                                 >
                                     {distance.description}
@@ -171,7 +171,7 @@ export default function PlansPage() {
                             {availableCoaches.length === 0 ? (
                                 <div className="v2-card p-8 text-center">
                                     <p className="v2-heading-md mb-2">No plans available</p>
-                                    <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                    <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                                         We don&apos;t have {selectedDistance} plans yet.
                                     </p>
                                 </div>
@@ -192,7 +192,7 @@ export default function PlansPage() {
                                             {/* Coach Header */}
                                             <button
                                                 onClick={() => setExpandedCoach(isExpanded ? null : coachId)}
-                                                className="w-full p-6 text-left flex items-start justify-between gap-4 transition-colors hover:bg-[var(--v2-bg-hover)]"
+                                                className="w-full p-6 text-left flex items-start justify-between gap-4 transition-colors hover:bg-[var(--bg-muted)]"
                                                 aria-expanded={isExpanded}
                                                 aria-label={`${coach?.name || coachId} training plans - ${isExpanded ? 'collapse' : 'expand'}`}
                                             >
@@ -203,7 +203,7 @@ export default function PlansPage() {
                                                             className="v2-badge"
                                                             style={{
                                                                 background: 'var(--v2-bg-inset)',
-                                                                color: 'var(--v2-text-muted)',
+                                                                color: 'var(--text-muted)',
                                                             }}
                                                         >
                                                             {plans.length} plan{plans.length !== 1 ? 's' : ''}
@@ -211,7 +211,7 @@ export default function PlansPage() {
                                                     </div>
                                                     <p
                                                         className="v2-body-sm"
-                                                        style={{ color: 'var(--v2-text-muted)' }}
+                                                        style={{ color: 'var(--text-muted)' }}
                                                     >
                                                         {coach?.keyConceptFull || coach?.protocol}
                                                     </p>
@@ -228,7 +228,7 @@ export default function PlansPage() {
                                                         fill="none"
                                                         stroke="currentColor"
                                                         strokeWidth="2"
-                                                        style={{ color: 'var(--v2-text-subtle)' }}
+                                                        style={{ color: 'var(--text-subtle)' }}
                                                     >
                                                         <path d="M6 9l6 6 6-6" />
                                                     </svg>
@@ -246,13 +246,13 @@ export default function PlansPage() {
                                                     >
                                                         <div
                                                             className="px-6 pb-6"
-                                                            style={{ borderTop: '1px solid var(--v2-border)' }}
+                                                            style={{ borderTop: '1px solid var(--border-base)' }}
                                                         >
                                                             {/* Coach Bio */}
                                                             {coach?.bio && (
                                                                 <p
                                                                     className="v2-body-sm py-4"
-                                                                    style={{ color: 'var(--v2-text-tertiary)' }}
+                                                                    style={{ color: 'var(--text-muted)' }}
                                                                 >
                                                                     {coach.bio}
                                                                 </p>
@@ -264,7 +264,7 @@ export default function PlansPage() {
                                                                     <div
                                                                         key={`${plan.coach}-${plan.distance}-${j}`}
                                                                         className="p-4 rounded-xl flex items-center justify-between gap-4"
-                                                                        style={{ background: 'var(--v2-bg-elevated)' }}
+                                                                        style={{ background: 'var(--bg-elevated)' }}
                                                                     >
                                                                         <div className="flex-1">
                                                                             <div className="flex items-center gap-2 mb-1">
@@ -279,19 +279,19 @@ export default function PlansPage() {
                                                                                 </span>
                                                                                 <span
                                                                                     className="v2-mono text-[10px]"
-                                                                                    style={{ color: 'var(--v2-text-subtle)' }}
+                                                                                    style={{ color: 'var(--text-subtle)' }}
                                                                                 >
                                                                                     {plan.weeks} weeks
                                                                                 </span>
                                                                             </div>
-                                                                            <p className="v2-body-sm" style={{ color: 'var(--v2-text-secondary)' }}>
+                                                                            <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                                                                                 {plan.description}
                                                                             </p>
                                                                             <div className="flex gap-4 mt-2">
-                                                                                <span className="v2-mono text-[10px]" style={{ color: 'var(--v2-text-muted)' }}>
+                                                                                <span className="v2-mono text-[10px]" style={{ color: 'var(--text-muted)' }}>
                                                                                     Peak: {plan.peakMileage} mi/wk
                                                                                 </span>
-                                                                                <span className="v2-mono text-[10px]" style={{ color: 'var(--v2-text-muted)' }}>
+                                                                                <span className="v2-mono text-[10px]" style={{ color: 'var(--text-muted)' }}>
                                                                                     {plan.daysPerWeek} days/wk
                                                                                 </span>
                                                                             </div>
@@ -310,7 +310,7 @@ export default function PlansPage() {
                                                             <Link
                                                                 href="/methodology"
                                                                 className="v2-body-sm inline-block mt-4 transition-colors hover:underline"
-                                                                style={{ color: 'var(--v2-accent)' }}
+                                                                style={{ color: 'var(--color-accent)' }}
                                                             >
                                                                 Learn more about {coach?.name} methodology →
                                                             </Link>
@@ -334,7 +334,7 @@ export default function PlansPage() {
                     >
                         <p
                             className="v2-body-sm mb-4"
-                            style={{ color: 'var(--v2-text-muted)' }}
+                            style={{ color: 'var(--text-muted)' }}
                         >
                             Not sure which plan fits you?
                         </p>

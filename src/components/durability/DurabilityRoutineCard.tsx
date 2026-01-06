@@ -25,7 +25,7 @@ export function DurabilityRoutineCard({ routine, onComplete }: DurabilityRoutine
     const getDayTypeIcon = () => {
         switch (routine.dayType) {
             case 'quality':
-                return <Zap size={18} className="text-[var(--v2-accent)]" />;
+                return <Zap size={18} className="text-[var(--color-accent)]" />;
             case 'long':
                 return <Target size={18} className="text-[var(--v2-durability)]" />;
             case 'easy':
@@ -48,7 +48,7 @@ export function DurabilityRoutineCard({ routine, onComplete }: DurabilityRoutine
                         {getDayTypeIcon()}
                         <div>
                             <h2 className="v2-heading-md">{routine.name}</h2>
-                            <p className="text-sm" style={{ color: 'var(--v2-text-subtle)' }}>
+                            <p className="text-sm" style={{ color: 'var(--text-subtle)' }}>
                                 {routine.modules.length} exercise{routine.modules.length > 1 ? 's' : ''} · ~{routine.totalMinutes} min
                             </p>
                         </div>
@@ -57,7 +57,7 @@ export function DurabilityRoutineCard({ routine, onComplete }: DurabilityRoutine
                         className="px-3 py-1.5 rounded-full text-sm font-medium"
                         style={{
                             background: 'var(--v2-gradient-glow)',
-                            color: 'var(--v2-accent)',
+                            color: 'var(--color-accent)',
                         }}
                     >
                         {routine.dayType === 'quality' || routine.dayType === 'long' ? 'Pre-Run' : 'Anytime'}
@@ -68,11 +68,11 @@ export function DurabilityRoutineCard({ routine, onComplete }: DurabilityRoutine
                 <div
                     className="p-3 rounded-lg text-xs"
                     style={{
-                        background: 'var(--v2-bg-elevated)',
-                        color: 'var(--v2-text-subtle)',
+                        background: 'var(--bg-elevated)',
+                        color: 'var(--text-subtle)',
                     }}
                 >
-                    <strong style={{ color: 'var(--v2-text-secondary)' }}>Daily Micro-Dose Template</strong> —
+                    <strong style={{ color: 'var(--text-muted)' }}>Daily Micro-Dose Template</strong> —
                     Combining Dicharry's control work with Starrett's daily maintenance.
                     Small daily work matters: 10-15 minutes on these basics.
                 </div>
@@ -93,7 +93,7 @@ export function DurabilityRoutineCard({ routine, onComplete }: DurabilityRoutine
                     onClick={onComplete}
                     className="w-full mt-6 py-4 rounded-xl text-lg font-semibold transition-all"
                     style={{
-                        background: 'linear-gradient(135deg, var(--v2-accent), var(--v2-accent-muted))',
+                        background: 'linear-gradient(135deg, var(--color-accent), var(--color-accent-muted))',
                         color: 'white',
                     }}
                 >
@@ -124,7 +124,7 @@ function ModuleSection({ module, index }: ModuleSectionProps) {
             case 'integration':
                 return { color: '#ec4899', bg: 'rgba(236, 72, 153, 0.1)' };
             default:
-                return { color: 'var(--v2-accent)', bg: 'var(--v2-gradient-glow)' };
+                return { color: 'var(--color-accent)', bg: 'var(--v2-gradient-glow)' };
         }
     };
 
@@ -144,7 +144,7 @@ function ModuleSection({ module, index }: ModuleSectionProps) {
                 />
                 <div>
                     <h3 className="v2-heading-sm">{module.name}</h3>
-                    <div className="flex items-center gap-3 text-xs" style={{ color: 'var(--v2-text-subtle)' }}>
+                    <div className="flex items-center gap-3 text-xs" style={{ color: 'var(--text-subtle)' }}>
                         <span
                             className="px-2 py-0.5 rounded-full capitalize"
                             style={{ background: style.bg, color: style.color }}

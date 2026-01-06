@@ -86,7 +86,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 const TOAST_COLORS: Record<ToastType, { bg: string; border: string; icon: string }> = {
     success: {
         bg: 'rgba(39, 174, 96, 0.1)',
-        border: 'var(--v2-accent)',
+        border: 'var(--color-accent)',
         icon: '✓',
     },
     error: {
@@ -96,7 +96,7 @@ const TOAST_COLORS: Record<ToastType, { bg: string; border: string; icon: string
     },
     info: {
         bg: 'rgba(52, 152, 219, 0.1)',
-        border: 'var(--v2-secondary)',
+        border: 'var(--color-strength)',
         icon: 'ℹ',
     },
     warning: {
@@ -159,7 +159,7 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: (id: string)
             </span>
 
             {/* Message */}
-            <p className="flex-1 text-sm" style={{ color: 'var(--v2-text-secondary)' }}>
+            <p className="flex-1 text-sm" style={{ color: 'var(--text-muted)' }}>
                 {toast.message}
             </p>
 
@@ -167,7 +167,7 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: (id: string)
             <button
                 onClick={handleDismiss}
                 className="flex-shrink-0 p-1 rounded hover:bg-white/10 transition-colors"
-                style={{ color: 'var(--v2-text-muted)' }}
+                style={{ color: 'var(--text-muted)' }}
                 aria-label="Dismiss"
             >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

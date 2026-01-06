@@ -20,8 +20,29 @@ import { WOD_LIBRARY, filterByEquipment } from "@/domain/plan/wod-library";
 import { WodWorkout, WodType } from "@/domain/plan/types";
 import { createSupabaseBrowserClient } from "@/infrastructure/supabase";
 import type { User } from "@supabase/supabase-js";
+import { z } from "zod";
 
 const ease = [0.25, 0.46, 0.45, 0.94] as const;
+
+// Schema for favorites validation
+const FavoritesSchema = z.array(z.string());
+
+// Helper: Load favorites from localStorage with validation
+function loadFavoritesFromStorage(): string[] {
+    try {
+        const saved = localStorage.getItem(FAVORITES_KEY);
+        if (!saved) return [];
+        const parsed = FavoritesSchema.safeParse(JSON.parse(saved));
+        if (parsed.success) {
+            return parsed.data;
+        }
+        console.warn('[WodLibrary] Invalid favorites format in localStorage, resetting');
+        return [];
+    } catch (error) {
+        console.error('[WodLibrary] Failed to load favorites from localStorage:', error);
+        return [];
+    }
+}
 
 // Equipment tier definitions
 const EQUIPMENT_TIERS = {
@@ -49,8 +70,8 @@ type EquipmentTier = keyof typeof EQUIPMENT_TIERS;
 const WOD_TYPE_LABELS: Record<WodType, { label: string; color: string }> = {
     "WOD_AEROBIC_MIXED_MODAL": { label: "Aerobic", color: "var(--v2-green)" },
     "WOD_THRESHOLD_MACHINE": { label: "Threshold", color: "var(--v2-yellow)" },
-    "WOD_ALACTIC_POWER": { label: "Power", color: "var(--v2-accent)" },
-    "WOD_STRENGTH_LOW_VOL": { label: "Strength", color: "var(--v2-secondary)" },
+    "WOD_ALACTIC_POWER": { label: "Power", color: "var(--color-accent)" },
+    "WOD_STRENGTH_LOW_VOL": { label: "Strength", color: "var(--color-strength)" },
     "WOD_GLYCOLYTIC_METCON": { label: "MetCon", color: "var(--v2-red)" },
 };
 
@@ -85,29 +106,19 @@ export default function WodLibraryPage() {
                     // Use type assertion since column may not be in generated types yet
                     const athleteData = athlete as { wod_favorites?: string[] } | null;
                     if (athleteData?.wod_favorites) {
-                        setFavorites(athleteData.wod_favorites);
-                    }
-                } catch {
-                    // Column doesn't exist yet or other error - use localStorage fallback
-                    const saved = localStorage.getItem(FAVORITES_KEY);
-                    if (saved) {
-                        try {
-                            setFavorites(JSON.parse(saved));
-                        } catch {
-                            // ignore parse errors
+                        const validated = FavoritesSchema.safeParse(athleteData.wod_favorites);
+                        if (validated.success) {
+                            setFavorites(validated.data);
                         }
                     }
+                } catch (error) {
+                    // Column doesn't exist yet or other error - use localStorage fallback
+                    console.warn('[WodLibrary] Supabase favorites not available, using localStorage:', error);
+                    setFavorites(loadFavoritesFromStorage());
                 }
             } else {
                 // Guest: load from localStorage
-                const saved = localStorage.getItem(FAVORITES_KEY);
-                if (saved) {
-                    try {
-                        setFavorites(JSON.parse(saved));
-                    } catch {
-                        // ignore parse errors
-                    }
-                }
+                setFavorites(loadFavoritesFromStorage());
             }
         });
 
@@ -170,7 +181,7 @@ export default function WodLibraryPage() {
     }
 
     return (
-        <div className="v2-root min-h-screen flex flex-col" style={{ background: 'var(--v2-bg-deep)', color: 'var(--v2-text-primary)' }}>
+        <div className="v2-root min-h-screen flex flex-col" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>
             <AppHeader />
 
             <main className="flex-1 px-6 py-8 max-w-6xl mx-auto w-full">
@@ -182,7 +193,7 @@ export default function WodLibraryPage() {
                     className="mb-8"
                 >
                     <h1 className="text-2xl font-semibold mb-2">WOD Library</h1>
-                    <p className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>
+                    <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                         Runner-friendly conditioning. Each WOD scales to your equipment and experience.
                     </p>
                 </motion.div>
@@ -196,15 +207,15 @@ export default function WodLibraryPage() {
                 >
                     {/* Equipment Tier */}
                     <div className="flex flex-col gap-2">
-                        <label className="text-xs font-medium" style={{ color: 'var(--v2-text-muted)' }}>Equipment</label>
+                        <label className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Equipment</label>
                         <select
                             value={equipmentTier}
                             onChange={(e) => setEquipmentTier(e.target.value as EquipmentTier)}
                             className="v2-input text-sm py-2 px-3 rounded-lg"
                             style={{
-                                background: 'var(--v2-bg-elevated)',
-                                border: '1px solid var(--v2-border)',
-                                color: 'var(--v2-text-primary)'
+                                background: 'var(--bg-elevated)',
+                                border: '1px solid var(--border-base)',
+                                color: 'var(--text-base)'
                             }}
                         >
                             {Object.entries(EQUIPMENT_TIERS).map(([key, { label }]) => (
@@ -215,15 +226,15 @@ export default function WodLibraryPage() {
 
                     {/* Type Filter */}
                     <div className="flex flex-col gap-2">
-                        <label className="text-xs font-medium" style={{ color: 'var(--v2-text-muted)' }}>Type</label>
+                        <label className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Type</label>
                         <select
                             value={typeFilter}
                             onChange={(e) => setTypeFilter(e.target.value as WodType | "all")}
                             className="v2-input text-sm py-2 px-3 rounded-lg"
                             style={{
-                                background: 'var(--v2-bg-elevated)',
-                                border: '1px solid var(--v2-border)',
-                                color: 'var(--v2-text-primary)'
+                                background: 'var(--bg-elevated)',
+                                border: '1px solid var(--border-base)',
+                                color: 'var(--text-base)'
                             }}
                         >
                             <option value="all">All Types</option>
@@ -235,14 +246,14 @@ export default function WodLibraryPage() {
 
                     {/* Favorites Toggle */}
                     <div className="flex flex-col gap-2">
-                        <label className="text-xs font-medium" style={{ color: 'var(--v2-text-muted)' }}>Show</label>
+                        <label className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Show</label>
                         <button
                             onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
                             className="text-sm py-2 px-4 rounded-lg transition-colors"
                             style={{
-                                background: showFavoritesOnly ? 'var(--v2-accent-subtle)' : 'var(--v2-bg-elevated)',
-                                border: '1px solid var(--v2-border)',
-                                color: showFavoritesOnly ? 'var(--v2-accent)' : 'var(--v2-text-secondary)'
+                                background: showFavoritesOnly ? 'var(--color-accent-subtle)' : 'var(--bg-elevated)',
+                                border: '1px solid var(--border-base)',
+                                color: showFavoritesOnly ? 'var(--color-accent)' : 'var(--text-muted)'
                             }}
                         >
                             ★ Favorites {favorites.length > 0 && `(${favorites.length})`}
@@ -251,7 +262,7 @@ export default function WodLibraryPage() {
                 </motion.div>
 
                 {/* Results count */}
-                <p className="text-xs mb-4" style={{ color: 'var(--v2-text-muted)' }}>
+                <p className="text-xs mb-4" style={{ color: 'var(--text-muted)' }}>
                     {filteredWods.length} WOD{filteredWods.length !== 1 ? 's' : ''} available
                 </p>
 
@@ -272,7 +283,7 @@ export default function WodLibraryPage() {
 
                 {filteredWods.length === 0 && (
                     <div className="text-center py-16">
-                        <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                             No WODs match your filters. Try adjusting equipment or type.
                         </p>
                     </div>
@@ -303,8 +314,8 @@ function WodCard({ wod, index, isFavorite, isExpanded, onToggleFavorite, onToggl
             transition={{ delay: 0.05 * index, duration: 0.4, ease }}
             className="rounded-xl overflow-hidden"
             style={{
-                background: 'var(--v2-bg-elevated)',
-                border: '1px solid var(--v2-border)'
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-base)'
             }}
         >
             {/* Header */}
@@ -322,7 +333,7 @@ function WodCard({ wod, index, isFavorite, isExpanded, onToggleFavorite, onToggl
                             >
                                 {typeInfo.label}
                             </span>
-                            <span className="text-[10px]" style={{ color: 'var(--v2-text-muted)' }}>
+                            <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
                                 {wod.timeDomain} min
                             </span>
                         </div>
@@ -330,26 +341,26 @@ function WodCard({ wod, index, isFavorite, isExpanded, onToggleFavorite, onToggl
                     <button
                         onClick={onToggleFavorite}
                         className="text-xl hover:scale-110 transition-transform"
-                        style={{ color: isFavorite ? 'var(--v2-yellow)' : 'var(--v2-text-muted)' }}
+                        style={{ color: isFavorite ? 'var(--v2-yellow)' : 'var(--text-muted)' }}
                     >
                         {isFavorite ? '★' : '☆'}
                     </button>
                 </div>
 
                 {/* Format */}
-                <p className="text-xs font-mono mb-3" style={{ color: 'var(--v2-text-secondary)' }}>
+                <p className="text-xs font-mono mb-3" style={{ color: 'var(--text-muted)' }}>
                     {wod.format}
                 </p>
 
                 {/* Movements preview */}
                 <div className="space-y-1 mb-3">
                     {wod.movements.slice(0, 3).map((movement, i) => (
-                        <p key={i} className="text-xs" style={{ color: 'var(--v2-text-secondary)' }}>
+                        <p key={i} className="text-xs" style={{ color: 'var(--text-muted)' }}>
                             • {movement.name}: {movement.reps}
                         </p>
                     ))}
                     {wod.movements.length > 3 && (
-                        <p className="text-xs" style={{ color: 'var(--v2-text-muted)' }}>
+                        <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
                             +{wod.movements.length - 3} more...
                         </p>
                     )}
@@ -362,7 +373,7 @@ function WodCard({ wod, index, isFavorite, isExpanded, onToggleFavorite, onToggl
                             <span
                                 key={eq}
                                 className="text-[10px] px-2 py-0.5 rounded"
-                                style={{ background: 'var(--v2-bg-hover)', color: 'var(--v2-text-muted)' }}
+                                style={{ background: 'var(--bg-muted)', color: 'var(--text-muted)' }}
                             >
                                 {eq.replace(/_/g, ' ')}
                             </span>
@@ -383,8 +394,8 @@ function WodCard({ wod, index, isFavorite, isExpanded, onToggleFavorite, onToggl
                     onClick={onToggleExpand}
                     className="text-xs w-full py-2 rounded-lg transition-colors"
                     style={{
-                        background: 'var(--v2-bg-hover)',
-                        color: 'var(--v2-text-secondary)'
+                        background: 'var(--bg-muted)',
+                        color: 'var(--text-muted)'
                     }}
                     aria-expanded={isExpanded}
                     aria-label={`${wod.name} scaling options - ${isExpanded ? 'collapse' : 'expand'}`}
@@ -400,18 +411,18 @@ function WodCard({ wod, index, isFavorite, isExpanded, onToggleFavorite, onToggl
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
                     className="px-4 pb-4"
-                    style={{ borderTop: '1px solid var(--v2-border)' }}
+                    style={{ borderTop: '1px solid var(--border-base)' }}
                 >
                     <div className="pt-4 space-y-3">
                         {/* Full movements */}
                         <div>
-                            <h4 className="text-xs font-medium mb-2" style={{ color: 'var(--v2-text-muted)' }}>
+                            <h4 className="text-xs font-medium mb-2" style={{ color: 'var(--text-muted)' }}>
                                 All Movements
                             </h4>
                             {wod.movements.map((movement, i) => (
-                                <p key={i} className="text-xs mb-1" style={{ color: 'var(--v2-text-secondary)' }}>
+                                <p key={i} className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>
                                     • {movement.name}: {movement.reps}
-                                    {movement.notes && <span style={{ color: 'var(--v2-text-muted)' }}> ({movement.notes})</span>}
+                                    {movement.notes && <span style={{ color: 'var(--text-muted)' }}> ({movement.notes})</span>}
                                 </p>
                             ))}
                         </div>
@@ -419,21 +430,21 @@ function WodCard({ wod, index, isFavorite, isExpanded, onToggleFavorite, onToggl
                         {/* Scaling options */}
                         {wod.scalingOptions && (
                             <div className="space-y-2">
-                                <h4 className="text-xs font-medium" style={{ color: 'var(--v2-text-muted)' }}>
+                                <h4 className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>
                                     Scaling Options
                                 </h4>
-                                <div className="rounded-lg p-3" style={{ background: 'var(--v2-bg-deep)' }}>
+                                <div className="rounded-lg p-3" style={{ background: 'var(--bg-base)' }}>
                                     <p className="text-xs mb-1">
-                                        <span className="font-medium" style={{ color: 'var(--v2-accent)' }}>Rx: </span>
-                                        <span style={{ color: 'var(--v2-text-secondary)' }}>{wod.scalingOptions.rx}</span>
+                                        <span className="font-medium" style={{ color: 'var(--color-accent)' }}>Rx: </span>
+                                        <span style={{ color: 'var(--text-muted)' }}>{wod.scalingOptions.rx}</span>
                                     </p>
                                     <p className="text-xs mb-1">
                                         <span className="font-medium" style={{ color: 'var(--v2-yellow)' }}>Scaled: </span>
-                                        <span style={{ color: 'var(--v2-text-secondary)' }}>{wod.scalingOptions.scaled}</span>
+                                        <span style={{ color: 'var(--text-muted)' }}>{wod.scalingOptions.scaled}</span>
                                     </p>
                                     <p className="text-xs">
                                         <span className="font-medium" style={{ color: 'var(--v2-green)' }}>Beginner: </span>
-                                        <span style={{ color: 'var(--v2-text-secondary)' }}>{wod.scalingOptions.beginner}</span>
+                                        <span style={{ color: 'var(--text-muted)' }}>{wod.scalingOptions.beginner}</span>
                                     </p>
                                 </div>
                             </div>
@@ -442,11 +453,11 @@ function WodCard({ wod, index, isFavorite, isExpanded, onToggleFavorite, onToggl
                         {/* Notes */}
                         {wod.notes && wod.notes.length > 0 && (
                             <div>
-                                <h4 className="text-xs font-medium mb-1" style={{ color: 'var(--v2-text-muted)' }}>
+                                <h4 className="text-xs font-medium mb-1" style={{ color: 'var(--text-muted)' }}>
                                     Coach Notes
                                 </h4>
                                 {wod.notes.map((note, i) => (
-                                    <p key={i} className="text-xs italic" style={{ color: 'var(--v2-text-secondary)' }}>
+                                    <p key={i} className="text-xs italic" style={{ color: 'var(--text-muted)' }}>
                                         "{note}"
                                     </p>
                                 ))}

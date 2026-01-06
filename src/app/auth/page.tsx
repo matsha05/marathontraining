@@ -235,7 +235,7 @@ function AuthForm() {
                 <h1 className="v2-heading-lg">
                     {step === 'email' ? 'Get Started' : 'Enter code'}
                 </h1>
-                <p className="v2-body-sm mt-2" style={{ color: 'var(--v2-text-muted)' }}>
+                <p className="v2-body-sm mt-2" style={{ color: 'var(--text-muted)' }}>
                     {step === 'email'
                         ? 'Enter your email to continue'
                         : `We sent a code to ${email}`}
@@ -256,9 +256,9 @@ function AuthForm() {
                     </button>
 
                     <div className="flex items-center gap-4 mb-6">
-                        <div className="flex-1 h-px" style={{ background: 'var(--v2-border)' }} />
-                        <span className="v2-label" style={{ color: 'var(--v2-text-muted)' }}>OR</span>
-                        <div className="flex-1 h-px" style={{ background: 'var(--v2-border)' }} />
+                        <div className="flex-1 h-px" style={{ background: 'var(--border-base)' }} />
+                        <span className="v2-label" style={{ color: 'var(--text-muted)' }}>OR</span>
+                        <div className="flex-1 h-px" style={{ background: 'var(--border-base)' }} />
                     </div>
 
                     <form onSubmit={handleSendOtp} className="space-y-4">
@@ -306,11 +306,11 @@ function AuthForm() {
                                 onChange={(e) => handleOtpChange(index, e.target.value)}
                                 onKeyDown={(e) => handleOtpKeyDown(index, e)}
                                 disabled={loadingAction === 'verify'}
-                                className="w-10 h-12 text-center text-lg font-semibold rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-[var(--v2-accent)]"
+                                className="w-10 h-12 text-center text-lg font-semibold rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
                                 style={{
-                                    background: 'var(--v2-bg-elevated)',
-                                    border: '1px solid var(--v2-border)',
-                                    color: 'var(--v2-text-primary)',
+                                    background: 'var(--bg-elevated)',
+                                    border: '1px solid var(--border-base)',
+                                    color: 'var(--text-base)',
                                 }}
                                 autoFocus={index === 0}
                                 aria-label={`Digit ${index + 1} of ${OTP_LENGTH}`}
@@ -321,7 +321,7 @@ function AuthForm() {
                     {/* Resend */}
                     <div className="text-center">
                         {resendCooldown > 0 ? (
-                            <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                            <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                                 Resend code in {resendCooldown}s
                             </p>
                         ) : (
@@ -372,11 +372,11 @@ function AuthForm() {
             )}
 
             {/* Terms */}
-            <p className="text-center v2-body-sm mt-8" style={{ color: 'var(--v2-text-muted)' }}>
+            <p className="text-center v2-body-sm mt-8" style={{ color: 'var(--text-muted)' }}>
                 By continuing, you agree to our{' '}
-                <Link href="/terms" className="underline hover:text-[var(--v2-text-secondary)]">Terms of Service</Link>
+                <Link href="/terms" className="underline hover:text-[var(--text-muted)]">Terms of Service</Link>
                 {' '}and{' '}
-                <Link href="/privacy" className="underline hover:text-[var(--v2-text-secondary)]">Privacy Policy</Link>
+                <Link href="/privacy" className="underline hover:text-[var(--text-muted)]">Privacy Policy</Link>
             </p>
         </>
     );
@@ -395,7 +395,7 @@ function AuthFormFallback() {
                 />
             </div>
             <h1 className="v2-heading-lg">Get Started</h1>
-            <p className="v2-body-sm mt-2" style={{ color: 'var(--v2-text-muted)' }}>Loading...</p>
+            <p className="v2-body-sm mt-2" style={{ color: 'var(--text-muted)' }}>Loading...</p>
         </div>
     );
 }

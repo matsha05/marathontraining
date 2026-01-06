@@ -85,7 +85,7 @@ export default function DurabilityPage() {
 
     // Quick check assessments
     const quickAssessments = useMemo(() =>
-        QUICK_CHECK_IDS.map(id => assessments.find(a => a.id === id)).filter(Boolean) as DurabilityAssessment[],
+        QUICK_CHECK_IDS.map(id => assessments.find(a => a.id === id)).filter((a): a is DurabilityAssessment => a !== undefined),
         [assessments]
     );
 
@@ -96,7 +96,7 @@ export default function DurabilityPage() {
     const prescribedModuleIds = getModulesForFailedAssessments(failedIds);
     const prescribedModules = prescribedModuleIds
         .map(id => DURABILITY_MODULES[id])
-        .filter(Boolean) as DurabilityModule[];
+        .filter((m): m is DurabilityModule => m !== undefined);
 
     const handleResult = (id: string, result: AssessmentResult) => {
         setResults(prev => ({
@@ -123,7 +123,7 @@ export default function DurabilityPage() {
     const failCount = Object.values(results).filter(r => r.result === 'fail').length;
 
     const getCategoryIcon = (cat: DurabilityAssessment['category'], size = 24) => {
-        const iconClass = "text-[var(--v2-accent)]";
+        const iconClass = "text-[var(--color-accent)]";
         switch (cat) {
             case 'foot': return <Footprints size={size} className={iconClass} />;
             case 'ankle': return <Activity size={size} className={iconClass} />;
@@ -150,7 +150,7 @@ export default function DurabilityPage() {
     const totalPrescribedTime = prescribedModules.reduce((sum, m) => sum + m.durationMin, 0);
 
     return (
-        <div className="min-h-screen" style={{ background: 'var(--v2-bg-deep)', color: 'var(--v2-text-primary)' }}>
+        <div className="min-h-screen" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>
             <AppHeader streak={0} />
 
             <main className="max-w-3xl mx-auto px-6 py-10 space-y-8">
@@ -166,13 +166,13 @@ export default function DurabilityPage() {
                         >
                             {/* Hero */}
                             <div className="text-center py-8">
-                                <p className="v2-label mb-2" style={{ color: 'var(--v2-accent)' }}>
+                                <p className="v2-label mb-2" style={{ color: 'var(--color-accent)' }}>
                                     DURABILITY ASSESSMENT
                                 </p>
-                                <h1 className="text-3xl font-light mb-4" style={{ color: 'var(--v2-text-primary)' }}>
+                                <h1 className="text-3xl font-light mb-4" style={{ color: 'var(--text-base)' }}>
                                     Move better, run stronger
                                 </h1>
-                                <p className="text-lg max-w-xl mx-auto" style={{ color: 'var(--v2-text-muted)' }}>
+                                <p className="text-lg max-w-xl mx-auto" style={{ color: 'var(--text-muted)' }}>
                                     Based on Jay Dicharry's Running Rewired and Kelly Starrett's Ready to Run.
                                     Identify movement limitations before they become injuries.
                                 </p>
@@ -182,16 +182,16 @@ export default function DurabilityPage() {
                             <div className="grid gap-4 md:grid-cols-2">
                                 <button
                                     onClick={() => setMode('quick')}
-                                    className="v2-card p-6 text-left hover:border-[var(--v2-accent)] transition-colors"
+                                    className="v2-card p-6 text-left hover:border-[var(--color-accent)] transition-colors"
                                 >
                                     <div className="flex items-center gap-3 mb-3">
-                                        <Zap size={28} className="text-[var(--v2-accent)]" />
+                                        <Zap size={28} className="text-[var(--color-accent)]" />
                                         <h2 className="text-xl font-light">Quick Check</h2>
                                     </div>
-                                    <p className="text-sm mb-4" style={{ color: 'var(--v2-text-muted)' }}>
+                                    <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>
                                         Daily readiness scan. 3 key tests in ~2 minutes.
                                     </p>
-                                    <ul className="text-xs space-y-1" style={{ color: 'var(--v2-text-subtle)' }}>
+                                    <ul className="text-xs space-y-1" style={{ color: 'var(--text-subtle)' }}>
                                         <li>• Toe Yoga (foot control)</li>
                                         <li>• Single Leg Balance</li>
                                         <li>• Squat Shape</li>
@@ -203,16 +203,16 @@ export default function DurabilityPage() {
 
                                 <button
                                     onClick={() => setMode('full')}
-                                    className="v2-card p-6 text-left hover:border-[var(--v2-accent)] transition-colors"
+                                    className="v2-card p-6 text-left hover:border-[var(--color-accent)] transition-colors"
                                 >
                                     <div className="flex items-center gap-3 mb-3">
-                                        <ClipboardList size={28} className="text-[var(--v2-accent)]" />
+                                        <ClipboardList size={28} className="text-[var(--color-accent)]" />
                                         <h2 className="text-xl font-light">Full Assessment</h2>
                                     </div>
-                                    <p className="text-sm mb-4" style={{ color: 'var(--v2-text-muted)' }}>
+                                    <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>
                                         Complete durability screen. 12 tests in ~10 minutes.
                                     </p>
-                                    <ul className="text-xs space-y-1" style={{ color: 'var(--v2-text-subtle)' }}>
+                                    <ul className="text-xs space-y-1" style={{ color: 'var(--text-subtle)' }}>
                                         <li>• Foot, ankle, hip, spine</li>
                                         <li>• Strength & mobility gates</li>
                                         <li>• Personalized prescription</li>
@@ -224,11 +224,11 @@ export default function DurabilityPage() {
                             </div>
 
                             {/* Philosophy note */}
-                            <div className="v2-card p-5" style={{ borderColor: 'var(--v2-accent-subtle)' }}>
-                                <p className="text-xs uppercase tracking-widest mb-2" style={{ color: 'var(--v2-accent)' }}>
+                            <div className="v2-card p-5" style={{ borderColor: 'var(--color-accent-subtle)' }}>
+                                <p className="text-xs uppercase tracking-widest mb-2" style={{ color: 'var(--color-accent)' }}>
                                     THE DICHARRY PRINCIPLE
                                 </p>
-                                <p className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>
+                                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                                     "Running injuries are often a skill and control problem, not just a mobility problem.
                                     If you can't hit baseline positions cleanly, your body compensates under load."
                                 </p>
@@ -250,21 +250,21 @@ export default function DurabilityPage() {
                                 <button
                                     onClick={() => setMode('intro')}
                                     className="text-sm"
-                                    style={{ color: 'var(--v2-text-subtle)' }}
+                                    style={{ color: 'var(--text-subtle)' }}
                                 >
                                     ← Back
                                 </button>
-                                <p className="v2-mono text-sm" style={{ color: 'var(--v2-accent)' }}>
+                                <p className="v2-mono text-sm" style={{ color: 'var(--color-accent)' }}>
                                     {currentQuickIndex + 1} / {quickAssessments.length}
                                 </p>
                             </div>
 
-                            <div className="h-1 rounded-full overflow-hidden" style={{ background: 'var(--v2-bg-elevated)' }}>
+                            <div className="h-1 rounded-full overflow-hidden" style={{ background: 'var(--bg-elevated)' }}>
                                 <div
                                     className="h-full transition-all duration-300"
                                     style={{
                                         width: `${((currentQuickIndex + 1) / quickAssessments.length) * 100}%`,
-                                        background: 'var(--v2-accent)'
+                                        background: 'var(--color-accent)'
                                     }}
                                 />
                             </div>
@@ -284,15 +284,15 @@ export default function DurabilityPage() {
                                         <h2 className="text-2xl font-light mb-2">
                                             {quickAssessments[currentQuickIndex].name}
                                         </h2>
-                                        <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                                             {quickAssessments[currentQuickIndex].description}
                                         </p>
                                     </div>
 
-                                    <div className="space-y-4 p-4 rounded-lg" style={{ background: 'var(--v2-bg-elevated)' }}>
+                                    <div className="space-y-4 p-4 rounded-lg" style={{ background: 'var(--bg-elevated)' }}>
                                         <div>
                                             <p className="v2-label mb-1">TEST</p>
-                                            <p className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>
+                                            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                                                 {quickAssessments[currentQuickIndex].testProcedure}
                                             </p>
                                         </div>
@@ -350,7 +350,7 @@ export default function DurabilityPage() {
                                     <button
                                         onClick={() => setMode('intro')}
                                         className="text-sm mb-2 block"
-                                        style={{ color: 'var(--v2-text-subtle)' }}
+                                        style={{ color: 'var(--text-subtle)' }}
                                     >
                                         ← Back
                                     </button>
@@ -363,7 +363,7 @@ export default function DurabilityPage() {
                                 <div className="flex items-center justify-between mb-3">
                                     <div>
                                         <p className="v2-label">Progress</p>
-                                        <p className="text-xl font-mono" style={{ color: 'var(--v2-accent)' }}>
+                                        <p className="text-xl font-mono" style={{ color: 'var(--color-accent)' }}>
                                             {completedCount} / {totalCount}
                                         </p>
                                     </div>
@@ -372,12 +372,12 @@ export default function DurabilityPage() {
                                         <span style={{ color: '#f87171' }}>✗ {failCount}</span>
                                     </div>
                                 </div>
-                                <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--v2-bg-elevated)' }}>
+                                <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--bg-elevated)' }}>
                                     <div
                                         className="h-full transition-all duration-300"
                                         style={{
                                             width: `${(completedCount / totalCount) * 100}%`,
-                                            background: 'var(--v2-accent)'
+                                            background: 'var(--color-accent)'
                                         }}
                                     />
                                 </div>
@@ -421,10 +421,10 @@ export default function DurabilityPage() {
                                                         onClick={() => setExpandedId(isExpanded ? null : assessment.id)}
                                                     >
                                                         <div className="flex-1">
-                                                            <h3 className="font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
+                                                            <h3 className="font-medium" style={{ color: 'var(--text-muted)' }}>
                                                                 {assessment.name}
                                                             </h3>
-                                                            <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                                            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                                                                 {assessment.description}
                                                             </p>
                                                         </div>
@@ -432,25 +432,25 @@ export default function DurabilityPage() {
                                                             <span
                                                                 className="v2-badge"
                                                                 style={{
-                                                                    background: result.result === 'pass' ? 'var(--v2-accent-subtle)' :
+                                                                    background: result.result === 'pass' ? 'var(--color-accent-subtle)' :
                                                                         result.result === 'fail' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)',
-                                                                    color: result.result === 'pass' ? 'var(--v2-accent)' :
+                                                                    color: result.result === 'pass' ? 'var(--color-accent)' :
                                                                         result.result === 'fail' ? '#ef4444' : '#f59e0b'
                                                                 }}
                                                             >
                                                                 {result.result}
                                                             </span>
                                                         )}
-                                                        <span style={{ color: 'var(--v2-text-subtle)' }}>
+                                                        <span style={{ color: 'var(--text-subtle)' }}>
                                                             {isExpanded ? '▲' : '▼'}
                                                         </span>
                                                     </button>
 
                                                     {isExpanded && (
-                                                        <div className="mt-4 pt-4 space-y-4" style={{ borderTop: '1px solid var(--v2-border)' }}>
+                                                        <div className="mt-4 pt-4 space-y-4" style={{ borderTop: '1px solid var(--border-base)' }}>
                                                             <div>
                                                                 <p className="v2-label mb-1">Test Procedure</p>
-                                                                <p className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>
+                                                                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                                                                     {assessment.testProcedure}
                                                                 </p>
                                                             </div>
@@ -462,7 +462,7 @@ export default function DurabilityPage() {
                                                             </div>
                                                             <div>
                                                                 <p className="v2-label mb-1">If Failed</p>
-                                                                <ul className="text-sm list-disc list-inside" style={{ color: 'var(--v2-text-muted)' }}>
+                                                                <ul className="text-sm list-disc list-inside" style={{ color: 'var(--text-muted)' }}>
                                                                     {assessment.failImplications.map((imp, i) => (
                                                                         <li key={i}>{imp}</li>
                                                                     ))}
@@ -509,7 +509,7 @@ export default function DurabilityPage() {
                             className="space-y-8"
                         >
                             <div className="text-center py-4">
-                                <p className="v2-label mb-2" style={{ color: 'var(--v2-accent)' }}>
+                                <p className="v2-label mb-2" style={{ color: 'var(--color-accent)' }}>
                                     YOUR DURABILITY PRESCRIPTION
                                 </p>
                                 <h1 className="text-3xl font-light">
@@ -521,17 +521,17 @@ export default function DurabilityPage() {
                             <div className="grid grid-cols-3 gap-4">
                                 <div className="v2-card p-4 text-center">
                                     <p className="text-2xl font-mono" style={{ color: '#4ade80' }}>{passCount}</p>
-                                    <p className="text-xs" style={{ color: 'var(--v2-text-muted)' }}>Pass</p>
+                                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Pass</p>
                                 </div>
                                 <div className="v2-card p-4 text-center">
                                     <p className="text-2xl font-mono" style={{ color: '#f59e0b' }}>
                                         {Object.values(results).filter(r => r.result === 'partial').length}
                                     </p>
-                                    <p className="text-xs" style={{ color: 'var(--v2-text-muted)' }}>Partial</p>
+                                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Partial</p>
                                 </div>
                                 <div className="v2-card p-4 text-center">
                                     <p className="text-2xl font-mono" style={{ color: '#f87171' }}>{failCount}</p>
-                                    <p className="text-xs" style={{ color: 'var(--v2-text-muted)' }}>Fail</p>
+                                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Fail</p>
                                 </div>
                             </div>
 
@@ -543,18 +543,18 @@ export default function DurabilityPage() {
                                     transition={{ duration: 0.5 }}
                                     className="relative overflow-hidden rounded-2xl p-8 text-center"
                                     style={{
-                                        background: 'linear-gradient(135deg, var(--v2-bg-card), var(--v2-bg-elevated))',
-                                        border: '1px solid var(--v2-accent)',
+                                        background: 'linear-gradient(135deg, var(--v2-bg-card), var(--bg-elevated))',
+                                        border: '1px solid var(--color-accent)',
                                     }}
                                 >
                                     {/* Glow effect */}
                                     <div
                                         className="absolute -top-20 left-1/2 -translate-x-1/2 w-40 h-40 rounded-full blur-3xl"
-                                        style={{ background: 'var(--v2-accent)', opacity: 0.15 }}
+                                        style={{ background: 'var(--color-accent)', opacity: 0.15 }}
                                     />
-                                    <Sparkles size={48} className="text-[var(--v2-accent)] mx-auto mb-4 relative" />
+                                    <Sparkles size={48} className="text-[var(--color-accent)] mx-auto mb-4 relative" />
                                     <h2 className="text-2xl font-light mb-2 relative">Outstanding Durability</h2>
-                                    <p className="text-sm relative max-w-md mx-auto" style={{ color: 'var(--v2-text-muted)' }}>
+                                    <p className="text-sm relative max-w-md mx-auto" style={{ color: 'var(--text-muted)' }}>
                                         All assessments passed. You've earned maintenance mode.
                                         Retest weekly to catch any changes before they become problems.
                                     </p>
@@ -597,7 +597,7 @@ export default function DurabilityPage() {
                                         <p className="text-xs uppercase tracking-widest mb-2 font-medium" style={{ color: '#4ade80' }}>
                                             THE RETEST RULE
                                         </p>
-                                        <p className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>
+                                        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                                             Do these modules daily until you pass the related assessment, then retire them.
                                             Small consistent doses beat long sporadic sessions. This is Dicharry's "micro-dose" principle.
                                         </p>

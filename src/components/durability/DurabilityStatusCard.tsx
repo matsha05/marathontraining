@@ -61,18 +61,18 @@ export function DurabilityStatusCard({
         return (
             <Link
                 href="/durability?mode=quick"
-                className="v2-card p-4 flex items-center gap-3 hover:border-[var(--v2-accent)] transition-colors"
+                className="v2-card p-4 flex items-center gap-3 hover:border-[var(--color-accent)] transition-colors"
             >
-                <Zap size={20} className="text-[var(--v2-accent)]" />
+                <Zap size={20} className="text-[var(--color-accent)]" />
                 <div className="flex-1">
-                    <p className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>
+                    <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                         Quick readiness check recommended
                     </p>
-                    <p className="text-xs" style={{ color: 'var(--v2-text-subtle)' }}>
+                    <p className="text-xs" style={{ color: 'var(--text-subtle)' }}>
                         1-2 min before your quality session
                     </p>
                 </div>
-                <ArrowRight size={16} className="text-[var(--v2-text-subtle)]" />
+                <ArrowRight size={16} className="text-[var(--text-subtle)]" />
             </Link>
         );
     }
@@ -100,32 +100,32 @@ export function DurabilityStatusCard({
             {/* Status Grid */}
             <div className="grid grid-cols-2 gap-4 mb-4">
                 {/* Quick Check Status */}
-                <div className="p-3 rounded-lg" style={{ background: 'var(--v2-bg-elevated)' }}>
+                <div className="p-3 rounded-lg" style={{ background: 'var(--bg-elevated)' }}>
                     <div className="flex items-center gap-2 mb-1">
-                        <Zap size={14} className="text-[var(--v2-accent)]" />
-                        <span className="text-xs uppercase tracking-wide" style={{ color: 'var(--v2-text-subtle)' }}>
+                        <Zap size={14} className="text-[var(--color-accent)]" />
+                        <span className="text-xs uppercase tracking-wide" style={{ color: 'var(--text-subtle)' }}>
                             Quick Check
                         </span>
                     </div>
                     {quickCheckDoneToday ? (
                         <div className="flex items-center gap-1">
-                            <Check size={14} className="text-[var(--v2-accent)]" />
-                            <span className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>
+                            <Check size={14} className="text-[var(--color-accent)]" />
+                            <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
                                 Today
                             </span>
                         </div>
                     ) : (
-                        <span className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                        <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
                             {lastQuickCheck ? formatRelativeDate(lastQuickCheck) : 'Not done yet'}
                         </span>
                     )}
                 </div>
 
                 {/* Full Assessment Status */}
-                <div className="p-3 rounded-lg" style={{ background: 'var(--v2-bg-elevated)' }}>
+                <div className="p-3 rounded-lg" style={{ background: 'var(--bg-elevated)' }}>
                     <div className="flex items-center gap-2 mb-1">
                         <ClipboardList size={14} className="text-[var(--v2-durability)]" />
-                        <span className="text-xs uppercase tracking-wide" style={{ color: 'var(--v2-text-subtle)' }}>
+                        <span className="text-xs uppercase tracking-wide" style={{ color: 'var(--text-subtle)' }}>
                             Full Assessment
                         </span>
                     </div>
@@ -137,7 +137,7 @@ export function DurabilityStatusCard({
                             </span>
                         </div>
                     ) : (
-                        <span className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>
+                        <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
                             {daysSinceFullAssessment}d ago
                         </span>
                     )}
@@ -164,9 +164,9 @@ export function DurabilityStatusCard({
 
             {/* Dicharry Quote */}
             {showQuickCheckPrompt && (
-                <p className="text-xs text-center mt-4" style={{ color: 'var(--v2-text-subtle)' }}>
+                <p className="text-xs text-center mt-4" style={{ color: 'var(--text-subtle)' }}>
                     "Can I hit the positions today? Do I need maintenance before I go smash myself?"
-                    <span className="block mt-1" style={{ color: 'var(--v2-text-ghost)' }}>— Starrett</span>
+                    <span className="block mt-1" style={{ color: 'var(--text-subtle)' }}>— Starrett</span>
                 </p>
             )}
         </motion.div>

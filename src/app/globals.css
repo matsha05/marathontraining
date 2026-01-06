@@ -17,8 +17,8 @@
 
 @theme {
   /* Font Families - Wired to Next.js font loader variables */
-  --font-display: var(--font-space, "Space Grotesk"), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-sans: var(--font-instrument, "Instrument Sans"), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: var(--font-sora, "Sora"), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans: var(--font-sora, "Sora"), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-serif: "Georgia", "Times New Roman", Times, serif;
   --font-mono: var(--font-plex-mono, "IBM Plex Mono"), "SF Mono", "Fira Code", Consolas, monospace;
 
@@ -38,9 +38,43 @@
 
   /* Semantic Colors */
   --color-success: #19e38c;
-  --color-warning: #f4b740;
+  --color-warning: #f59e0b;
   --color-error: #e5484d;
   --color-info: #3a6bff;
+
+  /* Coach Colors - Training Philosophy Signatures */
+  --color-coach-hansons: #3a6bff;
+  --color-coach-higdon: #ec4899;
+  --color-coach-pfitzinger: #06b6d4;
+  --color-coach-fitzgerald: #a855f7;
+  --color-coach-magness: #f472b6;
+  --color-coach-daniels: #19e38c;
+  --color-coach-seiler: #f59e0b;
+  --color-coach-dicharry: #7a5cff;
+  --color-coach-starrett: #14b8a6;
+  --color-coach-storen: #e5484d;
+  --color-coach-ingebrigtsen: #0ea5e9;
+  --color-coach-engine: #fbbf24;
+
+  /* VDOT Training Zone Colors */
+  --color-zone-easy: #3498DB;
+  --color-zone-marathon: #27AE60;
+  --color-zone-threshold: #F39C12;
+  --color-zone-interval: #E74C3C;
+  --color-zone-repetition: #9B59B6;
+
+  /* Body Region Colors - Durability/Mobility */
+  --color-region-foot: #10b981;
+  --color-region-ankle: #3b82f6;
+  --color-region-hip: #f59e0b;
+  --color-region-core: #8b5cf6;
+  --color-region-mobility: #ec4899;
+  --color-region-balance: #06b6d4;
+
+  /* Extended Status Colors */
+  --color-status-declining: #f59e0b;
+  --color-status-improving: #4ade80;
+  --color-status-stable: #3b82f6;
 
   /* Spacing Scale (8px base grid) */
   --spacing-0: 0;
@@ -886,7 +920,7 @@ textarea.input {
   .animate-slide-in-right,
   .animate-slide-in-up,
   .animate-scroll,
-  .stagger-children > * {
+  .stagger-children>* {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
@@ -1151,7 +1185,7 @@ textarea.input {
   pointer-events: none;
 }
 
-.cta-panel > * {
+.cta-panel>* {
   position: relative;
   z-index: 1;
 }
@@ -1294,7 +1328,7 @@ textarea.input {
   pointer-events: none;
 }
 
-.auth-card > * {
+.auth-card>* {
   position: relative;
   z-index: 1;
 }

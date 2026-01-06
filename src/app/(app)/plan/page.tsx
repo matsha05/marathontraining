@@ -137,7 +137,7 @@ export default function PlanPage() {
             <div className="v2-root min-h-screen">
                 <header className="v2-nav sticky top-0 z-50">
                     <div className="v2-container flex items-center justify-between py-4">
-                        <Link href="/dashboard" className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>← Back</Link>
+                        <Link href="/dashboard" className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>← Back</Link>
                         <span className="v2-heading-sm">Training Plan</span>
                     </div>
                 </header>
@@ -157,14 +157,14 @@ export default function PlanPage() {
             <div className="v2-root min-h-screen">
                 <header className="v2-nav sticky top-0 z-50">
                     <div className="v2-container flex items-center justify-between py-4">
-                        <Link href="/dashboard" className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>← Back</Link>
+                        <Link href="/dashboard" className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>← Back</Link>
                         <span className="v2-heading-sm">Training Plan</span>
                     </div>
                 </header>
                 <main className="v2-container py-10">
                     <div className="v2-card p-10 text-center">
                         <h2 className="v2-heading-md mb-4">No Training Plan</h2>
-                        <p className="v2-body-sm mb-6" style={{ color: 'var(--v2-text-muted)' }}>
+                        <p className="v2-body-sm mb-6" style={{ color: 'var(--text-muted)' }}>
                             Complete onboarding to generate your personalized training plan.
                         </p>
                         <Link href="/onboarding" className="v2-btn v2-btn-primary">
@@ -187,17 +187,17 @@ export default function PlanPage() {
             <header className="v2-nav sticky top-0 z-50">
                 <div className="v2-container flex items-center justify-between py-4">
                     <div className="flex items-center gap-4">
-                        <Link href="/dashboard" className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>← Back</Link>
+                        <Link href="/dashboard" className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>← Back</Link>
                         <span className="v2-heading-sm">Training Plan</span>
                     </div>
                     <div className="flex items-center gap-4">
-                        <Link href="/plans/history" className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                        <Link href="/plans/history" className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                             History
                         </Link>
                         <span className="v2-label">{plan.raceName || `${plan.goalDistance.toUpperCase()} Training`}</span>
                         {weeksUntilRace !== null && weeksUntilRace > 0 && (
                             <>
-                                <span className="v2-mono" style={{ fontSize: '10px', color: 'var(--v2-text-subtle)' }}>•</span>
+                                <span className="v2-mono" style={{ fontSize: '10px', color: 'var(--text-subtle)' }}>•</span>
                                 <span className="v2-body-sm v2-accent">{weeksUntilRace} weeks away</span>
                             </>
                         )}
@@ -228,12 +228,12 @@ export default function PlanPage() {
                                         : 'v2-card'
                                     }`}
                                 style={{
-                                    background: phase.status === 'current' ? 'var(--v2-bg-active)' : 'var(--v2-bg-elevated)',
-                                    borderColor: phase.status === 'current' ? 'var(--v2-accent)' : 'var(--v2-border)',
+                                    background: phase.status === 'current' ? 'var(--bg-subtle)' : 'var(--bg-elevated)',
+                                    borderColor: phase.status === 'current' ? 'var(--color-accent)' : 'var(--border-base)',
                                 }}
                             >
                                 <p className="v2-heading-sm">{phase.name}</p>
-                                <p className="v2-body-sm" style={{ color: phase.status === 'current' ? 'var(--v2-text-secondary)' : 'var(--v2-text-muted)' }}>
+                                <p className="v2-body-sm" style={{ color: phase.status === 'current' ? 'var(--text-muted)' : 'var(--text-muted)' }}>
                                     {phase.weeks.includes('-') ? `Weeks ${phase.weeks}` : `Week ${phase.weeks}`}
                                 </p>
                             </motion.div>
@@ -260,13 +260,13 @@ export default function PlanPage() {
                                 <Link
                                     href={`/plan/week/${week.number}`}
                                     className={`v2-card v2-card-interactive p-5 block ${selectedWeek === week.number ? 'v2-card-selected' : ''
-                                        } ${week.isCurrent ? 'ring-2 ring-[var(--v2-accent)] ring-offset-2 ring-offset-[var(--v2-bg-base)]' : ''}`}
+                                        } ${week.isCurrent ? 'ring-2 ring-[var(--color-accent)] ring-offset-2 ring-offset-[var(--v2-bg-base)]' : ''}`}
                                 >
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-4">
                                             <div
                                                 className="w-12 h-12 rounded-xl flex items-center justify-center v2-mono"
-                                                style={{ background: 'var(--v2-bg-hover)', fontWeight: 600 }}
+                                                style={{ background: 'var(--bg-muted)', fontWeight: 600 }}
                                             >
                                                 W{week.number}
                                             </div>
@@ -276,20 +276,20 @@ export default function PlanPage() {
                                                     {week.isCurrent && <span className="v2-badge v2-badge-accent">Current</span>}
                                                     {week.cutback && <span className="v2-badge">Cutback</span>}
                                                 </p>
-                                                <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>{week.phase} Phase</p>
+                                                <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>{week.phase} Phase</p>
                                             </div>
                                         </div>
 
                                         <div className="flex items-center gap-8 text-center">
                                             <div>
                                                 <p className="v2-heading-md v2-mono">{week.mileage}</p>
-                                                <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--v2-text-muted)' }}>miles</p>
+                                                <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>miles</p>
                                             </div>
                                             <div>
                                                 <p className="v2-heading-md v2-mono">{week.quality}</p>
-                                                <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--v2-text-muted)' }}>quality</p>
+                                                <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>quality</p>
                                             </div>
-                                            <svg className="w-5 h-5" style={{ color: 'var(--v2-text-subtle)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg className="w-5 h-5" style={{ color: 'var(--text-subtle)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                             </svg>
                                         </div>
@@ -311,22 +311,22 @@ export default function PlanPage() {
                         <div className="v2-card p-5">
                             <p className="v2-heading-lg v2-mono mb-1">{plan.totalWeeks}</p>
                             <p className="v2-label mb-1">Weeks</p>
-                            <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--v2-text-muted)' }}>Total plan length</p>
+                            <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Total plan length</p>
                         </div>
                         <div className="v2-card p-5">
                             <p className="v2-heading-lg v2-mono mb-1">{plan.peakMileage}</p>
                             <p className="v2-label mb-1">Peak Mi</p>
-                            <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--v2-text-muted)' }}>Week {plan.peakWeek}</p>
+                            <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Week {plan.peakWeek}</p>
                         </div>
                         <div className="v2-card p-5">
                             <p className="v2-heading-lg v2-mono mb-1">{totalQualitySessions}</p>
                             <p className="v2-label mb-1">Quality</p>
-                            <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--v2-text-muted)' }}>Total sessions</p>
+                            <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Total sessions</p>
                         </div>
                         <div className="v2-card p-5">
                             <p className="v2-heading-lg v2-mono mb-1">{totalStrengthSessions}</p>
                             <p className="v2-label mb-1">Strength</p>
-                            <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--v2-text-muted)' }}>Total sessions</p>
+                            <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Total sessions</p>
                         </div>
                     </div>
                 </motion.section>

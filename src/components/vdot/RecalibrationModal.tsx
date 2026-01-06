@@ -105,7 +105,7 @@ export function RecalibrationModal({ isOpen, currentVdot, onClose, onConfirm }: 
                     {step === 'input' ? (
                         <>
                             <h2 className="v2-heading-md mb-2">Update Your VDOT</h2>
-                            <p className="v2-body-sm mb-6" style={{ color: 'var(--v2-text-muted)' }}>
+                            <p className="v2-body-sm mb-6" style={{ color: 'var(--text-muted)' }}>
                                 Enter a recent race or time trial to recalculate your training paces.
                             </p>
 
@@ -113,22 +113,22 @@ export function RecalibrationModal({ isOpen, currentVdot, onClose, onConfirm }: 
                             <div className="flex gap-2 mb-6">
                                 <button
                                     onClick={() => setInputType('race')}
-                                    className={`flex-1 py-3 rounded-lg border transition-colors ${inputType === 'race' ? 'border-[var(--v2-accent)]' : 'border-[var(--v2-border)]'
+                                    className={`flex-1 py-3 rounded-lg border transition-colors ${inputType === 'race' ? 'border-[var(--color-accent)]' : 'border-[var(--border-base)]'
                                         }`}
                                     style={{
-                                        background: inputType === 'race' ? 'var(--v2-accent-subtle)' : 'transparent',
-                                        color: inputType === 'race' ? 'var(--v2-accent)' : 'var(--v2-text-muted)',
+                                        background: inputType === 'race' ? 'var(--color-accent-subtle)' : 'transparent',
+                                        color: inputType === 'race' ? 'var(--color-accent)' : 'var(--text-muted)',
                                     }}
                                 >
                                     🏁 Race Result
                                 </button>
                                 <button
                                     onClick={() => setInputType('time_trial')}
-                                    className={`flex-1 py-3 rounded-lg border transition-colors ${inputType === 'time_trial' ? 'border-[var(--v2-accent)]' : 'border-[var(--v2-border)]'
+                                    className={`flex-1 py-3 rounded-lg border transition-colors ${inputType === 'time_trial' ? 'border-[var(--color-accent)]' : 'border-[var(--border-base)]'
                                         }`}
                                     style={{
-                                        background: inputType === 'time_trial' ? 'var(--v2-accent-subtle)' : 'transparent',
-                                        color: inputType === 'time_trial' ? 'var(--v2-accent)' : 'var(--v2-text-muted)',
+                                        background: inputType === 'time_trial' ? 'var(--color-accent-subtle)' : 'transparent',
+                                        color: inputType === 'time_trial' ? 'var(--color-accent)' : 'var(--text-muted)',
                                     }}
                                 >
                                     ⏱️ Time Trial
@@ -140,17 +140,17 @@ export function RecalibrationModal({ isOpen, currentVdot, onClose, onConfirm }: 
                                 <label className="v2-form-label mb-2 block">Distance</label>
                                 <div className="grid grid-cols-4 gap-2">
                                     {(inputType === 'race'
-                                        ? ['5k', '10k', 'half', 'marathon']
-                                        : ['mile', '5k']
+                                        ? (['5k', '10k', 'half', 'marathon'] as const)
+                                        : (['mile', '5k'] as const)
                                     ).map((d) => (
                                         <button
                                             key={d}
-                                            onClick={() => setDistance(d as any)}
-                                            className={`py-2 rounded-lg border text-sm transition-colors ${distance === d ? 'border-[var(--v2-accent)]' : 'border-[var(--v2-border)]'
+                                            onClick={() => setDistance(d)}
+                                            className={`py-2 rounded-lg border text-sm transition-colors ${distance === d ? 'border-[var(--color-accent)]' : 'border-[var(--border-base)]'
                                                 }`}
                                             style={{
-                                                background: distance === d ? 'var(--v2-accent-subtle)' : 'var(--v2-bg-elevated)',
-                                                color: distance === d ? 'var(--v2-accent)' : 'var(--v2-text-secondary)',
+                                                background: distance === d ? 'var(--color-accent-subtle)' : 'var(--bg-elevated)',
+                                                color: distance === d ? 'var(--color-accent)' : 'var(--text-muted)',
                                             }}
                                         >
                                             {d === 'half' ? 'Half' : d === 'marathon' ? 'Full' : d.toUpperCase()}
@@ -206,16 +206,16 @@ export function RecalibrationModal({ isOpen, currentVdot, onClose, onConfirm }: 
                             {/* VDOT Change */}
                             <div className="flex items-center justify-center gap-6 py-6 mb-6" style={{ background: 'var(--v2-bg-inset)', borderRadius: '12px' }}>
                                 <div className="text-center">
-                                    <p className="v2-body-xs" style={{ color: 'var(--v2-text-muted)' }}>Current</p>
+                                    <p className="v2-body-xs" style={{ color: 'var(--text-muted)' }}>Current</p>
                                     <p className="v2-heading-lg v2-mono">{currentVdot}</p>
                                 </div>
-                                <span className="v2-heading-lg" style={{ color: 'var(--v2-text-muted)' }}>→</span>
+                                <span className="v2-heading-lg" style={{ color: 'var(--text-muted)' }}>→</span>
                                 <div className="text-center">
-                                    <p className="v2-body-xs" style={{ color: 'var(--v2-text-muted)' }}>New</p>
+                                    <p className="v2-body-xs" style={{ color: 'var(--text-muted)' }}>New</p>
                                     <p className="v2-heading-lg v2-mono v2-accent">{calculatedVdot}</p>
                                 </div>
                                 <div className="text-center">
-                                    <p className="v2-body-xs" style={{ color: 'var(--v2-text-muted)' }}>Change</p>
+                                    <p className="v2-body-xs" style={{ color: 'var(--text-muted)' }}>Change</p>
                                     <p className={`v2-heading-lg v2-mono ${(calculatedVdot || 0) > currentVdot ? 'v2-accent' : ''}`}
                                         style={(calculatedVdot || 0) < currentVdot ? { color: 'var(--v2-warning)' } : {}}
                                     >
@@ -231,10 +231,10 @@ export function RecalibrationModal({ isOpen, currentVdot, onClose, onConfirm }: 
                                     {Object.entries(newPaces || {}).map(([zone, newPace]) => {
                                         const oldPace = currentPaces[zone];
                                         return (
-                                            <div key={zone} className="flex items-center justify-between py-2 border-b" style={{ borderColor: 'var(--v2-border)' }}>
+                                            <div key={zone} className="flex items-center justify-between py-2 border-b" style={{ borderColor: 'var(--border-base)' }}>
                                                 <span className="v2-body-sm">{zone}</span>
                                                 <div className="flex items-center gap-2">
-                                                    <span className="v2-mono text-sm" style={{ color: 'var(--v2-text-muted)', textDecoration: 'line-through' }}>
+                                                    <span className="v2-mono text-sm" style={{ color: 'var(--text-muted)', textDecoration: 'line-through' }}>
                                                         {oldPace}
                                                     </span>
                                                     <span className="v2-mono text-sm v2-accent">{newPace}</span>
@@ -247,7 +247,7 @@ export function RecalibrationModal({ isOpen, currentVdot, onClose, onConfirm }: 
 
                             {/* Info */}
                             <div className="p-4 rounded-lg mb-6" style={{ background: 'var(--v2-bg-inset)' }}>
-                                <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                                     💡 This will update all future workout paces. Your plan structure stays the same.
                                 </p>
                             </div>

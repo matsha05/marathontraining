@@ -78,7 +78,7 @@ export function PrescriptionModuleCard({
             className="relative overflow-hidden rounded-2xl"
             style={{
                 background: 'var(--v2-bg-card)',
-                border: `1px solid ${isCompleted ? 'rgba(74, 222, 128, 0.3)' : 'var(--v2-border)'}`,
+                border: `1px solid ${isCompleted ? 'rgba(74, 222, 128, 0.3)' : 'var(--border-base)'}`,
             }}
         >
             {/* Gradient accent line at top */}
@@ -90,7 +90,7 @@ export function PrescriptionModuleCard({
             {/* Main clickable header */}
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="w-full p-5 text-left transition-colors hover:bg-[var(--v2-bg-elevated)]"
+                className="w-full p-5 text-left transition-colors hover:bg-[var(--bg-elevated)]"
             >
                 <div className="flex items-start gap-4">
                     {/* Module number with gradient background */}
@@ -112,7 +112,7 @@ export function PrescriptionModuleCard({
                             </span>
                             <span
                                 className="text-[10px] flex items-center gap-1"
-                                style={{ color: 'var(--v2-text-subtle)' }}
+                                style={{ color: 'var(--text-subtle)' }}
                             >
                                 <Calendar size={10} />
                                 {FREQUENCY_LABELS[module.frequency] || module.frequency}
@@ -120,11 +120,11 @@ export function PrescriptionModuleCard({
                         </div>
                         <h3
                             className="text-lg font-medium mb-1"
-                            style={{ color: 'var(--v2-text-primary)' }}
+                            style={{ color: 'var(--text-base)' }}
                         >
                             {module.name}
                         </h3>
-                        <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                        <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--text-muted)' }}>
                             <span className="flex items-center gap-1">
                                 <Clock size={14} />
                                 {module.durationMin} min
@@ -140,7 +140,7 @@ export function PrescriptionModuleCard({
                         animate={{ rotate: isExpanded ? 180 : 0 }}
                         transition={{ duration: 0.2 }}
                         className="flex-shrink-0"
-                        style={{ color: 'var(--v2-text-subtle)' }}
+                        style={{ color: 'var(--text-subtle)' }}
                     >
                         <ChevronDown size={20} />
                     </motion.div>
@@ -159,7 +159,7 @@ export function PrescriptionModuleCard({
                     >
                         <div
                             className="px-5 pb-5 border-t"
-                            style={{ borderColor: 'var(--v2-border)' }}
+                            style={{ borderColor: 'var(--border-base)' }}
                         >
                             {/* Exercise list */}
                             <div className="mt-4 space-y-3">
@@ -173,7 +173,7 @@ export function PrescriptionModuleCard({
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: exIndex * 0.05 }}
                                             className="p-4 rounded-xl relative overflow-hidden"
-                                            style={{ background: 'var(--v2-bg-elevated)' }}
+                                            style={{ background: 'var(--bg-elevated)' }}
                                         >
                                             {/* Exercise number indicator */}
                                             <div
@@ -185,7 +185,7 @@ export function PrescriptionModuleCard({
                                                 <div className="flex-1">
                                                     <h4
                                                         className="font-medium text-sm mb-2"
-                                                        style={{ color: 'var(--v2-text-primary)' }}
+                                                        style={{ color: 'var(--text-base)' }}
                                                     >
                                                         {exercise.name}
                                                     </h4>
@@ -218,7 +218,7 @@ export function PrescriptionModuleCard({
                                                     {exercise.notes && (
                                                         <p
                                                             className="text-xs italic"
-                                                            style={{ color: 'var(--v2-text-subtle)' }}
+                                                            style={{ color: 'var(--text-subtle)' }}
                                                         >
                                                             💡 {exercise.notes}
                                                         </p>
@@ -250,11 +250,11 @@ export function PrescriptionModuleCard({
                             {/* Source attribution */}
                             <div
                                 className="mt-4 pt-4 flex items-center justify-between border-t"
-                                style={{ borderColor: 'var(--v2-border)' }}
+                                style={{ borderColor: 'var(--border-base)' }}
                             >
                                 <p
                                     className="text-xs italic"
-                                    style={{ color: 'var(--v2-text-ghost)' }}
+                                    style={{ color: 'var(--text-subtle)' }}
                                 >
                                     Source: {module.source}
                                 </p>
@@ -264,8 +264,8 @@ export function PrescriptionModuleCard({
                                         onClick={() => onComplete(module.id)}
                                         className="text-xs font-medium px-3 py-1.5 rounded-lg transition-all hover:scale-105"
                                         style={{
-                                            background: isCompleted ? 'rgba(74, 222, 128, 0.15)' : 'var(--v2-accent-subtle)',
-                                            color: isCompleted ? '#4ade80' : 'var(--v2-accent)',
+                                            background: isCompleted ? 'rgba(74, 222, 128, 0.15)' : 'var(--color-accent-subtle)',
+                                            color: isCompleted ? '#4ade80' : 'var(--color-accent)',
                                         }}
                                     >
                                         {isCompleted ? '✓ Completed' : 'Mark Complete'}
@@ -303,22 +303,22 @@ export function PrescriptionSummaryHeader({
             transition={{ duration: 0.5 }}
             className="relative overflow-hidden rounded-2xl p-6"
             style={{
-                background: 'linear-gradient(135deg, var(--v2-bg-card), var(--v2-bg-elevated))',
-                border: '1px solid var(--v2-accent)',
+                background: 'linear-gradient(135deg, var(--v2-bg-card), var(--bg-elevated))',
+                border: '1px solid var(--color-accent)',
             }}
         >
             {/* Subtle glow effect */}
             <div
                 className="absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl"
-                style={{ background: 'var(--v2-accent)', opacity: 0.1 }}
+                style={{ background: 'var(--color-accent)', opacity: 0.1 }}
             />
 
             <div className="relative">
                 <div className="flex items-center gap-2 mb-3">
-                    <Sparkles size={18} className="text-[var(--v2-accent)]" />
+                    <Sparkles size={18} className="text-[var(--color-accent)]" />
                     <p
                         className="text-xs uppercase tracking-widest font-medium"
-                        style={{ color: 'var(--v2-accent)' }}
+                        style={{ color: 'var(--color-accent)' }}
                     >
                         Your Daily Micro-Dose
                     </p>
@@ -326,7 +326,7 @@ export function PrescriptionSummaryHeader({
 
                 <h2
                     className="text-2xl font-light mb-4"
-                    style={{ color: 'var(--v2-text-primary)' }}
+                    style={{ color: 'var(--text-base)' }}
                 >
                     {failCount === 0
                         ? 'Outstanding Durability'
@@ -337,19 +337,19 @@ export function PrescriptionSummaryHeader({
                 {failCount > 0 && (
                     <div className="flex items-center gap-6">
                         <div>
-                            <p className="text-3xl font-mono font-light" style={{ color: 'var(--v2-accent)' }}>
+                            <p className="text-3xl font-mono font-light" style={{ color: 'var(--color-accent)' }}>
                                 ~{totalMinutes}
                             </p>
-                            <p className="text-xs" style={{ color: 'var(--v2-text-subtle)' }}>
+                            <p className="text-xs" style={{ color: 'var(--text-subtle)' }}>
                                 minutes daily
                             </p>
                         </div>
-                        <div className="h-12 w-px" style={{ background: 'var(--v2-border)' }} />
+                        <div className="h-12 w-px" style={{ background: 'var(--border-base)' }} />
                         <div>
                             <p className="text-3xl font-mono font-light" style={{ color: '#f59e0b' }}>
                                 {failCount}
                             </p>
-                            <p className="text-xs" style={{ color: 'var(--v2-text-subtle)' }}>
+                            <p className="text-xs" style={{ color: 'var(--text-subtle)' }}>
                                 area{failCount > 1 ? 's' : ''} to address
                             </p>
                         </div>

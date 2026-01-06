@@ -132,7 +132,7 @@ export default function WeekDetailPage() {
                 <main className="v2-container py-10">
                     <div className="v2-card p-10 text-center">
                         <h2 className="v2-heading-md mb-4">Week Not Found</h2>
-                        <p className="v2-body-sm mb-6" style={{ color: 'var(--v2-text-muted)' }}>
+                        <p className="v2-body-sm mb-6" style={{ color: 'var(--text-muted)' }}>
                             This training week doesn&apos;t exist in your plan.
                         </p>
                         <Link href="/plan" className="v2-btn v2-btn-primary">
@@ -171,10 +171,10 @@ export default function WeekDetailPage() {
                 >
                     <h1 className="v2-heading-xl mb-2">Week {weekNumber}</h1>
                     <div className="flex items-center gap-4">
-                        <span className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>{phaseLabel} Phase</span>
-                        <span className="v2-mono" style={{ fontSize: '12px', color: 'var(--v2-text-subtle)' }}>•</span>
+                        <span className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>{phaseLabel} Phase</span>
+                        <span className="v2-mono" style={{ fontSize: '12px', color: 'var(--text-subtle)' }}>•</span>
                         <span className="v2-mono" style={{ fontSize: '12px' }}>{Math.round(weekPlan.totalMiles * 10) / 10} miles</span>
-                        <span className="v2-mono" style={{ fontSize: '12px', color: 'var(--v2-text-subtle)' }}>•</span>
+                        <span className="v2-mono" style={{ fontSize: '12px', color: 'var(--text-subtle)' }}>•</span>
                         <span className="v2-mono" style={{ fontSize: '12px' }}>{weekPlan.keyWorkouts} quality sessions</span>
                     </div>
                 </motion.div>
@@ -183,13 +183,13 @@ export default function WeekDetailPage() {
                 {weekPlan.coachNotes && (
                     <motion.div
                         className="mb-8 p-4 rounded-xl"
-                        style={{ background: 'var(--v2-bg-inset)', borderLeft: '3px solid var(--v2-accent)' }}
+                        style={{ background: 'var(--v2-bg-inset)', borderLeft: '3px solid var(--color-accent)' }}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3, delay: 0.05 }}
                     >
-                        <p className="v2-label mb-1" style={{ color: 'var(--v2-accent)' }}>Coach&apos;s Note</p>
-                        <p className="v2-body-sm" style={{ color: 'var(--v2-text-secondary)' }}>
+                        <p className="v2-label mb-1" style={{ color: 'var(--color-accent)' }}>Coach&apos;s Note</p>
+                        <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                             {weekPlan.coachNotes}
                         </p>
                     </motion.div>
@@ -216,7 +216,7 @@ export default function WeekDetailPage() {
                                     <div
                                         className="w-12 h-12 rounded-xl flex items-center justify-center v2-mono shrink-0"
                                         style={{
-                                            background: day.isRest ? 'var(--v2-bg-hover)' : 'var(--v2-accent-subtle)',
+                                            background: day.isRest ? 'var(--bg-muted)' : 'var(--color-accent-subtle)',
                                             fontWeight: 600,
                                             fontSize: '11px',
                                         }}
@@ -228,8 +228,8 @@ export default function WeekDetailPage() {
                                     <div className="flex-1 space-y-3">
                                         {day.isRest ? (
                                             <div>
-                                                <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>Rest Day</p>
-                                                <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>Recovery is training</p>
+                                                <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>Rest Day</p>
+                                                <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>Recovery is training</p>
                                             </div>
                                         ) : (
                                             <>
@@ -237,7 +237,7 @@ export default function WeekDetailPage() {
                                                     <div className="flex items-center justify-between">
                                                         <div>
                                                             <p className="v2-heading-sm">{day.runWorkout.name}</p>
-                                                            <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                                            <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                                                                 {day.runWorkout.distance} mi • {day.runWorkout.type}
                                                                 {day.runWorkout.paceGuidance && ` @ ${day.runWorkout.paceGuidance}`}
                                                             </p>
@@ -248,10 +248,10 @@ export default function WeekDetailPage() {
                                                     </div>
                                                 )}
                                                 {day.strengthWorkout && (
-                                                    <div className="flex items-center justify-between pt-2 border-t" style={{ borderColor: 'var(--v2-border)' }}>
+                                                    <div className="flex items-center justify-between pt-2 border-t" style={{ borderColor: 'var(--border-base)' }}>
                                                         <div>
                                                             <p className="v2-heading-sm" style={{ fontSize: '14px' }}>{day.strengthWorkout.name}</p>
-                                                            <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                                            <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                                                                 {day.strengthWorkout.exercises} exercises
                                                             </p>
                                                         </div>

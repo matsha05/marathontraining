@@ -20,8 +20,8 @@ export default function PhilosophyPage() {
     return (
         <div className="v2-root min-h-screen flex items-center justify-center">
             <div className="text-center">
-                <div className="w-12 h-12 border-2 rounded-full animate-spin mx-auto mb-4" style={{ borderColor: 'var(--v2-accent)', borderTopColor: 'transparent' }} />
-                <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>Redirecting...</p>
+                <div className="w-12 h-12 border-2 rounded-full animate-spin mx-auto mb-4" style={{ borderColor: 'var(--color-accent)', borderTopColor: 'transparent' }} />
+                <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>Redirecting...</p>
             </div>
         </div>
     );

@@ -68,7 +68,7 @@ export default function DesignSystemPlayground() {
             </section>
 
             {/* Typography Section */}
-            <section className="v2-section border-t" style={{ borderColor: 'var(--v2-border)' }}>
+            <section className="v2-section border-t" style={{ borderColor: 'var(--border-base)' }}>
                 <div className="v2-container">
                     <p className="v2-label mb-6">Typography</p>
 
@@ -127,7 +127,7 @@ export default function DesignSystemPlayground() {
             </section>
 
             {/* Form Inputs Section */}
-            <section className="v2-section border-t" style={{ borderColor: 'var(--v2-border)' }}>
+            <section className="v2-section border-t" style={{ borderColor: 'var(--border-base)' }}>
                 <div className="v2-container">
                     <p className="v2-label mb-6">Form Inputs</p>
 
@@ -205,7 +205,7 @@ export default function DesignSystemPlayground() {
                         </div>
 
                         <div className="v2-card v2-card-accent v2-card-interactive">
-                            <p className="v2-heading-sm mb-2" style={{ color: 'var(--v2-accent)' }}>Accent Card</p>
+                            <p className="v2-heading-sm mb-2" style={{ color: 'var(--color-accent)' }}>Accent Card</p>
                             <p className="v2-body-sm">With accent background tint.</p>
                         </div>
                     </div>
@@ -213,7 +213,7 @@ export default function DesignSystemPlayground() {
             </section>
 
             {/* Badges Section */}
-            <section className="v2-section border-t" style={{ borderColor: 'var(--v2-border)' }}>
+            <section className="v2-section border-t" style={{ borderColor: 'var(--border-base)' }}>
                 <div className="v2-container">
                     <p className="v2-label mb-6">Badges</p>
 
@@ -256,7 +256,7 @@ export default function DesignSystemPlayground() {
             </section>
 
             {/* Empty State Section */}
-            <section className="v2-section border-t" style={{ borderColor: 'var(--v2-border)' }}>
+            <section className="v2-section border-t" style={{ borderColor: 'var(--border-base)' }}>
                 <div className="v2-container">
                     <p className="v2-label mb-6">Empty State</p>
 
@@ -348,7 +348,7 @@ export default function DesignSystemPlayground() {
             </section>
 
             {/* Animated Icons Section */}
-            <section className="v2-section border-t" style={{ borderColor: 'var(--v2-border)' }}>
+            <section className="v2-section border-t" style={{ borderColor: 'var(--border-base)' }}>
                 <div className="v2-container">
                     <p className="v2-label mb-6">Animated Icons</p>
                     <p className="v2-body-sm mb-6">Use sparingly — 1-2 key moments per page. Click to trigger animations.</p>
@@ -461,7 +461,7 @@ export default function DesignSystemPlayground() {
             </section>
 
             {/* Domain Colors Section */}
-            <section className="v2-section border-t" style={{ borderColor: 'var(--v2-border)' }}>
+            <section className="v2-section border-t" style={{ borderColor: 'var(--border-base)' }}>
                 <div className="v2-container">
                     <p className="v2-label mb-6">Domain Colors</p>
 
@@ -523,7 +523,7 @@ export default function DesignSystemPlayground() {
             </section>
 
             {/* Slider Section */}
-            <section className="v2-section border-t" style={{ borderColor: 'var(--v2-border)' }}>
+            <section className="v2-section border-t" style={{ borderColor: 'var(--border-base)' }}>
                 <div className="v2-container">
                     <p className="v2-label mb-6">Slider / Range</p>
 
@@ -601,7 +601,7 @@ export default function DesignSystemPlayground() {
             </section>
 
             {/* Avatars Section */}
-            <section className="v2-section border-t" style={{ borderColor: 'var(--v2-border)' }}>
+            <section className="v2-section border-t" style={{ borderColor: 'var(--border-base)' }}>
                 <div className="v2-container">
                     <p className="v2-label mb-6">Avatars</p>
 
@@ -706,7 +706,7 @@ export default function DesignSystemPlayground() {
             </section>
 
             {/* Dropdown Section */}
-            <section className="v2-section border-t" style={{ borderColor: 'var(--v2-border)' }}>
+            <section className="v2-section border-t" style={{ borderColor: 'var(--border-base)' }}>
                 <div className="v2-container">
                     <p className="v2-label mb-6">Dropdown Menu</p>
 

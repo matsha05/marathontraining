@@ -44,7 +44,7 @@ export function MetricCard({
     const trendColors = {
         up: 'var(--v2-success)',
         down: 'var(--v2-error)',
-        neutral: 'var(--v2-text-muted)',
+        neutral: 'var(--text-muted)',
     };
 
     const trendIcons = {
@@ -62,14 +62,14 @@ export function MetricCard({
         >
             {/* Header with icon and label */}
             <div className="flex items-center gap-2 mb-2">
-                {icon && <span style={{ color: 'var(--v2-accent)' }}>{icon}</span>}
+                {icon && <span style={{ color: 'var(--color-accent)' }}>{icon}</span>}
                 <span className="v2-label">{label}</span>
             </div>
 
             {/* Main value */}
             <div className="flex items-baseline gap-1">
-                <p className={`${valueSize} font-mono`} style={{ color: 'var(--v2-accent)' }}>{value}</p>
-                {unit && <span className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>{unit}</span>}
+                <p className={`${valueSize} font-mono`} style={{ color: 'var(--color-accent)' }}>{value}</p>
+                {unit && <span className="text-sm" style={{ color: 'var(--text-muted)' }}>{unit}</span>}
             </div>
 
             {/* Optional delta */}

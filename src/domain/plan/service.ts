@@ -233,7 +233,6 @@ export function createPlanFromOnboarding(
     };
 
     const tierResult = selectPlanTier(tierInput);
-    console.log('[PlanService] Selected tier:', tierResult.tier, 'for philosophy:', philosophy);
 
     if (tierResult.warnings.length > 0) {
         console.warn('[PlanService] Tier selection warnings:', tierResult.warnings);

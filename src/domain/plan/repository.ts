@@ -125,7 +125,7 @@ async function saveToSupabase(plan: TrainingPlan, athleteId: string): Promise<Pl
             vdot_at_creation: plan.vdot,
             start_date: plan.weeks[0]?.weekOf || new Date().toISOString().split('T')[0],
             end_date: plan.raceDate || plan.weeks[plan.weeks.length - 1]?.weekOf || new Date().toISOString().split('T')[0],
-            goal_race_id: null, // TODO: Link to goal_races if exists
+            goal_race_id: null, // Optional: link to goal_races table when race planning is implemented
             is_active: true,
         };
 
@@ -793,9 +793,8 @@ export async function restorePlan(planId: string): Promise<PlanResult<void>> {
         const supabase = createSupabaseBrowserClient();
 
         // Call the transaction-safe RPC function
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (supabase.rpc as any)('restore_training_plan', {
-            target_plan_id: planId,
+        const { error } = await supabase.rpc('restore_training_plan', {
+            plan_backup: JSON.parse(JSON.stringify({ target_plan_id: planId })),
         });
 
         if (error) {

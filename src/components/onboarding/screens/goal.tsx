@@ -158,7 +158,7 @@ export function RaceDetailsScreen({
                         onChange={onRaceNameChange}
                         placeholder="e.g., Chicago Marathon, Turkey Trot 5K"
                     />
-                    <p className="v2-mono mt-2" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
+                    <p className="v2-mono mt-2" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
                         This personalizes your dashboard countdown
                     </p>
                 </div>
@@ -176,7 +176,7 @@ export function RaceDetailsScreen({
                         <p className="v2-body-sm mt-2" style={{ color: 'var(--v2-error)' }}>{dateError}</p>
                     )}
                     {!data.raceDate && (
-                        <p className="v2-mono mt-2" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
+                        <p className="v2-mono mt-2" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
                             We&apos;ll build a flexible plan without a specific target date
                         </p>
                     )}
@@ -191,7 +191,7 @@ export function RaceDetailsScreen({
                                 With {weeksToRace} weeks, we&apos;ll focus on finishing strong rather than a time goal.
                             </WarningBanner>
                         ) : (
-                            <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                            <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                                 {weeksToRace} weeks until race day — plenty of time to prepare!
                             </p>
                         )}

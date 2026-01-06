@@ -131,9 +131,9 @@ export function SyncStatusIndicator() {
         return (
             <div className="fixed bottom-4 left-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium backdrop-blur-sm"
                 style={{
-                    background: 'var(--v2-secondary-subtle)',
+                    background: 'var(--color-strength-subtle)',
                     border: '1px solid rgba(58, 107, 255, 0.3)',
-                    color: 'var(--v2-secondary)'
+                    color: 'var(--color-strength)'
                 }}>
                 <Loader2 size={16} className="animate-spin" />
                 <span>Saving...</span>
@@ -146,7 +146,7 @@ export function SyncStatusIndicator() {
         return (
             <div className="fixed bottom-4 left-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium backdrop-blur-sm"
                 style={{
-                    background: 'var(--v2-accent-subtle)',
+                    background: 'var(--color-accent-subtle)',
                     border: '1px solid rgba(25, 227, 140, 0.3)',
                     color: 'var(--v2-success)'
                 }}>

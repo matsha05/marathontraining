@@ -36,11 +36,11 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
 
     return (
         <div className="v2-root min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden"
-            style={{ background: 'var(--v2-bg-deep)' }}>
+            style={{ background: 'var(--bg-base)' }}>
             {/* Subtle radial glow behind content */}
             <div
                 className="absolute inset-0 pointer-events-none"
-                style={{ background: 'radial-gradient(600px circle at 50% 45%, var(--v2-accent-glow) 0%, transparent 60%)' }}
+                style={{ background: 'radial-gradient(600px circle at 50% 45%, var(--color-accent-glow) 0%, transparent 60%)' }}
             />
 
             {/* Step indicator at top */}
@@ -50,7 +50,7 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
                 transition={{ delay: 0.1, duration: 0.4 }}
                 className="fixed top-6 left-0 right-0 text-center"
             >
-                <p className="text-xs font-mono" style={{ color: 'var(--v2-text-ghost)' }}>
+                <p className="text-xs font-mono" style={{ color: 'var(--text-subtle)' }}>
                     Step 1 · Build Your Plan
                 </p>
             </motion.div>
@@ -62,7 +62,7 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2, duration: 0.6, ease }}
                     className="text-4xl md:text-5xl font-light mb-4 tracking-tight"
-                    style={{ color: 'var(--v2-text-primary)' }}
+                    style={{ color: 'var(--text-base)' }}
                 >
                     Let's build your plan
                 </motion.h1>
@@ -71,7 +71,7 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.35, duration: 0.6, ease }}
                     className="text-lg mb-10"
-                    style={{ color: 'var(--v2-text-subtle)' }}
+                    style={{ color: 'var(--text-subtle)' }}
                 >
                     Answer a few questions. Get a plan tailored to you.
                 </motion.p>
@@ -83,7 +83,7 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
                     transition={{ delay: 0.5, duration: 0.7, ease }}
                     className="max-w-2xl mx-auto mb-10"
                 >
-                    <p className="text-xs mb-4 font-mono" style={{ color: 'var(--v2-text-ghost)' }}>
+                    <p className="text-xs mb-4 font-mono" style={{ color: 'var(--text-subtle)' }}>
                         What you'll get · Calibrated to your fitness
                     </p>
                     <div className="grid grid-cols-7 gap-1">
@@ -104,21 +104,21 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
                                 className="p-3 rounded-lg text-center"
                                 style={{
                                     background: d.type === "long"
-                                        ? 'var(--v2-accent-subtle)'
+                                        ? 'var(--color-accent-subtle)'
                                         : d.type === "rest"
-                                            ? 'var(--v2-bg-elevated)'
-                                            : 'var(--v2-bg-hover)',
+                                            ? 'var(--bg-elevated)'
+                                            : 'var(--bg-muted)',
                                 }}
                             >
-                                <p className="text-[10px] mb-2" style={{ color: 'var(--v2-text-subtle)' }}>{d.day}</p>
+                                <p className="text-[10px] mb-2" style={{ color: 'var(--text-subtle)' }}>{d.day}</p>
                                 <p
                                     className="text-xs mb-0.5"
-                                    style={{ color: d.type === "rest" ? 'var(--v2-text-ghost)' : 'var(--v2-text-secondary)' }}
+                                    style={{ color: d.type === "rest" ? 'var(--text-subtle)' : 'var(--text-muted)' }}
                                 >
                                     {d.label}
                                 </p>
                                 {d.sub && (
-                                    <p className="text-[9px] font-mono" style={{ color: 'var(--v2-text-subtle)' }}>{d.sub}</p>
+                                    <p className="text-[9px] font-mono" style={{ color: 'var(--text-subtle)' }}>{d.sub}</p>
                                 )}
                             </motion.div>
                         ))}
@@ -145,7 +145,7 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1.2, duration: 0.5 }}
                     className="v2-mono mt-8"
-                    style={{ fontSize: '11px', color: 'var(--v2-text-ghost)' }}
+                    style={{ fontSize: '11px', color: 'var(--text-subtle)' }}
                 >
                     Takes about 3 minutes
                 </motion.p>
@@ -193,14 +193,14 @@ export function MileGateScreen({ value, onChange, onContinue, onBack }: MileGate
                 />
 
                 <div className="space-y-6 text-center">
-                    <p className="v2-body-md" style={{ color: 'var(--v2-text-muted)' }}>
+                    <p className="v2-body-md" style={{ color: 'var(--text-muted)' }}>
                         Our training plans assume you can run continuously.
                         The Couch to 5K program is perfect for building up to that point.
                     </p>
 
-                    <div className="v2-card p-6 text-left" style={{ borderColor: 'var(--v2-border)' }}>
+                    <div className="v2-card p-6 text-left" style={{ borderColor: 'var(--border-base)' }}>
                         <p className="v2-label mb-2">Recommended: Couch to 5K (C25K)</p>
-                        <p className="v2-body-sm mb-4" style={{ color: 'var(--v2-text-muted)' }}>
+                        <p className="v2-body-sm mb-4" style={{ color: 'var(--text-muted)' }}>
                             A proven 9-week walk/run program that gradually builds you up to running 3 miles without stopping.
                         </p>
                         <a
@@ -213,7 +213,7 @@ export function MileGateScreen({ value, onChange, onContinue, onBack }: MileGate
                         </a>
                     </div>
 
-                    <p className="v2-body-sm" style={{ color: 'var(--v2-text-subtle)' }}>
+                    <p className="v2-body-sm" style={{ color: 'var(--text-subtle)' }}>
                         Once you can run 1 mile, come back and we'll build your training plan!
                     </p>
                 </div>

@@ -43,7 +43,7 @@ export function QuestionScreen<T>({
                 <button
                     onClick={onBack}
                     className="fixed top-8 left-6 text-sm transition-colors"
-                    style={{ color: 'var(--v2-text-subtle)' }}
+                    style={{ color: 'var(--text-subtle)' }}
                 >
                     ← {backLabel}
                 </button>
@@ -56,7 +56,7 @@ export function QuestionScreen<T>({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
                     className="text-3xl md:text-4xl font-light mb-4"
-                    style={{ color: 'var(--v2-text-primary)' }}
+                    style={{ color: 'var(--text-base)' }}
                 >
                     {question}
                 </motion.h1>
@@ -66,7 +66,7 @@ export function QuestionScreen<T>({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.15 }}
                     className="text-lg mb-12"
-                    style={{ color: 'var(--v2-text-muted)' }}
+                    style={{ color: 'var(--text-muted)' }}
                 >
                     {subtitle}
                 </motion.p>
@@ -82,19 +82,19 @@ export function QuestionScreen<T>({
                             onClick={() => onSelect(option.value)}
                             className="w-full p-5 rounded-xl border transition-all text-left group"
                             style={{
-                                background: 'var(--v2-bg-hover)',
-                                borderColor: 'var(--v2-border-hover)',
+                                background: 'var(--bg-muted)',
+                                borderColor: 'var(--border-base-hover)',
                             }}
                         >
                             <p
                                 className="text-lg transition-colors"
-                                style={{ color: 'var(--v2-text-primary)' }}
+                                style={{ color: 'var(--text-base)' }}
                             >
                                 {option.label}
                             </p>
                             <p
                                 className="text-sm mt-1"
-                                style={{ color: 'var(--v2-text-muted)' }}
+                                style={{ color: 'var(--text-muted)' }}
                             >
                                 {option.description}
                             </p>

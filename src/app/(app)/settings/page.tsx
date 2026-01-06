@@ -309,8 +309,7 @@ export default function SettingsPage() {
             const supabase = createSupabaseBrowserClient();
 
             // Call the transaction-safe RPC function
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { error } = await (supabase.rpc as any)('delete_user_account');
+            const { error } = await supabase.rpc('delete_user_account');
 
             if (error) {
                 setDeleteError('Failed to delete account. Please try again.');
@@ -335,7 +334,7 @@ export default function SettingsPage() {
             <header className="v2-nav sticky top-0 z-50">
                 <div className="v2-container flex items-center justify-between py-4">
                     <div className="flex items-center gap-4">
-                        <Link href="/dashboard" className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                        <Link href="/dashboard" className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                             ← Back
                         </Link>
                         <span className="v2-heading-sm">Settings</span>
@@ -423,7 +422,7 @@ export default function SettingsPage() {
                         <div className="flex items-center justify-between mb-6">
                             <div>
                                 <p className="v2-heading-sm">Current VO2max (VDOT)</p>
-                                <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>Update every 4-6 weeks or after a race.</p>
+                                <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>Update every 4-6 weeks or after a race.</p>
                             </div>
                             <p className="v2-heading-lg v2-mono v2-accent">{currentVdot || '—'}</p>
                         </div>
@@ -449,7 +448,7 @@ export default function SettingsPage() {
                         <div className="flex flex-wrap items-center justify-between gap-3">
                             <div>
                                 <p className="v2-heading-sm">Connect Strava</p>
-                                <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                                     Sync your runs automatically. Connect Garmin → Strava first in the Garmin Connect app.
                                 </p>
                             </div>
@@ -481,10 +480,10 @@ export default function SettingsPage() {
                             </button>
                         </div>
                         {stravaMessage && (
-                            <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>{stravaMessage}</p>
+                            <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>{stravaMessage}</p>
                         )}
                         {isLocalhost && (
-                            <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--v2-text-subtle)' }}>
+                            <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
                                 Strava OAuth only works on production. Deploy to connect.
                             </p>
                         )}
@@ -503,7 +502,7 @@ export default function SettingsPage() {
                         <div className="flex items-center justify-between gap-4">
                             <div>
                                 <p className="v2-heading-sm">Training Reminders</p>
-                                <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                                     Get notified about upcoming workouts
                                 </p>
                             </div>
@@ -516,7 +515,7 @@ export default function SettingsPage() {
                         <div className="flex items-center justify-between gap-4">
                             <div>
                                 <p className="v2-heading-sm">Weekly Progress Summary</p>
-                                <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                                     Receive a recap every Monday
                                 </p>
                             </div>
@@ -529,7 +528,7 @@ export default function SettingsPage() {
                         <div className="flex items-center justify-between gap-4">
                             <div>
                                 <p className="v2-heading-sm">Units</p>
-                                <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                                <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                                     Distances and paces displayed in
                                 </p>
                             </div>
@@ -562,7 +561,7 @@ export default function SettingsPage() {
                 >
                     <h2 className="v2-heading-md mb-4">Account</h2>
                     <div className="v2-card p-6 space-y-3">
-                        <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>
+                        <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
                             Sign out on this device if you are done with setup.
                         </p>
                         <button
@@ -586,7 +585,7 @@ export default function SettingsPage() {
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="v2-heading-sm">Delete Account</p>
-                                <p className="v2-body-sm" style={{ color: 'var(--v2-text-muted)' }}>Permanently delete your account and all data</p>
+                                <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>Permanently delete your account and all data</p>
                             </div>
                             <button
                                 className="v2-btn v2-btn-sm"
@@ -630,21 +629,21 @@ export default function SettingsPage() {
                                     onClick={() => setShowDeleteModal(false)}
                                     className="p-1 rounded hover:bg-white/10"
                                 >
-                                    <X size={20} style={{ color: 'var(--v2-text-muted)' }} />
+                                    <X size={20} style={{ color: 'var(--text-muted)' }} />
                                 </button>
                             </div>
 
-                            <p className="v2-body-sm mb-4" style={{ color: 'var(--v2-text-secondary)' }}>
+                            <p className="v2-body-sm mb-4" style={{ color: 'var(--text-muted)' }}>
                                 This will permanently delete:
                             </p>
-                            <ul className="v2-body-sm mb-6 space-y-1" style={{ color: 'var(--v2-text-muted)' }}>
+                            <ul className="v2-body-sm mb-6 space-y-1" style={{ color: 'var(--text-muted)' }}>
                                 <li>• All your training plans and workouts</li>
                                 <li>• Your durability assessments</li>
                                 <li>• Your VDOT history and progress</li>
                                 <li>• All connected integrations</li>
                             </ul>
 
-                            <p className="v2-body-sm mb-2" style={{ color: 'var(--v2-text-secondary)' }}>
+                            <p className="v2-body-sm mb-2" style={{ color: 'var(--text-muted)' }}>
                                 Type <strong style={{ color: 'var(--v2-error)' }}>DELETE</strong> to confirm:
                             </p>
                             <input
@@ -670,8 +669,8 @@ export default function SettingsPage() {
                                 <button
                                     className="v2-btn flex-1"
                                     style={{
-                                        background: deleteConfirmText === 'DELETE' ? 'var(--v2-error)' : 'var(--v2-bg-elevated)',
-                                        color: deleteConfirmText === 'DELETE' ? 'white' : 'var(--v2-text-muted)',
+                                        background: deleteConfirmText === 'DELETE' ? 'var(--v2-error)' : 'var(--bg-elevated)',
+                                        color: deleteConfirmText === 'DELETE' ? 'white' : 'var(--text-muted)',
                                         cursor: deleteConfirmText === 'DELETE' ? 'pointer' : 'not-allowed',
                                     }}
                                     onClick={handleDeleteAccount}

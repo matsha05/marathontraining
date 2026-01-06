@@ -45,8 +45,8 @@ export function PhilosophyCard({
         <div
             className="rounded-2xl border transition-all"
             style={{
-                background: recommended ? 'var(--v2-bg-hover)' : 'var(--v2-bg-elevated)',
-                borderColor: recommended ? 'var(--v2-border-active)' : 'var(--v2-border-hover)',
+                background: recommended ? 'var(--bg-muted)' : 'var(--bg-elevated)',
+                borderColor: recommended ? 'var(--border-base-active)' : 'var(--border-base-hover)',
             }}
         >
             {/* Header */}
@@ -58,20 +58,20 @@ export function PhilosophyCard({
                     />
                     <h3
                         className="text-2xl font-light"
-                        style={{ color: 'var(--v2-text-primary)' }}
+                        style={{ color: 'var(--text-base)' }}
                     >
                         {philosophy.name}
                     </h3>
                     <span
                         className="text-xs uppercase tracking-wider"
-                        style={{ color: 'var(--v2-text-muted)' }}
+                        style={{ color: 'var(--text-muted)' }}
                     >
                         {philosophy.tagline}
                     </span>
                     {recommended && (
                         <span
                             className="ml-auto px-2 py-1 text-[10px] rounded-full uppercase tracking-wider"
-                            style={{ background: 'var(--v2-accent-subtle)', color: 'var(--v2-accent)' }}
+                            style={{ background: 'var(--color-accent-subtle)', color: 'var(--color-accent)' }}
                         >
                             Recommended
                         </span>
@@ -82,27 +82,27 @@ export function PhilosophyCard({
                 {(personalizedDuration || personalizedKeyWorkouts) && (
                     <div
                         className="mb-4 p-3 rounded-lg"
-                        style={{ background: 'var(--v2-bg-active)' }}
+                        style={{ background: 'var(--bg-subtle)' }}
                     >
                         <p
                             className="text-xs uppercase tracking-wider mb-2"
-                            style={{ color: 'var(--v2-accent)' }}
+                            style={{ color: 'var(--color-accent)' }}
                         >
                             Your {userDistance || 'plan'}
                         </p>
                         <div className="flex flex-wrap gap-4 text-sm">
                             {personalizedDuration && (
-                                <span style={{ color: 'var(--v2-text-secondary)' }}>
+                                <span style={{ color: 'var(--text-muted)' }}>
                                     {personalizedDuration}
                                 </span>
                             )}
                             {displayRunDays && (
-                                <span style={{ color: 'var(--v2-text-secondary)' }}>
+                                <span style={{ color: 'var(--text-muted)' }}>
                                     {displayRunDays}
                                 </span>
                             )}
                             {displayLongRunCap && (
-                                <span style={{ color: 'var(--v2-text-secondary)' }}>
+                                <span style={{ color: 'var(--text-muted)' }}>
                                     Long runs: {displayLongRunCap}
                                 </span>
                             )}
@@ -110,7 +110,7 @@ export function PhilosophyCard({
                         {personalizedKeyWorkouts && personalizedKeyWorkouts.length > 0 && (
                             <p
                                 className="text-xs mt-2"
-                                style={{ color: 'var(--v2-text-muted)' }}
+                                style={{ color: 'var(--text-muted)' }}
                             >
                                 Key workouts: {personalizedKeyWorkouts.join(' · ')}
                             </p>
@@ -122,12 +122,12 @@ export function PhilosophyCard({
                 {!personalizedDuration && !personalizedKeyWorkouts && (
                     <div className="flex gap-6 text-sm">
                         <div>
-                            <span style={{ color: 'var(--v2-text-muted)' }}>Run days:</span>{' '}
-                            <span style={{ color: 'var(--v2-text-secondary)' }}>{displayRunDays}</span>
+                            <span style={{ color: 'var(--text-muted)' }}>Run days:</span>{' '}
+                            <span style={{ color: 'var(--text-muted)' }}>{displayRunDays}</span>
                         </div>
                         <div>
-                            <span style={{ color: 'var(--v2-text-muted)' }}>Long run cap:</span>{' '}
-                            <span style={{ color: 'var(--v2-text-secondary)' }}>{displayLongRunCap}</span>
+                            <span style={{ color: 'var(--text-muted)' }}>Long run cap:</span>{' '}
+                            <span style={{ color: 'var(--text-muted)' }}>{displayLongRunCap}</span>
                         </div>
                     </div>
                 )}
@@ -137,7 +137,7 @@ export function PhilosophyCard({
             <div className="px-6 pb-4">
                 <p
                     className="text-xs uppercase tracking-widest mb-3"
-                    style={{ color: 'var(--v2-text-muted)' }}
+                    style={{ color: 'var(--text-muted)' }}
                 >
                     Core beliefs
                 </p>
@@ -146,9 +146,9 @@ export function PhilosophyCard({
                         <li
                             key={i}
                             className="text-sm flex items-start gap-2"
-                            style={{ color: 'var(--v2-text-tertiary)' }}
+                            style={{ color: 'var(--text-muted)' }}
                         >
-                            <span className="mt-0.5" style={{ color: 'var(--v2-text-subtle)' }}>•</span>
+                            <span className="mt-0.5" style={{ color: 'var(--text-subtle)' }}>•</span>
                             {belief}
                         </li>
                     ))}
@@ -161,11 +161,11 @@ export function PhilosophyCard({
                     {/* Summary */}
                     <div
                         className="px-6 py-4"
-                        style={{ borderTop: '1px solid var(--v2-border)' }}
+                        style={{ borderTop: '1px solid var(--border-base)' }}
                     >
                         <p
                             className="text-sm leading-relaxed"
-                            style={{ color: 'var(--v2-text-tertiary)' }}
+                            style={{ color: 'var(--text-muted)' }}
                         >
                             {philosophy.methodology.summary}
                         </p>
@@ -174,11 +174,11 @@ export function PhilosophyCard({
                     {/* Key principles */}
                     <div
                         className="px-6 py-4"
-                        style={{ borderTop: '1px solid var(--v2-border)' }}
+                        style={{ borderTop: '1px solid var(--border-base)' }}
                     >
                         <p
                             className="text-xs uppercase tracking-widest mb-3"
-                            style={{ color: 'var(--v2-text-muted)' }}
+                            style={{ color: 'var(--text-muted)' }}
                         >
                             Key principles
                         </p>
@@ -187,11 +187,11 @@ export function PhilosophyCard({
                                 <li
                                     key={i}
                                     className="text-sm flex items-start gap-2"
-                                    style={{ color: 'var(--v2-text-tertiary)' }}
+                                    style={{ color: 'var(--text-muted)' }}
                                 >
                                     <span
                                         className="font-mono text-xs mt-0.5"
-                                        style={{ color: 'var(--v2-text-subtle)' }}
+                                        style={{ color: 'var(--text-subtle)' }}
                                     >
                                         {i + 1}.
                                     </span>
@@ -204,11 +204,11 @@ export function PhilosophyCard({
                     {/* Typical week */}
                     <div
                         className="px-6 py-4"
-                        style={{ borderTop: '1px solid var(--v2-border)' }}
+                        style={{ borderTop: '1px solid var(--border-base)' }}
                     >
                         <p
                             className="text-xs uppercase tracking-widest mb-3"
-                            style={{ color: 'var(--v2-text-muted)' }}
+                            style={{ color: 'var(--text-muted)' }}
                         >
                             Typical week
                         </p>
@@ -230,23 +230,23 @@ export function PhilosophyCard({
                                         className="p-2 rounded-lg text-center"
                                         style={{
                                             background: isLong
-                                                ? 'var(--v2-accent-subtle)'
+                                                ? 'var(--color-accent-subtle)'
                                                 : isQuality
-                                                    ? 'var(--v2-secondary-subtle)'
+                                                    ? 'var(--color-strength-subtle)'
                                                     : isRest
-                                                        ? 'var(--v2-bg-elevated)'
-                                                        : 'var(--v2-bg-hover)',
+                                                        ? 'var(--bg-elevated)'
+                                                        : 'var(--bg-muted)',
                                         }}
                                     >
                                         <p
                                             className="text-[10px] mb-1"
-                                            style={{ color: 'var(--v2-text-subtle)' }}
+                                            style={{ color: 'var(--text-subtle)' }}
                                         >
                                             {dayLetter}
                                         </p>
                                         <p
                                             className="text-[10px]"
-                                            style={{ color: isRest ? 'var(--v2-text-subtle)' : 'var(--v2-text-tertiary)' }}
+                                            style={{ color: isRest ? 'var(--text-subtle)' : 'var(--text-muted)' }}
                                         >
                                             {activity.split(' ').slice(0, 2).join(' ')}
                                         </p>
@@ -259,11 +259,11 @@ export function PhilosophyCard({
                     {/* Best for */}
                     <div
                         className="px-6 py-4"
-                        style={{ borderTop: '1px solid var(--v2-border)' }}
+                        style={{ borderTop: '1px solid var(--border-base)' }}
                     >
                         <p
                             className="text-xs uppercase tracking-widest mb-3"
-                            style={{ color: 'var(--v2-text-muted)' }}
+                            style={{ color: 'var(--text-muted)' }}
                         >
                             Best for
                         </p>
@@ -273,8 +273,8 @@ export function PhilosophyCard({
                                     key={i}
                                     className="px-3 py-1 text-xs rounded-full"
                                     style={{
-                                        background: 'var(--v2-bg-active)',
-                                        color: 'var(--v2-text-tertiary)'
+                                        background: 'var(--bg-subtle)',
+                                        color: 'var(--text-muted)'
                                     }}
                                 >
                                     {item}
@@ -286,11 +286,11 @@ export function PhilosophyCard({
                     {/* Challenges */}
                     <div
                         className="px-6 py-4"
-                        style={{ borderTop: '1px solid var(--v2-border)' }}
+                        style={{ borderTop: '1px solid var(--border-base)' }}
                     >
                         <p
                             className="text-xs uppercase tracking-widest mb-3"
-                            style={{ color: 'var(--v2-text-muted)' }}
+                            style={{ color: 'var(--text-muted)' }}
                         >
                             Challenges to consider
                         </p>
@@ -299,7 +299,7 @@ export function PhilosophyCard({
                                 <li
                                     key={i}
                                     className="text-sm flex items-start gap-2"
-                                    style={{ color: 'var(--v2-text-tertiary)' }}
+                                    style={{ color: 'var(--text-muted)' }}
                                 >
                                     <span className="mt-0.5" style={{ color: 'var(--v2-warning)' }}>⚠</span>
                                     {challenge}
@@ -312,13 +312,13 @@ export function PhilosophyCard({
                     <div
                         className="px-6 py-4 rounded-b-2xl"
                         style={{
-                            borderTop: '1px solid var(--v2-border)',
-                            background: 'var(--v2-bg-section)'
+                            borderTop: '1px solid var(--border-base)',
+                            background: 'var(--bg-muted)'
                         }}
                     >
                         <p
                             className="text-xs leading-relaxed"
-                            style={{ color: 'var(--v2-text-subtle)' }}
+                            style={{ color: 'var(--text-subtle)' }}
                         >
                             {philosophy.alwaysIncluded}
                         </p>

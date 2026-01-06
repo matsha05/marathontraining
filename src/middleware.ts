@@ -2,7 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { getSafeRedirectPath } from '@/lib/redirects';
 
-const protectedPaths = ['/dashboard', '/plan', '/settings', '/workout'];
+/**
+ * Next.js Middleware - Elite Auth Guard
+ * 
+ * Anti-marketing ethos: logged-in users go straight to app, not landing page.
+ * Handles all auth routing server-side (no client-side flash).
+ */
+
+const protectedPaths = ['/dashboard', '/plan', '/settings', '/workout', '/onboarding'];
 
 export async function middleware(request: NextRequest) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -37,7 +44,14 @@ export async function middleware(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
     const isProtected = protectedPaths.some(path => pathname.startsWith(path));
     const isAuthRoute = pathname === '/auth' || pathname === '/login' || pathname === '/signup';
+    const isLandingPage = pathname === '/';
 
+    // Anti-marketing: Logged-in users hitting landing → go straight to dashboard
+    if (user && isLandingPage) {
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+
+    // Protected routes: require auth
     if (!user && isProtected) {
         const redirectUrl = request.nextUrl.clone();
         redirectUrl.pathname = '/auth';
@@ -45,6 +59,7 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(redirectUrl);
     }
 
+    // Auth routes: logged-in users redirect to next or dashboard
     if (user && isAuthRoute) {
         const nextParam = request.nextUrl.searchParams.get('next');
         const safeNext = getSafeRedirectPath(nextParam, '/dashboard', { allowApi: true });
@@ -55,5 +70,16 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/dashboard/:path*', '/plan/:path*', '/settings/:path*', '/workout/:path*', '/auth', '/login', '/signup'],
+    matcher: [
+        '/',  // Landing page
+        '/dashboard/:path*',
+        '/plan/:path*',
+        '/settings/:path*',
+        '/workout/:path*',
+        '/onboarding/:path*',
+        '/auth',
+        '/login',
+        '/signup'
+    ],
 };
+

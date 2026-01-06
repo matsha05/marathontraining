@@ -161,10 +161,10 @@ export function DatePicker({
                 className="v2-input w-full flex items-center justify-between gap-3 cursor-pointer text-left"
                 style={{ fontSize: '16px' }}
             >
-                <span style={{ color: displayValue ? 'var(--v2-text-primary)' : 'var(--v2-text-muted)' }}>
+                <span style={{ color: displayValue ? 'var(--text-base)' : 'var(--text-muted)' }}>
                     {displayValue || placeholder}
                 </span>
-                <Calendar className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--v2-text-muted)' }} />
+                <Calendar className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--text-muted)' }} />
             </button>
 
             {/* Calendar Dropdown */}
@@ -177,29 +177,29 @@ export function DatePicker({
                         transition={{ duration: 0.15, ease: [0.2, 0.8, 0.2, 1] }}
                         className="absolute top-full left-0 right-0 mt-2 z-50 rounded-xl overflow-hidden"
                         style={{
-                            background: 'var(--v2-bg-elevated)',
-                            border: '1px solid var(--v2-border)',
+                            background: 'var(--bg-elevated)',
+                            border: '1px solid var(--border-base)',
                             boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
                         }}
                     >
                         {/* Month Header */}
-                        <div className="flex items-center justify-between p-4" style={{ borderBottom: '1px solid var(--v2-border)' }}>
+                        <div className="flex items-center justify-between p-4" style={{ borderBottom: '1px solid var(--border-base)' }}>
                             <button
                                 type="button"
                                 onClick={goToPrevMonth}
                                 className="p-2 rounded-lg transition-colors hover:bg-white/10"
-                                style={{ color: 'var(--v2-text-muted)' }}
+                                style={{ color: 'var(--text-muted)' }}
                             >
                                 <ChevronLeft className="w-4 h-4" />
                             </button>
-                            <span className="text-sm font-medium" style={{ color: 'var(--v2-text-primary)' }}>
+                            <span className="text-sm font-medium" style={{ color: 'var(--text-base)' }}>
                                 {MONTHS[viewDate.getMonth()]} {viewDate.getFullYear()}
                             </span>
                             <button
                                 type="button"
                                 onClick={goToNextMonth}
                                 className="p-2 rounded-lg transition-colors hover:bg-white/10"
-                                style={{ color: 'var(--v2-text-muted)' }}
+                                style={{ color: 'var(--text-muted)' }}
                             >
                                 <ChevronRight className="w-4 h-4" />
                             </button>
@@ -211,7 +211,7 @@ export function DatePicker({
                                 <div
                                     key={day}
                                     className="text-[10px] uppercase tracking-wider text-center py-1"
-                                    style={{ color: 'var(--v2-text-muted)' }}
+                                    style={{ color: 'var(--text-muted)' }}
                                 >
                                     {day}
                                 </div>
@@ -232,11 +232,11 @@ export function DatePicker({
                                             ? '#04110b'
                                             : dayInfo.isCurrentMonth
                                                 ? dayInfo.isDisabled
-                                                    ? 'var(--v2-text-subtle)'
-                                                    : 'var(--v2-text-primary)'
-                                                : 'var(--v2-text-subtle)',
+                                                    ? 'var(--text-subtle)'
+                                                    : 'var(--text-base)'
+                                                : 'var(--text-subtle)',
                                         background: dayInfo.isSelected
-                                            ? 'var(--v2-accent)'
+                                            ? 'var(--color-accent)'
                                             : dayInfo.isToday && !dayInfo.isSelected
                                                 ? 'rgba(25, 227, 140, 0.15)'
                                                 : 'transparent',
@@ -262,7 +262,7 @@ export function DatePicker({
                         </div>
 
                         {/* Quick Actions */}
-                        <div className="flex items-center justify-between px-4 py-3" style={{ borderTop: '1px solid var(--v2-border)' }}>
+                        <div className="flex items-center justify-between px-4 py-3" style={{ borderTop: '1px solid var(--border-base)' }}>
                             <button
                                 type="button"
                                 onClick={() => {
@@ -270,7 +270,7 @@ export function DatePicker({
                                     setIsOpen(false);
                                 }}
                                 className="text-xs transition-colors hover:underline"
-                                style={{ color: 'var(--v2-text-muted)' }}
+                                style={{ color: 'var(--text-muted)' }}
                             >
                                 Clear
                             </button>
@@ -284,7 +284,7 @@ export function DatePicker({
                                     }
                                 }}
                                 className="text-xs transition-colors hover:underline"
-                                style={{ color: 'var(--v2-accent)' }}
+                                style={{ color: 'var(--color-accent)' }}
                             >
                                 Today
                             </button>
