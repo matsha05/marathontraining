@@ -36,7 +36,7 @@ export function ExerciseCard({ exercise, index, showVideo = true }: ExerciseCard
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: (index || 0) * 0.05 }}
-            className="v2-card overflow-hidden"
+            className="v3-card overflow-hidden"
         >
             {/* Main Exercise Header */}
             <button
@@ -59,7 +59,7 @@ export function ExerciseCard({ exercise, index, showVideo = true }: ExerciseCard
 
                 {/* Exercise Info */}
                 <div className="flex-1 min-w-0">
-                    <h4 className="v2-heading-sm mb-1">{exercise.name}</h4>
+                    <h4 className="v3-heading-sm mb-1">{exercise.name}</h4>
 
                     {/* Dosage */}
                     <div className="flex items-center gap-2 mb-2">
@@ -76,7 +76,7 @@ export function ExerciseCard({ exercise, index, showVideo = true }: ExerciseCard
                                 key={i}
                                 className="px-2 py-0.5 rounded-full text-xs"
                                 style={{
-                                    background: 'var(--v2-gradient-glow)',
+                                    background: 'var(--v3-gradient-glow)',
                                     color: 'var(--text-muted)',
                                 }}
                             >
@@ -112,7 +112,7 @@ export function ExerciseCard({ exercise, index, showVideo = true }: ExerciseCard
                             {/* Step-by-Step Instructions */}
                             <div className="mt-4 mb-4">
                                 <div className="flex items-center gap-2 mb-3">
-                                    <BookOpen size={14} className="text-[var(--v2-durability)]" />
+                                    <BookOpen size={14} className="text-[var(--v3-durability)]" />
                                     <span
                                         className="text-xs uppercase tracking-wide font-medium"
                                         style={{ color: 'var(--text-subtle)' }}

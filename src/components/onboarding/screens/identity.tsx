@@ -101,24 +101,27 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
                                 initial={{ opacity: 0, y: 15 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.6 + (i * 0.05), duration: 0.4, ease }}
-                                className="p-3 rounded-lg text-center"
+                                className="p-3 rounded-lg text-center border"
                                 style={{
                                     background: d.type === "long"
-                                        ? 'var(--color-accent-subtle)'
+                                        ? 'color-mix(in srgb, var(--color-accent) 15%, var(--bg-elevated))'
                                         : d.type === "rest"
                                             ? 'var(--bg-elevated)'
                                             : 'var(--bg-muted)',
+                                    borderColor: d.type === "long"
+                                        ? 'var(--color-accent)'
+                                        : 'var(--border-base)',
                                 }}
                             >
-                                <p className="text-[10px] mb-2" style={{ color: 'var(--text-subtle)' }}>{d.day}</p>
+                                <p className="text-[10px] font-semibold mb-2" style={{ color: 'var(--text-muted)' }}>{d.day}</p>
                                 <p
-                                    className="text-xs mb-0.5"
-                                    style={{ color: d.type === "rest" ? 'var(--text-subtle)' : 'var(--text-muted)' }}
+                                    className="text-sm font-medium mb-0.5"
+                                    style={{ color: d.type === "long" ? 'var(--color-accent)' : d.type === "rest" ? 'var(--text-subtle)' : 'var(--text-base)' }}
                                 >
                                     {d.label}
                                 </p>
                                 {d.sub && (
-                                    <p className="text-[9px] font-mono" style={{ color: 'var(--text-subtle)' }}>{d.sub}</p>
+                                    <p className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>{d.sub}</p>
                                 )}
                             </motion.div>
                         ))}

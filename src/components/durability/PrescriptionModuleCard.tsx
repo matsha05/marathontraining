@@ -77,7 +77,7 @@ export function PrescriptionModuleCard({
             transition={{ duration: 0.4, delay: index * 0.1 }}
             className="relative overflow-hidden rounded-2xl"
             style={{
-                background: 'var(--v2-bg-card)',
+                background: 'var(--v3-bg-card)',
                 border: `1px solid ${isCompleted ? 'rgba(74, 222, 128, 0.3)' : 'var(--border-base)'}`,
             }}
         >
@@ -303,7 +303,7 @@ export function PrescriptionSummaryHeader({
             transition={{ duration: 0.5 }}
             className="relative overflow-hidden rounded-2xl p-6"
             style={{
-                background: 'linear-gradient(135deg, var(--v2-bg-card), var(--bg-elevated))',
+                background: 'linear-gradient(135deg, var(--v3-bg-card), var(--bg-elevated))',
                 border: '1px solid var(--color-accent)',
             }}
         >

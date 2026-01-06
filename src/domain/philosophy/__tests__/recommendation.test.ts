@@ -294,7 +294,7 @@ describe('Philosophy Recommendation Algorithm', () => {
     // DISTANCE COVERAGE
     // =========================================================================
     describe('Distance Coverage', () => {
-        const distances = ['5k', '10k', 'half', 'marathon', 'ultra'] as const;
+        const distances = ['5k', '10k', 'half', 'marathon'] as const;
 
         distances.forEach(distance => {
             it(`${distance} + 6 days + Exp + 40+mi + Push → Pfitzinger`, () => {

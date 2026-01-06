@@ -84,7 +84,7 @@ export function CoachingContextCard({
                 className="w-full text-left"
             >
                 <div
-                    className="v2-card p-4 transition-all hover:border-opacity-100"
+                    className="v3-card p-4 transition-all hover:border-opacity-100"
                     style={{
                         borderColor: `${branding.color}40`,
                         background: 'var(--bg-elevated)',
@@ -130,7 +130,7 @@ export function CoachingContextCard({
 
     return (
         <div
-            className="v2-card p-5 border-l-4"
+            className="v3-card p-5 border-l-4"
             style={{
                 borderLeftColor: branding.color,
                 background: 'var(--bg-elevated)',

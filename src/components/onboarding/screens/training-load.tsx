@@ -227,7 +227,7 @@ export function AvailableDaysScreen({
                 ))}
             </OptionGrid>
 
-            <p className="v2-body-sm mt-4" style={{ color: 'var(--text-subtle)' }}>
+            <p className="v3-body-sm mt-4" style={{ color: 'var(--text-subtle)' }}>
                 More days = more adaptation stimulus. But quality beats quantity.
                 A focused 4-day plan often outperforms a half-hearted 6-day plan.
             </p>

@@ -301,7 +301,7 @@ export function PhilosophyCard({
                                     className="text-sm flex items-start gap-2"
                                     style={{ color: 'var(--text-muted)' }}
                                 >
-                                    <span className="mt-0.5" style={{ color: 'var(--v2-warning)' }}>⚠</span>
+                                    <span className="mt-0.5" style={{ color: 'var(--v3-warning)' }}>⚠</span>
                                     {challenge}
                                 </li>
                             ))}

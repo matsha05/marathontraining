@@ -94,7 +94,7 @@ function PlanCard({ plan, isActive, onRestore, isRestoring }: PlanCardProps) {
         <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`v2-card overflow-hidden ${isActive ? 'ring-2 ring-[var(--color-accent)]' : ''}`}
+            className={`v3-card overflow-hidden ${isActive ? 'ring-2 ring-[var(--color-accent)]' : ''}`}
         >
             {/* Card Header */}
             <button
@@ -110,20 +110,20 @@ function PlanCard({ plan, isActive, onRestore, isRestoring }: PlanCardProps) {
                     </div>
                     <div>
                         <div className="flex items-center gap-2">
-                            <h3 className="v2-heading-sm">{formatPlanType(plan.plan_type)} Plan</h3>
-                            {isActive && <span className="v2-badge v2-badge-accent">Active</span>}
+                            <h3 className="v3-heading-sm">{formatPlanType(plan.plan_type)} Plan</h3>
+                            {isActive && <span className="v3-badge v3-badge-accent">Active</span>}
                         </div>
-                        <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+                        <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                             {formatDateRange(plan.start_date, plan.end_date)}
                         </p>
                     </div>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="text-right hidden sm:block">
-                        <p className="v2-mono" style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                        <p className="v3-mono" style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
                             VDOT {plan.vdot_at_creation}
                         </p>
-                        <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                        <p className="v3-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
                             {timeAgo(plan.created_at)}
                         </p>
                     </div>
@@ -152,7 +152,7 @@ function PlanCard({ plan, isActive, onRestore, isRestoring }: PlanCardProps) {
                                     <button
                                         onClick={onRestore}
                                         disabled={isRestoring}
-                                        className="v2-btn v2-btn-secondary flex items-center gap-2"
+                                        className="v3-btn v3-btn-secondary flex items-center gap-2"
                                     >
                                         <RotateCcw size={16} className={isRestoring ? 'animate-spin' : ''} />
                                         {isRestoring ? 'Restoring...' : 'Restore This Plan'}
@@ -163,26 +163,26 @@ function PlanCard({ plan, isActive, onRestore, isRestoring }: PlanCardProps) {
                             {/* Workouts by Week */}
                             {loadingWorkouts ? (
                                 <div className="py-4 space-y-2">
-                                    <div className="v2-skeleton" style={{ height: '40px', borderRadius: '8px' }} />
-                                    <div className="v2-skeleton" style={{ height: '40px', borderRadius: '8px' }} />
+                                    <div className="v3-skeleton" style={{ height: '40px', borderRadius: '8px' }} />
+                                    <div className="v3-skeleton" style={{ height: '40px', borderRadius: '8px' }} />
                                 </div>
                             ) : workouts.length === 0 ? (
-                                <p className="v2-body-sm py-4" style={{ color: 'var(--text-muted)' }}>
+                                <p className="v3-body-sm py-4" style={{ color: 'var(--text-muted)' }}>
                                     No workout data available for this plan.
                                 </p>
                             ) : (
                                 <div className="py-4 space-y-2 max-h-[300px] overflow-y-auto">
-                                    <p className="v2-label mb-2">{weekNumbers.length} Weeks • {workouts.length} Workouts</p>
+                                    <p className="v3-label mb-2">{weekNumbers.length} Weeks • {workouts.length} Workouts</p>
                                     {weekNumbers.slice(0, 5).map(weekNum => (
                                         <div key={weekNum} className="flex items-center justify-between py-2 border-b" style={{ borderColor: 'var(--border-base)' }}>
-                                            <span className="v2-mono" style={{ fontSize: '12px' }}>Week {weekNum}</span>
-                                            <span className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+                                            <span className="v3-mono" style={{ fontSize: '12px' }}>Week {weekNum}</span>
+                                            <span className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                                                 {workoutsByWeek[weekNum].length} workouts
                                             </span>
                                         </div>
                                     ))}
                                     {weekNumbers.length > 5 && (
-                                        <p className="v2-mono text-center py-2" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
+                                        <p className="v3-mono text-center py-2" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
                                             + {weekNumbers.length - 5} more weeks
                                         </p>
                                     )}
@@ -238,17 +238,17 @@ export default function PlanHistoryPage() {
 
     if (loading) {
         return (
-            <div className="v2-root min-h-screen">
-                <header className="v2-nav sticky top-0 z-50">
-                    <div className="v2-container flex items-center justify-between py-4">
-                        <Link href="/plan" className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>← Back</Link>
-                        <span className="v2-heading-sm">Plan History</span>
+            <div className="v3-root min-h-screen">
+                <header className="v3-nav sticky top-0 z-50">
+                    <div className="v3-container flex items-center justify-between py-4">
+                        <Link href="/plan" className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>← Back</Link>
+                        <span className="v3-heading-sm">Plan History</span>
                     </div>
                 </header>
-                <main className="v2-container py-10">
+                <main className="v3-container py-10">
                     <div className="space-y-4">
-                        <div className="v2-skeleton" style={{ height: '100px', borderRadius: '12px' }} />
-                        <div className="v2-skeleton" style={{ height: '100px', borderRadius: '12px' }} />
+                        <div className="v3-skeleton" style={{ height: '100px', borderRadius: '12px' }} />
+                        <div className="v3-skeleton" style={{ height: '100px', borderRadius: '12px' }} />
                     </div>
                 </main>
             </div>
@@ -257,16 +257,16 @@ export default function PlanHistoryPage() {
 
     if (error) {
         return (
-            <div className="v2-root min-h-screen">
-                <header className="v2-nav sticky top-0 z-50">
-                    <div className="v2-container flex items-center justify-between py-4">
-                        <Link href="/plan" className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>← Back</Link>
-                        <span className="v2-heading-sm">Plan History</span>
+            <div className="v3-root min-h-screen">
+                <header className="v3-nav sticky top-0 z-50">
+                    <div className="v3-container flex items-center justify-between py-4">
+                        <Link href="/plan" className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>← Back</Link>
+                        <span className="v3-heading-sm">Plan History</span>
                     </div>
                 </header>
-                <main className="v2-container py-10">
-                    <div className="v2-card p-6 text-center">
-                        <p className="v2-body" style={{ color: 'var(--v2-error)' }}>{error}</p>
+                <main className="v3-container py-10">
+                    <div className="v3-card p-6 text-center">
+                        <p className="v3-body" style={{ color: 'var(--v3-error)' }}>{error}</p>
                     </div>
                 </main>
             </div>
@@ -274,23 +274,23 @@ export default function PlanHistoryPage() {
     }
 
     return (
-        <div className="v2-root min-h-screen">
-            <header className="v2-nav sticky top-0 z-50">
-                <div className="v2-container flex items-center justify-between py-4">
-                    <Link href="/plan" className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>← Back</Link>
-                    <span className="v2-heading-sm">Plan History</span>
+        <div className="v3-root min-h-screen">
+            <header className="v3-nav sticky top-0 z-50">
+                <div className="v3-container flex items-center justify-between py-4">
+                    <Link href="/plan" className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>← Back</Link>
+                    <span className="v3-heading-sm">Plan History</span>
                 </div>
             </header>
 
-            <main className="v2-container py-10">
+            <main className="v3-container py-10">
                 {plans.length === 0 ? (
-                    <div className="v2-card p-10 text-center">
-                        <div className="v2-empty-icon">📋</div>
-                        <h2 className="v2-heading-md mb-2">No Plans Yet</h2>
-                        <p className="v2-body-sm mb-6" style={{ color: 'var(--text-muted)' }}>
+                    <div className="v3-card p-10 text-center">
+                        <div className="v3-empty-icon">📋</div>
+                        <h2 className="v3-heading-md mb-2">No Plans Yet</h2>
+                        <p className="v3-body-sm mb-6" style={{ color: 'var(--text-muted)' }}>
                             Complete onboarding to create your first training plan.
                         </p>
-                        <Link href="/onboarding" className="v2-btn v2-btn-primary">
+                        <Link href="/onboarding" className="v3-btn v3-btn-primary">
                             Get Started
                         </Link>
                     </div>
@@ -299,7 +299,7 @@ export default function PlanHistoryPage() {
                         {/* Current Plan */}
                         {activePlan && (
                             <section>
-                                <h2 className="v2-label mb-4">Current Plan</h2>
+                                <h2 className="v3-label mb-4">Current Plan</h2>
                                 <PlanCard
                                     plan={activePlan}
                                     isActive={true}
@@ -312,7 +312,7 @@ export default function PlanHistoryPage() {
                         {/* Archived Plans */}
                         {archivedPlans.length > 0 && (
                             <section>
-                                <h2 className="v2-label mb-4">Past Plans ({archivedPlans.length})</h2>
+                                <h2 className="v3-label mb-4">Past Plans ({archivedPlans.length})</h2>
                                 <div className="space-y-3">
                                     {archivedPlans.map(plan => (
                                         <PlanCard

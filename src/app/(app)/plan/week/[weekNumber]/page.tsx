@@ -111,12 +111,12 @@ export default function WeekDetailPage() {
     // Loading state
     if (status === 'loading') {
         return (
-            <div className="v2-root min-h-screen">
+            <div className="v3-root min-h-screen">
                 <AppHeader backHref="/plan" title="Back to Plan" />
-                <main className="v2-container py-10">
+                <main className="v3-container py-10">
                     <div className="space-y-4">
                         {[1, 2, 3, 4, 5, 6, 7].map(i => (
-                            <div key={i} className="v2-skeleton" style={{ height: '80px', borderRadius: '12px' }} />
+                            <div key={i} className="v3-skeleton" style={{ height: '80px', borderRadius: '12px' }} />
                         ))}
                     </div>
                 </main>
@@ -127,15 +127,15 @@ export default function WeekDetailPage() {
     // No plan state
     if (!plan || !weekPlan) {
         return (
-            <div className="v2-root min-h-screen">
+            <div className="v3-root min-h-screen">
                 <AppHeader backHref="/plan" title="Back to Plan" />
-                <main className="v2-container py-10">
-                    <div className="v2-card p-10 text-center">
-                        <h2 className="v2-heading-md mb-4">Week Not Found</h2>
-                        <p className="v2-body-sm mb-6" style={{ color: 'var(--text-muted)' }}>
+                <main className="v3-container py-10">
+                    <div className="v3-card p-10 text-center">
+                        <h2 className="v3-heading-md mb-4">Week Not Found</h2>
+                        <p className="v3-body-sm mb-6" style={{ color: 'var(--text-muted)' }}>
                             This training week doesn&apos;t exist in your plan.
                         </p>
-                        <Link href="/plan" className="v2-btn v2-btn-primary">
+                        <Link href="/plan" className="v3-btn v3-btn-primary">
                             Back to Plan
                         </Link>
                     </div>
@@ -148,20 +148,20 @@ export default function WeekDetailPage() {
     const phaseLabel = weekPlan.phase.charAt(0).toUpperCase() + weekPlan.phase.slice(1);
 
     return (
-        <div className="v2-root min-h-screen">
+        <div className="v3-root min-h-screen">
             {/* Header */}
             <AppHeader
                 backHref="/plan"
                 title="Back to Plan"
                 rightContent={
                     <div className="flex items-center gap-2">
-                        {isCurrent && <span className="v2-badge v2-badge-accent">Current Week</span>}
-                        {weekPlan.isRecoveryWeek && <span className="v2-badge">Cutback</span>}
+                        {isCurrent && <span className="v3-badge v3-badge-accent">Current Week</span>}
+                        {weekPlan.isRecoveryWeek && <span className="v3-badge">Cutback</span>}
                     </div>
                 }
             />
 
-            <main className="v2-container py-10">
+            <main className="v3-container py-10">
                 {/* Week Header */}
                 <motion.div
                     className="mb-10"
@@ -169,13 +169,13 @@ export default function WeekDetailPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4 }}
                 >
-                    <h1 className="v2-heading-xl mb-2">Week {weekNumber}</h1>
+                    <h1 className="v3-heading-xl mb-2">Week {weekNumber}</h1>
                     <div className="flex items-center gap-4">
-                        <span className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>{phaseLabel} Phase</span>
-                        <span className="v2-mono" style={{ fontSize: '12px', color: 'var(--text-subtle)' }}>•</span>
-                        <span className="v2-mono" style={{ fontSize: '12px' }}>{Math.round(weekPlan.totalMiles * 10) / 10} miles</span>
-                        <span className="v2-mono" style={{ fontSize: '12px', color: 'var(--text-subtle)' }}>•</span>
-                        <span className="v2-mono" style={{ fontSize: '12px' }}>{weekPlan.keyWorkouts} quality sessions</span>
+                        <span className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>{phaseLabel} Phase</span>
+                        <span className="v3-mono" style={{ fontSize: '12px', color: 'var(--text-subtle)' }}>•</span>
+                        <span className="v3-mono" style={{ fontSize: '12px' }}>{Math.round(weekPlan.totalMiles * 10) / 10} miles</span>
+                        <span className="v3-mono" style={{ fontSize: '12px', color: 'var(--text-subtle)' }}>•</span>
+                        <span className="v3-mono" style={{ fontSize: '12px' }}>{weekPlan.keyWorkouts} quality sessions</span>
                     </div>
                 </motion.div>
 
@@ -183,13 +183,13 @@ export default function WeekDetailPage() {
                 {weekPlan.coachNotes && (
                     <motion.div
                         className="mb-8 p-4 rounded-xl"
-                        style={{ background: 'var(--v2-bg-inset)', borderLeft: '3px solid var(--color-accent)' }}
+                        style={{ background: 'var(--v3-bg-inset)', borderLeft: '3px solid var(--color-accent)' }}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3, delay: 0.05 }}
                     >
-                        <p className="v2-label mb-1" style={{ color: 'var(--color-accent)' }}>Coach&apos;s Note</p>
-                        <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+                        <p className="v3-label mb-1" style={{ color: 'var(--color-accent)' }}>Coach&apos;s Note</p>
+                        <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                             {weekPlan.coachNotes}
                         </p>
                     </motion.div>
@@ -201,7 +201,7 @@ export default function WeekDetailPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.1 }}
                 >
-                    <h2 className="v2-heading-md mb-4">Daily Schedule</h2>
+                    <h2 className="v3-heading-md mb-4">Daily Schedule</h2>
                     <div className="space-y-3">
                         {days.map((day, i) => (
                             <motion.div
@@ -209,12 +209,12 @@ export default function WeekDetailPage() {
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 0.3, delay: 0.15 + i * 0.05 }}
-                                className="v2-card p-5"
+                                className="v3-card p-5"
                             >
                                 <div className="flex items-start gap-4">
                                     {/* Day Label */}
                                     <div
-                                        className="w-12 h-12 rounded-xl flex items-center justify-center v2-mono shrink-0"
+                                        className="w-12 h-12 rounded-xl flex items-center justify-center v3-mono shrink-0"
                                         style={{
                                             background: day.isRest ? 'var(--bg-muted)' : 'var(--color-accent-subtle)',
                                             fontWeight: 600,
@@ -228,35 +228,35 @@ export default function WeekDetailPage() {
                                     <div className="flex-1 space-y-3">
                                         {day.isRest ? (
                                             <div>
-                                                <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>Rest Day</p>
-                                                <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>Recovery is training</p>
+                                                <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>Rest Day</p>
+                                                <p className="v3-mono" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>Recovery is training</p>
                                             </div>
                                         ) : (
                                             <>
                                                 {day.runWorkout && (
                                                     <div className="flex items-center justify-between">
                                                         <div>
-                                                            <p className="v2-heading-sm">{day.runWorkout.name}</p>
-                                                            <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+                                                            <p className="v3-heading-sm">{day.runWorkout.name}</p>
+                                                            <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                                                                 {day.runWorkout.distance} mi • {day.runWorkout.type}
                                                                 {day.runWorkout.paceGuidance && ` @ ${day.runWorkout.paceGuidance}`}
                                                             </p>
                                                         </div>
                                                         <div className="text-right">
-                                                            <p className="v2-mono" style={{ fontSize: '12px' }}>{day.runWorkout.duration} min</p>
+                                                            <p className="v3-mono" style={{ fontSize: '12px' }}>{day.runWorkout.duration} min</p>
                                                         </div>
                                                     </div>
                                                 )}
                                                 {day.strengthWorkout && (
                                                     <div className="flex items-center justify-between pt-2 border-t" style={{ borderColor: 'var(--border-base)' }}>
                                                         <div>
-                                                            <p className="v2-heading-sm" style={{ fontSize: '14px' }}>{day.strengthWorkout.name}</p>
-                                                            <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+                                                            <p className="v3-heading-sm" style={{ fontSize: '14px' }}>{day.strengthWorkout.name}</p>
+                                                            <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                                                                 {day.strengthWorkout.exercises} exercises
                                                             </p>
                                                         </div>
                                                         <div className="text-right">
-                                                            <p className="v2-mono" style={{ fontSize: '12px' }}>{day.strengthWorkout.duration} min</p>
+                                                            <p className="v3-mono" style={{ fontSize: '12px' }}>{day.strengthWorkout.duration} min</p>
                                                         </div>
                                                     </div>
                                                 )}
@@ -276,19 +276,19 @@ export default function WeekDetailPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.3 }}
                 >
-                    <h2 className="v2-heading-md mb-4">Week Summary</h2>
+                    <h2 className="v3-heading-md mb-4">Week Summary</h2>
                     <div className="grid grid-cols-3 gap-4">
-                        <div className="v2-card p-5 text-center">
-                            <p className="v2-heading-lg v2-mono mb-1">{Math.round(weekPlan.totalMiles)}</p>
-                            <p className="v2-label">Total Miles</p>
+                        <div className="v3-card p-5 text-center">
+                            <p className="v3-heading-lg v3-mono mb-1">{Math.round(weekPlan.totalMiles)}</p>
+                            <p className="v3-label">Total Miles</p>
                         </div>
-                        <div className="v2-card p-5 text-center">
-                            <p className="v2-heading-lg v2-mono mb-1">{weekPlan.keyWorkouts}</p>
-                            <p className="v2-label">Quality Sessions</p>
+                        <div className="v3-card p-5 text-center">
+                            <p className="v3-heading-lg v3-mono mb-1">{weekPlan.keyWorkouts}</p>
+                            <p className="v3-label">Quality Sessions</p>
                         </div>
-                        <div className="v2-card p-5 text-center">
-                            <p className="v2-heading-lg v2-mono mb-1">{weekPlan.days.filter(d => d.strengthWorkout).length}</p>
-                            <p className="v2-label">Strength Days</p>
+                        <div className="v3-card p-5 text-center">
+                            <p className="v3-heading-lg v3-mono mb-1">{weekPlan.days.filter(d => d.strengthWorkout).length}</p>
+                            <p className="v3-label">Strength Days</p>
                         </div>
                     </div>
                 </motion.section>
@@ -301,12 +301,12 @@ export default function WeekDetailPage() {
                     transition={{ duration: 0.4, delay: 0.4 }}
                 >
                     {weekNumber > 1 ? (
-                        <Link href={`/plan/week/${weekNumber - 1}`} className="v2-btn v2-btn-secondary">
+                        <Link href={`/plan/week/${weekNumber - 1}`} className="v3-btn v3-btn-secondary">
                             ← Week {weekNumber - 1}
                         </Link>
                     ) : <div />}
                     {weekNumber < (plan?.totalWeeks || 1) ? (
-                        <Link href={`/plan/week/${weekNumber + 1}`} className="v2-btn v2-btn-secondary">
+                        <Link href={`/plan/week/${weekNumber + 1}`} className="v3-btn v3-btn-secondary">
                             Week {weekNumber + 1} →
                         </Link>
                     ) : <div />}

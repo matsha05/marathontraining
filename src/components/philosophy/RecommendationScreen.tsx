@@ -150,7 +150,7 @@ export function RecommendationScreen({
                         >
                             <p
                                 className="text-sm font-medium mb-3"
-                                style={{ color: 'var(--v2-warning)' }}
+                                style={{ color: 'var(--v3-warning)' }}
                             >
                                 Heads up
                             </p>
@@ -186,7 +186,7 @@ export function RecommendationScreen({
                     })()}
 
                     {/* Foundation reminder */}
-                    <div className="v2-card mt-8 p-5">
+                    <div className="v3-card mt-8 p-5">
                         <p
                             className="text-xs uppercase tracking-widest mb-4"
                             style={{ color: 'var(--text-muted)' }}
@@ -206,7 +206,7 @@ export function RecommendationScreen({
                     {/* Confirm */}
                     <button
                         onClick={handleConfirmOverride}
-                        className="v2-btn v2-btn-primary w-full mt-8"
+                        className="v3-btn v3-btn-primary w-full mt-8"
                     >
                         Start with {selectedPhilosophy.name}
                     </button>
@@ -302,7 +302,7 @@ export function RecommendationScreen({
                     )}
 
                     {/* Reasoning */}
-                    <div className="v2-card mt-6 p-5">
+                    <div className="v3-card mt-6 p-5">
                         <p
                             className="text-xs uppercase tracking-widest mb-3"
                             style={{ color: 'var(--text-muted)' }}
@@ -347,7 +347,7 @@ export function RecommendationScreen({
                     )}
 
                     {/* Foundation reminder */}
-                    <div className="v2-card mt-6 p-5">
+                    <div className="v3-card mt-6 p-5">
                         <p
                             className="text-xs uppercase tracking-widest mb-4"
                             style={{ color: 'var(--text-muted)' }}
@@ -367,7 +367,7 @@ export function RecommendationScreen({
                     {/* Primary CTA */}
                     <button
                         onClick={() => onSelect(recommendation.primary)}
-                        className="v2-btn v2-btn-primary w-full mt-8"
+                        className="v3-btn v3-btn-primary w-full mt-8"
                     >
                         Start with {primary.name}
                     </button>
@@ -414,7 +414,7 @@ export function RecommendationScreen({
                                         />
                                         <button
                                             onClick={() => handleSelectAlternative(alt.id)}
-                                            className="v2-btn v2-btn-secondary w-full mt-4"
+                                            className="v3-btn v3-btn-secondary w-full mt-4"
                                         >
                                             Choose {alt.name} instead
                                         </button>

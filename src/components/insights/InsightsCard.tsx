@@ -26,8 +26,8 @@ export function InsightsCard({ workoutLogs, className = '' }: InsightsCardProps)
 
     if (!insights) {
         return (
-            <div className={`v2-card p-6 ${className}`}>
-                <h3 className="v2-label mb-4" style={{ color: 'var(--text-muted)' }}>Training Insights</h3>
+            <div className={`v3-card p-6 ${className}`}>
+                <h3 className="v3-label mb-4" style={{ color: 'var(--text-muted)' }}>Training Insights</h3>
                 <p className="text-sm" style={{ color: 'var(--text-subtle)' }}>
                     Complete more workouts to unlock insights.
                 </p>
@@ -38,11 +38,11 @@ export function InsightsCard({ workoutLogs, className = '' }: InsightsCardProps)
     const hasRedFlags = insights.redFlags.length > 0;
 
     return (
-        <div className={`v2-card p-6 ${className}`}>
+        <div className={`v3-card p-6 ${className}`}>
             <div className="flex items-center justify-between mb-4">
-                <h3 className="v2-label" style={{ color: 'var(--text-muted)' }}>Training Insights</h3>
+                <h3 className="v3-label" style={{ color: 'var(--text-muted)' }}>Training Insights</h3>
                 {insights.currentStreak > 0 && (
-                    <span className="v2-badge flex items-center gap-1" style={{ background: 'var(--color-accent-subtle)', color: 'var(--color-accent)' }}>
+                    <span className="v3-badge flex items-center gap-1" style={{ background: 'var(--color-accent-subtle)', color: 'var(--color-accent)' }}>
                         <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.451-.404l-2.068 1.653a1 1 0 00-.348.53l-.645 2.644-2.2-.637a1 1 0 00-.95.227l-2.3 2.3a1 1 0 00.387 1.645l2.556.853-.855 2.556a1 1 0 00.387 1.645l1.817.606a1 1 0 001.034-.204l2.2-2.2-.637-2.2 2.644-.647a1 1 0 00.53-.348l1.653-2.068a1 1 0 00-.404-1.451l-1.923-.962.962-1.923z" clipRule="evenodd" />
                         </svg>

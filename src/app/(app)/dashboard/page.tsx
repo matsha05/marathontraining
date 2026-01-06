@@ -20,6 +20,8 @@ import { PacesCard } from '@/components/paces/PacesCard';
 import { RecalibrationModal } from '@/components/vdot/RecalibrationModal';
 import { DurabilityStatusCard } from '@/components/durability';
 import { SiteHeader } from '@/components/ui/SiteHeader';
+import { WeeklyCalendar } from '@/components/ui/WeeklyCalendar';
+import confetti from 'canvas-confetti';
 
 /**
  * THE LONG GAME - Dashboard V2
@@ -73,24 +75,24 @@ function getGreeting(): string {
 
 function DashboardSkeletonV2() {
     return (
-        <div className="v2-root min-h-screen">
-            <header className="v2-nav">
-                <div className="v2-container flex items-center justify-between py-4">
-                    <div className="v2-skeleton" style={{ width: '120px', height: '24px' }} />
-                    <div className="v2-skeleton" style={{ width: '100px', height: '32px' }} />
+        <div className="v3-root min-h-screen">
+            <header className="v3-nav">
+                <div className="v3-container flex items-center justify-between py-4">
+                    <div className="v3-skeleton" style={{ width: '120px', height: '24px' }} />
+                    <div className="v3-skeleton" style={{ width: '100px', height: '32px' }} />
                 </div>
             </header>
-            <main className="v2-container py-10">
+            <main className="v3-container py-10">
                 <div className="flex items-start justify-between mb-10">
                     <div>
-                        <div className="v2-skeleton mb-2" style={{ width: '100px', height: '14px' }} />
-                        <div className="v2-skeleton" style={{ width: '180px', height: '32px' }} />
+                        <div className="v3-skeleton mb-2" style={{ width: '100px', height: '14px' }} />
+                        <div className="v3-skeleton" style={{ width: '180px', height: '32px' }} />
                     </div>
-                    <div className="v2-skeleton rounded-full" style={{ width: '80px', height: '80px' }} />
+                    <div className="v3-skeleton rounded-full" style={{ width: '80px', height: '80px' }} />
                 </div>
-                <div className="v2-skeleton mb-6" style={{ width: '150px', height: '24px' }} />
-                <div className="v2-skeleton mb-4" style={{ width: '100%', height: '80px', borderRadius: '12px' }} />
-                <div className="v2-skeleton" style={{ width: '100%', height: '80px', borderRadius: '12px' }} />
+                <div className="v3-skeleton mb-6" style={{ width: '150px', height: '24px' }} />
+                <div className="v3-skeleton mb-4" style={{ width: '100%', height: '80px', borderRadius: '12px' }} />
+                <div className="v3-skeleton" style={{ width: '100%', height: '80px', borderRadius: '12px' }} />
             </main>
         </div>
     );
@@ -113,6 +115,7 @@ export default function DashboardPage() {
     const [displayVdotOverride, setDisplayVdotOverride] = useState<number | null>(null);
     const [maxHROverride, setMaxHROverride] = useState<number | null>(null);
     const [completedToday, setCompletedToday] = useState<Set<string>>(new Set());
+    const [viewingWeek, setViewingWeek] = useState<number | null>(null);  // null = current week
 
     // Handle VDOT recalibration
     const handleRecalibrate = async (newVdot: number) => {
@@ -260,60 +263,117 @@ export default function DashboardPage() {
     }, [todayWorkout, plan]);
 
     // Build week overview from plan data - MUST be before any conditional returns
-    const weekOverview = useMemo<DayOverview[]>(() => {
+    const weekOverview = useMemo(() => {
+        const today = new Date();
+        const todayDayOfWeek = today.getDay();
+
+        // Calculate start of the current week (Sunday)
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - todayDayOfWeek);
+
         if (!currentWeekPlan) {
+            return [0, 1, 2, 3, 4, 5, 6].map(i => {
+                const dayDate = new Date(startOfWeek);
+                dayDate.setDate(startOfWeek.getDate() + i);
+                const dateStr = dayDate.toISOString().split('T')[0];
+
+                return {
+                    day: getDayName(i).toUpperCase(),
+                    type: 'rest',
+                    label: 'Rest',
+                    done: false,
+                    today: i === todayDayOfWeek,
+                    distance: undefined,
+                    workoutType: 'rest' as const,
+                    date: dateStr,
+                };
+            });
+        }
+
+        // Use viewing week if navigating, otherwise current week
+        const activeWeekNum = viewingWeek ?? currentWeek ?? 1;
+        const activeWeekPlan = plan?.weeks.find(w => w.weekNumber === activeWeekNum) ?? currentWeekPlan;
+
+        if (!activeWeekPlan) {
             return [0, 1, 2, 3, 4, 5, 6].map(i => ({
-                day: getDayName(i),
+                day: getDayName(i).toUpperCase(),
                 type: 'rest',
-                label: '—',
+                label: 'Rest',
                 done: false,
-                today: i === new Date().getDay(),
+                today: false,
+                distance: undefined,
+                workoutType: 'rest' as const,
+                date: '',
             }));
         }
 
-        const todayDayOfWeek = new Date().getDay();
+        // Calculate the start of this specific week based on plan start date
+        const planStart = plan?.startDate ? new Date(plan.startDate + 'T12:00:00') : new Date();
+        const weekStart = new Date(planStart);
+        weekStart.setDate(planStart.getDate() + (activeWeekNum - 1) * 7);
+
+        // today is already defined at the start of the useMemo
+        const isCurrentWeek = activeWeekNum === currentWeek;
 
         return [0, 1, 2, 3, 4, 5, 6].map(dayNum => {
-            const dayPlan = currentWeekPlan.days.find(d => d.dayOfWeek === dayNum);
-            const isToday = dayNum === todayDayOfWeek;
-            const isPast = dayNum < todayDayOfWeek;
+            const dayPlan = activeWeekPlan.days.find(d => d.dayOfWeek === dayNum);
+
+            // Calculate the actual date for this day
+            const dayDate = new Date(weekStart);
+            dayDate.setDate(weekStart.getDate() + dayNum);
+            const dateStr = dayDate.toISOString().split('T')[0];
+
+            const isToday = isCurrentWeek && today.toISOString().split('T')[0] === dateStr;
+            const isPast = dayDate < today && !isToday;
 
             if (!dayPlan || !dayPlan.runWorkout) {
                 return {
-                    day: getDayName(dayNum),
+                    day: getDayName(dayNum).toUpperCase(),
                     type: 'rest',
                     label: 'Rest',
                     done: isPast,
                     today: isToday,
+                    distance: undefined,
+                    workoutType: 'rest' as const,
+                    date: dateStr,
                 };
             }
 
             const workout = dayPlan.runWorkout;
-            const typeMap: Record<string, string> = {
-                'easy': 'easy',
-                'recovery': 'easy',
-                'tempo': 'tempo',
-                'threshold': 'tempo',
-                'cruise_intervals': 'intervals',
-                'vo2max_800s': 'intervals',
-                'vo2max_1000s': 'intervals',
-                'vo2max_1200s': 'intervals',
-                'vo2max_mile': 'intervals',
-                'long_easy': 'long',
-                'long_progression': 'long',
-                'long_mp_finish': 'long',
-                'long_fast_finish': 'long',
+
+            // Map workout type to display type and color category
+            const typeInfo: Record<string, { label: string; workoutType: 'easy' | 'long' | 'quality' | 'recovery' | 'rest' }> = {
+                'easy': { label: 'Easy', workoutType: 'easy' },
+                'recovery': { label: 'Recovery', workoutType: 'recovery' },
+                'tempo': { label: 'Tempo', workoutType: 'quality' },
+                'threshold': { label: 'Threshold', workoutType: 'quality' },
+                'cruise_intervals': { label: 'Intervals', workoutType: 'quality' },
+                'vo2max_800s': { label: 'VO2', workoutType: 'quality' },
+                'vo2max_1000s': { label: 'VO2', workoutType: 'quality' },
+                'vo2max_1200s': { label: 'VO2', workoutType: 'quality' },
+                'vo2max_mile': { label: 'VO2', workoutType: 'quality' },
+                'long_easy': { label: 'Long', workoutType: 'long' },
+                'long_progression': { label: 'Long', workoutType: 'long' },
+                'long_mp_finish': { label: 'Long', workoutType: 'long' },
+                'long_fast_finish': { label: 'Long', workoutType: 'long' },
             };
 
+            const info = typeInfo[workout.type] || { label: 'Easy', workoutType: 'easy' as const };
+            const hasStrength = !!dayPlan.strengthWorkout;
+
             return {
-                day: getDayName(dayNum),
-                type: typeMap[workout.type] || 'easy',
-                label: `${workout.type.replace(/_/g, ' ')} ${dayPlan.totalMiles}mi`,
+                day: getDayName(dayNum).toUpperCase(),
+                type: info.label.toLowerCase(),
+                label: info.label,
                 done: isPast,
                 today: isToday,
+                distance: dayPlan.totalMiles,
+                workoutType: info.workoutType,
+                hasStrength,
+                date: dateStr,
             };
         });
-    }, [currentWeekPlan]);
+    }, [currentWeekPlan, viewingWeek, currentWeek, plan]);
 
     // Determine if today is a quality session (Starrett: "before I go smash myself")
     const isQualityDay = useMemo(() => {
@@ -334,20 +394,32 @@ export default function DashboardPage() {
 
 
     return (
-        <div className="v2-root min-h-screen">
+        <div className="v3-root min-h-screen">
             {/* Use shared SiteHeader for consistency */}
             <SiteHeader hideAuth />
 
-            <main className="v2-container py-10" style={{ paddingTop: 'calc(var(--v2-space-10) + 64px)' }}>
-                {/* Greeting + Readiness */}
+            <main className="v3-container py-10" style={{ paddingTop: 'calc(var(--v3-space-10) + 80px)' }}>
+                {/* Greeting + VDOT Hero */}
                 <motion.div
-                    className="mb-10"
+                    className="mb-8"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <p className="v2-body-sm mb-1" style={{ color: 'var(--text-muted)' }}>{getGreeting()}</p>
-                    <h1 className="v2-heading-lg">{displayName}</h1>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="v3-label mb-1" style={{ color: 'var(--text-subtle)' }}>{getGreeting()}</p>
+                            <h1 className="v3-heading-xl" style={{ fontSize: '2rem' }}>{displayName}</h1>
+                        </div>
+                        {/* VDOT Hero */}
+                        <div className="text-center">
+                            <p className="v3-label" style={{ color: 'var(--text-muted)' }}>Your Fitness</p>
+                            <p className="v3-mono font-bold" style={{ fontSize: '2.5rem', color: 'var(--color-accent)' }}>
+                                {displayVdot}
+                            </p>
+                            <p className="v3-body-xs" style={{ color: 'var(--text-subtle)' }}>VDOT</p>
+                        </div>
+                    </div>
                 </motion.div>
 
                 {/* Pre-workout readiness nudge on quality days (Starrett methodology) */}
@@ -370,10 +442,10 @@ export default function DashboardPage() {
                     transition={{ duration: 0.5, delay: 0.1 }}
                 >
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="v2-heading-md">Today&apos;s Plan</h2>
+                        <h2 className="v3-heading-md">Today&apos;s Plan</h2>
                         <div className="flex items-center gap-2">
-                            <CalendarDaysIcon size={16} className="v2-icon-color-muted" />
-                            <span className="v2-label">
+                            <CalendarDaysIcon size={16} className="v3-icon-color-muted" />
+                            <span className="v3-label">
                                 {getFullDayName(new Date().getDay())} • Week {currentWeek || 1}
                             </span>
                         </div>
@@ -391,7 +463,7 @@ export default function DashboardPage() {
                                 >
                                     <Link
                                         href={`/workout/${workout.id}`}
-                                        className="v2-card v2-card-interactive p-5 flex items-center gap-4 flex-1"
+                                        className="v3-card v3-card-interactive p-5 flex items-center gap-4 flex-1"
                                     >
                                         <div
                                             className="w-12 h-12 rounded-xl flex items-center justify-center"
@@ -404,7 +476,7 @@ export default function DashboardPage() {
                                             }}
                                         >
                                             {workout.type === 'run' ? (
-                                                <PlayIcon size={20} className="v2-accent" />
+                                                <PlayIcon size={20} className="v3-accent" />
                                             ) : workout.type === 'strength' ? (
                                                 <ChartBarIncreasingIcon size={20} style={{ color: 'var(--color-strength)' }} />
                                             ) : (
@@ -413,12 +485,12 @@ export default function DashboardPage() {
                                         </div>
 
                                         <div className="flex-1">
-                                            <p className="v2-heading-sm">{workout.title}</p>
-                                            <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>{workout.subtitle}</p>
+                                            <p className="v3-heading-md" style={{ fontWeight: 600 }}>{workout.title}</p>
+                                            <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>{workout.subtitle}</p>
                                         </div>
 
                                         <div className="text-right">
-                                            <p className="v2-mono" style={{ fontSize: '12px', color: 'var(--text-subtle)' }}>{workout.duration} min</p>
+                                            <p className="v3-mono" style={{ fontSize: '12px', color: 'var(--text-subtle)' }}>{workout.duration} min</p>
                                         </div>
 
                                         <svg className="w-5 h-5" style={{ color: 'var(--text-subtle)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -426,30 +498,69 @@ export default function DashboardPage() {
                                         </svg>
                                     </Link>
 
-                                    {/* Mark Complete Button */}
+                                    {/* Mark Complete Button - Apple-style circle */}
                                     {!completedToday.has(workout.id) ? (
                                         <button
-                                            onClick={() => {
+                                            onClick={(e) => {
+                                                const rect = e.currentTarget.getBoundingClientRect();
+                                                const x = (rect.left + rect.width / 2) / window.innerWidth;
+                                                const y = (rect.top + rect.height / 2) / window.innerHeight;
+
+                                                // Sleek confetti burst
+                                                confetti({
+                                                    particleCount: 80,
+                                                    spread: 60,
+                                                    origin: { x, y },
+                                                    colors: ['#19e38c', '#10b981', '#34d399', '#6ee7b7'],
+                                                    ticks: 150,
+                                                    gravity: 1.2,
+                                                    scalar: 0.9,
+                                                });
+
                                                 setCompletedToday(prev => new Set([...prev, workout.id]));
                                             }}
-                                            className="v2-btn v2-btn-ghost v2-btn-sm shrink-0"
+                                            className="shrink-0 w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95"
+                                            style={{
+                                                background: 'var(--color-accent)',
+                                                boxShadow: '0 2px 8px rgba(25, 227, 140, 0.3)',
+                                            }}
                                             title="Mark as complete"
                                         >
-                                            <CheckIcon size={16} />
-                                            <span className="ml-1">Done</span>
+                                            <CheckIcon size={20} className="text-black" />
                                         </button>
                                     ) : (
-                                        <span className="v2-badge v2-badge-success flex items-center gap-1 shrink-0">
-                                            <CheckIcon size={12} /> Complete
-                                        </span>
+                                        <button
+                                            onClick={() => {
+                                                setCompletedToday(prev => {
+                                                    const newSet = new Set(prev);
+                                                    newSet.delete(workout.id);
+                                                    return newSet;
+                                                });
+                                            }}
+                                            className="shrink-0 w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 group"
+                                            style={{
+                                                background: 'var(--color-accent)',
+                                            }}
+                                            title="Click to undo"
+                                        >
+                                            <CheckIcon size={20} className="text-black group-hover:hidden" />
+                                            <svg
+                                                className="w-5 h-5 text-black hidden group-hover:block"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
                                     )}
                                 </motion.div>
                             ))
                         ) : (
-                            <div className="v2-card p-8 text-center">
-                                <CheckIcon size={40} className="mx-auto mb-4 v2-accent" />
-                                <p className="v2-heading-sm mb-2">Rest Day</p>
-                                <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>Recovery is part of the plan. Enjoy it!</p>
+                            <div className="v3-card p-8 text-center">
+                                <CheckIcon size={40} className="mx-auto mb-4 v3-accent" />
+                                <p className="v3-heading-sm mb-2">Rest Day</p>
+                                <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>Recovery is part of the plan. Enjoy it!</p>
                             </div>
                         )}
                     </div>
@@ -463,71 +574,37 @@ export default function DashboardPage() {
                     transition={{ duration: 0.5, delay: 0.2 }}
                 >
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="v2-heading-md">This Week</h2>
-                        {plan && (() => {
-                            // Calculate week vs last week delta
-                            const currentMiles = currentWeekPlan?.totalMiles || 0;
-                            const prevWeekPlan = plan.weeks.find(w => w.weekNumber === (currentWeek || 1) - 1);
-                            const prevMiles = prevWeekPlan?.totalMiles || 0;
-                            const delta = prevMiles > 0 ? Math.round(((currentMiles - prevMiles) / prevMiles) * 100) : 0;
-
-                            return (
-                                <div className="flex items-center gap-3">
-                                    <span className="v2-mono" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
-                                        Week {currentWeek} • {currentWeekPlan?.phase.toUpperCase()} • {Math.round((currentWeekPlan?.totalMiles || 0) * 10) / 10} mi
-                                    </span>
-                                    {delta !== 0 && prevMiles > 0 && (
-                                        <span
-                                            className="v2-mono px-2 py-0.5 rounded-full"
-                                            style={{
-                                                fontSize: '10px',
-                                                background: delta > 0 ? 'var(--color-accent-subtle)' : 'var(--v2-bg-inset)',
-                                                color: delta > 0 ? 'var(--color-accent)' : 'var(--text-muted)'
-                                            }}
-                                        >
-                                            {delta > 0 ? '+' : ''}{delta}% vs last week
-                                        </span>
-                                    )}
-                                </div>
-                            );
-                        })()}
-                    </div>
-
-                    <div className="grid grid-cols-7 gap-2">
-                        {weekOverview.map((day, i) => (
-                            <motion.div
-                                key={day.day}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3, delay: 0.25 + i * 0.03 }}
-                                className={`v2-card text-center py-4 px-2 ${day.today ? 'v2-card-accent' : ''}`}
-                                style={{
-                                    background: day.today
-                                        ? 'var(--bg-subtle)'
-                                        : day.done
-                                            ? 'var(--bg-elevated)'
-                                            : 'var(--bg-elevated)',
-                                    borderColor: day.today ? 'var(--color-accent)' : undefined,
-                                }}
+                        <h2 className="v3-heading-md">Week Overview</h2>
+                        {viewingWeek && viewingWeek !== currentWeek && (
+                            <button
+                                onClick={() => setViewingWeek(null)}
+                                className="v3-body-sm v3-accent hover:underline"
                             >
-                                <p className="v2-label mb-2" style={{ color: day.today ? 'var(--color-accent)' : 'var(--text-muted)' }}>
-                                    {day.day}
-                                </p>
-                                <p className="v2-mono mb-1" style={{
-                                    fontSize: '11px',
-                                    color: day.today ? 'var(--text-base)' : 'var(--text-muted)'
-                                }}>
-                                    {day.type === 'rest' ? '—' : day.label.split(' ')[0]}
-                                </p>
-                                {day.done && !day.today && (
-                                    <CheckIcon size={12} className="mx-auto v2-accent" />
-                                )}
-                                {day.today && (
-                                    <div className="w-1.5 h-1.5 rounded-full mx-auto mt-1" style={{ background: 'var(--color-accent)' }} />
-                                )}
-                            </motion.div>
-                        ))}
+                                Back to current week
+                            </button>
+                        )}
                     </div>
+
+                    <WeeklyCalendar
+                        days={weekOverview.map(day => ({
+                            day: day.day,
+                            label: day.label,
+                            status: day.today ? 'today' : day.done ? 'completed' : day.type === 'rest' ? 'rest' : 'upcoming',
+                            workoutType: day.workoutType,
+                            distance: day.distance,
+                            hasStrength: day.hasStrength,
+                            date: day.date,
+                        }))}
+                        weekLabel={(() => {
+                            const activeWeekNum = viewingWeek ?? currentWeek ?? 1;
+                            const activeWeekPlan = plan?.weeks.find(w => w.weekNumber === activeWeekNum);
+                            return `Week ${activeWeekNum} • ${activeWeekPlan?.phase.toUpperCase() || 'BASE'} • ${Math.round((activeWeekPlan?.totalMiles || 0) * 10) / 10} mi`;
+                        })()}
+                        currentWeek={viewingWeek ?? currentWeek ?? 1}
+                        totalWeeks={plan?.weeks.length || 1}
+                        onPrevWeek={() => setViewingWeek(prev => Math.max(1, (prev ?? currentWeek ?? 1) - 1))}
+                        onNextWeek={() => setViewingWeek(prev => Math.min(plan?.weeks.length || 1, (prev ?? currentWeek ?? 1) + 1))}
+                    />
                 </motion.section>
 
                 {/* Plan Overview Card */}
@@ -538,22 +615,42 @@ export default function DashboardPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.3 }}
                     >
-                        <Link href="/plan" className="v2-card v2-card-interactive p-6 block">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="v2-label mb-1" style={{ color: 'var(--text-muted)' }}>TRAINING PLAN</p>
-                                    <p className="v2-heading-sm">
-                                        {plan.raceName || `${plan.goalDistance.toUpperCase()} Training`}
-                                    </p>
-                                    <p className="v2-body-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-                                        Week {currentWeek} of {plan.totalWeeks} • {currentWeekPlan?.phase.toUpperCase()} phase
-                                    </p>
-                                </div>
-                                <svg className="w-6 h-6" style={{ color: 'var(--text-subtle)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                            </div>
-                        </Link>
+                        {(() => {
+                            // Phase color mapping
+                            const phaseColors: Record<string, string> = {
+                                'base': '#3b82f6',      // Blue
+                                'build': '#f97316',     // Orange  
+                                'peak': '#ef4444',      // Red
+                                'taper': '#22c55e',     // Green
+                                'race': '#a855f7',      // Purple
+                            };
+                            const phaseColor = phaseColors[currentWeekPlan?.phase?.toLowerCase() || 'base'] || '#3b82f6';
+
+                            return (
+                                <Link
+                                    href="/plan"
+                                    className="v3-card v3-card-interactive p-6 block"
+                                    style={{
+                                        borderLeft: `4px solid ${phaseColor}`,
+                                    }}
+                                >
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="v3-label mb-1" style={{ color: 'var(--text-muted)' }}>TRAINING PLAN</p>
+                                            <p className="v3-heading-sm">
+                                                {plan.raceName || `${plan.goalDistance.toUpperCase()} Training`}
+                                            </p>
+                                            <p className="v3-body-sm mt-1" style={{ color: 'var(--text-muted)' }}>
+                                                Week {currentWeek} of {plan.totalWeeks} • <span style={{ color: phaseColor, fontWeight: 500 }}>{currentWeekPlan?.phase.toUpperCase()}</span> phase
+                                            </p>
+                                        </div>
+                                        <svg className="w-6 h-6" style={{ color: 'var(--text-subtle)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </div>
+                                </Link>
+                            );
+                        })()}
                     </motion.section>
                 )}
 
@@ -578,22 +675,49 @@ export default function DashboardPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.35 }}
                 >
-                    <h2 className="v2-heading-md mb-4">Quick Stats</h2>
+                    <h2 className="v3-heading-md mb-4">Quick Stats</h2>
                     <div className="grid grid-cols-3 gap-4">
-                        <div className="v2-card p-4 text-center">
-                            <FlameIcon size={24} className="mx-auto mb-2 v2-accent" />
-                            <p className="v2-heading-md v2-mono">{streak}</p>
-                            <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Day Streak</p>
+                        <div className="v3-card p-4">
+                            <div className="flex items-center gap-3">
+                                <div
+                                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+                                    style={{ background: 'rgba(249, 115, 22, 0.1)' }}
+                                >
+                                    <FlameIcon size={22} style={{ color: '#f97316' }} />
+                                </div>
+                                <div>
+                                    <p className="v3-heading-md v3-mono" style={{ lineHeight: 1 }}>{streak}</p>
+                                    <p className="v3-body-xs" style={{ color: 'var(--text-muted)' }}>Day Streak</p>
+                                </div>
+                            </div>
                         </div>
-                        <div className="v2-card p-4 text-center">
-                            <ChartBarIncreasingIcon size={24} className="mx-auto mb-2 v2-accent" />
-                            <p className="v2-heading-md v2-mono">{displayVdot}</p>
-                            <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>VDOT</p>
+                        <div className="v3-card p-4">
+                            <div className="flex items-center gap-3">
+                                <div
+                                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+                                    style={{ background: 'var(--color-accent-subtle)' }}
+                                >
+                                    <ChartBarIncreasingIcon size={22} className="v3-accent" />
+                                </div>
+                                <div>
+                                    <p className="v3-heading-md v3-mono" style={{ lineHeight: 1 }}>{displayVdot}</p>
+                                    <p className="v3-body-xs" style={{ color: 'var(--text-muted)' }}>VDOT</p>
+                                </div>
+                            </div>
                         </div>
-                        <div className="v2-card p-4 text-center">
-                            <CalendarDaysIcon size={24} className="mx-auto mb-2 v2-accent" />
-                            <p className="v2-heading-md v2-mono">{plan?.totalWeeks || 0}</p>
-                            <p className="v2-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Total Weeks</p>
+                        <div className="v3-card p-4">
+                            <div className="flex items-center gap-3">
+                                <div
+                                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+                                    style={{ background: 'var(--color-accent-subtle)' }}
+                                >
+                                    <CalendarDaysIcon size={22} className="v3-accent" />
+                                </div>
+                                <div>
+                                    <p className="v3-heading-md v3-mono" style={{ lineHeight: 1 }}>{plan?.totalWeeks || 0}</p>
+                                    <p className="v3-body-xs" style={{ color: 'var(--text-muted)' }}>Total Weeks</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </motion.section>
@@ -621,7 +745,7 @@ export default function DashboardPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.4 }}
                 >
-                    <h2 className="v2-heading-md mb-4">Training Insights</h2>
+                    <h2 className="v3-heading-md mb-4">Training Insights</h2>
                     <InsightsCard workoutLogs={workoutLogs} />
                 </motion.section>
             </main>

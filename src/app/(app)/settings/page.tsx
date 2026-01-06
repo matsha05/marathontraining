@@ -6,8 +6,9 @@ import Link from 'next/link';
 import { Toggle } from '@/components/ui/Toggle';
 import { createSupabaseBrowserClient } from '@/infrastructure/supabase';
 import { usePlan } from '@/domain/plan/context';
+import { downloadPlanAsJSON } from '@/domain/plan/service';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertTriangle, X } from 'lucide-react';
+import { AlertTriangle, X, Download } from 'lucide-react';
 
 /**
  * Settings Page V2
@@ -67,6 +68,8 @@ export default function SettingsPage() {
     const [isLocalhost, setIsLocalhost] = useState(false);
     const stravaConnected = Boolean(stravaStatus?.connected);
     const [signOutBusy, setSignOutBusy] = useState(false);
+    const [exportBusy, setExportBusy] = useState(false);
+    const [exportMessage, setExportMessage] = useState<string | null>(null);
 
     // Deletion state
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -329,21 +332,21 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="v2-root min-h-screen">
+        <div className="v3-root min-h-screen">
             {/* Header */}
-            <header className="v2-nav sticky top-0 z-50">
-                <div className="v2-container flex items-center justify-between py-4">
+            <header className="v3-nav sticky top-0 z-50">
+                <div className="v3-container flex items-center justify-between py-4">
                     <div className="flex items-center gap-4">
-                        <Link href="/dashboard" className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+                        <Link href="/dashboard" className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                             ← Back
                         </Link>
-                        <span className="v2-heading-sm">Settings</span>
+                        <span className="v3-heading-sm">Settings</span>
                     </div>
-                    <Link href="/" className="v2-nav-logo">The Long Game</Link>
+                    <Link href="/" className="v3-nav-logo">The Long Game</Link>
                 </div>
             </header>
 
-            <main className="v2-container-narrow py-10">
+            <main className="v3-container-narrow py-10">
                 {/* Profile */}
                 <motion.section
                     className="mb-10"
@@ -351,42 +354,42 @@ export default function SettingsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4 }}
                 >
-                    <h2 className="v2-heading-md mb-4">Profile</h2>
-                    <div className="v2-card p-6 space-y-6">
+                    <h2 className="v3-heading-md mb-4">Profile</h2>
+                    <div className="v3-card p-6 space-y-6">
                         {profileLoading ? (
                             <div className="space-y-4">
-                                <div className="v2-skeleton" style={{ height: '40px' }} />
-                                <div className="v2-skeleton" style={{ height: '40px' }} />
+                                <div className="v3-skeleton" style={{ height: '40px' }} />
+                                <div className="v3-skeleton" style={{ height: '40px' }} />
                             </div>
                         ) : (
                             <>
-                                <div className="v2-form-group">
-                                    <label className="v2-form-label">Name</label>
+                                <div className="v3-form-group">
+                                    <label className="v3-form-label">Name</label>
                                     <input
                                         type="text"
                                         value={profile.name}
                                         onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                                        className="v2-input"
+                                        className="v3-input"
                                         placeholder="Your name"
                                     />
                                 </div>
-                                <div className="v2-form-group">
-                                    <label className="v2-form-label">Email</label>
+                                <div className="v3-form-group">
+                                    <label className="v3-form-label">Email</label>
                                     <input
                                         type="email"
                                         value={profile.email}
                                         disabled
-                                        className="v2-input v2-input-disabled"
+                                        className="v3-input v3-input-disabled"
                                     />
-                                    <span className="v2-form-hint">Email cannot be changed here</span>
+                                    <span className="v3-form-hint">Email cannot be changed here</span>
                                 </div>
-                                <div className="v2-form-group">
-                                    <label className="v2-form-label">Age</label>
+                                <div className="v3-form-group">
+                                    <label className="v3-form-label">Age</label>
                                     <input
                                         type="number"
                                         value={profile.age || ''}
                                         onChange={(e) => setProfile({ ...profile, age: e.target.value ? Number(e.target.value) : null })}
-                                        className="v2-input"
+                                        className="v3-input"
                                         placeholder="—"
                                     />
                                 </div>
@@ -395,12 +398,12 @@ export default function SettingsPage() {
                                     <button
                                         onClick={handleSaveProfile}
                                         disabled={profileSaving}
-                                        className="v2-btn v2-btn-secondary w-full"
+                                        className="v3-btn v3-btn-secondary w-full"
                                     >
                                         {profileSaving ? 'Saving...' : 'Save Profile'}
                                     </button>
                                     {profileMessage && (
-                                        <p className={`v2-body-sm mt-2 text-center ${profileMessage.includes('saved') ? 'v2-accent' : ''}`} style={profileMessage.includes('saved') ? {} : { color: 'var(--v2-error)' }}>
+                                        <p className={`v3-body-sm mt-2 text-center ${profileMessage.includes('saved') ? 'v3-accent' : ''}`} style={profileMessage.includes('saved') ? {} : { color: 'var(--v3-error)' }}>
                                             {profileMessage}
                                         </p>
                                     )}
@@ -417,18 +420,18 @@ export default function SettingsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.1 }}
                 >
-                    <h2 className="v2-heading-md mb-4">Fitness</h2>
-                    <div className="v2-card p-6">
+                    <h2 className="v3-heading-md mb-4">Fitness</h2>
+                    <div className="v3-card p-6">
                         <div className="flex items-center justify-between mb-6">
                             <div>
-                                <p className="v2-heading-sm">Current VO2max (VDOT)</p>
-                                <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>Update every 4-6 weeks or after a race.</p>
+                                <p className="v3-heading-sm">Current VO2max (VDOT)</p>
+                                <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>Update every 4-6 weeks or after a race.</p>
                             </div>
-                            <p className="v2-heading-lg v2-mono v2-accent">{currentVdot || '—'}</p>
+                            <p className="v3-heading-lg v3-mono v3-accent">{currentVdot || '—'}</p>
                         </div>
 
                         <button
-                            className="v2-btn v2-btn-secondary w-full"
+                            className="v3-btn v3-btn-secondary w-full"
                             onClick={() => router.push('/onboarding')}
                         >
                             Recalibrate VO2max (rebuild plan)
@@ -443,36 +446,36 @@ export default function SettingsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.2 }}
                 >
-                    <h2 className="v2-heading-md mb-4">Strava Integration</h2>
-                    <div className="v2-card p-6 space-y-4">
+                    <h2 className="v3-heading-md mb-4">Strava Integration</h2>
+                    <div className="v3-card p-6 space-y-4">
                         <div className="flex flex-wrap items-center justify-between gap-3">
                             <div>
-                                <p className="v2-heading-sm">Connect Strava</p>
-                                <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+                                <p className="v3-heading-sm">Connect Strava</p>
+                                <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                                     Sync your runs automatically. Connect Garmin → Strava first in the Garmin Connect app.
                                 </p>
                             </div>
-                            <span className={`v2-badge ${stravaConnected ? 'v2-badge-accent' : ''}`} style={!stravaConnected ? { background: 'var(--v2-error-subtle)', color: 'var(--v2-error)' } : {}}>
+                            <span className={`v3-badge ${stravaConnected ? 'v3-badge-accent' : ''}`} style={!stravaConnected ? { background: 'var(--v3-error-subtle)', color: 'var(--v3-error)' } : {}}>
                                 {stravaAuthRequired ? 'Sign in required' : stravaConnected ? 'Connected' : 'Not connected'}
                             </span>
                         </div>
                         <div className="flex flex-wrap gap-3">
                             <button
-                                className="v2-btn v2-btn-primary v2-btn-sm"
+                                className="v3-btn v3-btn-primary v3-btn-sm"
                                 onClick={handleStravaConnect}
                                 disabled={stravaBusy || stravaAuthRequired || stravaConnected || isLocalhost}
                             >
                                 Connect Strava
                             </button>
                             <button
-                                className="v2-btn v2-btn-secondary v2-btn-sm"
+                                className="v3-btn v3-btn-secondary v3-btn-sm"
                                 onClick={handleStravaSyncNow}
                                 disabled={stravaBusy || stravaAuthRequired || !stravaConnected}
                             >
                                 Sync now
                             </button>
                             <button
-                                className="v2-btn v2-btn-ghost v2-btn-sm"
+                                className="v3-btn v3-btn-ghost v3-btn-sm"
                                 onClick={handleStravaDisconnect}
                                 disabled={stravaBusy || stravaAuthRequired || !stravaConnected}
                             >
@@ -480,10 +483,10 @@ export default function SettingsPage() {
                             </button>
                         </div>
                         {stravaMessage && (
-                            <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>{stravaMessage}</p>
+                            <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>{stravaMessage}</p>
                         )}
                         {isLocalhost && (
-                            <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
+                            <p className="v3-mono" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
                                 Strava OAuth only works on production. Deploy to connect.
                             </p>
                         )}
@@ -497,12 +500,12 @@ export default function SettingsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.25 }}
                 >
-                    <h2 className="v2-heading-md mb-4">Preferences</h2>
-                    <div className="v2-card p-6 space-y-6">
+                    <h2 className="v3-heading-md mb-4">Preferences</h2>
+                    <div className="v3-card p-6 space-y-6">
                         <div className="flex items-center justify-between gap-4">
                             <div>
-                                <p className="v2-heading-sm">Training Reminders</p>
-                                <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+                                <p className="v3-heading-sm">Training Reminders</p>
+                                <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                                     Get notified about upcoming workouts
                                 </p>
                             </div>
@@ -514,8 +517,8 @@ export default function SettingsPage() {
                         </div>
                         <div className="flex items-center justify-between gap-4">
                             <div>
-                                <p className="v2-heading-sm">Weekly Progress Summary</p>
-                                <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+                                <p className="v3-heading-sm">Weekly Progress Summary</p>
+                                <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                                     Receive a recap every Monday
                                 </p>
                             </div>
@@ -527,21 +530,21 @@ export default function SettingsPage() {
                         </div>
                         <div className="flex items-center justify-between gap-4">
                             <div>
-                                <p className="v2-heading-sm">Units</p>
-                                <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+                                <p className="v3-heading-sm">Units</p>
+                                <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                                     Distances and paces displayed in
                                 </p>
                             </div>
                             <div className="flex gap-2">
                                 <button
-                                    className={`v2-btn v2-btn-sm ${preferences.units === 'miles' ? 'v2-btn-primary' : 'v2-btn-ghost'}`}
+                                    className={`v3-btn v3-btn-sm ${preferences.units === 'miles' ? 'v3-btn-primary' : 'v3-btn-ghost'}`}
                                     onClick={() => handlePreferenceChange('units', 'miles')}
                                     disabled={prefSaving}
                                 >
                                     Miles
                                 </button>
                                 <button
-                                    className={`v2-btn v2-btn-sm ${preferences.units === 'kilometers' ? 'v2-btn-primary' : 'v2-btn-ghost'}`}
+                                    className={`v3-btn v3-btn-sm ${preferences.units === 'kilometers' ? 'v3-btn-primary' : 'v3-btn-ghost'}`}
                                     onClick={() => handlePreferenceChange('units', 'kilometers')}
                                     disabled={prefSaving}
                                 >
@@ -559,18 +562,60 @@ export default function SettingsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.3 }}
                 >
-                    <h2 className="v2-heading-md mb-4">Account</h2>
-                    <div className="v2-card p-6 space-y-3">
-                        <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
-                            Sign out on this device if you are done with setup.
-                        </p>
-                        <button
-                            className="v2-btn v2-btn-secondary w-full"
-                            onClick={handleSignOut}
-                            disabled={signOutBusy}
-                        >
-                            {signOutBusy ? 'Signing out...' : 'Sign out'}
-                        </button>
+                    <h2 className="v3-heading-md mb-4">Account</h2>
+                    <div className="v3-card p-6 space-y-4">
+                        {/* Export Plan */}
+                        {plan && (
+                            <div className="flex items-center justify-between pb-4" style={{ borderBottom: '1px solid var(--border-base)' }}>
+                                <div>
+                                    <p className="v3-heading-sm">Export Training Plan</p>
+                                    <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>Download a backup of your plan as JSON</p>
+                                </div>
+                                <button
+                                    className="v3-btn v3-btn-sm v3-btn-secondary flex items-center gap-2"
+                                    onClick={async () => {
+                                        setExportBusy(true);
+                                        setExportMessage(null);
+                                        try {
+                                            const success = await downloadPlanAsJSON();
+                                            if (success) {
+                                                setExportMessage('Plan exported successfully!');
+                                            } else {
+                                                setExportMessage('No plan to export');
+                                            }
+                                        } catch (error) {
+                                            console.error('Export failed:', error);
+                                            setExportMessage('Export failed');
+                                        } finally {
+                                            setExportBusy(false);
+                                            setTimeout(() => setExportMessage(null), 3000);
+                                        }
+                                    }}
+                                    disabled={exportBusy}
+                                >
+                                    {exportBusy ? 'Exporting...' : <><Download size={16} /> Export</>}
+                                </button>
+                            </div>
+                        )}
+                        {exportMessage && (
+                            <p className="v3-body-sm" style={{ color: exportMessage.includes('success') ? 'var(--v3-success)' : 'var(--text-muted)' }}>
+                                {exportMessage}
+                            </p>
+                        )}
+
+                        {/* Sign Out */}
+                        <div>
+                            <p className="v3-body-sm mb-3" style={{ color: 'var(--text-muted)' }}>
+                                Sign out on this device if you are done with setup.
+                            </p>
+                            <button
+                                className="v3-btn v3-btn-secondary w-full"
+                                onClick={handleSignOut}
+                                disabled={signOutBusy}
+                            >
+                                {signOutBusy ? 'Signing out...' : 'Sign out'}
+                            </button>
+                        </div>
                     </div>
                 </motion.section>
 
@@ -580,16 +625,16 @@ export default function SettingsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.4 }}
                 >
-                    <h2 className="v2-heading-md mb-4" style={{ color: 'var(--v2-error)' }}>Danger Zone</h2>
-                    <div className="v2-card p-6" style={{ borderColor: 'var(--v2-error)' }}>
+                    <h2 className="v3-heading-md mb-4" style={{ color: 'var(--v3-error)' }}>Danger Zone</h2>
+                    <div className="v3-card p-6" style={{ borderColor: 'var(--v3-error)' }}>
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="v2-heading-sm">Delete Account</p>
-                                <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>Permanently delete your account and all data</p>
+                                <p className="v3-heading-sm">Delete Account</p>
+                                <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>Permanently delete your account and all data</p>
                             </div>
                             <button
-                                className="v2-btn v2-btn-sm"
-                                style={{ background: 'var(--v2-error)', color: 'white' }}
+                                className="v3-btn v3-btn-sm"
+                                style={{ background: 'var(--v3-error)', color: 'white' }}
                                 onClick={() => setShowDeleteModal(true)}
                             >
                                 Delete
@@ -614,16 +659,16 @@ export default function SettingsPage() {
                             initial={{ scale: 0.95, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.95, opacity: 0 }}
-                            className="v2-card p-6 max-w-md w-full"
-                            style={{ borderColor: 'var(--v2-error)' }}
+                            className="v3-card p-6 max-w-md w-full"
+                            style={{ borderColor: 'var(--v3-error)' }}
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="flex items-start justify-between mb-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'var(--v2-error-subtle)' }}>
-                                        <AlertTriangle size={20} style={{ color: 'var(--v2-error)' }} />
+                                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'var(--v3-error-subtle)' }}>
+                                        <AlertTriangle size={20} style={{ color: 'var(--v3-error)' }} />
                                     </div>
-                                    <h3 className="v2-heading-md">Delete Account</h3>
+                                    <h3 className="v3-heading-md">Delete Account</h3>
                                 </div>
                                 <button
                                     onClick={() => setShowDeleteModal(false)}
@@ -633,43 +678,43 @@ export default function SettingsPage() {
                                 </button>
                             </div>
 
-                            <p className="v2-body-sm mb-4" style={{ color: 'var(--text-muted)' }}>
+                            <p className="v3-body-sm mb-4" style={{ color: 'var(--text-muted)' }}>
                                 This will permanently delete:
                             </p>
-                            <ul className="v2-body-sm mb-6 space-y-1" style={{ color: 'var(--text-muted)' }}>
+                            <ul className="v3-body-sm mb-6 space-y-1" style={{ color: 'var(--text-muted)' }}>
                                 <li>• All your training plans and workouts</li>
                                 <li>• Your durability assessments</li>
                                 <li>• Your VDOT history and progress</li>
                                 <li>• All connected integrations</li>
                             </ul>
 
-                            <p className="v2-body-sm mb-2" style={{ color: 'var(--text-muted)' }}>
-                                Type <strong style={{ color: 'var(--v2-error)' }}>DELETE</strong> to confirm:
+                            <p className="v3-body-sm mb-2" style={{ color: 'var(--text-muted)' }}>
+                                Type <strong style={{ color: 'var(--v3-error)' }}>DELETE</strong> to confirm:
                             </p>
                             <input
                                 type="text"
                                 value={deleteConfirmText}
                                 onChange={(e) => setDeleteConfirmText(e.target.value)}
-                                className="v2-input mb-4"
+                                className="v3-input mb-4"
                                 placeholder="Type DELETE"
                                 autoComplete="off"
                             />
 
                             {deleteError && (
-                                <p className="v2-body-sm mb-4" style={{ color: 'var(--v2-error)' }}>{deleteError}</p>
+                                <p className="v3-body-sm mb-4" style={{ color: 'var(--v3-error)' }}>{deleteError}</p>
                             )}
 
                             <div className="flex gap-3">
                                 <button
-                                    className="v2-btn v2-btn-secondary flex-1"
+                                    className="v3-btn v3-btn-secondary flex-1"
                                     onClick={() => setShowDeleteModal(false)}
                                 >
                                     Cancel
                                 </button>
                                 <button
-                                    className="v2-btn flex-1"
+                                    className="v3-btn flex-1"
                                     style={{
-                                        background: deleteConfirmText === 'DELETE' ? 'var(--v2-error)' : 'var(--bg-elevated)',
+                                        background: deleteConfirmText === 'DELETE' ? 'var(--v3-error)' : 'var(--bg-elevated)',
                                         color: deleteConfirmText === 'DELETE' ? 'white' : 'var(--text-muted)',
                                         cursor: deleteConfirmText === 'DELETE' ? 'pointer' : 'not-allowed',
                                     }}

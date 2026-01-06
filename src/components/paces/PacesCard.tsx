@@ -187,7 +187,7 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: Pa
 
     return (
         <motion.div
-            className="v2-card p-6"
+            className="v3-card p-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
@@ -195,9 +195,9 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: Pa
             {/* Header */}
             <div className="flex items-start justify-between mb-6">
                 <div>
-                    <h2 className="v2-heading-md mb-1">Your Training Zones</h2>
+                    <h2 className="v3-heading-md mb-1">Your Training Zones</h2>
                     <div className="flex items-center gap-2">
-                        <span className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+                        <span className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                             VDOT {vdot}
                         </span>
                         {calculatedMaxHR && (
@@ -208,11 +208,11 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: Pa
                                         setHRInput(String(calculatedMaxHR));
                                         setShowHREditor(true);
                                     }}
-                                    className="v2-body-sm flex items-center gap-1 transition-colors hover:underline"
+                                    className="v3-body-sm flex items-center gap-1 transition-colors hover:underline"
                                     style={{ color: 'var(--text-muted)' }}
                                     title="Click to update your max HR"
                                 >
-                                    <HeartIcon size={12} />
+                                    <HeartIcon size={12} filled pulsing style={{ color: '#ef4444' }} />
                                     Max HR {calculatedMaxHR}
                                     {isEstimated && <span className="text-[10px]">(est.)</span>}
                                 </button>
@@ -221,12 +221,18 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: Pa
                     </div>
                 </div>
                 {onRecalibrate && (
-                    <button
-                        onClick={onRecalibrate}
-                        className="v2-btn v2-btn-ghost v2-btn-sm"
-                    >
-                        Recalibrate
-                    </button>
+                    <div className="text-right">
+                        <button
+                            onClick={onRecalibrate}
+                            className="v3-btn v3-btn-secondary v3-btn-sm"
+                            title="Update your VDOT based on a recent race result"
+                        >
+                            Recalibrate
+                        </button>
+                        <p className="v3-body-xs mt-1" style={{ color: 'var(--text-subtle)' }}>
+                            New race result?
+                        </p>
+                    </div>
                 )}
             </div>
 
@@ -241,10 +247,10 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: Pa
                         style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-base)' }}
                     >
                         <div className="flex items-center gap-2 mb-3">
-                            <HeartIcon size={16} className="v2-accent" />
-                            <span className="v2-heading-sm">Update Max Heart Rate</span>
+                            <HeartIcon size={16} filled pulsing style={{ color: '#ef4444' }} />
+                            <span className="v3-heading-sm">Update Max Heart Rate</span>
                         </div>
-                        <p className="v2-body-sm mb-4" style={{ color: 'var(--text-muted)' }}>
+                        <p className="v3-body-sm mb-4" style={{ color: 'var(--text-muted)' }}>
                             The default (220 - age) is a rough estimate. For accuracy, use your highest HR from an all-out effort like a 5K race or uphill sprint.
                         </p>
                         <div className="flex gap-2">
@@ -252,12 +258,12 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: Pa
                                 type="number"
                                 value={hrInput}
                                 onChange={(e) => setHRInput(e.target.value)}
-                                className="v2-input v2-mono w-24 text-center"
+                                className="v3-input v3-mono w-24 text-center"
                                 placeholder="180"
                                 min="120"
                                 max="220"
                             />
-                            <span className="v2-body-sm self-center" style={{ color: 'var(--text-muted)' }}>bpm</span>
+                            <span className="v3-body-sm self-center" style={{ color: 'var(--text-muted)' }}>bpm</span>
                             <button
                                 onClick={() => {
                                     const val = parseInt(hrInput);
@@ -266,13 +272,13 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: Pa
                                     }
                                     setShowHREditor(false);
                                 }}
-                                className="v2-btn v2-btn-primary v2-btn-sm"
+                                className="v3-btn v3-btn-primary v3-btn-sm"
                             >
                                 Save
                             </button>
                             <button
                                 onClick={() => setShowHREditor(false)}
-                                className="v2-btn v2-btn-ghost v2-btn-sm"
+                                className="v3-btn v3-btn-ghost v3-btn-sm"
                             >
                                 Cancel
                             </button>
@@ -291,17 +297,17 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: Pa
                     >
                         <div className="flex-1">
                             <div className="flex items-center gap-2">
-                                <span className="v2-body-md font-medium">{zone.name}</span>
-                                <span className="v2-body-xs" style={{ color: 'var(--text-muted)' }}>
+                                <span className="v3-body-md font-medium">{zone.name}</span>
+                                <span className="v3-body-xs" style={{ color: 'var(--text-muted)' }}>
                                     {zone.description}
                                 </span>
                             </div>
                         </div>
                         <div className="text-right">
-                            <span className="v2-mono v2-body-md">{zone.pace}/mi</span>
+                            <span className="v3-mono v3-body-md">{zone.pace}/mi</span>
                             {zone.hrRange && (
-                                <div className="v2-body-xs flex items-center justify-end gap-1" style={{ color: 'var(--text-subtle)' }}>
-                                    <HeartIcon size={10} />
+                                <div className="v3-body-xs flex items-center justify-end gap-1" style={{ color: 'var(--text-subtle)' }}>
+                                    <HeartIcon size={10} filled pulsing style={{ color: '#ef4444' }} />
                                     {zone.hrRange}
                                 </div>
                             )}
@@ -310,18 +316,21 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: Pa
                 ))}
             </div>
 
-            {/* Race Predictions */}
-            <div>
-                <h3 className="v2-heading-sm mb-4" style={{ color: 'var(--text-muted)' }}>
+            {/* Race Predictions - Separate Section */}
+            <div
+                className="mt-8 p-5 rounded-xl"
+                style={{ background: 'var(--bg-muted)', border: '1px solid var(--border-base)' }}
+            >
+                <h3 className="v3-heading-sm mb-4">
                     Predicted Race Times
                 </h3>
                 <div className="grid grid-cols-4 gap-4">
                     {Object.entries(raceTimes).map(([distance, time]) => (
                         <div key={distance} className="text-center">
-                            <div className="v2-body-xs mb-1" style={{ color: 'var(--text-muted)' }}>
+                            <div className="v3-body-xs mb-1" style={{ color: 'var(--text-muted)' }}>
                                 {distance}
                             </div>
-                            <div className="v2-mono v2-body-md font-medium">
+                            <div className="v3-mono font-semibold" style={{ fontSize: '1.125rem' }}>
                                 {time}
                             </div>
                         </div>
@@ -333,9 +342,9 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: Pa
             {calculatedMaxHR && (
                 <div
                     className="mt-6 p-4 rounded-lg"
-                    style={{ background: 'var(--v2-bg-inset)' }}
+                    style={{ background: 'var(--v3-bg-inset)' }}
                 >
-                    <p className="v2-body-sm flex items-start gap-2" style={{ color: 'var(--text-muted)' }}>
+                    <p className="v3-body-sm flex items-start gap-2" style={{ color: 'var(--text-muted)' }}>
                         <svg className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'var(--color-accent)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                         </svg>

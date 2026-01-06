@@ -42,8 +42,8 @@ export function MetricCard({
     };
 
     const trendColors = {
-        up: 'var(--v2-success)',
-        down: 'var(--v2-error)',
+        up: 'var(--v3-success)',
+        down: 'var(--v3-error)',
         neutral: 'var(--text-muted)',
     };
 
@@ -57,13 +57,13 @@ export function MetricCard({
 
     return (
         <div
-            className={`v2-card ${card}`}
+            className={`v3-card ${card}`}
             style={animationDelay ? { animationDelay: `${animationDelay}ms` } : undefined}
         >
             {/* Header with icon and label */}
             <div className="flex items-center gap-2 mb-2">
                 {icon && <span style={{ color: 'var(--color-accent)' }}>{icon}</span>}
-                <span className="v2-label">{label}</span>
+                <span className="v3-label">{label}</span>
             </div>
 
             {/* Main value */}

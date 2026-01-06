@@ -2,7 +2,7 @@
 
 import { motion, useAnimation } from "motion/react";
 import type { HTMLAttributes } from "react";
-import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
+import { forwardRef, useCallback, useImperativeHandle, useRef, useEffect } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -13,10 +13,14 @@ export interface HeartIconHandle {
 
 interface HeartIconProps extends HTMLAttributes<HTMLDivElement> {
   size?: number;
+  /** Fill the heart with solid color */
+  filled?: boolean;
+  /** Enable continuous pulsing animation */
+  pulsing?: boolean;
 }
 
 const HeartIcon = forwardRef<HeartIconHandle, HeartIconProps>(
-  ({ onMouseEnter, onMouseLeave, className, size = 28, ...props }, ref) => {
+  ({ onMouseEnter, onMouseLeave, className, size = 28, filled = false, pulsing = false, ...props }, ref) => {
     const controls = useAnimation();
     const isControlledRef = useRef(false);
 
@@ -28,6 +32,13 @@ const HeartIcon = forwardRef<HeartIconHandle, HeartIconProps>(
         stopAnimation: () => controls.start("normal"),
       };
     });
+
+    // Start pulsing animation on mount if pulsing prop is true
+    useEffect(() => {
+      if (pulsing) {
+        controls.start("pulse");
+      }
+    }, [pulsing, controls]);
 
     const handleMouseEnter = useCallback(
       (e: React.MouseEvent<HTMLDivElement>) => {
@@ -44,11 +55,11 @@ const HeartIcon = forwardRef<HeartIconHandle, HeartIconProps>(
       (e: React.MouseEvent<HTMLDivElement>) => {
         if (isControlledRef.current) {
           onMouseLeave?.(e);
-        } else {
+        } else if (!pulsing) {
           controls.start("normal");
         }
       },
-      [controls, onMouseLeave]
+      [controls, onMouseLeave, pulsing]
     );
 
     return (
@@ -60,19 +71,24 @@ const HeartIcon = forwardRef<HeartIconHandle, HeartIconProps>(
       >
         <motion.svg
           animate={controls}
-          fill="none"
+          initial={pulsing ? "pulse" : "normal"}
+          fill={filled ? "currentColor" : "none"}
           height={size}
           stroke="currentColor"
           strokeLinecap="round"
           strokeLinejoin="round"
-          strokeWidth="2"
-          transition={{
-            duration: 0.45,
-            repeat: 2,
-          }}
+          strokeWidth={filled ? "0" : "2"}
           variants={{
             normal: { scale: 1 },
             animate: { scale: [1, 1.08, 1] },
+            pulse: {
+              scale: [1, 1.1, 1],
+              transition: {
+                duration: 1.2,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }
+            },
           }}
           viewBox="0 0 24 24"
           width={size}

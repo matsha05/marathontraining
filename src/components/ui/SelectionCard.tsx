@@ -36,9 +36,9 @@ export function SelectionCard({
     domain = 'accent',
 }: SelectionCardProps) {
     const domainColors = {
-        running: 'var(--v2-running)',
-        strength: 'var(--v2-strength)',
-        durability: 'var(--v2-durability)',
+        running: 'var(--v3-running)',
+        strength: 'var(--v3-strength)',
+        durability: 'var(--v3-durability)',
         accent: 'var(--color-accent)',
     };
 

@@ -27,7 +27,7 @@ export function DurabilityRoutineCard({ routine, onComplete }: DurabilityRoutine
             case 'quality':
                 return <Zap size={18} className="text-[var(--color-accent)]" />;
             case 'long':
-                return <Target size={18} className="text-[var(--v2-durability)]" />;
+                return <Target size={18} className="text-[var(--v3-durability)]" />;
             case 'easy':
                 return <Sparkles size={18} className="text-emerald-500" />;
             case 'rest':
@@ -42,12 +42,12 @@ export function DurabilityRoutineCard({ routine, onComplete }: DurabilityRoutine
             transition={{ duration: 0.4 }}
         >
             {/* Header */}
-            <div className="v2-card p-5 mb-4">
+            <div className="v3-card p-5 mb-4">
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                         {getDayTypeIcon()}
                         <div>
-                            <h2 className="v2-heading-md">{routine.name}</h2>
+                            <h2 className="v3-heading-md">{routine.name}</h2>
                             <p className="text-sm" style={{ color: 'var(--text-subtle)' }}>
                                 {routine.modules.length} exercise{routine.modules.length > 1 ? 's' : ''} · ~{routine.totalMinutes} min
                             </p>
@@ -56,7 +56,7 @@ export function DurabilityRoutineCard({ routine, onComplete }: DurabilityRoutine
                     <div
                         className="px-3 py-1.5 rounded-full text-sm font-medium"
                         style={{
-                            background: 'var(--v2-gradient-glow)',
+                            background: 'var(--v3-gradient-glow)',
                             color: 'var(--color-accent)',
                         }}
                     >
@@ -124,7 +124,7 @@ function ModuleSection({ module, index }: ModuleSectionProps) {
             case 'integration':
                 return { color: '#ec4899', bg: 'rgba(236, 72, 153, 0.1)' };
             default:
-                return { color: 'var(--color-accent)', bg: 'var(--v2-gradient-glow)' };
+                return { color: 'var(--color-accent)', bg: 'var(--v3-gradient-glow)' };
         }
     };
 
@@ -143,7 +143,7 @@ function ModuleSection({ module, index }: ModuleSectionProps) {
                     style={{ background: style.color }}
                 />
                 <div>
-                    <h3 className="v2-heading-sm">{module.name}</h3>
+                    <h3 className="v3-heading-sm">{module.name}</h3>
                     <div className="flex items-center gap-3 text-xs" style={{ color: 'var(--text-subtle)' }}>
                         <span
                             className="px-2 py-0.5 rounded-full capitalize"

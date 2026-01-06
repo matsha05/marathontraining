@@ -96,7 +96,7 @@ export function MethodologyContent() {
     const colors = ['var(--color-strength)', '#ec4899', '#06b6d4', 'var(--color-accent)', '#8b5cf6', '#14b8a6', '#f59e0b', '#ef4444'];
 
     return (
-        <div className="v2-root min-h-screen" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>
+        <div className="v3-root min-h-screen" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>
             <SiteHeader />
 
             {/* Hero */}
@@ -203,7 +203,7 @@ export function MethodologyContent() {
                 <div className="max-w-3xl mx-auto text-center">
                     <h2 className="text-3xl font-light mb-6" style={{ color: 'var(--text-base)' }}>Ready to train smarter?</h2>
                     <p className="text-lg mb-8" style={{ color: 'var(--text-muted)' }}>Get a personalized plan built on these proven methodologies.</p>
-                    <Link href="/onboarding" className="v2-btn v2-btn-primary v2-btn-lg">Get Started</Link>
+                    <Link href="/onboarding" className="v3-btn v3-btn-primary v3-btn-lg">Get Started</Link>
                 </div>
             </section>
 

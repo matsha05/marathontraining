@@ -8,7 +8,7 @@
  */
 
 import { ReactNode, useEffect, useCallback } from 'react';
-import { ChevronLeft, Info, ExternalLink, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronDown, Info, ExternalLink, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CoachTooltip } from '@/domain/onboarding/types';
 
@@ -57,7 +57,7 @@ export function QuestionScreen({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.2 }}
-            className={`v2-root min-h-screen flex flex-col items-center justify-center px-6 py-12 ${className}`}
+            className={`v3-root min-h-screen flex flex-col items-center justify-center px-6 py-12 ${className}`}
         >
             <div className="w-full max-w-lg">
                 {showBack && onBack && (
@@ -67,7 +67,7 @@ export function QuestionScreen({
                         style={{ color: 'var(--text-muted)' }}
                     >
                         <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                        <span className="v2-body-sm">Back</span>
+                        <span className="v3-body-sm">Back</span>
                     </button>
                 )}
                 {children}
@@ -89,9 +89,9 @@ interface QuestionHeaderProps {
 export function QuestionHeader({ title, subtitle, tooltip }: QuestionHeaderProps) {
     return (
         <div className="mb-8">
-            <h1 className="v2-heading-lg mb-3">{title}</h1>
+            <h1 className="v3-heading-lg mb-3">{title}</h1>
             {subtitle && (
-                <p className="v2-body-md" style={{ color: 'var(--text-muted)' }}>{subtitle}</p>
+                <p className="v3-body-md" style={{ color: 'var(--text-muted)' }}>{subtitle}</p>
             )}
             {tooltip && <TooltipExpander tooltip={tooltip} />}
         </div>
@@ -110,18 +110,21 @@ export function TooltipExpander({ tooltip }: TooltipExpanderProps) {
     return (
         <details className="mt-4 group">
             <summary
-                className="flex items-center gap-2 v2-body-sm cursor-pointer transition-colors"
-                style={{ color: 'var(--text-subtle)' }}
+                className="flex items-center justify-between gap-2 v3-body-sm cursor-pointer transition-colors p-3 rounded-lg"
+                style={{ color: 'var(--text-subtle)', background: 'var(--v3-bg-inset)' }}
             >
-                <Info className="w-4 h-4" />
-                <span>{tooltip.title}</span>
+                <span className="flex items-center gap-2">
+                    <Info className="w-4 h-4" />
+                    <span>{tooltip.title}</span>
+                </span>
+                <ChevronDown className="w-4 h-4 transition-transform group-open:rotate-180" />
             </summary>
-            <div className="mt-3 pl-6 v2-body-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+            <div className="mt-3 pl-6 v3-body-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                 <p>{tooltip.content}</p>
                 {tooltip.coach && tooltip.coachLink && (
                     <a
                         href={tooltip.coachLink}
-                        className="inline-flex items-center gap-1 mt-2 v2-accent hover:underline"
+                        className="inline-flex items-center gap-1 mt-2 v3-accent hover:underline"
                     >
                         Learn about {tooltip.coach}
                         <ExternalLink className="w-3 h-3" />
@@ -163,43 +166,44 @@ export function OptionButton({
         <button
             onClick={onClick}
             disabled={disabled}
-            className="w-full p-4 rounded-xl border text-left transition-all"
+            className="w-full p-4 rounded-xl text-left transition-all"
             style={{
                 background: selected ? 'var(--color-accent)' : 'var(--bg-elevated)',
-                borderColor: selected
-                    ? 'transparent'
+                border: selected
+                    ? '2px solid var(--color-accent)'
                     : warning
-                        ? 'var(--v2-warning)'
-                        : 'var(--border-base)',
-                color: selected ? 'var(--v2-bg-base)' : 'var(--text-base)',
+                        ? '2px solid var(--color-warning)'
+                        : '2px solid var(--border-emphasis)',
+                color: selected ? 'white' : 'var(--text-base)',
                 opacity: disabled ? 0.6 : 1,
                 cursor: disabled ? 'not-allowed' : 'pointer',
+                boxShadow: selected ? '0 4px 12px color-mix(in srgb, var(--color-accent) 40%, transparent)' : 'none',
             }}
         >
             <div className="flex items-start gap-3">
                 {shortcut && (
                     <span
-                        className="flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center v2-mono"
+                        className="flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center v3-mono"
                         style={{
                             fontSize: '11px',
-                            background: selected ? 'rgba(0,0,0,0.2)' : 'var(--v2-bg-base)',
-                            color: selected ? 'var(--v2-bg-base)' : 'var(--text-muted)',
+                            background: selected ? 'rgba(0,0,0,0.2)' : 'var(--v3-bg-base)',
+                            color: selected ? 'var(--v3-bg-base)' : 'var(--text-muted)',
                         }}
                     >
                         {shortcut}
                     </span>
                 )}
                 {icon && (
-                    <span style={{ color: selected ? 'var(--v2-bg-base)' : 'var(--text-muted)' }}>
+                    <span style={{ color: selected ? 'var(--v3-bg-base)' : 'var(--text-muted)' }}>
                         {icon}
                     </span>
                 )}
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                        <span className="v2-body-md" style={{ fontWeight: 500 }}>{label}</span>
+                        <span className="v3-body-md" style={{ fontWeight: 500 }}>{label}</span>
                         {recommended && !selected && (
                             <span
-                                className="v2-mono px-2 py-0.5 rounded-full"
+                                className="v3-mono px-2 py-0.5 rounded-full"
                                 style={{
                                     fontSize: '10px',
                                     background: 'var(--color-accent-subtle)',
@@ -212,7 +216,7 @@ export function OptionButton({
                     </div>
                     {description && (
                         <p
-                            className="v2-body-sm mt-0.5"
+                            className="v3-body-sm mt-0.5"
                             style={{ color: selected ? 'rgba(0,0,0,0.7)' : 'var(--text-subtle)' }}
                         >
                             {description}
@@ -290,15 +294,15 @@ export function TextInput({
                     max={max}
                     step={step}
                     aria-invalid={Boolean(error)}
-                    className="v2-input flex-1"
+                    className="v3-input flex-1"
                     style={{ fontSize: '18px' }}
                 />
                 {suffix && (
-                    <span className="v2-body-md" style={{ color: 'var(--text-muted)' }}>{suffix}</span>
+                    <span className="v3-body-md" style={{ color: 'var(--text-muted)' }}>{suffix}</span>
                 )}
             </div>
             {error && (
-                <p className="mt-2 v2-body-sm" style={{ color: 'var(--v2-error)' }}>{error}</p>
+                <p className="mt-2 v3-body-sm" style={{ color: 'var(--v3-error)' }}>{error}</p>
             )}
         </div>
     );
@@ -341,10 +345,10 @@ export function TimeInput({
                             placeholder="H"
                             min={0}
                             max={9}
-                            className="v2-input w-16 text-center"
+                            className="v3-input w-16 text-center"
                             style={{ fontSize: '18px' }}
                         />
-                        <span className="v2-heading-md" style={{ color: 'var(--text-muted)' }}>:</span>
+                        <span className="v3-heading-md" style={{ color: 'var(--text-muted)' }}>:</span>
                     </>
                 )}
                 <input
@@ -354,10 +358,10 @@ export function TimeInput({
                     placeholder="MM"
                     min={0}
                     max={59}
-                    className="v2-input w-20 text-center"
+                    className="v3-input w-20 text-center"
                     style={{ fontSize: '18px' }}
                 />
-                <span className="v2-heading-md" style={{ color: 'var(--text-muted)' }}>:</span>
+                <span className="v3-heading-md" style={{ color: 'var(--text-muted)' }}>:</span>
                 <input
                     type="number"
                     value={seconds ?? ''}
@@ -365,12 +369,12 @@ export function TimeInput({
                     placeholder="SS"
                     min={0}
                     max={59}
-                    className="v2-input w-20 text-center"
+                    className="v3-input w-20 text-center"
                     style={{ fontSize: '18px' }}
                 />
             </div>
             {error && (
-                <p className="mt-2 v2-body-sm" style={{ color: 'var(--v2-error)' }}>{error}</p>
+                <p className="mt-2 v3-body-sm" style={{ color: 'var(--v3-error)' }}>{error}</p>
             )}
         </div>
     );
@@ -397,7 +401,7 @@ export function ContinueButton({
         <button
             onClick={onClick}
             disabled={disabled || loading}
-            className="v2-btn v2-btn-primary v2-btn-lg w-full mt-8"
+            className="v3-btn v3-btn-primary v3-btn-lg w-full mt-8"
             style={{
                 opacity: disabled ? 0.4 : 1,
                 cursor: disabled ? 'not-allowed' : 'pointer',
@@ -411,7 +415,7 @@ export function ContinueButton({
             ) : (
                 <span className="flex items-center justify-center gap-2">
                     <span>{label}</span>
-                    <span className="v2-mono" style={{ fontSize: '11px', opacity: 0.7 }}>↵</span>
+                    <span className="v3-mono" style={{ fontSize: '11px', opacity: 0.7 }}>↵</span>
                 </span>
             )}
         </button>
@@ -426,6 +430,11 @@ interface UseKeyboardNavigationProps {
     onEnter?: () => void;
     onBack?: () => void;
     onNumber?: (num: number) => void;
+    onArrowUp?: () => void;
+    onArrowDown?: () => void;
+    totalOptions?: number;           // For auto-wrapping with arrow keys
+    selectedIndex?: number;          // Current selection for arrow navigation
+    onSelectIndex?: (index: number) => void;  // Callback when arrow changes selection
     disabled?: boolean;
 }
 
@@ -433,6 +442,11 @@ export function useKeyboardNavigation({
     onEnter,
     onBack,
     onNumber,
+    onArrowUp,
+    onArrowDown,
+    totalOptions,
+    selectedIndex,
+    onSelectIndex,
     disabled = false,
 }: UseKeyboardNavigationProps) {
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -451,6 +465,7 @@ export function useKeyboardNavigation({
 
         switch (e.key) {
             case 'Enter':
+            case 'ArrowRight':
                 if (onEnter) {
                     e.preventDefault();
                     onEnter();
@@ -461,6 +476,26 @@ export function useKeyboardNavigation({
                 if (onBack) {
                     e.preventDefault();
                     onBack();
+                }
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                if (onArrowUp) {
+                    onArrowUp();
+                } else if (totalOptions !== undefined && selectedIndex !== undefined && onSelectIndex) {
+                    // Auto-wrap navigation
+                    const newIndex = selectedIndex <= 0 ? totalOptions - 1 : selectedIndex - 1;
+                    onSelectIndex(newIndex);
+                }
+                break;
+            case 'ArrowDown':
+                e.preventDefault();
+                if (onArrowDown) {
+                    onArrowDown();
+                } else if (totalOptions !== undefined && selectedIndex !== undefined && onSelectIndex) {
+                    // Auto-wrap navigation
+                    const newIndex = selectedIndex >= totalOptions - 1 ? 0 : selectedIndex + 1;
+                    onSelectIndex(newIndex);
                 }
                 break;
             case '1':
@@ -474,11 +509,11 @@ export function useKeyboardNavigation({
             case '9':
                 if (onNumber) {
                     e.preventDefault();
-                    onNumber(parseInt(e.key));
+                    onNumber(parseInt(e.key, 10));
                 }
                 break;
         }
-    }, [onEnter, onBack, onNumber, disabled]);
+    }, [onEnter, onBack, onNumber, onArrowUp, onArrowDown, totalOptions, selectedIndex, onSelectIndex, disabled]);
 
     useEffect(() => {
         window.addEventListener('keydown', handleKeyDown);
@@ -499,20 +534,21 @@ interface CollapsibleInstructionsProps {
 export function CollapsibleInstructions({ title, steps, tips }: CollapsibleInstructionsProps) {
     return (
         <details
-            className="mt-6 p-4 rounded-xl v2-card"
+            className="mt-6 rounded-xl v3-card group"
         >
             <summary
-                className="cursor-pointer v2-heading-sm transition-colors"
+                className="p-4 cursor-pointer flex items-center justify-between transition-colors"
                 style={{ color: 'var(--text-base)' }}
             >
-                {title}
+                <span className="v3-body font-medium">{title}</span>
+                <ChevronDown className="w-5 h-5 transition-transform group-open:rotate-180" style={{ color: 'var(--text-subtle)' }} />
             </summary>
-            <div className="mt-4 space-y-4">
+            <div className="px-4 pb-4 space-y-4">
                 <ol className="space-y-2">
                     {steps.map((step, i) => (
-                        <li key={i} className="flex gap-3 v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+                        <li key={i} className="flex gap-3 v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                             <span
-                                className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center v2-mono"
+                                className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center v3-mono"
                                 style={{
                                     fontSize: '10px',
                                     background: 'var(--color-accent-subtle)',
@@ -528,11 +564,11 @@ export function CollapsibleInstructions({ title, steps, tips }: CollapsibleInstr
                 </ol>
                 {tips && tips.length > 0 && (
                     <div className="pt-3" style={{ borderTop: '1px solid var(--border-base)' }}>
-                        <p className="v2-label mb-2">Tips</p>
+                        <p className="v3-label mb-2">Tips</p>
                         <ul className="space-y-1">
                             {tips.map((tip, i) => (
-                                <li key={i} className="v2-body-sm flex items-start gap-2" style={{ color: 'var(--text-muted)' }}>
-                                    <span className="v2-accent">•</span>
+                                <li key={i} className="v3-body-sm flex items-start gap-2" style={{ color: 'var(--text-muted)' }}>
+                                    <span className="v3-accent">•</span>
                                     <span>{tip}</span>
                                 </li>
                             ))}
@@ -558,12 +594,12 @@ export function WarningBanner({ title, children }: WarningBannerProps) {
         <div
             className="mt-6 p-4 rounded-xl border"
             style={{
-                background: "var(--v2-warning-subtle)",
-                borderColor: "var(--v2-warning)",
+                background: "var(--v3-warning-subtle)",
+                borderColor: "var(--v3-warning)",
             }}
         >
-            <p className="v2-heading-sm mb-1" style={{ color: 'var(--v2-warning)' }}>{title}</p>
-            <div className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+            <p className="v3-heading-sm mb-1" style={{ color: 'var(--v3-warning)' }}>{title}</p>
+            <div className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                 {children}
             </div>
         </div>
@@ -584,12 +620,12 @@ export function SuccessBanner({ title, children }: SuccessBannerProps) {
         <div
             className="mt-6 p-4 rounded-xl border"
             style={{
-                background: "var(--v2-success-subtle)",
-                borderColor: "var(--v2-success)",
+                background: "var(--v3-success-subtle)",
+                borderColor: "var(--v3-success)",
             }}
         >
-            <p className="v2-heading-sm mb-1" style={{ color: 'var(--v2-success)' }}>{title}</p>
-            <div className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+            <p className="v3-heading-sm mb-1" style={{ color: 'var(--v3-success)' }}>{title}</p>
+            <div className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                 {children}
             </div>
         </div>

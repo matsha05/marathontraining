@@ -312,10 +312,10 @@ function OnboardingContent() {
     // Show loading while checking auth or mounting
     if (!authChecked || !mounted) {
         return (
-            <div className="v2-root min-h-screen flex items-center justify-center">
+            <div className="v3-root min-h-screen flex items-center justify-center">
                 <div className="text-center">
                     <div className="w-12 h-12 border-2 rounded-full animate-spin mx-auto mb-4" style={{ borderColor: 'var(--color-accent)', borderTopColor: 'transparent' }} />
-                    <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>Preparing your coaching experience...</p>
+                    <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>Preparing your coaching experience...</p>
                 </div>
             </div>
         );
@@ -324,17 +324,17 @@ function OnboardingContent() {
     // Resume prompt
     if (showResumePrompt && savedProgress) {
         return (
-            <div className="v2-root min-h-screen flex items-center justify-center px-6 py-12">
-                <div className="v2-card p-8 text-center max-w-md w-full">
-                    <h1 className="v2-heading-md mb-4">Welcome back!</h1>
-                    <p className="v2-body-md mb-8" style={{ color: 'var(--text-muted)' }}>
+            <div className="v3-root min-h-screen flex items-center justify-center px-6 py-12">
+                <div className="v3-card p-8 text-center max-w-md w-full">
+                    <h1 className="v3-heading-md mb-4">Welcome back!</h1>
+                    <p className="v3-body-md mb-8" style={{ color: 'var(--text-muted)' }}>
                         You have saved progress. Would you like to continue where you left off?
                     </p>
                     <div className="space-y-3">
-                        <button onClick={handleResume} className="v2-btn v2-btn-primary v2-btn-lg w-full">
+                        <button onClick={handleResume} className="v3-btn v3-btn-primary v3-btn-lg w-full">
                             Continue where I left off
                         </button>
-                        <button onClick={handleStartFresh} className="v2-btn v2-btn-secondary w-full">
+                        <button onClick={handleStartFresh} className="v3-btn v3-btn-secondary w-full">
                             Start fresh
                         </button>
                     </div>
@@ -346,28 +346,28 @@ function OnboardingContent() {
     // Existing plan guard - prevent accidental re-onboarding
     if (hasExistingPlan && step === 'welcome') {
         return (
-            <div className="v2-root min-h-screen flex items-center justify-center px-6 py-12">
-                <div className="v2-card p-8 text-center max-w-md w-full">
+            <div className="v3-root min-h-screen flex items-center justify-center px-6 py-12">
+                <div className="v3-card p-8 text-center max-w-md w-full">
                     <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-6"
                         style={{ background: 'var(--color-accent-subtle)' }}>
                         <svg className="w-7 h-7" style={{ color: 'var(--color-accent)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
-                    <h1 className="v2-heading-md mb-4">You already have a plan</h1>
-                    <p className="v2-body-md mb-8" style={{ color: 'var(--text-muted)' }}>
+                    <h1 className="v3-heading-md mb-4">You already have a plan</h1>
+                    <p className="v3-body-md mb-8" style={{ color: 'var(--text-muted)' }}>
                         Creating a new plan will replace your current training. Are you sure?
                     </p>
                     <div className="space-y-3">
                         <button
                             onClick={() => router.push('/dashboard')}
-                            className="v2-btn v2-btn-primary v2-btn-lg w-full"
+                            className="v3-btn v3-btn-primary v3-btn-lg w-full"
                         >
                             View Current Plan
                         </button>
                         <button
                             onClick={() => setHasExistingPlan(false)}
-                            className="v2-btn v2-btn-secondary w-full"
+                            className="v3-btn v3-btn-secondary w-full"
                         >
                             Create New Plan
                         </button>
@@ -750,10 +750,10 @@ function OnboardingContent() {
 // Loading fallback for Suspense
 function OnboardingLoading() {
     return (
-        <div className="v2-root min-h-screen flex items-center justify-center">
+        <div className="v3-root min-h-screen flex items-center justify-center">
             <div className="text-center">
                 <div className="w-12 h-12 border-2 rounded-full animate-spin mx-auto mb-4" style={{ borderColor: 'var(--color-accent)', borderTopColor: 'transparent' }} />
-                <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>Loading...</p>
+                <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>Loading...</p>
             </div>
         </div>
     );

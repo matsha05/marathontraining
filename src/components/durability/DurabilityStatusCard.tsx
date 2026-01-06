@@ -61,7 +61,7 @@ export function DurabilityStatusCard({
         return (
             <Link
                 href="/durability?mode=quick"
-                className="v2-card p-4 flex items-center gap-3 hover:border-[var(--color-accent)] transition-colors"
+                className="v3-card p-4 flex items-center gap-3 hover:border-[var(--color-accent)] transition-colors"
             >
                 <Zap size={20} className="text-[var(--color-accent)]" />
                 <div className="flex-1">
@@ -82,16 +82,16 @@ export function DurabilityStatusCard({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="v2-card p-5"
+            className="v3-card p-5"
         >
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                    <ClipboardList size={18} className="text-[var(--v2-durability)]" />
-                    <h3 className="v2-heading-sm">Durability</h3>
+                    <ClipboardList size={18} className="text-[var(--v3-durability)]" />
+                    <h3 className="v3-heading-sm">Durability</h3>
                 </div>
                 {failedCount > 0 && (
-                    <span className="v2-badge" style={{ background: 'rgba(139, 92, 246, 0.15)', color: '#8b5cf6' }}>
+                    <span className="v3-badge" style={{ background: 'rgba(139, 92, 246, 0.15)', color: '#8b5cf6' }}>
                         {failedCount} area{failedCount > 1 ? 's' : ''} to work on
                     </span>
                 )}
@@ -124,7 +124,7 @@ export function DurabilityStatusCard({
                 {/* Full Assessment Status */}
                 <div className="p-3 rounded-lg" style={{ background: 'var(--bg-elevated)' }}>
                     <div className="flex items-center gap-2 mb-1">
-                        <ClipboardList size={14} className="text-[var(--v2-durability)]" />
+                        <ClipboardList size={14} className="text-[var(--v3-durability)]" />
                         <span className="text-xs uppercase tracking-wide" style={{ color: 'var(--text-subtle)' }}>
                             Full Assessment
                         </span>
@@ -148,14 +148,14 @@ export function DurabilityStatusCard({
             <div className="flex gap-3">
                 <Link
                     href="/durability?mode=quick"
-                    className={`v2-btn flex-1 ${showQuickCheckPrompt ? 'v2-btn-primary' : 'v2-btn-secondary'}`}
+                    className={`v3-btn flex-1 ${showQuickCheckPrompt ? 'v3-btn-primary' : 'v3-btn-secondary'}`}
                 >
                     <Zap size={16} className="mr-2" />
                     Quick Check
                 </Link>
                 <Link
                     href="/durability?mode=full"
-                    className={`v2-btn flex-1 ${fullAssessmentDue ? 'v2-btn-primary' : 'v2-btn-secondary'}`}
+                    className={`v3-btn flex-1 ${fullAssessmentDue ? 'v3-btn-primary' : 'v3-btn-secondary'}`}
                 >
                     <ClipboardList size={16} className="mr-2" />
                     Full Assessment

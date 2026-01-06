@@ -1,5 +1,5 @@
 /**
- * THE LONG GAME - Design Philosophy V2
+ * THE LONG GAME - Design Philosophy V3
  * 
  * Based on the "Week" landing page aesthetic.
  * Refined minimalism. Atmospheric depth. Light typography.
@@ -282,27 +282,23 @@ export const SHADOWS = {
     glow: 'radial-gradient(800px circle at 50% 55%, rgba(25, 227, 140, 0.04), transparent 60%)',
 } as const;
 
-// =============================================================================
-// COMPONENT HELPERS
-// =============================================================================
-
 /**
- * Get the CSS classes for a v2 button
+ * Get the CSS classes for a v3 button
  */
 export function getButtonClasses(variant: 'primary' | 'secondary' | 'ghost', size?: 'sm' | 'lg'): string {
-    const base = 'v2-btn';
-    const variantClass = `v2-btn-${variant}`;
-    const sizeClass = size ? `v2-btn-${size}` : '';
+    const base = 'v3-btn';
+    const variantClass = `v3-btn-${variant}`;
+    const sizeClass = size ? `v3-btn-${size}` : '';
     return [base, variantClass, sizeClass].filter(Boolean).join(' ');
 }
 
 /**
- * Get the CSS classes for a v2 input
+ * Get the CSS classes for a v3 input
  */
 export function getInputClasses(hasError?: boolean, hasSuccess?: boolean): string {
-    const base = 'v2-input';
-    if (hasError) return `${base} v2-input-error`;
-    if (hasSuccess) return `${base} v2-input-success`;
+    const base = 'v3-input';
+    if (hasError) return `${base} v3-input-error`;
+    if (hasSuccess) return `${base} v3-input-success`;
     return base;
 }
 
@@ -310,12 +306,12 @@ export function getInputClasses(hasError?: boolean, hasSuccess?: boolean): strin
  * Get the CSS classes for a domain-colored element
  */
 export function getDomainClasses(domain: 'running' | 'strength' | 'durability'): string {
-    return `v2-${domain}`;
+    return `v3-${domain}`;
 }
 
 /**
  * Get the CSS classes for a domain background
  */
 export function getDomainBgClasses(domain: 'running' | 'strength' | 'durability'): string {
-    return `v2-bg-${domain}`;
+    return `v3-bg-${domain}`;
 }

@@ -215,7 +215,7 @@ export function ConfirmModal({
     variant = 'default',
 }: ConfirmModalProps) {
     const confirmColors = {
-        danger: 'var(--v2-error)',
+        danger: 'var(--v3-error)',
         warning: '#f1c40f',
         default: 'var(--color-accent)',
     };
@@ -229,7 +229,7 @@ export function ConfirmModal({
             <div className="flex gap-3 justify-end">
                 <button
                     onClick={onClose}
-                    className="v2-btn v2-btn-secondary"
+                    className="v3-btn v3-btn-secondary"
                 >
                     {cancelText}
                 </button>
@@ -238,7 +238,7 @@ export function ConfirmModal({
                         onConfirm();
                         onClose();
                     }}
-                    className="v2-btn"
+                    className="v3-btn"
                     style={{
                         background: confirmColors[variant],
                         color: '#04110b',

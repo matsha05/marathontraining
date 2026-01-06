@@ -267,7 +267,7 @@ export const LONG_RUN_TEMPLATES: WorkoutTemplate[] = [
         segments: [
             { type: 'main', paceZone: 'E' }
         ],
-        minMiles: 10,
+        minMiles: 5,  // Lowered from 10 to support 5K/10K plans in base phase
         maxMiles: 22,
         qualityPercentage: 0,
         phaseAppropriate: ['base', 'build', 'peak', 'taper'],

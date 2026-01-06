@@ -71,7 +71,7 @@ export default function LandingShowcase() {
     }, [selectedIndex]);
 
     return (
-        <div className="v2-root min-h-screen" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>
+        <div className="v3-root min-h-screen" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>
             {/* Subtle grid background */}
             <div
                 className="fixed inset-0 pointer-events-none opacity-[0.02]"
@@ -200,7 +200,7 @@ export default function LandingShowcase() {
                                 ref={(el) => { cardRefs.current[index] = el; }}
                                 className="group relative block outline-none transition-all duration-200"
                                 style={{
-                                    borderRadius: 'var(--v2-radius-xl)',
+                                    borderRadius: 'var(--v3-radius-xl)',
                                     boxShadow: isSelected ? `0 0 0 2px var(--color-accent), 0 0 0 4px var(--bg-base)` : 'none'
                                 }}
                                 onMouseEnter={() => {

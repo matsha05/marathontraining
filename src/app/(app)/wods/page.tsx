@@ -68,11 +68,11 @@ const EQUIPMENT_TIERS = {
 type EquipmentTier = keyof typeof EQUIPMENT_TIERS;
 
 const WOD_TYPE_LABELS: Record<WodType, { label: string; color: string }> = {
-    "WOD_AEROBIC_MIXED_MODAL": { label: "Aerobic", color: "var(--v2-green)" },
-    "WOD_THRESHOLD_MACHINE": { label: "Threshold", color: "var(--v2-yellow)" },
+    "WOD_AEROBIC_MIXED_MODAL": { label: "Aerobic", color: "var(--v3-green)" },
+    "WOD_THRESHOLD_MACHINE": { label: "Threshold", color: "var(--v3-yellow)" },
     "WOD_ALACTIC_POWER": { label: "Power", color: "var(--color-accent)" },
     "WOD_STRENGTH_LOW_VOL": { label: "Strength", color: "var(--color-strength)" },
-    "WOD_GLYCOLYTIC_METCON": { label: "MetCon", color: "var(--v2-red)" },
+    "WOD_GLYCOLYTIC_METCON": { label: "MetCon", color: "var(--v3-red)" },
 };
 
 const FAVORITES_KEY = "long-game-wod-favorites";
@@ -181,7 +181,7 @@ export default function WodLibraryPage() {
     }
 
     return (
-        <div className="v2-root min-h-screen flex flex-col" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>
+        <div className="v3-root min-h-screen flex flex-col" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>
             <AppHeader />
 
             <main className="flex-1 px-6 py-8 max-w-6xl mx-auto w-full">
@@ -211,7 +211,7 @@ export default function WodLibraryPage() {
                         <select
                             value={equipmentTier}
                             onChange={(e) => setEquipmentTier(e.target.value as EquipmentTier)}
-                            className="v2-input text-sm py-2 px-3 rounded-lg"
+                            className="v3-input text-sm py-2 px-3 rounded-lg"
                             style={{
                                 background: 'var(--bg-elevated)',
                                 border: '1px solid var(--border-base)',
@@ -230,7 +230,7 @@ export default function WodLibraryPage() {
                         <select
                             value={typeFilter}
                             onChange={(e) => setTypeFilter(e.target.value as WodType | "all")}
-                            className="v2-input text-sm py-2 px-3 rounded-lg"
+                            className="v3-input text-sm py-2 px-3 rounded-lg"
                             style={{
                                 background: 'var(--bg-elevated)',
                                 border: '1px solid var(--border-base)',
@@ -341,7 +341,7 @@ function WodCard({ wod, index, isFavorite, isExpanded, onToggleFavorite, onToggl
                     <button
                         onClick={onToggleFavorite}
                         className="text-xl hover:scale-110 transition-transform"
-                        style={{ color: isFavorite ? 'var(--v2-yellow)' : 'var(--text-muted)' }}
+                        style={{ color: isFavorite ? 'var(--v3-yellow)' : 'var(--text-muted)' }}
                     >
                         {isFavorite ? '★' : '☆'}
                     </button>
@@ -383,7 +383,7 @@ function WodCard({ wod, index, isFavorite, isExpanded, onToggleFavorite, onToggl
                 {wod.equipmentNeeded.length === 0 && (
                     <span
                         className="text-[10px] px-2 py-0.5 rounded inline-block mb-3"
-                        style={{ background: 'var(--v2-green)20', color: 'var(--v2-green)' }}
+                        style={{ background: 'var(--v3-green)20', color: 'var(--v3-green)' }}
                     >
                         Bodyweight
                     </span>
@@ -439,11 +439,11 @@ function WodCard({ wod, index, isFavorite, isExpanded, onToggleFavorite, onToggl
                                         <span style={{ color: 'var(--text-muted)' }}>{wod.scalingOptions.rx}</span>
                                     </p>
                                     <p className="text-xs mb-1">
-                                        <span className="font-medium" style={{ color: 'var(--v2-yellow)' }}>Scaled: </span>
+                                        <span className="font-medium" style={{ color: 'var(--v3-yellow)' }}>Scaled: </span>
                                         <span style={{ color: 'var(--text-muted)' }}>{wod.scalingOptions.scaled}</span>
                                     </p>
                                     <p className="text-xs">
-                                        <span className="font-medium" style={{ color: 'var(--v2-green)' }}>Beginner: </span>
+                                        <span className="font-medium" style={{ color: 'var(--v3-green)' }}>Beginner: </span>
                                         <span style={{ color: 'var(--text-muted)' }}>{wod.scalingOptions.beginner}</span>
                                     </p>
                                 </div>

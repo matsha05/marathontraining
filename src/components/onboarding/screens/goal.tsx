@@ -45,11 +45,33 @@ export function TrainingGoalScreen({
     onContinue,
     onBack
 }: TrainingGoalScreenProps) {
+    // Track focused option for visual feedback during arrow navigation
+    const [focusedIndex, setFocusedIndex] = useState<number>(() => {
+        // Initialize to currently selected, or -1 if none
+        if (selected) {
+            const idx = TRAINING_GOALS.findIndex(g => g.value === selected);
+            return idx >= 0 ? idx : 0;
+        }
+        return 0;
+    });
+
     useKeyboardNavigation({
         onEnter: selected ? onContinue : undefined,
         onBack,
         onNumber: (num) => {
             const goal = TRAINING_GOALS[num - 1];
+            if (goal) {
+                onSelect(goal.value as TrainingGoal);
+                setFocusedIndex(num - 1);
+            }
+        },
+        // Arrow key navigation
+        totalOptions: TRAINING_GOALS.length,
+        selectedIndex: focusedIndex,
+        onSelectIndex: (index) => {
+            setFocusedIndex(index);
+            // Auto-select on arrow navigation for fluid UX
+            const goal = TRAINING_GOALS[index];
             if (goal) {
                 onSelect(goal.value as TrainingGoal);
             }
@@ -71,7 +93,10 @@ export function TrainingGoalScreen({
                         description={goal.description}
                         shortcut={String(index + 1)}
                         selected={selected === goal.value}
-                        onClick={() => onSelect(goal.value as TrainingGoal)}
+                        onClick={() => {
+                            onSelect(goal.value as TrainingGoal);
+                            setFocusedIndex(index);
+                        }}
                     />
                 ))}
             </OptionGrid>
@@ -152,20 +177,20 @@ export function RaceDetailsScreen({
             <div className="space-y-6">
                 {/* Race name (optional) */}
                 <div>
-                    <label className="v2-label block mb-2">Race name (optional)</label>
+                    <label className="v3-label block mb-2">Race name (optional)</label>
                     <TextInput
                         value={data.raceName}
                         onChange={onRaceNameChange}
                         placeholder="e.g., Chicago Marathon, Turkey Trot 5K"
                     />
-                    <p className="v2-mono mt-2" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
+                    <p className="v3-body-xs mt-2" style={{ color: 'var(--text-subtle)' }}>
                         This personalizes your dashboard countdown
                     </p>
                 </div>
 
                 {/* Race date (optional) */}
                 <div>
-                    <label className="v2-label block mb-2">Race date (optional)</label>
+                    <label className="v3-label block mb-2">Race date (optional)</label>
                     <DatePicker
                         value={data.raceDate}
                         onChange={handleDateChange}
@@ -173,10 +198,10 @@ export function RaceDetailsScreen({
                         placeholder="Select your race date"
                     />
                     {dateError && (
-                        <p className="v2-body-sm mt-2" style={{ color: 'var(--v2-error)' }}>{dateError}</p>
+                        <p className="v3-body-sm mt-2" style={{ color: 'var(--v3-error)' }}>{dateError}</p>
                     )}
                     {!data.raceDate && (
-                        <p className="v2-mono mt-2" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
+                        <p className="v3-body-xs mt-2" style={{ color: 'var(--text-subtle)' }}>
                             We&apos;ll build a flexible plan without a specific target date
                         </p>
                     )}
@@ -191,7 +216,7 @@ export function RaceDetailsScreen({
                                 With {weeksToRace} weeks, we&apos;ll focus on finishing strong rather than a time goal.
                             </WarningBanner>
                         ) : (
-                            <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+                            <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                                 {weeksToRace} weeks until race day — plenty of time to prepare!
                             </p>
                         )}
@@ -225,11 +250,31 @@ export function FitnessDurationScreen({
     onContinue,
     onBack
 }: FitnessDurationScreenProps) {
+    // Track focused option for arrow navigation
+    const [focusedIndex, setFocusedIndex] = useState<number>(() => {
+        if (selected) {
+            const idx = FITNESS_DURATION_OPTIONS.findIndex(o => o.value === selected);
+            return idx >= 0 ? idx : 0;
+        }
+        return 0;
+    });
+
     useKeyboardNavigation({
         onEnter: selected ? onContinue : undefined,
         onBack,
         onNumber: (num) => {
             const option = FITNESS_DURATION_OPTIONS[num - 1];
+            if (option) {
+                onSelect(option.value as FitnessDuration);
+                setFocusedIndex(num - 1);
+            }
+        },
+        // Arrow key navigation
+        totalOptions: FITNESS_DURATION_OPTIONS.length,
+        selectedIndex: focusedIndex,
+        onSelectIndex: (index) => {
+            setFocusedIndex(index);
+            const option = FITNESS_DURATION_OPTIONS[index];
             if (option) {
                 onSelect(option.value as FitnessDuration);
             }
@@ -250,7 +295,10 @@ export function FitnessDurationScreen({
                         description={option.description}
                         shortcut={String(index + 1)}
                         selected={selected === option.value}
-                        onClick={() => onSelect(option.value as FitnessDuration)}
+                        onClick={() => {
+                            onSelect(option.value as FitnessDuration);
+                            setFocusedIndex(index);
+                        }}
                     />
                 ))}
             </OptionGrid>

@@ -115,7 +115,7 @@ export function PainDetailsScreen({
             <div className="space-y-6">
                 {/* Location */}
                 <div>
-                    <label className="v2-label block mb-2">What area is affected?</label>
+                    <label className="v3-label block mb-2">What area is affected?</label>
                     <OptionGrid columns={2}>
                         {INJURY_LOCATIONS.map((location) => (
                             <OptionButton
@@ -130,7 +130,7 @@ export function PainDetailsScreen({
 
                 {/* Severity */}
                 <div>
-                    <label className="v2-label block mb-2">How bad is it?</label>
+                    <label className="v3-label block mb-2">How bad is it?</label>
                     <OptionGrid>
                         {PAIN_SEVERITY_OPTIONS.map((option) => (
                             <OptionButton
@@ -260,7 +260,7 @@ export function InjuryDetailsScreen({
             </OptionGrid>
 
             {selectedPrehab && (
-                <p className="v2-body-sm mt-6" style={{ color: 'var(--text-muted)' }}>
+                <p className="v3-body-sm mt-6" style={{ color: 'var(--text-muted)' }}>
                     We&apos;ll include targeted prehab work: <strong>{selectedPrehab}</strong>
                 </p>
             )}

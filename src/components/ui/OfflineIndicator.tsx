@@ -116,9 +116,9 @@ export function SyncStatusIndicator() {
         return (
             <div className="fixed bottom-4 left-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium backdrop-blur-sm"
                 style={{
-                    background: 'var(--v2-warning-subtle)',
-                    border: '1px solid var(--v2-warning-muted)',
-                    color: 'var(--v2-warning)'
+                    background: 'var(--v3-warning-subtle)',
+                    border: '1px solid var(--v3-warning-muted)',
+                    color: 'var(--v3-warning)'
                 }}>
                 <CloudOff size={16} />
                 <span>Offline — changes will sync when reconnected</span>
@@ -148,7 +148,7 @@ export function SyncStatusIndicator() {
                 style={{
                     background: 'var(--color-accent-subtle)',
                     border: '1px solid rgba(25, 227, 140, 0.3)',
-                    color: 'var(--v2-success)'
+                    color: 'var(--v3-success)'
                 }}>
                 <Check size={16} />
                 <span>Saved</span>
@@ -163,9 +163,9 @@ export function SyncStatusIndicator() {
                 onClick={processQueue}
                 className="fixed bottom-4 left-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium backdrop-blur-sm cursor-pointer transition-colors"
                 style={{
-                    background: 'var(--v2-warning-subtle)',
-                    border: '1px solid var(--v2-warning-muted)',
-                    color: 'var(--v2-warning)'
+                    background: 'var(--v3-warning-subtle)',
+                    border: '1px solid var(--v3-warning-muted)',
+                    color: 'var(--v3-warning)'
                 }}
             >
                 <Cloud size={16} />
@@ -181,9 +181,9 @@ export function SyncStatusIndicator() {
                 onClick={processQueue}
                 className="fixed bottom-4 left-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium backdrop-blur-sm cursor-pointer transition-colors"
                 style={{
-                    background: 'var(--v2-error-subtle)',
-                    border: '1px solid var(--v2-error-muted)',
-                    color: 'var(--v2-error)'
+                    background: 'var(--v3-error-subtle)',
+                    border: '1px solid var(--v3-error-muted)',
+                    color: 'var(--v3-error)'
                 }}
             >
                 <AlertCircle size={16} />

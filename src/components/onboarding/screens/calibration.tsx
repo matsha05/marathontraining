@@ -9,7 +9,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ChevronDown } from 'lucide-react';
 import {
     QuestionScreen,
     QuestionHeader,
@@ -166,7 +166,7 @@ export function RaceInputScreen({
             <div className="space-y-6">
                 {/* Distance */}
                 <div>
-                    <label className="v2-label block mb-2">Distance</label>
+                    <label className="v3-label block mb-2">Distance</label>
                     <OptionGrid columns={3}>
                         {RACE_DISTANCES.map((dist) => (
                             <OptionButton
@@ -181,7 +181,7 @@ export function RaceInputScreen({
 
                 {/* Time */}
                 <div>
-                    <label className="v2-label block mb-2">Finish time</label>
+                    <label className="v3-label block mb-2">Finish time</label>
                     <TimeInput
                         minutes={data.raceTimeMinutes}
                         seconds={data.raceTimeSeconds}
@@ -194,7 +194,7 @@ export function RaceInputScreen({
 
                 {/* Recency */}
                 <div>
-                    <label className="v2-label block mb-2">When was this race?</label>
+                    <label className="v3-label block mb-2">When was this race?</label>
                     <OptionGrid columns={2}>
                         {RACE_RECENCY_OPTIONS.map((option) => (
                             <OptionButton
@@ -257,7 +257,7 @@ export function EasyPaceInputScreen({
                 <p style={{ color: 'var(--text-muted)' }}>per mile</p>
             </div>
 
-            <p className="v2-body-sm mt-4" style={{ color: 'var(--text-subtle)' }}>
+            <p className="v3-body-sm mt-4" style={{ color: 'var(--text-subtle)' }}>
                 This should feel like you could chat with a friend.<br />
                 If you&apos;re breathing hard, that&apos;s not easy pace.
             </p>
@@ -321,10 +321,10 @@ export function ManualVo2maxInputScreen({
                 suffix="VO2max"
             />
 
-            <p className="mt-4 v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+            <p className="mt-4 v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                 Most runners fall between 30 and 70. We use this to set your training paces.
             </p>
-            <p className="mt-2 v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+            <p className="mt-2 v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                 Update your VO2max every 4-6 weeks or after a race in Settings.
             </p>
 
@@ -372,7 +372,7 @@ export function HardEffortInputScreen({
             <div className="space-y-6">
                 {/* Effort type */}
                 <div>
-                    <label className="v2-label block mb-2">What was it?</label>
+                    <label className="v3-label block mb-2">What was it?</label>
                     <OptionGrid columns={2}>
                         {EFFORT_TYPES.map((type) => (
                             <OptionButton
@@ -393,7 +393,7 @@ export function HardEffortInputScreen({
                 {/* Distance (if needed) */}
                 {data.effortType && data.effortType !== 'parkrun' && (
                     <div>
-                        <label className="v2-label block mb-2">Distance</label>
+                        <label className="v3-label block mb-2">Distance</label>
                         <TextInput
                             value={data.effortDistance}
                             onChange={onDistanceChange}
@@ -404,7 +404,7 @@ export function HardEffortInputScreen({
 
                 {/* Time */}
                 <div>
-                    <label className="v2-label block mb-2">Time</label>
+                    <label className="v3-label block mb-2">Time</label>
                     <TimeInput
                         minutes={data.effortTimeMinutes}
                         seconds={data.effortTimeSeconds}
@@ -415,7 +415,7 @@ export function HardEffortInputScreen({
 
                 {/* Effort level */}
                 <div>
-                    <label className="v2-label block mb-2">Effort level (1-10)</label>
+                    <label className="v3-label block mb-2">Effort level (1-10)</label>
                     <div className="flex items-center gap-2">
                         {[6, 7, 8, 9, 10].map((level) => (
                             <button
@@ -425,14 +425,14 @@ export function HardEffortInputScreen({
                                 style={{
                                     background: data.effortLevel === level ? 'var(--color-accent)' : 'var(--bg-elevated)',
                                     borderColor: data.effortLevel === level ? 'transparent' : 'var(--border-base)',
-                                    color: data.effortLevel === level ? 'var(--v2-bg-base)' : 'var(--text-base)',
+                                    color: data.effortLevel === level ? 'var(--v3-bg-base)' : 'var(--text-base)',
                                 }}
                             >
                                 {level}
                             </button>
                         ))}
                     </div>
-                    <p className="v2-mono mt-2" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
+                    <p className="v3-body-xs mt-2" style={{ color: 'var(--text-subtle)' }}>
                         10 = absolute max effort, 6 = comfortably hard
                     </p>
                 </div>
@@ -497,7 +497,7 @@ export function EstimationFlowScreen({
             />
 
             <div>
-                <label className="v2-label block mb-3">{promptLabel}</label>
+                <label className="v3-label block mb-3">{promptLabel}</label>
                 <OptionGrid>
                     {EXPERIENCE_LEVELS.map((level, index) => (
                         <OptionButton
@@ -560,7 +560,7 @@ export function VdotRevealScreen({
         return (
             <QuestionScreen onBack={onBack}>
                 <div className="text-center py-12">
-                    <Loader2 className="w-8 h-8 animate-spin mx-auto v2-accent" />
+                    <Loader2 className="w-8 h-8 animate-spin mx-auto v3-accent" />
                     <p className="mt-4" style={{ color: 'var(--text-muted)' }}>Calculating your VDOT...</p>
                 </div>
             </QuestionScreen>
@@ -579,100 +579,91 @@ export function VdotRevealScreen({
     return (
         <QuestionScreen onBack={onBack}>
             <div className="text-center mb-6">
-                <p className="v2-label v2-accent mb-2">Your VDOT</p>
-                <div className="v2-heading-xl v2-mono mb-2">{data.vdot}</div>
-                <p style={{ color: 'var(--text-muted)' }}>
+                <p className="v3-heading-sm" style={{ color: 'var(--color-accent)' }}>Your VDOT</p>
+                <div className="v3-heading-2xl" style={{ color: 'var(--text-base)', fontSize: 'clamp(4rem, 10vw, 6rem)' }}>{data.vdot}</div>
+                <p className="v3-body-md" style={{ color: 'var(--text-muted)' }}>
                     {percentileInfo.label} • Top {100 - percentileInfo.percentile}% of recreational runners
                 </p>
                 {data.vdotConfidence === 'low' && (
-                    <p className="v2-body-sm mt-2" style={{ color: 'var(--v2-warning)' }}>
+                    <p className="v3-body-sm mt-2" style={{ color: 'var(--v3-warning)' }}>
                         This is an estimate — we&apos;ll refine it with your calibration run
                     </p>
                 )}
             </div>
 
-            {/* What is VDOT? Explainer */}
-            <div className="p-4 rounded-xl mb-4" style={{ background: 'var(--v2-bg-inset)' }}>
-                <p className="v2-label mb-2" style={{ color: 'var(--text-muted)' }}>What is VDOT?</p>
-                <p className="v2-body-sm leading-relaxed">
-                    VDOT is your &quot;running fitness score&quot; developed by legendary coach Jack Daniels.
-                    It&apos;s calculated from your race performance and accounts for both your aerobic capacity
-                    and running efficiency. Higher number = fitter. This single number determines all your
-                    training paces — so every run is at the right intensity for YOUR current fitness.
-                </p>
-            </div>
+            {/* What is VDOT? - Collapsible */}
+            <details className="mb-4">
+                <summary
+                    className="p-4 rounded-xl cursor-pointer flex items-center justify-between transition-colors group"
+                    style={{ background: 'var(--v3-bg-inset)' }}
+                >
+                    <span className="v3-body font-medium" style={{ color: 'var(--text-muted)' }}>What is VDOT?</span>
+                    <ChevronDown className="w-5 h-5 transition-transform group-open:rotate-180" style={{ color: 'var(--text-subtle)' }} />
+                </summary>
+                <div className="p-4 pt-2" style={{ background: 'var(--v3-bg-inset)', borderRadius: '0 0 12px 12px', marginTop: '-8px' }}>
+                    <p className="v3-body-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                        VDOT is your "running fitness score" developed by legendary coach Jack Daniels.
+                        It&apos;s calculated from your race performance and accounts for both your aerobic capacity
+                        and running efficiency. Higher number = fitter. This single number determines all your
+                        training paces — so every run is at the right intensity for YOUR current fitness.
+                    </p>
+                </div>
+            </details>
 
             <SuccessBanner title={`Predicts a ~${marathonHours}:${marathonMins.toString().padStart(2, '0')} marathon`}>
                 This gives us the data we need to set your training zones perfectly.
             </SuccessBanner>
-            <p className="mt-4 v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+            <p className="mt-4 v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                 You can update VO2max anytime in Settings → Fitness and we&apos;ll adjust your plan.
             </p>
 
-            {/* Training Paces with Explanations */}
-            <div className="mt-6 p-4 rounded-xl v2-card">
-                <p className="v2-label mb-4">Your training paces</p>
-                <div className="space-y-4 v2-body-sm">
-                    {/* Easy Pace */}
-                    <div>
-                        <div className="flex justify-between mb-1">
-                            <span style={{ fontWeight: 500 }}>Easy</span>
-                            <span className="v2-mono">{formatPace(paces.easy.min)} - {formatPace(paces.easy.max)}/mi</span>
+            {/* Training Paces - Collapsible */}
+            <details className="mt-6">
+                <summary
+                    className="p-4 rounded-xl v3-card cursor-pointer flex items-center justify-between group"
+                >
+                    <span className="v3-body font-medium">Your training paces</span>
+                    <ChevronDown className="w-5 h-5 transition-transform group-open:rotate-180" style={{ color: 'var(--text-subtle)' }} />
+                </summary>
+                <div className="p-4 pt-2 v3-card" style={{ borderRadius: '0 0 12px 12px', marginTop: '-8px' }}>
+                    <div className="space-y-4">
+                        {/* Easy Pace */}
+                        <div className="flex justify-between items-center">
+                            <span className="v3-body">Easy</span>
+                            <span className="v3-body font-medium" style={{ fontFamily: 'var(--font-plex-mono)' }}>{formatPace(paces.easy.min)} - {formatPace(paces.easy.max)}/mi</span>
                         </div>
-                        <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
-                            Recovery runs, warm-ups, cool-downs. You should be able to hold a conversation comfortably.
-                            This builds your aerobic base without taxing your body.
-                        </p>
-                    </div>
 
-                    {/* Marathon Pace */}
-                    <div>
-                        <div className="flex justify-between mb-1">
-                            <span style={{ fontWeight: 500 }}>Marathon Pace</span>
-                            <span className="v2-mono">{formatPace(paces.marathon)}/mi</span>
+                        {/* Marathon Pace */}
+                        <div className="flex justify-between items-center">
+                            <span className="v3-body">Marathon Pace</span>
+                            <span className="v3-body font-medium" style={{ fontFamily: 'var(--font-plex-mono)' }}>{formatPace(paces.marathon)}/mi</span>
                         </div>
-                        <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
-                            Your predicted race-day pace. Feels &quot;comfortably hard&quot; — sustainable for 26.2 miles but
-                            requires focus. Tempo blocks at this pace teach your body to hold it.
-                        </p>
-                    </div>
 
-                    {/* Tempo/Threshold Pace */}
-                    <div>
-                        <div className="flex justify-between mb-1">
-                            <span style={{ fontWeight: 500 }}>Tempo (Threshold)</span>
-                            <span className="v2-mono">{formatPace(paces.threshold)}/mi</span>
+                        {/* Tempo/Threshold Pace */}
+                        <div className="flex justify-between items-center">
+                            <span className="v3-body">Tempo (Threshold)</span>
+                            <span className="v3-body font-medium" style={{ fontFamily: 'var(--font-plex-mono)' }}>{formatPace(paces.threshold)}/mi</span>
                         </div>
-                        <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
-                            &quot;Comfortably hard&quot; — you can hold this for 20-40 minutes. Trains your body to clear
-                            lactate efficiently, raising the pace you can sustain before your legs give out.
-                        </p>
-                    </div>
 
-                    {/* Interval Pace */}
-                    <div>
-                        <div className="flex justify-between mb-1">
-                            <span style={{ fontWeight: 500 }}>Interval</span>
-                            <span className="v2-mono">{formatPace(paces.interval)}/mi</span>
+                        {/* Interval Pace */}
+                        <div className="flex justify-between items-center">
+                            <span className="v3-body">Interval</span>
+                            <span className="v3-body font-medium" style={{ fontFamily: 'var(--font-plex-mono)' }}>{formatPace(paces.interval)}/mi</span>
                         </div>
-                        <p className="v2-mono" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
-                            Hard, short repeats (400m–1 mile). Builds VO2max — your maximum aerobic capacity.
-                            These are the workouts that genuinely hurt, but they make you faster.
-                        </p>
                     </div>
                 </div>
-            </div>
+            </details>
 
             <div className="mt-6 flex gap-3">
                 <button
                     onClick={onRecalculate}
-                    className="flex-1 v2-btn v2-btn-secondary"
+                    className="flex-1 v3-btn v3-btn-secondary"
                 >
                     This seems off — recalculate
                 </button>
                 <button
                     onClick={onContinue}
-                    className="flex-1 v2-btn v2-btn-primary"
+                    className="flex-1 v3-btn v3-btn-primary"
                 >
                     Looks right →
                 </button>

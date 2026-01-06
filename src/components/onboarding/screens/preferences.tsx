@@ -50,11 +50,30 @@ export function TrainingIntensityScreen({
     onContinue,
     onBack
 }: TrainingIntensityScreenProps) {
+    const [focusedIndex, setFocusedIndex] = useState<number>(() => {
+        if (value) {
+            const idx = TRAINING_INTENSITY_OPTIONS.findIndex(o => o.value === value);
+            return idx >= 0 ? idx : 1; // Default to moderate (index 1)
+        }
+        return 1; // Start at "Moderate" as the recommended default
+    });
+
     useKeyboardNavigation({
         onEnter: value !== null ? onContinue : undefined,
         onBack,
         onNumber: (num) => {
             const option = TRAINING_INTENSITY_OPTIONS[num - 1];
+            if (option) {
+                onChange(option.value as TrainingIntensity);
+                setFocusedIndex(num - 1);
+            }
+        },
+        // Arrow key navigation
+        totalOptions: TRAINING_INTENSITY_OPTIONS.length,
+        selectedIndex: focusedIndex,
+        onSelectIndex: (index) => {
+            setFocusedIndex(index);
+            const option = TRAINING_INTENSITY_OPTIONS[index];
             if (option) {
                 onChange(option.value as TrainingIntensity);
             }
@@ -76,7 +95,10 @@ export function TrainingIntensityScreen({
                         description={option.description}
                         shortcut={String(index + 1)}
                         selected={value === option.value}
-                        onClick={() => onChange(option.value as TrainingIntensity)}
+                        onClick={() => {
+                            onChange(option.value as TrainingIntensity);
+                            setFocusedIndex(index);
+                        }}
                         recommended={option.recommended}
                     />
                 ))}
@@ -214,7 +236,7 @@ export function StrengthTrainingScreen({
             </OptionGrid>
 
             {value === true && (
-                <p className="v2-body-sm mt-4" style={{ color: 'var(--text-muted)' }}>
+                <p className="v3-body-sm mt-4" style={{ color: 'var(--text-muted)' }}>
                     Our strength work is mostly bodyweight — no gym required.
                     It&apos;s designed to prevent injury and improve running economy.
                 </p>
@@ -292,18 +314,18 @@ export function CoachRevealScreen({ data, onConfirm, onBack }: CoachRevealScreen
                     </span>
                 </div>
 
-                <h1 className="v2-heading-lg mb-2">Your Coach: {coach.name}</h1>
-                <p className="v2-body-md mb-6" style={{ color: coach.color }}>
+                <h1 className="v3-heading-lg mb-2">Your Coach: {coach.name}</h1>
+                <p className="v3-body-md mb-6" style={{ color: coach.color }}>
                     {coach.tagline}
                 </p>
             </div>
 
             {/* Reasoning summary */}
-            <div className="v2-card p-5 mb-6">
-                <p className="v2-label mb-3">Why {coach.name}?</p>
+            <div className="v3-card p-5 mb-6">
+                <p className="v3-label mb-3">Why {coach.name}?</p>
                 <ul className="space-y-2">
                     {recommendation.reasoning.slice(0, 3).map((reason: string, i: number) => (
-                        <li key={i} className="v2-body-sm flex items-start gap-2" style={{ color: 'var(--text-muted)' }}>
+                        <li key={i} className="v3-body-sm flex items-start gap-2" style={{ color: 'var(--text-muted)' }}>
                             <span style={{ color: coach.color }}>•</span>
                             <span>{reason}</span>
                         </li>
@@ -312,20 +334,20 @@ export function CoachRevealScreen({ data, onConfirm, onBack }: CoachRevealScreen
             </div>
 
             {/* Plan preview */}
-            <div className="v2-card p-5 mb-8">
-                <p className="v2-label mb-3">Your Plan Structure</p>
+            <div className="v3-card p-5 mb-8">
+                <p className="v3-label mb-3">Your Plan Structure</p>
                 <div className="grid grid-cols-3 gap-4 text-center">
                     <div>
-                        <p className="v2-body-lg font-medium">{coach.runDays}</p>
-                        <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>Run days</p>
+                        <p className="v3-body-lg font-medium">{coach.runDays}</p>
+                        <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>Run days</p>
                     </div>
                     <div>
-                        <p className="v2-body-lg font-medium">{coach.longRunCap}</p>
-                        <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>Long run</p>
+                        <p className="v3-body-lg font-medium">{coach.longRunCap}</p>
+                        <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>Long run</p>
                     </div>
                     <div>
-                        <p className="v2-body-lg font-medium">{data.weeklyMiles || '?'}+</p>
-                        <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>Peak MPW</p>
+                        <p className="v3-body-lg font-medium">{data.weeklyMiles || '?'}+</p>
+                        <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>Peak MPW</p>
                     </div>
                 </div>
             </div>
@@ -339,7 +361,7 @@ export function CoachRevealScreen({ data, onConfirm, onBack }: CoachRevealScreen
 
             <button
                 onClick={() => onConfirm(recommendation.primary)}
-                className="v2-btn v2-btn-primary v2-btn-lg w-full"
+                className="v3-btn v3-btn-primary v3-btn-lg w-full"
                 style={{ background: coach.color }}
             >
                 Continue with {coach.name}
@@ -386,33 +408,33 @@ export function ReadinessCheckScreen({
                 <div className="text-center">
                     <div
                         className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-                        style={{ background: 'var(--v2-success-subtle)' }}
+                        style={{ background: 'var(--v3-success-subtle)' }}
                     >
-                        <Check className="w-8 h-8" style={{ color: 'var(--v2-success)' }} />
+                        <Check className="w-8 h-8" style={{ color: 'var(--v3-success)' }} />
                     </div>
-                    <h1 className="v2-heading-lg mb-4">You&apos;re ready to start your plan.</h1>
-                    <p className="v2-body-md mb-8" style={{ color: 'var(--text-muted)' }}>
+                    <h1 className="v3-heading-lg mb-4">You&apos;re ready to start your plan.</h1>
+                    <p className="v3-body-md mb-8" style={{ color: 'var(--text-muted)' }}>
                         Based on what you told us:
                     </p>
 
                     <div className="text-left space-y-2 mb-8">
-                        <div className="flex items-center gap-2 v2-body-sm">
-                            <Check className="w-4 h-4" style={{ color: 'var(--v2-success)' }} />
+                        <div className="flex items-center gap-2 v3-body-sm">
+                            <Check className="w-4 h-4" style={{ color: 'var(--v3-success)' }} />
                             <span>Your current mileage supports Week 1 volume</span>
                         </div>
-                        <div className="flex items-center gap-2 v2-body-sm">
-                            <Check className="w-4 h-4" style={{ color: 'var(--v2-success)' }} />
+                        <div className="flex items-center gap-2 v3-body-sm">
+                            <Check className="w-4 h-4" style={{ color: 'var(--v3-success)' }} />
                             <span>Your longest run matches plan requirements</span>
                         </div>
-                        <div className="flex items-center gap-2 v2-body-sm">
-                            <Check className="w-4 h-4" style={{ color: 'var(--v2-success)' }} />
+                        <div className="flex items-center gap-2 v3-body-sm">
+                            <Check className="w-4 h-4" style={{ color: 'var(--v3-success)' }} />
                             <span>Training days align with plan structure</span>
                         </div>
                     </div>
 
                     <button
                         onClick={onProceed}
-                        className="v2-btn v2-btn-primary v2-btn-lg w-full"
+                        className="v3-btn v3-btn-primary v3-btn-lg w-full"
                     >
                         Generate my plan
                         <ArrowRight className="w-5 h-5 ml-2" />
@@ -429,16 +451,16 @@ export function ReadinessCheckScreen({
                 <div className="text-center">
                     <div
                         className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-                        style={{ background: 'var(--v2-warning-subtle)' }}
+                        style={{ background: 'var(--v3-warning-subtle)' }}
                     >
-                        <AlertTriangle className="w-8 h-8" style={{ color: 'var(--v2-warning)' }} />
+                        <AlertTriangle className="w-8 h-8" style={{ color: 'var(--v3-warning)' }} />
                     </div>
-                    <h1 className="v2-heading-md mb-4">Let&apos;s build your foundation first.</h1>
+                    <h1 className="v3-heading-md mb-4">Let&apos;s build your foundation first.</h1>
                 </div>
 
                 <div className="text-left mb-6">
-                    <p className="v2-body-md mb-4" style={{ color: 'var(--text-muted)' }}>Based on your current training:</p>
-                    <ul className="space-y-1 v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+                    <p className="v3-body-md mb-4" style={{ color: 'var(--text-muted)' }}>Based on your current training:</p>
+                    <ul className="space-y-1 v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                         <li>• Weekly miles: {data.weeklyMiles} mi/wk</li>
                         <li>• Longest run: {data.longestRecentRun} miles</li>
                         {weeksToRace && <li>• Race date: {weeksToRace} weeks away</li>}
@@ -454,10 +476,10 @@ export function ReadinessCheckScreen({
                 </WarningBanner>
 
                 <div
-                    className="mt-6 p-4 rounded-xl v2-card"
+                    className="mt-6 p-4 rounded-xl v3-card"
                 >
-                    <p className="v2-label mb-3">Here&apos;s what we recommend:</p>
-                    <div className="space-y-2 v2-body-sm">
+                    <p className="v3-label mb-3">Here&apos;s what we recommend:</p>
+                    <div className="space-y-2 v3-body-sm">
                         <div className="flex justify-between">
                             <span style={{ color: 'var(--text-muted)' }}>Weeks 1-{baseWeeksNeeded}</span>
                             <span>Base Building</span>
@@ -472,13 +494,13 @@ export function ReadinessCheckScreen({
                 <div className="mt-8 space-y-3">
                     <button
                         onClick={onProceed}
-                        className="v2-btn v2-btn-primary v2-btn-lg w-full"
+                        className="v3-btn v3-btn-primary v3-btn-lg w-full"
                     >
                         Start with base building
                     </button>
                     <button
                         onClick={onProceedAnyway}
-                        className="v2-btn v2-btn-secondary w-full"
+                        className="v3-btn v3-btn-secondary w-full"
                     >
                         I know my limits — start plan anyway
                     </button>
@@ -493,14 +515,14 @@ export function ReadinessCheckScreen({
             <div className="text-center">
                 <div
                     className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-                    style={{ background: 'var(--v2-warning-subtle)' }}
+                    style={{ background: 'var(--v3-warning-subtle)' }}
                 >
-                    <AlertTriangle className="w-8 h-8" style={{ color: 'var(--v2-warning)' }} />
+                    <AlertTriangle className="w-8 h-8" style={{ color: 'var(--v3-warning)' }} />
                 </div>
-                <h1 className="v2-heading-md mb-4">
+                <h1 className="v3-heading-md mb-4">
                     Heads up: You only have {weeksToRace} weeks until your race.
                 </h1>
-                <p className="v2-body-md mb-8" style={{ color: 'var(--text-muted)' }}>
+                <p className="v3-body-md mb-8" style={{ color: 'var(--text-muted)' }}>
                     That&apos;s on the short side for a {goalLabel.toLowerCase()}. We can build you
                     a condensed plan, but expectations should be adjusted.
                 </p>
@@ -509,13 +531,13 @@ export function ReadinessCheckScreen({
             <div className="space-y-3">
                 <button
                     onClick={onProceed}
-                    className="v2-btn v2-btn-primary v2-btn-lg w-full"
+                    className="v3-btn v3-btn-primary v3-btn-lg w-full"
                 >
                     Build me a {weeksToRace}-week plan
                 </button>
                 <button
                     onClick={onBack}
-                    className="v2-btn v2-btn-secondary w-full"
+                    className="v3-btn v3-btn-secondary w-full"
                 >
                     Go back and change my race date
                 </button>
@@ -561,17 +583,17 @@ export function GeneratingScreen({ onComplete }: GeneratingScreenProps) {
     return (
         <QuestionScreen showBack={false}>
             <div className="text-center py-12">
-                <Loader2 className="w-12 h-12 animate-spin mx-auto mb-8 v2-accent" />
-                <h1 className="v2-heading-md mb-6">Building your plan...</h1>
+                <Loader2 className="w-12 h-12 animate-spin mx-auto mb-8 v3-accent" />
+                <h1 className="v3-heading-md mb-6">Building your plan...</h1>
 
                 <div className="space-y-2">
                     {stages.slice(0, stage + 1).map((text, i) => (
                         <div
                             key={i}
-                            className="v2-body-sm transition-opacity"
+                            className="v3-body-sm transition-opacity"
                             style={{ color: i === stage ? 'var(--text-base)' : 'var(--text-subtle)' }}
                         >
-                            {i < stage && <Check className="w-4 h-4 inline mr-2" style={{ color: 'var(--v2-success)' }} />}
+                            {i < stage && <Check className="w-4 h-4 inline mr-2" style={{ color: 'var(--v3-success)' }} />}
                             {text}
                         </div>
                     ))}
@@ -602,22 +624,22 @@ export function CompleteScreen({ data, onViewDashboard, onViewPlan }: CompleteSc
             <div className="text-center">
                 <div
                     className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
-                    style={{ background: 'var(--v2-success-subtle)' }}
+                    style={{ background: 'var(--v3-success-subtle)' }}
                 >
-                    <Check className="w-10 h-10" style={{ color: 'var(--v2-success)' }} />
+                    <Check className="w-10 h-10" style={{ color: 'var(--v3-success)' }} />
                 </div>
 
-                <h1 className="v2-heading-lg mb-2">Your plan is ready, {data.name}.</h1>
+                <h1 className="v3-heading-lg mb-2">Your plan is ready, {data.name}.</h1>
 
                 {data.raceName && data.raceDate && weeksToRace && (
-                    <p className="v2-body-lg v2-accent mb-6">
+                    <p className="v3-body-lg v3-accent mb-6">
                         {weeksToRace * 7} days until {data.raceName}
                     </p>
                 )}
             </div>
 
             <SuccessBanner title={`${weeksToRace ?? 12}-Week ${goalLabel} Plan`}>
-                <div className="space-y-1 mt-2 v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+                <div className="space-y-1 mt-2 v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                     <p>• Starting VDOT: {data.vdot}</p>
                     <p>• {data.availableDays} training days per week</p>
                     <p>• Long runs on {data.longRunDay}</p>
@@ -628,13 +650,13 @@ export function CompleteScreen({ data, onViewDashboard, onViewPlan }: CompleteSc
             <div className="mt-8 space-y-3">
                 <button
                     onClick={onViewPlan}
-                    className="v2-btn v2-btn-primary v2-btn-lg w-full"
+                    className="v3-btn v3-btn-primary v3-btn-lg w-full"
                 >
                     View full plan
                 </button>
                 <button
                     onClick={onViewDashboard}
-                    className="v2-btn v2-btn-secondary w-full"
+                    className="v3-btn v3-btn-secondary w-full"
                 >
                     Go to dashboard
                 </button>

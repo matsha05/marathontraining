@@ -91,7 +91,7 @@ const TOAST_COLORS: Record<ToastType, { bg: string; border: string; icon: string
     },
     error: {
         bg: 'rgba(231, 76, 60, 0.1)',
-        border: 'var(--v2-error)',
+        border: 'var(--v3-error)',
         icon: '✕',
     },
     info: {

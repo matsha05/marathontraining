@@ -377,3 +377,93 @@ export function getUpcomingKeyWorkouts(
 
     return upcoming;
 }
+
+// =============================================================================
+// PLAN EXPORT (USER BACKUP)
+// =============================================================================
+
+export interface PlanExport {
+    version: '1.0';
+    exportedAt: string;
+    plan: TrainingPlan;
+    metadata: {
+        goalDistance: string;
+        totalWeeks: number;
+        vdot: number;
+        intensityLevel: 'conservative' | 'moderate' | 'aggressive';
+    };
+}
+
+/**
+ * Export the current plan as a JSON object suitable for download.
+ * This allows users to backup their training plan.
+ */
+export async function exportPlanToJSON(): Promise<ServiceResult<PlanExport>> {
+    const planResult = await loadPlanV2();
+
+    if (!planResult.success) {
+        return {
+            success: false,
+            error: {
+                code: 'PLAN_NOT_FOUND',
+                message: 'No training plan found to export',
+            },
+        };
+    }
+
+    if (!planResult.data) {
+        return {
+            success: false,
+            error: {
+                code: 'PLAN_NOT_FOUND',
+                message: 'No training plan found to export',
+            },
+        };
+    }
+
+    const plan = planResult.data;
+
+    const exportData: PlanExport = {
+        version: '1.0',
+        exportedAt: new Date().toISOString(),
+        plan,
+        metadata: {
+            goalDistance: plan.goalDistance,
+            totalWeeks: plan.weeks.length,
+            vdot: plan.vdot,
+            intensityLevel: plan.intensityLevel,
+        },
+    };
+
+    return { success: true, data: exportData };
+}
+
+/**
+ * Download plan as a JSON file (browser only).
+ */
+export async function downloadPlanAsJSON(): Promise<boolean> {
+    if (typeof window === 'undefined') return false;
+
+    const result = await exportPlanToJSON();
+    if (!result.success) {
+        console.error('[PlanExport] Export failed:', result.error);
+        return false;
+    }
+
+    try {
+        const blob = new Blob([JSON.stringify(result.data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `the-long-game-plan-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        return true;
+    } catch (error) {
+        console.error('[PlanExport] Download failed:', error);
+        return false;
+    }
+}
+

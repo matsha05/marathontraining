@@ -97,20 +97,20 @@ export function RecalibrationModal({ isOpen, currentVdot, onClose, onConfirm }: 
 
                 {/* Modal */}
                 <motion.div
-                    className="v2-card relative z-10 w-full max-w-lg p-6"
+                    className="v3-card relative z-10 w-full max-w-lg p-6"
                     initial={{ scale: 0.95, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.95, opacity: 0 }}
                 >
                     {step === 'input' ? (
                         <>
-                            <h2 className="v2-heading-md mb-2">Update Your VDOT</h2>
-                            <p className="v2-body-sm mb-6" style={{ color: 'var(--text-muted)' }}>
+                            <h2 className="v3-heading-md mb-2">Update Your VDOT</h2>
+                            <p className="v3-body-sm mb-6" style={{ color: 'var(--text-muted)' }}>
                                 Enter a recent race or time trial to recalculate your training paces.
                             </p>
 
                             {/* Input Type Toggle */}
-                            <div className="flex gap-2 mb-6">
+                            <div className="flex gap-2 mb-4">
                                 <button
                                     onClick={() => setInputType('race')}
                                     className={`flex-1 py-3 rounded-lg border transition-colors ${inputType === 'race' ? 'border-[var(--color-accent)]' : 'border-[var(--border-base)]'
@@ -135,9 +135,22 @@ export function RecalibrationModal({ isOpen, currentVdot, onClose, onConfirm }: 
                                 </button>
                             </div>
 
+                            {/* Time Trial Explanation */}
+                            {inputType === 'time_trial' && (
+                                <div className="p-4 rounded-lg mb-4" style={{ background: 'var(--color-accent-subtle)', border: '1px solid var(--color-accent)' }}>
+                                    <p className="v3-body-sm font-medium mb-2" style={{ color: 'var(--color-accent)' }}>
+                                        What&apos;s a Time Trial?
+                                    </p>
+                                    <p className="v3-body-xs" style={{ color: 'var(--text-muted)' }}>
+                                        Run the distance <strong>as fast as you can sustain</strong>. Warm up first, then give an all-out effort like you&apos;re racing.
+                                        A 1-mile time trial is great for tracking fitness without the fatigue of a full race.
+                                    </p>
+                                </div>
+                            )}
+
                             {/* Distance Selection */}
                             <div className="mb-6">
-                                <label className="v2-form-label mb-2 block">Distance</label>
+                                <label className="v3-form-label mb-2 block">Distance</label>
                                 <div className="grid grid-cols-4 gap-2">
                                     {(inputType === 'race'
                                         ? (['5k', '10k', 'half', 'marathon'] as const)
@@ -161,24 +174,24 @@ export function RecalibrationModal({ isOpen, currentVdot, onClose, onConfirm }: 
 
                             {/* Time Input */}
                             <div className="mb-6">
-                                <label className="v2-form-label mb-2 block">Finish Time</label>
+                                <label className="v3-form-label mb-2 block">Finish Time</label>
                                 <div className="flex items-center gap-2">
                                     <input
                                         type="number"
                                         placeholder="MM"
                                         value={timeMinutes}
                                         onChange={(e) => setTimeMinutes(e.target.value)}
-                                        className="v2-input w-20 text-center v2-mono"
+                                        className="v3-input w-20 text-center v3-mono"
                                         min="1"
                                         max="999"
                                     />
-                                    <span className="v2-heading-md">:</span>
+                                    <span className="v3-heading-md">:</span>
                                     <input
                                         type="number"
                                         placeholder="SS"
                                         value={timeSeconds}
                                         onChange={(e) => setTimeSeconds(e.target.value)}
-                                        className="v2-input w-20 text-center v2-mono"
+                                        className="v3-input w-20 text-center v3-mono"
                                         min="0"
                                         max="59"
                                     />
@@ -187,13 +200,13 @@ export function RecalibrationModal({ isOpen, currentVdot, onClose, onConfirm }: 
 
                             {/* Actions */}
                             <div className="flex gap-3">
-                                <button onClick={handleClose} className="v2-btn v2-btn-ghost flex-1">
+                                <button onClick={handleClose} className="v3-btn v3-btn-ghost flex-1">
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleCalculate}
                                     disabled={!timeMinutes}
-                                    className="v2-btn v2-btn-primary flex-1"
+                                    className="v3-btn v3-btn-primary flex-1"
                                 >
                                     Calculate
                                 </button>
@@ -201,23 +214,23 @@ export function RecalibrationModal({ isOpen, currentVdot, onClose, onConfirm }: 
                         </>
                     ) : (
                         <>
-                            <h2 className="v2-heading-md mb-2">Confirm Update</h2>
+                            <h2 className="v3-heading-md mb-2">Confirm Update</h2>
 
                             {/* VDOT Change */}
-                            <div className="flex items-center justify-center gap-6 py-6 mb-6" style={{ background: 'var(--v2-bg-inset)', borderRadius: '12px' }}>
+                            <div className="flex items-center justify-center gap-6 py-6 mb-6" style={{ background: 'var(--v3-bg-inset)', borderRadius: '12px' }}>
                                 <div className="text-center">
-                                    <p className="v2-body-xs" style={{ color: 'var(--text-muted)' }}>Current</p>
-                                    <p className="v2-heading-lg v2-mono">{currentVdot}</p>
+                                    <p className="v3-body-xs" style={{ color: 'var(--text-muted)' }}>Current</p>
+                                    <p className="v3-heading-lg v3-mono">{currentVdot}</p>
                                 </div>
-                                <span className="v2-heading-lg" style={{ color: 'var(--text-muted)' }}>→</span>
+                                <span className="v3-heading-lg" style={{ color: 'var(--text-muted)' }}>→</span>
                                 <div className="text-center">
-                                    <p className="v2-body-xs" style={{ color: 'var(--text-muted)' }}>New</p>
-                                    <p className="v2-heading-lg v2-mono v2-accent">{calculatedVdot}</p>
+                                    <p className="v3-body-xs" style={{ color: 'var(--text-muted)' }}>New</p>
+                                    <p className="v3-heading-lg v3-mono v3-accent">{calculatedVdot}</p>
                                 </div>
                                 <div className="text-center">
-                                    <p className="v2-body-xs" style={{ color: 'var(--text-muted)' }}>Change</p>
-                                    <p className={`v2-heading-lg v2-mono ${(calculatedVdot || 0) > currentVdot ? 'v2-accent' : ''}`}
-                                        style={(calculatedVdot || 0) < currentVdot ? { color: 'var(--v2-warning)' } : {}}
+                                    <p className="v3-body-xs" style={{ color: 'var(--text-muted)' }}>Change</p>
+                                    <p className={`v3-heading-lg v3-mono ${(calculatedVdot || 0) > currentVdot ? 'v3-accent' : ''}`}
+                                        style={(calculatedVdot || 0) < currentVdot ? { color: 'var(--v3-warning)' } : {}}
                                     >
                                         {(calculatedVdot || 0) > currentVdot ? '+' : ''}{(calculatedVdot || 0) - currentVdot}
                                     </p>
@@ -226,18 +239,18 @@ export function RecalibrationModal({ isOpen, currentVdot, onClose, onConfirm }: 
 
                             {/* Pace Comparison */}
                             <div className="mb-6">
-                                <p className="v2-form-label mb-3">Your Training Paces</p>
+                                <p className="v3-form-label mb-3">Your Training Paces</p>
                                 <div className="space-y-2">
                                     {Object.entries(newPaces || {}).map(([zone, newPace]) => {
                                         const oldPace = currentPaces[zone];
                                         return (
                                             <div key={zone} className="flex items-center justify-between py-2 border-b" style={{ borderColor: 'var(--border-base)' }}>
-                                                <span className="v2-body-sm">{zone}</span>
+                                                <span className="v3-body-sm">{zone}</span>
                                                 <div className="flex items-center gap-2">
-                                                    <span className="v2-mono text-sm" style={{ color: 'var(--text-muted)', textDecoration: 'line-through' }}>
+                                                    <span className="v3-mono text-sm" style={{ color: 'var(--text-muted)', textDecoration: 'line-through' }}>
                                                         {oldPace}
                                                     </span>
-                                                    <span className="v2-mono text-sm v2-accent">{newPace}</span>
+                                                    <span className="v3-mono text-sm v3-accent">{newPace}</span>
                                                 </div>
                                             </div>
                                         );
@@ -246,18 +259,18 @@ export function RecalibrationModal({ isOpen, currentVdot, onClose, onConfirm }: 
                             </div>
 
                             {/* Info */}
-                            <div className="p-4 rounded-lg mb-6" style={{ background: 'var(--v2-bg-inset)' }}>
-                                <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+                            <div className="p-4 rounded-lg mb-6" style={{ background: 'var(--v3-bg-inset)' }}>
+                                <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                                     💡 This will update all future workout paces. Your plan structure stays the same.
                                 </p>
                             </div>
 
                             {/* Actions */}
                             <div className="flex gap-3">
-                                <button onClick={() => setStep('input')} className="v2-btn v2-btn-ghost flex-1">
+                                <button onClick={() => setStep('input')} className="v3-btn v3-btn-ghost flex-1">
                                     Back
                                 </button>
-                                <button onClick={handleConfirm} className="v2-btn v2-btn-primary flex-1">
+                                <button onClick={handleConfirm} className="v3-btn v3-btn-primary flex-1">
                                     Update Paces
                                 </button>
                             </div>

@@ -592,19 +592,30 @@ function selectQualityWorkouts(
 }
 
 function selectLongRunTemplate(phase: TrainingPhase, goalDistance: string): WorkoutTemplate {
+    // BASE PHASE: Always easy long runs regardless of distance
+    // TAPER PHASE: Always easy long runs to preserve freshness
     if (phase === 'base' || phase === 'taper') {
         return LONG_RUN_TEMPLATES[0]; // Easy long run
     }
 
-    if (goalDistance === 'marathon') {
-        return LONG_RUN_TEMPLATES[2]; // MP finish (Hansons)
+    // 5K/10K: Always easy long runs - these distances don't need progression runs
+    // The long run cap (10-12mi) is sufficient without adding intensity
+    if (goalDistance === '5k' || goalDistance === '10k' || goalDistance === 'general') {
+        return LONG_RUN_TEMPLATES[0]; // Easy long run
     }
 
+    // BUILD/PEAK for HALF: Progression long run (finish faster)
     if (goalDistance === 'half') {
         return LONG_RUN_TEMPLATES[1]; // Progression
     }
 
-    return LONG_RUN_TEMPLATES[0]; // Easy for shorter distances
+    // BUILD/PEAK for MARATHON: MP finish long run (Hansons style)
+    if (goalDistance === 'marathon') {
+        return LONG_RUN_TEMPLATES[2]; // MP finish
+    }
+
+    // Fallback: easy long run
+    return LONG_RUN_TEMPLATES[0];
 }
 
 // =============================================================================

@@ -75,7 +75,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
                     setUser(null);
                     setStatus("unauthenticated");
                 }
-            } catch {
+            } catch (error) {
+                // Log auth check failures for debugging but still gracefully fall back
+                console.error('[AuthContext] Failed to get user:', error);
                 if (!cancelled) {
                     setUser(null);
                     setStatus("unauthenticated");

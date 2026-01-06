@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Instrument_Sans, IBM_Plex_Mono, Inter, Sora, DM_Sans, Onest } from "next/font/google";
 import { GeistSans, GeistMono } from "geist/font";
 import "./globals.css";
-import "./globals-v2.css";
 import { SyncStatusIndicator } from "@/components/ui/OfflineIndicator";
 import { Providers } from "@/components/ui/Providers";
 

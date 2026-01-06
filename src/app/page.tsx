@@ -132,7 +132,7 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.0, duration: 0.5, ease }}
           >
-            <Link href="/onboarding" className="v2-btn v2-btn-primary">
+            <Link href="/onboarding" className="v3-btn v3-btn-primary">
               Get Started
             </Link>
           </motion.div>
@@ -166,7 +166,7 @@ export default function LandingPage() {
         description="Six days a week. Train on tired legs, race on fresh ones. 16-mile long run cap — because the cumulative week matters more than any single run."
         bestFor="Experienced runners, 6 days available, high mileage tolerance"
       >
-        <div className="v2-card p-4">
+        <div className="v3-card p-4">
           <div className="grid grid-cols-7 gap-2 text-center">
             {["Easy", "Speed", "Rest", "Tempo", "Easy", "Easy", "Long"].map((day, i) => (
               <div key={i}>
@@ -203,7 +203,7 @@ export default function LandingPage() {
             { level: "Intermediate", sub: "Building fitness" },
             { level: "Advanced", sub: "Chasing PRs" },
           ].map((p) => (
-            <div key={p.level} className="v2-card p-4 text-center">
+            <div key={p.level} className="v3-card p-4 text-center">
               <p className="text-lg font-light" style={{ color: 'var(--text-muted)' }}>{p.level}</p>
               <p className="text-[10px] mt-1" style={{ color: 'var(--text-subtle)' }}>{p.sub}</p>
             </div>
@@ -225,7 +225,7 @@ export default function LandingPage() {
             { range: "70-85", unit: "mi/week" },
             { range: "85+", unit: "mi/week" },
           ].map((p) => (
-            <div key={p.range} className="flex-1 v2-card p-4 text-center">
+            <div key={p.range} className="flex-1 v3-card p-4 text-center">
               <p className="text-lg font-mono" style={{ color: 'var(--text-muted)' }}>{p.range}</p>
               <p className="text-[10px] mt-1" style={{ color: 'var(--text-subtle)' }}>{p.unit}</p>
             </div>
@@ -257,7 +257,7 @@ export default function LandingPage() {
             { label: "Philosophy", value: "Coach the person" },
             { label: "Method", value: "Not the system" },
           ].map((p) => (
-            <div key={p.label} className="v2-card p-4 text-center">
+            <div key={p.label} className="v3-card p-4 text-center">
               <p className="text-sm mb-1" style={{ color: 'var(--text-muted)' }}>{p.label}</p>
               <p style={{ color: 'var(--text-muted)' }}>{p.value}</p>
             </div>
@@ -288,7 +288,7 @@ export default function LandingPage() {
             { zone: "Interval", pace: "6:45" },
             { zone: "Marathon", pace: "8:01" },
           ].map((p) => (
-            <div key={p.zone} className="v2-card p-3 text-center">
+            <div key={p.zone} className="v3-card p-3 text-center">
               <p className="text-sm mb-1" style={{ color: 'var(--text-muted)' }}>{p.zone}</p>
               <p className="font-mono" style={{ color: 'var(--text-muted)' }}>{p.pace}</p>
             </div>
@@ -339,7 +339,7 @@ export default function LandingPage() {
             { label: "Before", value: "Prep & Activation" },
             { label: "After", value: "Recovery & Reset" },
           ].map((p) => (
-            <div key={p.label} className="flex-1 v2-card p-4 text-center">
+            <div key={p.label} className="flex-1 v3-card p-4 text-center">
               <p className="text-sm mb-1" style={{ color: 'var(--text-muted)' }}>{p.label}</p>
               <p style={{ color: 'var(--text-muted)' }}>{p.value}</p>
             </div>
@@ -368,7 +368,7 @@ export default function LandingPage() {
             { value: "4×4", label: "protocol" },
             { value: "5%", label: "economy gain" },
           ].map((p) => (
-            <div key={p.value} className="flex-1 v2-card p-4 text-center">
+            <div key={p.value} className="flex-1 v3-card p-4 text-center">
               <p className="text-2xl font-light" style={{ color: 'var(--text-muted)' }}>{p.value}</p>
               <p className="text-xs mt-1" style={{ color: 'var(--text-subtle)' }}>{p.label}</p>
             </div>
@@ -391,7 +391,7 @@ export default function LandingPage() {
             { phase: "Peak", action: "Maintain" },
             { phase: "Taper", action: "Protect" },
           ].map((p) => (
-            <div key={p.phase} className="v2-card p-3 text-center">
+            <div key={p.phase} className="v3-card p-3 text-center">
               <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{p.phase}</p>
               <p className="text-[10px] mt-1" style={{ color: 'var(--text-subtle)' }}>{p.action}</p>
             </div>
@@ -421,7 +421,7 @@ export default function LandingPage() {
             { value: "2×", label: "threshold/day" },
             { value: "3", label: "Olympic sons" },
           ].map((p) => (
-            <div key={p.value} className="flex-1 v2-card p-4 text-center">
+            <div key={p.value} className="flex-1 v3-card p-4 text-center">
               <p className="text-2xl font-light" style={{ color: 'var(--text-muted)' }}>{p.value}</p>
               <p className="text-xs mt-1" style={{ color: 'var(--text-subtle)' }}>{p.label}</p>
             </div>
@@ -437,7 +437,7 @@ export default function LandingPage() {
           <p className="text-lg mb-8" style={{ color: 'var(--text-muted)' }}>
             Race on the calendar or just building fitness. We'll meet you where you are.
           </p>
-          <Link href="/onboarding" className="v2-btn v2-btn-primary v2-btn-lg">
+          <Link href="/onboarding" className="v3-btn v3-btn-primary v3-btn-lg">
             Get Started
           </Link>
         </div>

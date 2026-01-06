@@ -81,7 +81,11 @@ export function DatePicker({
 
     const selectDate = (day: number) => {
         const selected = new Date(viewDate.getFullYear(), viewDate.getMonth(), day);
-        const formatted = selected.toISOString().split('T')[0];
+        // Format as YYYY-MM-DD in LOCAL time (not UTC) to avoid timezone shift
+        const year = selected.getFullYear();
+        const month = String(selected.getMonth() + 1).padStart(2, '0');
+        const dayStr = String(selected.getDate()).padStart(2, '0');
+        const formatted = `${year}-${month}-${dayStr}`;
         onChange(formatted);
         setIsOpen(false);
     };
@@ -158,7 +162,7 @@ export function DatePicker({
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className="v2-input w-full flex items-center justify-between gap-3 cursor-pointer text-left"
+                className="v3-input w-full flex items-center justify-between gap-3 cursor-pointer text-left"
                 style={{ fontSize: '16px' }}
             >
                 <span style={{ color: displayValue ? 'var(--text-base)' : 'var(--text-muted)' }}>
@@ -279,7 +283,11 @@ export function DatePicker({
                                 onClick={() => {
                                     const today = new Date();
                                     if (!minDateObj || today >= minDateObj) {
-                                        onChange(today.toISOString().split('T')[0]);
+                                        // Format in LOCAL time (not UTC) to avoid timezone shift
+                                        const year = today.getFullYear();
+                                        const month = String(today.getMonth() + 1).padStart(2, '0');
+                                        const day = String(today.getDate()).padStart(2, '0');
+                                        onChange(`${year}-${month}-${day}`);
                                         setIsOpen(false);
                                     }
                                 }}

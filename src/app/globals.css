@@ -3,7 +3,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* =============================================================================
-   THE LONG GAME - DESIGN SYSTEM (v2.0)
+   THE LONG GAME - DESIGN SYSTEM (v3.0)
    World-Class Athletic Precision
 
    This is a complete, intentional design system. Every value is deliberate.
@@ -62,6 +62,13 @@
   --color-zone-threshold: #F39C12;
   --color-zone-interval: #E74C3C;
   --color-zone-repetition: #9B59B6;
+
+  /* Workout Type Colors - For day cards and calendar */
+  --color-workout-easy: #19e38c;
+  --color-workout-long: #fbbf24;
+  --color-workout-quality: #f59e0b;
+  --color-workout-recovery: #94a3b8;
+  --color-workout-rest: #64748b;
 
   /* Body Region Colors - Durability/Mobility */
   --color-region-foot: #10b981;
@@ -169,6 +176,20 @@
   --gradient-primary: linear-gradient(135deg, var(--color-accent) 0%, var(--color-strength) 100%);
   --gradient-hero: radial-gradient(1200px circle at 20% 10%, color-mix(in srgb, var(--color-accent) 18%, transparent), transparent 68%);
   --gradient-radial: radial-gradient(600px circle at 50% 20%, color-mix(in srgb, var(--color-strength) 16%, transparent), transparent 72%);
+
+  /* V3 Component Variable Aliases (used by onboarding UI) */
+  --v3-bg-base: var(--bg-base);
+  --v3-bg-inset: var(--bg-inset);
+  --v3-success: var(--color-success);
+  --v3-success-subtle: color-mix(in srgb, var(--color-success) 12%, transparent);
+  --v3-warning: var(--color-warning);
+  --v3-warning-subtle: color-mix(in srgb, var(--color-warning) 12%, transparent);
+  --v3-error: var(--color-error);
+  --v3-error-subtle: color-mix(in srgb, var(--color-error) 12%, transparent);
+
+  /* Accent glow for radial backgrounds */
+  --color-accent-glow: color-mix(in srgb, var(--color-accent) 6%, transparent);
+  --color-accent-subtle: color-mix(in srgb, var(--color-accent) 10%, transparent);
 }
 
 /* Dark Mode */
@@ -1449,4 +1470,1194 @@ textarea.input {
 .tap-target {
   min-height: 44px;
   min-width: 44px;
+}
+
+/**
+ * THE LONG GAME - V3 UTILITY CLASSES
+ * 
+ * Theme-aware utility classes that work in both light and dark modes.
+ * Uses CSS variables from globals.css as foundation.
+ * 
+ * Replaces globals-v2.css entirely.
+ */
+
+/* =============================================================================
+   BASE STYLES
+   ============================================================================= */
+
+.v3-root {
+  background-color: var(--bg-base);
+  color: var(--text-base);
+  font-family: var(--font-sora, system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* =============================================================================
+   TYPOGRAPHY
+   ============================================================================= */
+
+/* Headings - responsive with clamp() */
+.v3-heading-2xl {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--text-base);
+}
+
+.v3-heading-xl {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: var(--text-base);
+}
+
+.v3-heading-lg {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: var(--text-base);
+}
+
+.v3-heading-md {
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+  font-weight: 400;
+  color: var(--text-base);
+}
+
+.v3-heading-sm {
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  font-weight: 500;
+  color: var(--text-base);
+}
+
+/* Body text - responsive with clamp() for readability on all screens */
+.v3-body-lg {
+  font-size: clamp(1.0625rem, 1.2vw, 1.25rem);
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.v3-body {
+  font-size: clamp(0.9375rem, 1vw, 1.125rem);
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.v3-body-md {
+  font-size: clamp(0.9375rem, 1vw, 1.0625rem);
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.v3-body-sm {
+  font-size: clamp(0.875rem, 0.9vw, 1rem);
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.v3-body-xs {
+  font-size: clamp(0.75rem, 0.8vw, 0.875rem);
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+/* Labels - minimum 12px for readability */
+.v3-label {
+  font-size: clamp(0.75rem, 0.85vw, 0.875rem);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+/* Mono/code - minimum 11px */
+.v3-mono {
+  font-family: var(--font-plex-mono, "IBM Plex Mono", monospace);
+  font-size: clamp(0.6875rem, 0.75vw, 0.8125rem);
+  color: var(--text-subtle);
+}
+
+/* Hero date display */
+.v3-date-hero {
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.v3-metric-hero {
+  font-size: clamp(2.5rem, 6vw, 3.5rem);
+  font-weight: 300;
+  line-height: 1;
+}
+
+.v3-metric-hero-accent {
+  color: var(--color-accent);
+}
+
+.v3-metric-hero-muted {
+  color: var(--text-muted);
+}
+
+.v3-metric-label {
+  font-size: clamp(0.75rem, 0.85vw, 0.875rem);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+/* =============================================================================
+   COLORS
+   ============================================================================= */
+
+.v3-accent {
+  color: var(--color-accent);
+}
+
+.v3-success {
+  color: var(--color-success);
+}
+
+.v3-warning {
+  color: var(--color-warning);
+}
+
+.v3-error {
+  color: var(--color-error);
+}
+
+.v3-running {
+  color: var(--color-running);
+}
+
+.v3-strength {
+  color: var(--color-strength);
+}
+
+.v3-durability {
+  color: var(--color-durability);
+}
+
+.v3-green {
+  color: var(--color-success);
+}
+
+.v3-yellow {
+  color: var(--color-warning);
+}
+
+.v3-red {
+  color: var(--color-error);
+}
+
+/* =============================================================================
+   BACKGROUNDS
+   ============================================================================= */
+
+.v3-bg-base {
+  background-color: var(--bg-base);
+}
+
+.v3-bg-inset {
+  background-color: var(--bg-inset);
+}
+
+.v3-bg-card {
+  background-color: var(--bg-elevated);
+}
+
+.v3-bg-running {
+  background-color: color-mix(in srgb, var(--color-running) 10%, transparent);
+}
+
+.v3-bg-strength {
+  background-color: color-mix(in srgb, var(--color-strength) 10%, transparent);
+}
+
+.v3-bg-durability {
+  background-color: color-mix(in srgb, var(--color-durability) 10%, transparent);
+}
+
+/* Subtle backgrounds */
+.v3-success-subtle {
+  background-color: color-mix(in srgb, var(--color-success) 10%, transparent);
+}
+
+.v3-warning-subtle {
+  background-color: color-mix(in srgb, var(--color-warning) 10%, transparent);
+}
+
+.v3-error-subtle {
+  background-color: color-mix(in srgb, var(--color-error) 10%, transparent);
+}
+
+.v3-warning-muted {
+  background-color: color-mix(in srgb, var(--color-warning) 30%, transparent);
+}
+
+.v3-error-muted {
+  background-color: color-mix(in srgb, var(--color-error) 30%, transparent);
+}
+
+/* =============================================================================
+   CARDS
+   ============================================================================= */
+
+.v3-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-base);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  transition: all 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.v3-card:hover {
+  background: var(--bg-muted);
+  border-color: var(--border-emphasis);
+}
+
+.v3-card-interactive {
+  cursor: pointer;
+}
+
+.v3-card-interactive:hover {
+  transform: scale(1.02);
+}
+
+.v3-card-accent {
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+
+.v3-card-accent:hover {
+  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+}
+
+.v3-card-selected {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+/* =============================================================================
+   BUTTONS
+   ============================================================================= */
+
+.v3-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.75rem;
+  transition: all 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+.v3-btn:active {
+  transform: scale(0.98);
+}
+
+/* Primary: Accent bg, white text */
+.v3-btn-primary {
+  background: var(--color-accent);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-accent) 40%, transparent);
+}
+
+.v3-btn-primary:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-accent) 50%, transparent);
+}
+
+/* Secondary: Visible border */
+.v3-btn-secondary {
+  background: var(--bg-elevated);
+  border: 2px solid var(--border-emphasis);
+  color: var(--text-base);
+  font-weight: 500;
+}
+
+.v3-btn-secondary:hover {
+  background: var(--bg-muted);
+  border-color: var(--color-accent);
+  color: var(--text-base);
+}
+
+/* Ghost: Minimal */
+.v3-btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.v3-btn-ghost:hover {
+  color: var(--text-base);
+  background: var(--bg-muted);
+}
+
+/* Sizes */
+.v3-btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.625rem;
+  min-height: 2rem;
+}
+
+@media (max-width: 768px) {
+  .v3-btn-sm {
+    min-height: 2.75rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
+}
+
+.v3-btn-lg {
+  padding: 1rem 2rem;
+  font-size: 1rem;
+}
+
+/* Disabled */
+.v3-btn:disabled,
+.v3-btn[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* =============================================================================
+   FORM INPUTS
+   ============================================================================= */
+
+.v3-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-base);
+  border-radius: 0.75rem;
+  color: var(--text-base);
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.v3-input::placeholder {
+  color: var(--text-subtle);
+}
+
+.v3-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+
+.v3-input:hover:not(:focus) {
+  border-color: var(--border-emphasis);
+}
+
+.v3-input-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.v3-input-error {
+  border-color: var(--color-error);
+}
+
+.v3-input-success {
+  border-color: var(--color-success);
+}
+
+.v3-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%235a6676' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+
+.v3-checkbox {
+  appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-emphasis);
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 150ms;
+}
+
+.v3-checkbox:checked {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M2.5 6L5 8.5L9.5 3.5' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.v3-radio {
+  appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-emphasis);
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 150ms;
+}
+
+.v3-radio:checked {
+  background: var(--bg-base);
+  border-color: var(--color-accent);
+  box-shadow: inset 0 0 0 4px var(--color-accent);
+}
+
+.v3-form-group {
+  margin-bottom: 1rem;
+}
+
+.v3-form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-base);
+  margin-bottom: 0.5rem;
+}
+
+.v3-form-hint {
+  font-size: 0.75rem;
+  color: var(--text-subtle);
+  margin-top: 0.25rem;
+}
+
+.v3-error-message {
+  font-size: 0.625rem;
+  color: var(--color-error);
+  margin-top: 0.25rem;
+}
+
+/* =============================================================================
+   BADGES
+   ============================================================================= */
+
+.v3-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.625rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: var(--bg-muted);
+  border: 1px solid var(--border-emphasis);
+  border-radius: 9999px;
+  color: var(--text-muted);
+}
+
+.v3-badge-accent {
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent) 20%, transparent);
+  color: var(--color-accent);
+}
+
+.v3-badge-secondary {
+  background: color-mix(in srgb, var(--color-strength) 10%, transparent);
+  border-color: color-mix(in srgb, var(--color-strength) 20%, transparent);
+  color: var(--color-strength);
+}
+
+.v3-badge-success {
+  background: color-mix(in srgb, var(--color-success) 10%, transparent);
+  border-color: color-mix(in srgb, var(--color-success) 20%, transparent);
+  color: var(--color-success);
+}
+
+/* =============================================================================
+   SECTIONS & CONTAINERS
+   ============================================================================= */
+
+.v3-section {
+  padding: 5rem 1.5rem;
+}
+
+.v3-section-alt {
+  background: var(--bg-muted);
+}
+
+.v3-container {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.v3-container-narrow {
+  max-width: 36rem;
+  margin: 0 auto;
+}
+
+.v3-container-wide {
+  max-width: 64rem;
+  margin: 0 auto;
+}
+
+/* =============================================================================
+   NAVIGATION
+   ============================================================================= */
+
+.v3-nav {
+  background: var(--bg-base);
+  border-bottom: 1px solid var(--border-base);
+  backdrop-filter: blur(12px);
+}
+
+.v3-nav-logo {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-base);
+  text-decoration: none;
+}
+
+/* =============================================================================
+   AVATARS
+   ============================================================================= */
+
+.v3-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background: var(--bg-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.v3-avatar-xs {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.v3-avatar-sm {
+  width: 2rem;
+  height: 2rem;
+}
+
+.v3-avatar-md {
+  width: 3rem;
+  height: 3rem;
+}
+
+.v3-avatar-lg {
+  width: 4rem;
+  height: 4rem;
+}
+
+.v3-avatar-xl {
+  width: 5rem;
+  height: 5rem;
+}
+
+.v3-avatar-2xl {
+  width: 6rem;
+  height: 6rem;
+}
+
+.v3-avatar-accent {
+  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+  color: var(--color-accent);
+}
+
+.v3-avatar-group {
+  display: flex;
+}
+
+.v3-avatar-group>* {
+  margin-left: -0.5rem;
+  border: 2px solid var(--bg-base);
+}
+
+/* =============================================================================
+   ICONS
+   ============================================================================= */
+
+.v3-icon-xs {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.v3-icon-sm {
+  width: 1rem;
+  height: 1rem;
+}
+
+.v3-icon-md {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.v3-icon-lg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.v3-icon-xl {
+  width: 2rem;
+  height: 2rem;
+}
+
+.v3-icon-accent {
+  color: var(--color-accent);
+}
+
+.v3-icon-muted {
+  color: var(--text-muted);
+}
+
+.v3-icon-ghost {
+  color: var(--text-subtle);
+}
+
+.v3-icon-secondary {
+  color: var(--color-strength);
+}
+
+.v3-icon-color-muted {
+  color: var(--text-muted);
+}
+
+/* =============================================================================
+   LOADING STATES
+   ============================================================================= */
+
+@keyframes v3-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.v3-skeleton {
+  background: linear-gradient(90deg,
+      var(--bg-elevated) 25%,
+      var(--bg-muted) 50%,
+      var(--bg-elevated) 75%);
+  background-size: 200% 100%;
+  animation: v3-shimmer 1.5s infinite;
+  border-radius: 0.5rem;
+}
+
+.v3-skeleton-text {
+  height: 1em;
+  width: 100%;
+}
+
+.v3-skeleton-text-sm {
+  width: 60%;
+}
+
+@keyframes v3-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.v3-spinner {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--border-base);
+  border-top-color: var(--color-accent);
+  border-radius: 9999px;
+  animation: v3-spin 0.8s linear infinite;
+}
+
+/* =============================================================================
+   EMPTY STATES
+   ============================================================================= */
+
+.v3-empty {
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.v3-empty-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  opacity: 0.3;
+}
+
+.v3-empty-title {
+  font-size: 1.125rem;
+  font-weight: 300;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.v3-empty-description {
+  font-size: 0.875rem;
+  color: var(--text-subtle);
+  max-width: 20rem;
+  margin: 0 auto;
+}
+
+/* =============================================================================
+   TOAST / NOTIFICATION
+   ============================================================================= */
+
+.v3-toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-emphasis);
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+}
+
+.v3-toast-success {
+  border-color: color-mix(in srgb, var(--color-success) 30%, transparent);
+}
+
+.v3-toast-error {
+  border-color: color-mix(in srgb, var(--color-error) 30%, transparent);
+}
+
+/* =============================================================================
+   MODAL / DIALOG
+   ============================================================================= */
+
+.v3-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 50;
+}
+
+.v3-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 28rem;
+  padding: 1.5rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-base);
+  border-radius: 1rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  z-index: 51;
+}
+
+.v3-modal-title {
+  font-size: 1.5rem;
+  font-weight: 300;
+  color: var(--text-base);
+  margin-bottom: 1rem;
+}
+
+.v3-modal-body {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.v3-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+/* =============================================================================
+   TABLES
+   ============================================================================= */
+
+.v3-table-wrapper {
+  overflow-x: auto;
+}
+
+.v3-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.v3-table th,
+.v3-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-base);
+}
+
+.v3-table th {
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+.v3-table td {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.v3-table-interactive tr:hover {
+  background: var(--bg-muted);
+}
+
+.v3-table-right {
+  text-align: right;
+}
+
+.v3-table-center {
+  text-align: center;
+}
+
+.v3-table-mono {
+  font-family: var(--font-plex-mono, monospace);
+}
+
+.v3-table-accent {
+  color: var(--color-accent);
+}
+
+/* =============================================================================
+   TABS
+   ============================================================================= */
+
+.v3-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-base);
+}
+
+.v3-tab {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+  transition: all 150ms;
+}
+
+.v3-tab:hover {
+  color: var(--text-base);
+}
+
+.v3-tab-active {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+.v3-tabs-pills {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: none;
+}
+
+.v3-tabs-pills .v3-tab {
+  border-radius: 9999px;
+  border-bottom: none;
+  background: var(--bg-muted);
+}
+
+.v3-tabs-pills .v3-tab-active {
+  background: var(--color-accent);
+  color: white;
+}
+
+.v3-tab-panel {
+  padding: 1rem 0;
+}
+
+/* =============================================================================
+   DROPDOWN
+   ============================================================================= */
+
+.v3-dropdown {
+  position: relative;
+}
+
+.v3-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  min-width: 12rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-base);
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  padding: 0.5rem;
+  z-index: 50;
+}
+
+.v3-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 150ms;
+}
+
+.v3-dropdown-item:hover {
+  background: var(--bg-muted);
+  color: var(--text-base);
+}
+
+.v3-dropdown-divider {
+  border-top: 1px solid var(--border-base);
+  margin: 0.5rem 0;
+}
+
+/* =============================================================================
+   SLIDER
+   ============================================================================= */
+
+.v3-slider {
+  appearance: none;
+  width: 100%;
+  height: 0.5rem;
+  background: var(--bg-muted);
+  border-radius: 9999px;
+  cursor: pointer;
+}
+
+.v3-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  background: var(--color-accent);
+  border-radius: 9999px;
+  cursor: grab;
+}
+
+.v3-slider-accent::-webkit-slider-thumb {
+  background: var(--color-accent);
+}
+
+.v3-slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.625rem;
+  color: var(--text-subtle);
+  margin-top: 0.5rem;
+}
+
+/* =============================================================================
+   PROGRESS
+   ============================================================================= */
+
+.v3-progress {
+  height: 0.5rem;
+  background: var(--bg-muted);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.v3-progress-bar {
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: 9999px;
+  transition: width 300ms ease;
+}
+
+/* =============================================================================
+   DIVIDERS
+   ============================================================================= */
+
+.v3-divider {
+  border: none;
+  border-top: 1px solid var(--border-base);
+}
+
+/* =============================================================================
+   GLOW & EFFECTS
+   ============================================================================= */
+
+.v3-gradient-glow {
+  background: radial-gradient(800px circle at 50% 55%,
+      color-mix(in srgb, var(--color-accent) 4%, transparent),
+      transparent 60%);
+}
+
+.v3-glow-accent {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--color-accent) 20%, transparent);
+}
+
+/* =============================================================================
+   FOCUS STATES
+   ============================================================================= */
+
+.v3-btn:focus-visible,
+.v3-input:focus-visible,
+.v3-checkbox:focus-visible,
+.v3-radio:focus-visible,
+.v3-card-interactive:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px var(--color-accent);
+}
+
+a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 0.375rem;
+}
+
+/* =============================================================================
+   RADIUS UTILITIES
+   ============================================================================= */
+
+.v3-radius-sm {
+  border-radius: 0.375rem;
+}
+
+.v3-radius-md {
+  border-radius: 0.5rem;
+}
+
+.v3-radius-lg {
+  border-radius: 0.75rem;
+}
+
+.v3-radius-xl {
+  border-radius: 1rem;
+}
+
+.v3-radius-full {
+  border-radius: 9999px;
+}
+
+/* =============================================================================
+   SHADOW UTILITIES
+   ============================================================================= */
+
+.v3-shadow-sm {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.v3-shadow-md {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.v3-shadow-lg {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* =============================================================================
+   SPACING UTILITIES (matching Tailwind scale)
+   ============================================================================= */
+
+.v3-space-1 {
+  --space: 0.25rem;
+}
+
+.v3-space-2 {
+  --space: 0.5rem;
+}
+
+.v3-space-3 {
+  --space: 0.75rem;
+}
+
+.v3-space-4 {
+  --space: 1rem;
+}
+
+.v3-space-6 {
+  --space: 1.5rem;
+}
+
+.v3-space-8 {
+  --space: 2rem;
+}
+
+.v3-space-10 {
+  --space: 2.5rem;
+}
+
+.v3-space-12 {
+  --space: 3rem;
+}
+
+.v3-space-16 {
+  --space: 4rem;
+}
+
+/* =============================================================================
+   DURATION UTILITIES
+   ============================================================================= */
+
+.v3-duration-fast {
+  --duration: 150ms;
+}
+
+.v3-duration-base {
+  --duration: 200ms;
+}
+
+.v3-duration-slow {
+  --duration: 300ms;
+}
+
+/* =============================================================================
+   TEXT SIZE UTILITIES
+   ============================================================================= */
+
+.v3-text-xs {
+  font-size: 0.625rem;
+}
+
+.v3-text-sm {
+  font-size: 0.875rem;
+}
+
+.v3-text-base {
+  font-size: 1rem;
+}
+
+.v3-text-lg {
+  font-size: 1.125rem;
+}
+
+.v3-text-xl {
+  font-size: 1.5rem;
+}
+
+.v3-text-2xl {
+  font-size: 2rem;
+}
+
+.v3-text-4xl {
+  font-size: 3rem;
+}
+
+.v3-text-5xl {
+  font-size: 3.5rem;
+}
+
+.v3-text-hero {
+  font-size: clamp(3rem, 8vw, 4.5rem);
 }

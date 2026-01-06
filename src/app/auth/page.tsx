@@ -232,10 +232,10 @@ function AuthForm() {
                         className="object-cover"
                     />
                 </div>
-                <h1 className="v2-heading-lg">
+                <h1 className="v3-heading-lg">
                     {step === 'email' ? 'Get Started' : 'Enter code'}
                 </h1>
-                <p className="v2-body-sm mt-2" style={{ color: 'var(--text-muted)' }}>
+                <p className="v3-body-sm mt-2" style={{ color: 'var(--text-muted)' }}>
                     {step === 'email'
                         ? 'Enter your email to continue'
                         : `We sent a code to ${email}`}
@@ -250,20 +250,20 @@ function AuthForm() {
                         type="button"
                         onClick={handleGoogleSignIn}
                         disabled={isLoading}
-                        className="v2-btn v2-btn-secondary w-full mb-6"
+                        className="v3-btn v3-btn-secondary w-full mb-6"
                     >
                         {loadingAction === 'google' ? 'Connecting...' : 'Continue with Google'}
                     </button>
 
                     <div className="flex items-center gap-4 mb-6">
                         <div className="flex-1 h-px" style={{ background: 'var(--border-base)' }} />
-                        <span className="v2-label" style={{ color: 'var(--text-muted)' }}>OR</span>
+                        <span className="v3-label" style={{ color: 'var(--text-muted)' }}>OR</span>
                         <div className="flex-1 h-px" style={{ background: 'var(--border-base)' }} />
                     </div>
 
                     <form onSubmit={handleSendOtp} className="space-y-4">
-                        <div className="v2-form-group">
-                            <label htmlFor="auth-email" className="v2-form-label">EMAIL</label>
+                        <div className="v3-form-group">
+                            <label htmlFor="auth-email" className="v3-form-label">EMAIL</label>
                             <input
                                 id="auth-email"
                                 type="email"
@@ -272,7 +272,7 @@ function AuthForm() {
                                 disabled={isLoading}
                                 required
                                 placeholder="you@example.com"
-                                className="v2-input"
+                                className="v3-input"
                                 autoComplete="email"
                                 autoFocus
                                 aria-describedby={errorMessage ? "auth-error" : undefined}
@@ -282,7 +282,7 @@ function AuthForm() {
                         <button
                             type="submit"
                             disabled={isLoading || !email}
-                            className="v2-btn v2-btn-primary w-full"
+                            className="v3-btn v3-btn-primary w-full"
                         >
                             {loadingAction === 'otp' ? 'Sending code...' : 'Continue'}
                         </button>
@@ -321,7 +321,7 @@ function AuthForm() {
                     {/* Resend */}
                     <div className="text-center">
                         {resendCooldown > 0 ? (
-                            <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+                            <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                                 Resend code in {resendCooldown}s
                             </p>
                         ) : (
@@ -329,7 +329,7 @@ function AuthForm() {
                                 type="button"
                                 onClick={handleResendCode}
                                 disabled={isLoading}
-                                className="v2-body-sm v2-accent hover:underline"
+                                className="v3-body-sm v3-accent hover:underline"
                             >
                                 Didn&apos;t get the code? Resend
                             </button>
@@ -346,7 +346,7 @@ function AuthForm() {
                             setErrorMessage(null);
                             setResendCooldown(0);
                         }}
-                        className="v2-btn v2-btn-secondary w-full"
+                        className="v3-btn v3-btn-secondary w-full"
                     >
                         Use a different email
                     </button>
@@ -355,15 +355,15 @@ function AuthForm() {
 
             {/* Messages */}
             {message && (
-                <p className="text-center v2-body-sm v2-accent mt-6">
+                <p className="text-center v3-body-sm v3-accent mt-6">
                     {message}
                 </p>
             )}
             {errorMessage && (
                 <p
                     id="auth-error"
-                    className="text-center v2-body-sm mt-2"
-                    style={{ color: 'var(--v2-error)' }}
+                    className="text-center v3-body-sm mt-2"
+                    style={{ color: 'var(--v3-error)' }}
                     role="alert"
                     aria-live="polite"
                 >
@@ -372,7 +372,7 @@ function AuthForm() {
             )}
 
             {/* Terms */}
-            <p className="text-center v2-body-sm mt-8" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-center v3-body-sm mt-8" style={{ color: 'var(--text-muted)' }}>
                 By continuing, you agree to our{' '}
                 <Link href="/terms" className="underline hover:text-[var(--text-muted)]">Terms of Service</Link>
                 {' '}and{' '}
@@ -394,16 +394,16 @@ function AuthFormFallback() {
                     className="object-cover"
                 />
             </div>
-            <h1 className="v2-heading-lg">Get Started</h1>
-            <p className="v2-body-sm mt-2" style={{ color: 'var(--text-muted)' }}>Loading...</p>
+            <h1 className="v3-heading-lg">Get Started</h1>
+            <p className="v3-body-sm mt-2" style={{ color: 'var(--text-muted)' }}>Loading...</p>
         </div>
     );
 }
 
 export default function AuthPage() {
     return (
-        <div className="v2-root min-h-screen flex items-center justify-center px-6 py-12">
-            <div className="v2-card p-8 w-full max-w-md">
+        <div className="v3-root min-h-screen flex items-center justify-center px-6 py-12">
+            <div className="v3-card p-8 w-full max-w-md">
                 <Suspense fallback={<AuthFormFallback />}>
                     <AuthForm />
                 </Suspense>

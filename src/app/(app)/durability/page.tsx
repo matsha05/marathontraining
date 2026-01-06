@@ -166,7 +166,7 @@ export default function DurabilityPage() {
                         >
                             {/* Hero */}
                             <div className="text-center py-8">
-                                <p className="v2-label mb-2" style={{ color: 'var(--color-accent)' }}>
+                                <p className="v3-label mb-2" style={{ color: 'var(--color-accent)' }}>
                                     DURABILITY ASSESSMENT
                                 </p>
                                 <h1 className="text-3xl font-light mb-4" style={{ color: 'var(--text-base)' }}>
@@ -182,7 +182,7 @@ export default function DurabilityPage() {
                             <div className="grid gap-4 md:grid-cols-2">
                                 <button
                                     onClick={() => setMode('quick')}
-                                    className="v2-card p-6 text-left hover:border-[var(--color-accent)] transition-colors"
+                                    className="v3-card p-6 text-left hover:border-[var(--color-accent)] transition-colors"
                                 >
                                     <div className="flex items-center gap-3 mb-3">
                                         <Zap size={28} className="text-[var(--color-accent)]" />
@@ -196,14 +196,14 @@ export default function DurabilityPage() {
                                         <li>• Single Leg Balance</li>
                                         <li>• Squat Shape</li>
                                     </ul>
-                                    <div className="mt-4 v2-btn v2-btn-primary w-full">
+                                    <div className="mt-4 v3-btn v3-btn-primary w-full">
                                         Start Quick Check
                                     </div>
                                 </button>
 
                                 <button
                                     onClick={() => setMode('full')}
-                                    className="v2-card p-6 text-left hover:border-[var(--color-accent)] transition-colors"
+                                    className="v3-card p-6 text-left hover:border-[var(--color-accent)] transition-colors"
                                 >
                                     <div className="flex items-center gap-3 mb-3">
                                         <ClipboardList size={28} className="text-[var(--color-accent)]" />
@@ -217,14 +217,14 @@ export default function DurabilityPage() {
                                         <li>• Strength & mobility gates</li>
                                         <li>• Personalized prescription</li>
                                     </ul>
-                                    <div className="mt-4 v2-btn v2-btn-secondary w-full">
+                                    <div className="mt-4 v3-btn v3-btn-secondary w-full">
                                         Start Full Assessment
                                     </div>
                                 </button>
                             </div>
 
                             {/* Philosophy note */}
-                            <div className="v2-card p-5" style={{ borderColor: 'var(--color-accent-subtle)' }}>
+                            <div className="v3-card p-5" style={{ borderColor: 'var(--color-accent-subtle)' }}>
                                 <p className="text-xs uppercase tracking-widest mb-2" style={{ color: 'var(--color-accent)' }}>
                                     THE DICHARRY PRINCIPLE
                                 </p>
@@ -254,7 +254,7 @@ export default function DurabilityPage() {
                                 >
                                     ← Back
                                 </button>
-                                <p className="v2-mono text-sm" style={{ color: 'var(--color-accent)' }}>
+                                <p className="v3-mono text-sm" style={{ color: 'var(--color-accent)' }}>
                                     {currentQuickIndex + 1} / {quickAssessments.length}
                                 </p>
                             </div>
@@ -275,7 +275,7 @@ export default function DurabilityPage() {
                                     key={quickAssessments[currentQuickIndex].id}
                                     initial={{ opacity: 0, x: 20 }}
                                     animate={{ opacity: 1, x: 0 }}
-                                    className="v2-card p-6 space-y-6"
+                                    className="v3-card p-6 space-y-6"
                                 >
                                     <div className="text-center">
                                         <span className="text-4xl mb-4 block">
@@ -291,13 +291,13 @@ export default function DurabilityPage() {
 
                                     <div className="space-y-4 p-4 rounded-lg" style={{ background: 'var(--bg-elevated)' }}>
                                         <div>
-                                            <p className="v2-label mb-1">TEST</p>
+                                            <p className="v3-label mb-1">TEST</p>
                                             <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                                                 {quickAssessments[currentQuickIndex].testProcedure}
                                             </p>
                                         </div>
                                         <div>
-                                            <p className="v2-label mb-1">PASS STANDARD</p>
+                                            <p className="v3-label mb-1">PASS STANDARD</p>
                                             <p className="text-sm" style={{ color: '#4ade80' }}>
                                                 {quickAssessments[currentQuickIndex].passStandard}
                                             </p>
@@ -307,7 +307,7 @@ export default function DurabilityPage() {
                                     <div className="grid grid-cols-3 gap-3">
                                         <button
                                             onClick={() => handleQuickResult('pass')}
-                                            className="v2-btn v2-btn-secondary py-4"
+                                            className="v3-btn v3-btn-secondary py-4"
                                             style={{ background: 'rgba(74, 222, 128, 0.1)', borderColor: 'rgba(74, 222, 128, 0.3)' }}
                                         >
                                             <span className="block text-lg mb-1">✓</span>
@@ -315,7 +315,7 @@ export default function DurabilityPage() {
                                         </button>
                                         <button
                                             onClick={() => handleQuickResult('partial')}
-                                            className="v2-btn v2-btn-secondary py-4"
+                                            className="v3-btn v3-btn-secondary py-4"
                                             style={{ background: 'rgba(245, 158, 11, 0.1)', borderColor: 'rgba(245, 158, 11, 0.3)' }}
                                         >
                                             <span className="block text-lg mb-1">~</span>
@@ -323,7 +323,7 @@ export default function DurabilityPage() {
                                         </button>
                                         <button
                                             onClick={() => handleQuickResult('fail')}
-                                            className="v2-btn v2-btn-secondary py-4"
+                                            className="v3-btn v3-btn-secondary py-4"
                                             style={{ background: 'rgba(248, 113, 113, 0.1)', borderColor: 'rgba(248, 113, 113, 0.3)' }}
                                         >
                                             <span className="block text-lg mb-1">✗</span>
@@ -359,10 +359,10 @@ export default function DurabilityPage() {
                             </div>
 
                             {/* Progress */}
-                            <div className="v2-card p-4">
+                            <div className="v3-card p-4">
                                 <div className="flex items-center justify-between mb-3">
                                     <div>
-                                        <p className="v2-label">Progress</p>
+                                        <p className="v3-label">Progress</p>
                                         <p className="text-xl font-mono" style={{ color: 'var(--color-accent)' }}>
                                             {completedCount} / {totalCount}
                                         </p>
@@ -383,7 +383,7 @@ export default function DurabilityPage() {
                                 </div>
                                 {completedCount === totalCount && (
                                     <button
-                                        className="v2-btn v2-btn-primary mt-4 w-full"
+                                        className="v3-btn v3-btn-primary mt-4 w-full"
                                         onClick={() => setMode('results')}
                                     >
                                         View Your Prescription
@@ -410,7 +410,7 @@ export default function DurabilityPage() {
                                             return (
                                                 <div
                                                     key={assessment.id}
-                                                    className="v2-card p-4 transition-all"
+                                                    className="v3-card p-4 transition-all"
                                                     style={{
                                                         borderColor: result?.result === 'pass' ? 'rgba(74, 222, 128, 0.3)' :
                                                             result?.result === 'fail' ? 'rgba(248, 113, 113, 0.3)' : undefined
@@ -430,7 +430,7 @@ export default function DurabilityPage() {
                                                         </div>
                                                         {result && (
                                                             <span
-                                                                className="v2-badge"
+                                                                className="v3-badge"
                                                                 style={{
                                                                     background: result.result === 'pass' ? 'var(--color-accent-subtle)' :
                                                                         result.result === 'fail' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)',
@@ -449,19 +449,19 @@ export default function DurabilityPage() {
                                                     {isExpanded && (
                                                         <div className="mt-4 pt-4 space-y-4" style={{ borderTop: '1px solid var(--border-base)' }}>
                                                             <div>
-                                                                <p className="v2-label mb-1">Test Procedure</p>
+                                                                <p className="v3-label mb-1">Test Procedure</p>
                                                                 <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                                                                     {assessment.testProcedure}
                                                                 </p>
                                                             </div>
                                                             <div>
-                                                                <p className="v2-label mb-1">Pass Standard</p>
+                                                                <p className="v3-label mb-1">Pass Standard</p>
                                                                 <p className="text-sm" style={{ color: '#4ade80' }}>
                                                                     {assessment.passStandard}
                                                                 </p>
                                                             </div>
                                                             <div>
-                                                                <p className="v2-label mb-1">If Failed</p>
+                                                                <p className="v3-label mb-1">If Failed</p>
                                                                 <ul className="text-sm list-disc list-inside" style={{ color: 'var(--text-muted)' }}>
                                                                     {assessment.failImplications.map((imp, i) => (
                                                                         <li key={i}>{imp}</li>
@@ -470,19 +470,19 @@ export default function DurabilityPage() {
                                                             </div>
                                                             <div className="flex gap-3">
                                                                 <button
-                                                                    className={`v2-btn flex-1 ${result?.result === 'pass' ? 'v2-btn-primary' : 'v2-btn-secondary'}`}
+                                                                    className={`v3-btn flex-1 ${result?.result === 'pass' ? 'v3-btn-primary' : 'v3-btn-secondary'}`}
                                                                     onClick={() => handleResult(assessment.id, 'pass')}
                                                                 >
                                                                     ✓ Pass
                                                                 </button>
                                                                 <button
-                                                                    className={`v2-btn flex-1 ${result?.result === 'partial' ? 'v2-btn-primary' : 'v2-btn-secondary'}`}
+                                                                    className={`v3-btn flex-1 ${result?.result === 'partial' ? 'v3-btn-primary' : 'v3-btn-secondary'}`}
                                                                     onClick={() => handleResult(assessment.id, 'partial')}
                                                                 >
                                                                     ~ Partial
                                                                 </button>
                                                                 <button
-                                                                    className={`v2-btn flex-1 ${result?.result === 'fail' ? 'v2-btn-primary' : 'v2-btn-secondary'}`}
+                                                                    className={`v3-btn flex-1 ${result?.result === 'fail' ? 'v3-btn-primary' : 'v3-btn-secondary'}`}
                                                                     onClick={() => handleResult(assessment.id, 'fail')}
                                                                 >
                                                                     ✗ Fail
@@ -509,7 +509,7 @@ export default function DurabilityPage() {
                             className="space-y-8"
                         >
                             <div className="text-center py-4">
-                                <p className="v2-label mb-2" style={{ color: 'var(--color-accent)' }}>
+                                <p className="v3-label mb-2" style={{ color: 'var(--color-accent)' }}>
                                     YOUR DURABILITY PRESCRIPTION
                                 </p>
                                 <h1 className="text-3xl font-light">
@@ -519,17 +519,17 @@ export default function DurabilityPage() {
 
                             {/* Summary stats */}
                             <div className="grid grid-cols-3 gap-4">
-                                <div className="v2-card p-4 text-center">
+                                <div className="v3-card p-4 text-center">
                                     <p className="text-2xl font-mono" style={{ color: '#4ade80' }}>{passCount}</p>
                                     <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Pass</p>
                                 </div>
-                                <div className="v2-card p-4 text-center">
+                                <div className="v3-card p-4 text-center">
                                     <p className="text-2xl font-mono" style={{ color: '#f59e0b' }}>
                                         {Object.values(results).filter(r => r.result === 'partial').length}
                                     </p>
                                     <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Partial</p>
                                 </div>
-                                <div className="v2-card p-4 text-center">
+                                <div className="v3-card p-4 text-center">
                                     <p className="text-2xl font-mono" style={{ color: '#f87171' }}>{failCount}</p>
                                     <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Fail</p>
                                 </div>
@@ -543,7 +543,7 @@ export default function DurabilityPage() {
                                     transition={{ duration: 0.5 }}
                                     className="relative overflow-hidden rounded-2xl p-8 text-center"
                                     style={{
-                                        background: 'linear-gradient(135deg, var(--v2-bg-card), var(--bg-elevated))',
+                                        background: 'linear-gradient(135deg, var(--v3-bg-card), var(--bg-elevated))',
                                         border: '1px solid var(--color-accent)',
                                     }}
                                 >
@@ -608,7 +608,7 @@ export default function DurabilityPage() {
                             {/* Actions */}
                             <div className="flex gap-4">
                                 <button
-                                    className="v2-btn v2-btn-secondary flex-1"
+                                    className="v3-btn v3-btn-secondary flex-1"
                                     onClick={() => {
                                         setMode('intro');
                                         setResults({});
@@ -618,7 +618,7 @@ export default function DurabilityPage() {
                                     Retake Assessment
                                 </button>
                                 <button
-                                    className="v2-btn v2-btn-primary flex-1"
+                                    className="v3-btn v3-btn-primary flex-1"
                                     disabled={saving}
                                     onClick={async () => {
                                         setSaving(true);
@@ -655,7 +655,7 @@ export default function DurabilityPage() {
                                     {saving ? 'Saving...' : 'Save & Continue'}
                                 </button>
                                 {saveError && (
-                                    <p className="text-sm text-center mt-2" style={{ color: 'var(--v2-error)' }}>{saveError}</p>
+                                    <p className="text-sm text-center mt-2" style={{ color: 'var(--v3-error)' }}>{saveError}</p>
                                 )}
                             </div>
                         </motion.div>

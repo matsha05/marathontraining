@@ -18,10 +18,10 @@ export function TrainingInsightsCard({ insights }: TrainingInsightsCardProps) {
             {/* Primary Stats Grid */}
             <div className="grid grid-cols-2 gap-3">
                 {/* Streak */}
-                <div className="v2-card p-4">
+                <div className="v3-card p-4">
                     <div className="flex items-center gap-2 mb-1">
                         <span className="text-lg">🔥</span>
-                        <span className="v2-label">Streak</span>
+                        <span className="v3-label">Streak</span>
                     </div>
                     <p className="text-lg font-mono" style={{ color: 'var(--color-accent)' }}>{insights.currentStreak}</p>
                     <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
@@ -30,10 +30,10 @@ export function TrainingInsightsCard({ insights }: TrainingInsightsCardProps) {
                 </div>
 
                 {/* Completion Rate */}
-                <div className="v2-card p-4">
+                <div className="v3-card p-4">
                     <div className="flex items-center gap-2 mb-1">
                         <span className="text-lg">📊</span>
-                        <span className="v2-label">Completed</span>
+                        <span className="v3-label">Completed</span>
                     </div>
                     <p className="text-lg font-mono" style={{ color: 'var(--color-accent)' }}>{insights.completionRate30Days}%</p>
                     <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
@@ -42,10 +42,10 @@ export function TrainingInsightsCard({ insights }: TrainingInsightsCardProps) {
                 </div>
 
                 {/* Average Feel */}
-                <div className="v2-card p-4">
+                <div className="v3-card p-4">
                     <div className="flex items-center gap-2 mb-1">
                         <span className="text-lg">{getFeelEmoji(Math.round(insights.averageFeel30Days))}</span>
-                        <span className="v2-label">Avg Feel</span>
+                        <span className="v3-label">Avg Feel</span>
                     </div>
                     <p className="text-lg font-mono" style={{ color: 'var(--color-accent)' }}>{insights.averageFeel30Days}</p>
                     <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
@@ -55,10 +55,10 @@ export function TrainingInsightsCard({ insights }: TrainingInsightsCardProps) {
                 </div>
 
                 {/* Missed Workouts */}
-                <div className="v2-card p-4">
+                <div className="v3-card p-4">
                     <div className="flex items-center gap-2 mb-1">
                         <span className="text-lg">📅</span>
-                        <span className="v2-label">Missed</span>
+                        <span className="v3-label">Missed</span>
                     </div>
                     <p className="text-lg font-mono" style={{ color: 'var(--color-accent)' }}>{insights.missedWorkouts30Days}</p>
                     <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
@@ -68,8 +68,8 @@ export function TrainingInsightsCard({ insights }: TrainingInsightsCardProps) {
             </div>
 
             {/* Effort Calibration (Seiler insight) */}
-            <div className="v2-card p-4">
-                <p className="v2-label mb-3">Effort Calibration</p>
+            <div className="v3-card p-4">
+                <p className="v3-label mb-3">Effort Calibration</p>
                 <div className="grid grid-cols-2 gap-4">
                     <div>
                         <p className="text-sm mb-1" style={{ color: 'var(--text-muted)' }}>Easy days</p>
@@ -78,7 +78,7 @@ export function TrainingInsightsCard({ insights }: TrainingInsightsCardProps) {
                             <span className="text-sm" style={{ color: 'var(--text-muted)' }}>/ 5</span>
                             {insights.easyDayAverageFeel < 2.5 && (
                                 <span
-                                    className="v2-badge"
+                                    className="v3-badge"
                                     style={{ background: 'color-mix(in srgb, var(--color-warning) 15%, transparent)', color: 'var(--color-warning)' }}
                                 >
                                     Too hard

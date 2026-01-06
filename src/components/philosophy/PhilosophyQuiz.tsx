@@ -99,7 +99,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
     const recommendation = step === 'result' ? calculateRecommendation(answers) : null;
 
     return (
-        <div className="v2-root min-h-screen" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>
+        <div className="v3-root min-h-screen" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>
             {/* Progress bar - hide on beginner gate and result */}
             {step !== 'result' && step !== 'beginner_gate' && (
                 <div className="fixed top-0 left-0 right-0 z-50">
@@ -112,8 +112,8 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                             transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
                         />
                     </div>
-                    <div className="v2-container py-2">
-                        <p className="v2-mono text-center" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                    <div className="v3-container py-2">
+                        <p className="v3-mono text-center" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                             Step {currentIndex + 1} of 6
                         </p>
                     </div>
@@ -150,19 +150,19 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                                         setCanRunMile(true);
                                         setStep('distance');
                                     }}
-                                    className="w-full v2-card v2-card-interactive p-5 text-left"
+                                    className="w-full v3-card v3-card-interactive p-5 text-left"
                                 >
-                                    <p className="v2-heading-sm">Yes, I can run a mile</p>
-                                    <p className="v2-body-sm mt-1" style={{ color: 'var(--text-muted)' }}>
+                                    <p className="v3-heading-sm">Yes, I can run a mile</p>
+                                    <p className="v3-body-sm mt-1" style={{ color: 'var(--text-muted)' }}>
                                         Great! Let&apos;s find your training approach.
                                     </p>
                                 </button>
                                 <button
                                     onClick={() => setCanRunMile(false)}
-                                    className="w-full v2-card v2-card-interactive p-5 text-left"
+                                    className="w-full v3-card v3-card-interactive p-5 text-left"
                                 >
-                                    <p className="v2-heading-sm">Not yet</p>
-                                    <p className="v2-body-sm mt-1" style={{ color: 'var(--text-muted)' }}>
+                                    <p className="v3-heading-sm">Not yet</p>
+                                    <p className="v3-body-sm mt-1" style={{ color: 'var(--text-muted)' }}>
                                         That&apos;s okay — we&apos;ll point you in the right direction.
                                     </p>
                                 </button>
@@ -193,23 +193,23 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                                 Our training plans assume you can run continuously.
                                 The Couch to 5K program is perfect for building up to that point.
                             </p>
-                            <div className="v2-card p-6 mb-8 text-left">
-                                <p className="v2-label mb-2">Recommended: Couch to 5K (C25K)</p>
-                                <p className="v2-body-sm mb-4" style={{ color: 'var(--text-muted)' }}>
+                            <div className="v3-card p-6 mb-8 text-left">
+                                <p className="v3-label mb-2">Recommended: Couch to 5K (C25K)</p>
+                                <p className="v3-body-sm mb-4" style={{ color: 'var(--text-muted)' }}>
                                     A proven 9-week walk/run program that gradually builds you up to running 3 miles without stopping.
                                 </p>
                                 <a
                                     href="https://c25k.com/"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="v2-btn v2-btn-primary"
+                                    className="v3-btn v3-btn-primary"
                                 >
                                     Start C25K Program
                                 </a>
                             </div>
                             <button
                                 onClick={() => setCanRunMile(null)}
-                                className="v2-btn v2-btn-ghost"
+                                className="v3-btn v3-btn-ghost"
                             >
                                 ← Go back
                             </button>
@@ -308,7 +308,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                                 <input
                                     type="date"
                                     value={answers.raceDate || ''}
-                                    className="v2-input text-center text-lg py-4 px-6 w-full max-w-xs mx-auto"
+                                    className="v3-input text-center text-lg py-4 px-6 w-full max-w-xs mx-auto"
                                     style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-base)' }}
                                     min={new Date().toISOString().split('T')[0]}
                                     onChange={(e) => {
@@ -325,10 +325,10 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                                         animate={{ opacity: 1, y: 0 }}
                                         className="mt-6"
                                     >
-                                        <p className="v2-heading-md v2-mono" style={{ color: 'var(--color-accent)' }}>
+                                        <p className="v3-heading-md v3-mono" style={{ color: 'var(--color-accent)' }}>
                                             {weeksToRace} weeks
                                         </p>
-                                        <p className="v2-body-sm" style={{ color: 'var(--text-muted)' }}>
+                                        <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                                             until race day
                                         </p>
 
@@ -339,11 +339,11 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                                                 animate={{ opacity: 1, scale: 1 }}
                                                 className="mt-4 p-4 rounded-lg border"
                                                 style={{
-                                                    background: 'var(--v2-warning-subtle)',
-                                                    borderColor: 'var(--v2-warning)'
+                                                    background: 'var(--v3-warning-subtle)',
+                                                    borderColor: 'var(--v3-warning)'
                                                 }}
                                             >
-                                                <p className="v2-body-sm" style={{ color: 'var(--v2-warning)' }}>
+                                                <p className="v3-body-sm" style={{ color: 'var(--v3-warning)' }}>
                                                     ⚠️ We recommend at least {requiredWeeks} weeks for a {answers.targetDistance === 'half' ? 'half marathon' : answers.targetDistance}.
                                                     You can still proceed, but we&apos;ll adjust expectations.
                                                 </p>
@@ -353,7 +353,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                                         {/* Continue button */}
                                         <button
                                             onClick={() => handleDateSelect(answers.raceDate!)}
-                                            className="v2-btn v2-btn-primary v2-btn-lg mt-6"
+                                            className="v3-btn v3-btn-primary v3-btn-lg mt-6"
                                         >
                                             Continue
                                         </button>
@@ -423,14 +423,14 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                                             : 'Every marathon method we offer requires at least 4 running days per week. This isn\'t arbitrary — it\'s what the science and proven programs require.'
                                         }
                                     </p>
-                                    <div className="v2-card p-6 mb-8 text-left" style={{ borderColor: 'var(--border-base)' }}>
-                                        <p className="v2-heading-sm mb-2">
+                                    <div className="v3-card p-6 mb-8 text-left" style={{ borderColor: 'var(--border-base)' }}>
+                                        <p className="v3-heading-sm mb-2">
                                             {showTooFewDays === '2_or_fewer'
                                                 ? 'Can you find one more day?'
                                                 : 'Can you commit to 4 days?'
                                             }
                                         </p>
-                                        <p className="v2-body-sm mb-4" style={{ color: 'var(--text-muted)' }}>
+                                        <p className="v3-body-sm mb-4" style={{ color: 'var(--text-muted)' }}>
                                             {showTooFewDays === '2_or_fewer'
                                                 ? 'Even short 20-30 minute runs count. Many people find morning runs before work, lunch runs, or runs with kids in a stroller.'
                                                 : 'Two of those days can be short easy runs (20-30 minutes). The key is consistency, not crushing volume every day.'
@@ -438,7 +438,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                                         </p>
                                         <button
                                             onClick={() => setShowTooFewDays(null)}
-                                            className="v2-btn v2-btn-primary"
+                                            className="v3-btn v3-btn-primary"
                                         >
                                             Let me reconsider
                                         </button>
@@ -454,7 +454,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                                     </p>
                                     <button
                                         onClick={goBack}
-                                        className="v2-btn v2-btn-ghost mt-4"
+                                        className="v3-btn v3-btn-ghost mt-4"
                                     >
                                         Change my goal
                                     </button>
@@ -532,10 +532,10 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                                         <button
                                             key={option.value}
                                             onClick={() => handleDaysClick(option.value)}
-                                            className="w-full v2-card v2-card-interactive p-5 text-left"
+                                            className="w-full v3-card v3-card-interactive p-5 text-left"
                                         >
-                                            <p className="v2-heading-sm">{option.label}</p>
-                                            <p className="v2-body-sm mt-1" style={{ color: 'var(--text-muted)' }}>
+                                            <p className="v3-heading-sm">{option.label}</p>
+                                            <p className="v3-body-sm mt-1" style={{ color: 'var(--text-muted)' }}>
                                                 {option.description}
                                             </p>
                                         </button>

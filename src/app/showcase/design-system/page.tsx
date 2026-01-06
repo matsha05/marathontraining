@@ -13,7 +13,7 @@ import { StepIndicator } from "@/components/ui/StepIndicator";
  * Design System V3 — Complete Showcase
  * Board-Presentation Quality
  * 
- * All tokens from globals-v2.css + proposed additions
+ * All tokens from globals-v3.css + proposed additions
  */
 
 export default function DesignSystemShowcase() {
@@ -24,7 +24,7 @@ export default function DesignSystemShowcase() {
 
     // Complete token system
     const tokens = {
-        // From globals-v2.css
+        // From globals-v3.css
         colors: {
             dark: {
                 // Backgrounds
@@ -72,43 +72,43 @@ export default function DesignSystemShowcase() {
             }
         },
         typography: [
-            { name: "Metric", token: "--v2-text-5xl", size: "56px", weight: 300, lh: 1.0 },
-            { name: "Hero", token: "--v2-text-hero", size: "72px", weight: 300, lh: 1.1 },
-            { name: "Display", token: "--v2-text-4xl", size: "48px", weight: 300, lh: 1.1 },
-            { name: "Title 1", token: "--v2-text-2xl", size: "32px", weight: 400, lh: 1.2 },
-            { name: "Title 2", token: "--v2-text-xl", size: "24px", weight: 500, lh: 1.3 },
+            { name: "Metric", token: "--v3-text-5xl", size: "56px", weight: 300, lh: 1.0 },
+            { name: "Hero", token: "--v3-text-hero", size: "72px", weight: 300, lh: 1.1 },
+            { name: "Display", token: "--v3-text-4xl", size: "48px", weight: 300, lh: 1.1 },
+            { name: "Title 1", token: "--v3-text-2xl", size: "32px", weight: 400, lh: 1.2 },
+            { name: "Title 2", token: "--v3-text-xl", size: "24px", weight: 500, lh: 1.3 },
             { name: "Headline", token: "(proposed)", size: "20px", weight: 500, lh: 1.3 },
-            { name: "Callout", token: "--v2-text-lg", size: "18px", weight: 400, lh: 1.4 },
-            { name: "Body", token: "--v2-text-base", size: "16px", weight: 400, lh: 1.5 },
-            { name: "Footnote", token: "--v2-text-sm", size: "14px", weight: 500, lh: 1.4 },
+            { name: "Callout", token: "--v3-text-lg", size: "18px", weight: 400, lh: 1.4 },
+            { name: "Body", token: "--v3-text-base", size: "16px", weight: 400, lh: 1.5 },
+            { name: "Footnote", token: "--v3-text-sm", size: "14px", weight: 500, lh: 1.4 },
             { name: "Caption", token: "(proposed)", size: "12px", weight: 400, lh: 1.3 },
         ],
         spacing: [
-            { name: "space-1", value: 4, token: "--v2-space-1" },
-            { name: "space-2", value: 8, token: "--v2-space-2" },
-            { name: "space-3", value: 12, token: "--v2-space-3" },
-            { name: "space-4", value: 16, token: "--v2-space-4" },
-            { name: "space-6", value: 24, token: "--v2-space-6" },
-            { name: "space-8", value: 32, token: "--v2-space-8" },
-            { name: "space-12", value: 48, token: "--v2-space-12" },
-            { name: "space-16", value: 64, token: "--v2-space-16" },
+            { name: "space-1", value: 4, token: "--v3-space-1" },
+            { name: "space-2", value: 8, token: "--v3-space-2" },
+            { name: "space-3", value: 12, token: "--v3-space-3" },
+            { name: "space-4", value: 16, token: "--v3-space-4" },
+            { name: "space-6", value: 24, token: "--v3-space-6" },
+            { name: "space-8", value: 32, token: "--v3-space-8" },
+            { name: "space-12", value: 48, token: "--v3-space-12" },
+            { name: "space-16", value: 64, token: "--v3-space-16" },
         ],
         radii: [
-            { name: "sm", value: "6px", token: "--v2-radius-sm" },
-            { name: "md", value: "8px", token: "--v2-radius-md" },
-            { name: "lg", value: "12px", token: "--v2-radius-lg" },
-            { name: "xl", value: "16px", token: "--v2-radius-xl" },
-            { name: "full", value: "9999px", token: "--v2-radius-full" },
+            { name: "sm", value: "6px", token: "--v3-radius-sm" },
+            { name: "md", value: "8px", token: "--v3-radius-md" },
+            { name: "lg", value: "12px", token: "--v3-radius-lg" },
+            { name: "xl", value: "16px", token: "--v3-radius-xl" },
+            { name: "full", value: "9999px", token: "--v3-radius-full" },
         ],
         shadows: [
-            { name: "sm", value: "0 1px 2px rgba(0,0,0,0.5)", token: "--v2-shadow-sm" },
-            { name: "md", value: "0 4px 12px rgba(0,0,0,0.4)", token: "--v2-shadow-md" },
-            { name: "lg", value: "0 8px 24px rgba(0,0,0,0.5)", token: "--v2-shadow-lg" },
+            { name: "sm", value: "0 1px 2px rgba(0,0,0,0.5)", token: "--v3-shadow-sm" },
+            { name: "md", value: "0 4px 12px rgba(0,0,0,0.4)", token: "--v3-shadow-md" },
+            { name: "lg", value: "0 8px 24px rgba(0,0,0,0.5)", token: "--v3-shadow-lg" },
         ],
         motion: [
-            { name: "Fast", duration: "150ms", token: "--v2-duration-fast", use: "Hovers" },
-            { name: "Base", duration: "200ms", token: "--v2-duration-base", use: "Transitions" },
-            { name: "Slow", duration: "300ms", token: "--v2-duration-slow", use: "Modals" },
+            { name: "Fast", duration: "150ms", token: "--v3-duration-fast", use: "Hovers" },
+            { name: "Base", duration: "200ms", token: "--v3-duration-base", use: "Transitions" },
+            { name: "Slow", duration: "300ms", token: "--v3-duration-slow", use: "Modals" },
             { name: "Spring", duration: "400ms", token: "(proposed)", use: "Delights" },
         ],
         zIndex: [
