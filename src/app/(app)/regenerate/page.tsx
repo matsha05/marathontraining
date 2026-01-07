@@ -181,6 +181,7 @@ export default function RegeneratePlanPage() {
     const handleGenerate = async () => {
         setStep('generating');
         setIsGenerating(true);
+        setError(null); // Clear previous errors
 
         try {
             const supabase = createSupabaseBrowserClient();
@@ -190,7 +191,10 @@ export default function RegeneratePlanPage() {
             // Generate plan from onboarding data
             const planResult = createPlanFromOnboarding(data);
             if (!planResult.success) {
-                throw new Error(planResult.error?.message || 'Failed to generate plan');
+                // Show the actual error message
+                setError(planResult.error?.message || 'Failed to generate plan');
+                setStep('vdot-confirm'); // Go back to start so user can fix issues
+                return;
             }
 
             // Save to database (user ID fetched internally)
@@ -200,8 +204,8 @@ export default function RegeneratePlanPage() {
             setStep('complete');
         } catch (err) {
             console.error('Plan generation failed:', err);
-            setError('Failed to generate plan. Please try again.');
-            setStep('strength-training'); // Go back to last step
+            setError(err instanceof Error ? err.message : 'Failed to generate plan. Please try again.');
+            setStep('vdot-confirm'); // Go back to start so user can review all data
         } finally {
             setIsGenerating(false);
         }
@@ -273,6 +277,14 @@ export default function RegeneratePlanPage() {
                                         title="Your current fitness level"
                                         subtitle="We'll use this to calculate your training paces."
                                     />
+
+                                    {/* Error display */}
+                                    {error && (
+                                        <div className="mb-4 p-4 rounded-lg" style={{ background: 'var(--v3-error-subtle)' }}>
+                                            <p className="text-sm font-medium" style={{ color: 'var(--v3-error)' }}>Plan generation failed</p>
+                                            <p className="text-sm mt-1" style={{ color: 'var(--v3-error)' }}>{error}</p>
+                                        </div>
+                                    )}
 
                                     {/* VDOT Display */}
                                     <div

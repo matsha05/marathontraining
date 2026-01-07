@@ -50,49 +50,124 @@ function getMileageValue(mileage: CurrentMileage): number {
 
 function selectHigdonTier(input: TierSelectionInput): TierSelectionResult {
     const { distance, experience } = input;
+    const mileageValue = getMileageValue(input.currentMileage);
     const warnings: string[] = [];
     let tier: string;
+    let effectiveLevel: 'novice' | 'intermediate' | 'advanced';
 
+    // Capacity-First Tier Selection (per coach_module_architecture.md Section 7)
+    // Mileage gates which tiers are available; experience only selects within eligible tiers
     switch (distance) {
         case '5k':
-            tier = experience === 'advanced' ? '5k_advanced' :
-                experience === 'intermediate' ? '5k_intermediate' : '5k_novice';
+            // 5K thresholds: advanced needs 30+ mpw, intermediate needs 20+ mpw
+            if (mileageValue >= 30 && experience === 'advanced') {
+                tier = '5k_advanced';
+                effectiveLevel = 'advanced';
+            } else if (mileageValue >= 20 && (experience === 'advanced' || experience === 'intermediate')) {
+                tier = '5k_intermediate';
+                effectiveLevel = 'intermediate';
+                if (experience === 'advanced') {
+                    warnings.push(`Your current mileage (${mileageValue} mpw) is best suited for Intermediate tier.`);
+                }
+            } else {
+                tier = '5k_novice';
+                effectiveLevel = 'novice';
+                if (experience !== 'beginner' && mileageValue < 20) {
+                    warnings.push(`Your current mileage (${mileageValue} mpw) is best suited for Novice tier.`);
+                }
+            }
             break;
+
         case '10k':
-            tier = experience === 'advanced' ? '10k_advanced' :
-                experience === 'intermediate' ? '10k_intermediate' : '10k_novice';
+            // 10K thresholds: advanced needs 35+ mpw, intermediate needs 25+ mpw
+            if (mileageValue >= 35 && experience === 'advanced') {
+                tier = '10k_advanced';
+                effectiveLevel = 'advanced';
+            } else if (mileageValue >= 25 && (experience === 'advanced' || experience === 'intermediate')) {
+                tier = '10k_intermediate';
+                effectiveLevel = 'intermediate';
+                if (experience === 'advanced') {
+                    warnings.push(`Your current mileage (${mileageValue} mpw) is best suited for Intermediate tier.`);
+                }
+            } else {
+                tier = '10k_novice';
+                effectiveLevel = 'novice';
+                if (experience !== 'beginner' && mileageValue < 25) {
+                    warnings.push(`Your current mileage (${mileageValue} mpw) is best suited for Novice tier.`);
+                }
+            }
             break;
+
         case 'half':
-            if (experience === 'advanced') {
+            // Half thresholds: advanced needs 40+ mpw, intermediate needs 25+ mpw
+            if (mileageValue >= 40 && experience === 'advanced') {
                 tier = 'half_advanced';
-            } else if (experience === 'intermediate') {
+                effectiveLevel = 'advanced';
+            } else if (mileageValue >= 25 && (experience === 'advanced' || experience === 'intermediate')) {
                 tier = 'half_intermediate_1';
+                effectiveLevel = 'intermediate';
+                if (experience === 'advanced') {
+                    warnings.push(`Your current mileage (${mileageValue} mpw) is best suited for Intermediate tier.`);
+                }
             } else {
                 tier = 'half_novice_1';
+                effectiveLevel = 'novice';
+                if (experience !== 'beginner' && mileageValue < 25) {
+                    warnings.push(`Your current mileage (${mileageValue} mpw) is best suited for Novice tier.`);
+                }
             }
             break;
+
         case 'marathon':
-            if (experience === 'advanced') {
+            // Marathon thresholds: advanced needs 45+ mpw, intermediate needs 30+ mpw
+            if (mileageValue >= 45 && experience === 'advanced') {
                 tier = 'marathon_advanced_1';
-            } else if (experience === 'intermediate') {
+                effectiveLevel = 'advanced';
+            } else if (mileageValue >= 30 && (experience === 'advanced' || experience === 'intermediate')) {
                 tier = 'marathon_intermediate_1';
+                effectiveLevel = 'intermediate';
+                if (experience === 'advanced') {
+                    warnings.push(`Your current mileage (${mileageValue} mpw) is best suited for Intermediate tier.`);
+                }
             } else {
                 tier = 'marathon_novice_1';
+                effectiveLevel = 'novice';
+                if (experience !== 'beginner' && mileageValue < 30) {
+                    warnings.push(`Your current mileage (${mileageValue} mpw) is best suited for Novice tier.`);
+                }
             }
             break;
+
         case 'base':
-            tier = experience === 'advanced' ? 'base_advanced' :
-                experience === 'intermediate' ? 'base_intermediate' : 'base_novice';
+            // Base training thresholds: advanced needs 30+ mpw, intermediate needs 20+ mpw
+            if (mileageValue >= 30 && experience === 'advanced') {
+                tier = 'base_advanced';
+                effectiveLevel = 'advanced';
+            } else if (mileageValue >= 20 && (experience === 'advanced' || experience === 'intermediate')) {
+                tier = 'base_intermediate';
+                effectiveLevel = 'intermediate';
+                if (experience === 'advanced') {
+                    warnings.push(`Your current mileage (${mileageValue} mpw) is best suited for Intermediate tier.`);
+                }
+            } else {
+                tier = 'base_novice';
+                effectiveLevel = 'novice';
+                if (experience !== 'beginner' && mileageValue < 20) {
+                    warnings.push(`Your current mileage (${mileageValue} mpw) is best suited for Novice tier.`);
+                }
+            }
             break;
+
         default:
             tier = 'marathon_novice_1';
+            effectiveLevel = 'novice';
             warnings.push(`Unknown distance ${distance}, defaulting to marathon novice 1`);
     }
 
     return {
         tier,
         philosophy: 'higdon',
-        displayName: `Hal Higdon ${distance.toUpperCase()} ${experience}`,
+        displayName: `Hal Higdon ${distance.toUpperCase()} ${effectiveLevel.charAt(0).toUpperCase() + effectiveLevel.slice(1)}`,
         warnings,
     };
 }
