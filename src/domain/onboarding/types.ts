@@ -43,6 +43,7 @@ export type OnboardingStep =
     // Phase 6: Schedule
     | 'available-days'
     | 'long-run-day'
+    | 'plan-start-date'
 
     // Phase 7: Safety
     | 'current-pain'

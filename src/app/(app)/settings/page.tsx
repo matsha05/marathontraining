@@ -209,7 +209,7 @@ export default function SettingsPage() {
             await clearPlan();
             await refreshPlan();
             setShowResetModal(false);
-            router.push('/onboarding');
+            router.push('/regenerate');  // Quick regeneration flow
         } catch (error) { console.error('Reset failed:', error); }
         finally { setResetBusy(false); }
     };
@@ -749,7 +749,7 @@ export default function SettingsPage() {
                                 <h3 className="text-heading-sm">Reset Training Plan?</h3>
                             </div>
                             <p className="text-body-sm mb-6" style={{ color: 'var(--text-muted)' }}>
-                                This will clear your current plan. You&apos;ll go through onboarding to create a new one.
+                                This will clear your current plan. You&apos;ll answer a few quick questions to build a new one.
                             </p>
                             <div className="flex gap-3">
                                 <button onClick={() => setShowResetModal(false)} className="btn btn-secondary flex-1">Cancel</button>

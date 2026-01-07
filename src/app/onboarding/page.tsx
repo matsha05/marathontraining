@@ -62,6 +62,7 @@ import {
     LongestRunScreen,
     AvailableDaysScreen,
     LongRunDayScreen,
+    PlanStartDateScreen,
 } from '@/components/onboarding/screens/training-load';
 import {
     CurrentPainScreen,
@@ -634,6 +635,16 @@ function OnboardingContent() {
                     <LongRunDayScreen
                         value={data.longRunDays}
                         onChange={(longRunDays) => setData(prev => ({ ...prev, longRunDays }))}
+                        onContinue={goToNext}
+                        onBack={goBack}
+                    />
+                )}
+
+                {step === 'plan-start-date' && (
+                    <PlanStartDateScreen
+                        value={data.planStartDate}
+                        raceDate={data.raceDate || null}
+                        onChange={(planStartDate) => setData(prev => ({ ...prev, planStartDate }))}
                         onContinue={goToNext}
                         onBack={goBack}
                     />
