@@ -43,7 +43,6 @@ import {
     HelpCircle,
 } from "lucide-react";
 import { SiteHeader } from "@/components/ui/SiteHeader";
-import { Footer } from "@/components/ui/Footer";
 
 const ease = [0.25, 0.46, 0.45, 0.94] as const;
 
@@ -856,7 +855,7 @@ export function DurabilityLabContent({ onStartAssessment }: {
                 </div>
             </section>
 
-            <Footer />
+            {/* Footer is provided by app layout */}
 
             {/* Standard Detail Modal */}
             <AnimatePresence>
