@@ -26,6 +26,8 @@ import {
     HIGDON_TIER_CONFIGS,
 } from '../types';
 
+import { getHigdonLongRunProgression } from './higdon-data';
+
 // =============================================================================
 // MICROCYCLE TEMPLATES
 // =============================================================================
@@ -458,16 +460,12 @@ const LONG_RUN_CAPS: Record<HigdonDistance, number> = {
  * Get the EXACT Higdon long run progression.
  * Uses literal arrays extracted from halhigdon.com - no approximations.
  *
- * @deprecated Use getHigdonLongRunProgression from './higdon-data' for exact data.
- * This wrapper exists for backwards compatibility.
+ * Re-exports the function from './higdon-data' for backwards compatibility.
  */
 export function generateHigdonLongRunProgression(
     tier: HigdonTier,
     _totalWeeks: number
 ): number[] {
-    // Import exact data from higdon-data.ts
-    // This replaces the previous algorithmic generation with exact week-by-week values
-    const { getHigdonLongRunProgression } = require('./higdon-data');
     return getHigdonLongRunProgression(tier);
 }
 

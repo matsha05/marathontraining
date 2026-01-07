@@ -30,8 +30,8 @@ import {
 // =============================================================================
 
 describe('HANSONS_TIER_CONFIGS', () => {
-    it('should have 2 tiers', () => {
-        expect(Object.keys(HANSONS_TIER_CONFIGS)).toHaveLength(2);
+    it('should have 4 tiers (2 marathon + 2 half marathon)', () => {
+        expect(Object.keys(HANSONS_TIER_CONFIGS)).toHaveLength(4);
     });
 
     it('should have beginner and advanced tiers', () => {
@@ -46,11 +46,13 @@ describe('HANSONS_TIER_CONFIGS', () => {
         });
     });
 
-    it('all tiers should have 16-mile long run cap', () => {
-        const tiers = getHansonsTiers();
-        tiers.forEach((tier) => {
-            expect(HANSONS_TIER_CONFIGS[tier].longRunCap).toBe(16);
-        });
+    it('marathon tiers should have 16-mile long run cap, half marathon tiers vary', () => {
+        // Marathon tiers cap at 16 miles
+        expect(HANSONS_TIER_CONFIGS.hansons_beginner.longRunCap).toBe(16);
+        expect(HANSONS_TIER_CONFIGS.hansons_advanced.longRunCap).toBe(16);
+        // Half marathon: beginner caps at 12, advanced at 14
+        expect(HANSONS_TIER_CONFIGS.hansons_half_beginner.longRunCap).toBe(12);
+        expect(HANSONS_TIER_CONFIGS.hansons_half_advanced.longRunCap).toBe(14);
     });
 
     it('beginner should peak at 57.5 mpw', () => {

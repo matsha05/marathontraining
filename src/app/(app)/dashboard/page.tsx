@@ -4,18 +4,16 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { COACHES } from '@/config/coach-spec/methodology';
-import { FlameIcon } from '@/components/ui/flame';
+import { CheckIcon } from '@/components/ui/check';
+import { PlayIcon } from '@/components/ui/play';
 import { ActivityIcon } from '@/components/ui/activity';
 import { ChartBarIncreasingIcon } from '@/components/ui/chart-bar-increasing';
 import { CalendarDaysIcon } from '@/components/ui/calendar-days';
-import { CheckIcon } from '@/components/ui/check';
-import { PlayIcon } from '@/components/ui/play';
 import { usePlan } from '@/domain/plan/context';
 import { useAuth } from '@/domain/auth/context';
-import { InsightsCard } from '@/components/insights/InsightsCard';
 import { IntensityDistributionCard } from '@/components/insights/IntensityDistributionCard';
 import { WorkoutLog, WorkoutForIntensity } from '@/domain/insights';
-import { formatPace, getDayName, getFullDayName } from '@/lib/format';
+import { getDayName, getFullDayName, formatPace } from '@/lib/format';
 import { motion } from 'framer-motion';
 import { PacesCard } from '@/components/paces/PacesCard';
 import { RecalibrationModal } from '@/components/vdot/RecalibrationModal';
@@ -23,6 +21,7 @@ import { DurabilityStatusCard } from '@/components/durability';
 import { SiteHeader } from '@/components/ui/SiteHeader';
 import { WeeklyCalendar } from '@/components/ui/WeeklyCalendar';
 import confetti from 'canvas-confetti';
+import { RaceCommandBar, CoachingWhisper, MileageGauge, PhaseTimeline, extractPhasesFromWeeks } from '@/components/dashboard';
 
 /**
  * THE LONG GAME - Dashboard V2
@@ -407,129 +406,27 @@ export default function DashboardPage() {
     return (
         <div className="v3-root min-h-screen">
             {/* Use shared SiteHeader for consistency */}
-            <SiteHeader hideAuth />
+            <SiteHeader />
 
             <main className="v3-container py-10" style={{ paddingTop: 'calc(var(--v3-space-10) + 80px)' }}>
-                {/* Greeting + VDOT Hero */}
-                <motion.div
-                    className="mb-8"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                >
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="v3-label mb-1" style={{ color: 'var(--text-subtle)' }}>{getGreeting()}</p>
-                            <h1 className="v3-heading-xl" style={{ fontSize: '2rem' }}>{displayName}</h1>
-                        </div>
-                        {/* VDOT Hero */}
-                        <div className="text-center">
-                            <p className="v3-label" style={{ color: 'var(--text-muted)' }}>Your Fitness</p>
-                            <p className="v3-mono font-bold" style={{ fontSize: '2.5rem', color: 'var(--color-accent)' }}>
-                                {displayVdot}
-                            </p>
-                            <p className="v3-body-xs" style={{ color: 'var(--text-subtle)' }}>VDOT</p>
-                        </div>
-                    </div>
-                </motion.div>
-
-                {/* Plan Identity Hero Card */}
+                {/* Race Command Bar - Premium Dense Hero */}
                 {plan && (
-                    <motion.div
-                        className="mb-6"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.05 }}
-                    >
-                        <Link href="/plan" className="block">
-                            <div
-                                className="v3-card v3-card-interactive p-5"
-                                style={{
-                                    background: 'linear-gradient(135deg, var(--bg-elevated) 0%, var(--bg-muted) 100%)',
-                                    borderColor: 'var(--border-base)',
-                                }}
-                            >
-                                {/* Coach & Plan Header */}
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="flex items-center gap-3">
-                                        {/* Coach color indicator */}
-                                        <div
-                                            className="w-2.5 h-2.5 rounded-full"
-                                            style={{
-                                                background: plan.philosophy
-                                                    ? `var(--color-coach-${plan.philosophy}, var(--color-accent))`
-                                                    : 'var(--color-accent)',
-                                            }}
-                                        />
-                                        <div>
-                                            <p className="text-xs uppercase tracking-widest" style={{ color: 'var(--text-subtle)' }}>
-                                                {plan.planTier || (plan.philosophy
-                                                    ? plan.philosophy.charAt(0).toUpperCase() + plan.philosophy.slice(1)
-                                                    : 'Training Plan')}
-                                            </p>
-                                            <p className="text-lg font-light" style={{ color: 'var(--text-base)' }}>
-                                                {plan.raceName || `${plan.goalDistance.toUpperCase()} Training`}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <svg className="w-5 h-5" style={{ color: 'var(--text-muted)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </div>
+                    <RaceCommandBar
+                        plan={plan}
+                        currentWeek={currentWeek}
+                        currentWeekPlan={currentWeekPlan}
+                        vdot={displayVdot}
+                        athleteName={displayName}
+                    />
+                )}
 
-                                {/* Key Metrics Row */}
-                                <div className="grid grid-cols-3 gap-4">
-                                    {/* Weeks to Race / Current Week */}
-                                    <div className="text-center p-3 rounded-xl" style={{ background: 'var(--bg-base)' }}>
-                                        <p className="text-2xl font-light v3-mono" style={{ color: 'var(--color-accent)' }}>
-                                            {plan.raceDate ? (() => {
-                                                const weeksToRace = Math.ceil((new Date(plan.raceDate).getTime() - Date.now()) / (7 * 24 * 60 * 60 * 1000));
-                                                return weeksToRace > 0 ? weeksToRace : currentWeek || 1;
-                                            })() : currentWeek || 1}
-                                        </p>
-                                        <p className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--text-subtle)' }}>
-                                            {plan.raceDate && Math.ceil((new Date(plan.raceDate).getTime() - Date.now()) / (7 * 24 * 60 * 60 * 1000)) > 0
-                                                ? 'weeks left'
-                                                : 'current week'}
-                                        </p>
-                                    </div>
-
-                                    {/* Current Phase */}
-                                    <div className="text-center p-3 rounded-xl" style={{ background: 'var(--bg-base)' }}>
-                                        <p className="text-2xl font-light" style={{ color: 'var(--text-base)' }}>
-                                            {currentWeekPlan?.phase
-                                                ? currentWeekPlan.phase.charAt(0).toUpperCase() + currentWeekPlan.phase.slice(1)
-                                                : 'Base'}
-                                        </p>
-                                        <p className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--text-subtle)' }}>
-                                            phase
-                                        </p>
-                                    </div>
-
-                                    {/* Weekly Mileage */}
-                                    <div className="text-center p-3 rounded-xl" style={{ background: 'var(--bg-base)' }}>
-                                        <p className="text-2xl font-light v3-mono" style={{ color: 'var(--text-base)' }}>
-                                            {currentWeekPlan?.totalMiles ? Math.round(currentWeekPlan.totalMiles) : plan.peakMileage}
-                                        </p>
-                                        <p className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--text-subtle)' }}>
-                                            miles
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Race Date */}
-                                {plan.raceDate && (
-                                    <div className="mt-4 pt-3 text-center" style={{ borderTop: '1px solid var(--border-base)' }}>
-                                        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                                            {plan.raceName || 'Race Day'} · {new Date(plan.raceDate).toLocaleDateString('en-US', {
-                                                month: 'long', day: 'numeric', year: 'numeric'
-                                            })}
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
-                        </Link>
-                    </motion.div>
+                {/* Phase Timeline */}
+                {plan && plan.weeks.length > 0 && (
+                    <PhaseTimeline
+                        phases={extractPhasesFromWeeks(plan.weeks.map(w => ({ weekNumber: w.weekNumber, phase: w.phase })))}
+                        currentWeek={currentWeek || 1}
+                        totalWeeks={plan.totalWeeks}
+                    />
                 )}
 
                 {/* Pre-workout readiness nudge on quality days (Starrett methodology) */}
@@ -676,6 +573,18 @@ export default function DashboardPage() {
                     </div>
                 </motion.section>
 
+                {/* Coaching Whisper - Contextual coach wisdom */}
+                {plan && currentWeekPlan && (
+                    <CoachingWhisper
+                        philosophy={plan.philosophy as 'hansons' | 'higdon' | 'pfitzinger' | 'daniels' | 'fitzgerald' | 'magness' | undefined}
+                        phase={currentWeekPlan.phase}
+                        workoutType={todayWorkout?.runWorkout?.type}
+                        workoutNotes={todayWorkout?.runWorkout?.notes?.[0]}
+                        weekNumber={currentWeek || 1}
+                        totalWeeks={plan.totalWeeks}
+                    />
+                )}
+
                 {/* Week Overview - Week Grid Style */}
                 <motion.section
                     className="mb-10"
@@ -694,6 +603,17 @@ export default function DashboardPage() {
                             </button>
                         )}
                     </div>
+
+                    {/* Weekly Mileage Progress */}
+                    {currentWeekPlan && (
+                        <div className="mb-4">
+                            <MileageGauge
+                                completed={weekOverview.filter(d => d.done && d.distance).reduce((sum, d) => sum + (d.distance || 0), 0)}
+                                planned={currentWeekPlan.totalMiles || 0}
+                                label="This week"
+                            />
+                        </div>
+                    )}
 
                     <WeeklyCalendar
                         days={weekOverview.map(day => ({
@@ -795,60 +715,6 @@ export default function DashboardPage() {
                     />
                 </motion.section>
 
-
-                {/* Stats Row */}
-                <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.35 }}
-                >
-                    <h2 className="v3-heading-md mb-4">Quick Stats</h2>
-                    <div className="grid grid-cols-3 gap-4">
-                        <div className="v3-card p-4">
-                            <div className="flex items-center gap-3">
-                                <div
-                                    className="w-10 h-10 rounded-xl flex items-center justify-center"
-                                    style={{ background: 'rgba(249, 115, 22, 0.1)' }}
-                                >
-                                    <FlameIcon size={22} style={{ color: '#f97316' }} />
-                                </div>
-                                <div>
-                                    <p className="v3-heading-md v3-mono" style={{ lineHeight: 1 }}>{streak}</p>
-                                    <p className="v3-body-xs" style={{ color: 'var(--text-muted)' }}>Day Streak</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="v3-card p-4">
-                            <div className="flex items-center gap-3">
-                                <div
-                                    className="w-10 h-10 rounded-xl flex items-center justify-center"
-                                    style={{ background: 'var(--color-accent-subtle)' }}
-                                >
-                                    <ChartBarIncreasingIcon size={22} className="v3-accent" />
-                                </div>
-                                <div>
-                                    <p className="v3-heading-md v3-mono" style={{ lineHeight: 1 }}>{displayVdot}</p>
-                                    <p className="v3-body-xs" style={{ color: 'var(--text-muted)' }}>VDOT</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="v3-card p-4">
-                            <div className="flex items-center gap-3">
-                                <div
-                                    className="w-10 h-10 rounded-xl flex items-center justify-center"
-                                    style={{ background: 'var(--color-accent-subtle)' }}
-                                >
-                                    <CalendarDaysIcon size={22} className="v3-accent" />
-                                </div>
-                                <div>
-                                    <p className="v3-heading-md v3-mono" style={{ lineHeight: 1 }}>{plan?.totalWeeks || 0}</p>
-                                    <p className="v3-body-xs" style={{ color: 'var(--text-muted)' }}>Total Weeks</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </motion.section>
-
                 {/* Training Zones & Paces */}
                 <motion.section
                     className="mt-10"
@@ -863,17 +729,6 @@ export default function DashboardPage() {
                         onRecalibrate={() => setShowRecalibrationModal(true)}
                         onMaxHRUpdate={handleMaxHRUpdate}
                     />
-                </motion.section>
-
-                {/* Training Insights */}
-                <motion.section
-                    className="mt-10"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.4 }}
-                >
-                    <h2 className="v3-heading-md mb-4">Training Insights</h2>
-                    <InsightsCard workoutLogs={workoutLogs} />
                 </motion.section>
             </main>
 
