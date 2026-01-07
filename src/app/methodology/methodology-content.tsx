@@ -7,7 +7,7 @@
  * All content included: bio, achievements, publications, notable athletes, whatThisMeans, source, website
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { BookOpen, ExternalLink, ChevronDown } from "lucide-react";
@@ -92,8 +92,18 @@ function CoachDetailContent({ coach }: { coach: Coach }) {
 
 export function MethodologyContent() {
     const [expandedId, setExpandedId] = useState<string | null>(null);
+    const [mounted, setMounted] = useState(false);
     const allCoaches = Object.values(COACHES);
     const colors = ['var(--color-strength)', '#ec4899', '#06b6d4', 'var(--color-accent)', '#8b5cf6', '#14b8a6', '#f59e0b', '#ef4444'];
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    // Prevent SSG from rendering with useTheme
+    if (!mounted) {
+        return <div className="v3-root min-h-screen" style={{ background: 'var(--bg-base)' }} />;
+    }
 
     return (
         <div className="v3-root min-h-screen" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>

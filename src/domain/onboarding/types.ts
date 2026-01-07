@@ -17,6 +17,7 @@ export type OnboardingStep =
     // Phase 2: Identity
     | 'name'
     | 'demographics'
+    | 'avatar'  // User profile avatar selection
 
     // Phase 3: Goal
     | 'training-goal'
@@ -109,7 +110,8 @@ export type VdotConfidence = 'high' | 'medium' | 'low';
 export interface OnboardingData {
     // Phase 2: Identity
     name: string;
-    age: number | null;
+    dateOfBirth: string | null;  // ISO date (YYYY-MM-DD) - preferred over age
+    age: number | null;          // @deprecated - derived from dateOfBirth, kept for backwards compat
     sex: Sex | null;
 
     // Phase 3: Goal
@@ -156,7 +158,9 @@ export interface OnboardingData {
 
     // Phase 6: Schedule
     availableDays: number | null;
-    longRunDay: string;
+    longRunDays: string[];       // Array of day names ['saturday', 'sunday'] - preferred
+    longRunDay: string;          // @deprecated - single day, kept for backwards compat
+    planStartDate: string | null; // ISO date for when training starts
 
     // Phase 7: Safety
     hasCurrentPain: boolean | null;
@@ -177,6 +181,9 @@ export interface OnboardingData {
     // Phase 9: Readiness
     readinessStatus: ReadinessStatus | null;
     baseWeeksNeeded: number | null;
+
+    // User profile
+    avatar: string | null; // Avatar ID from avatars.ts
 }
 
 // =============================================================================
@@ -186,6 +193,7 @@ export interface OnboardingData {
 export const INITIAL_ONBOARDING_DATA: OnboardingData = {
     // Identity
     name: '',
+    dateOfBirth: null,
     age: null,
     sex: null,
 
@@ -221,7 +229,9 @@ export const INITIAL_ONBOARDING_DATA: OnboardingData = {
 
     // Schedule
     availableDays: null,
+    longRunDays: [],
     longRunDay: '',
+    planStartDate: null,
 
     // Safety
     hasCurrentPain: null,
@@ -242,6 +252,9 @@ export const INITIAL_ONBOARDING_DATA: OnboardingData = {
     // Readiness
     readinessStatus: null,
     baseWeeksNeeded: null,
+
+    // User profile
+    avatar: null,
 };
 
 // =============================================================================
@@ -268,6 +281,9 @@ export function getNextStep(
             return 'demographics';
 
         case 'demographics':
+            return 'avatar';
+
+        case 'avatar':
             return 'training-goal';
 
         case 'training-goal':
@@ -372,8 +388,11 @@ export function getPreviousStep(
         case 'demographics':
             return 'name';
 
-        case 'training-goal':
+        case 'avatar':
             return 'demographics';
+
+        case 'training-goal':
+            return 'avatar';
 
         case 'race-details':
             return 'training-goal';
@@ -467,6 +486,7 @@ const STEP_PROGRESS: Record<OnboardingStep, number> = {
     'mile-gate': 3,
     'name': 6,
     'demographics': 10,
+    'avatar': 12,
     'training-goal': 15,
     'race-details': 20,
     'fitness-duration': 20,
@@ -556,9 +576,9 @@ export const STEP_TOOLTIPS: Partial<Record<OnboardingStep, CoachTooltip>> = {
     },
     'strength-training': {
         title: 'Why strength matters',
-        content: 'Jay Dicharry\'s research is clear: runners who strength train get injured less and run faster. We recommend it.',
-        coach: 'Jay Dicharry',
-        coachLink: '/methodology#dicharry',
+        content: 'The research is clear: heavy strength training improves running economy by 2-8% (Støren et al., 2008) and reduces injury rates. ACSM recommends 2x/week for endurance athletes. Jay Dicharry builds running-specific strength into all his programs.',
+        coach: 'Øyvind Støren',
+        coachLink: '/methodology#storen',
     },
 };
 
@@ -579,6 +599,9 @@ export function isStepComplete(step: OnboardingStep, data: OnboardingData): bool
 
         case 'demographics':
             return data.age !== null && data.age > 0 && data.sex !== null;
+
+        case 'avatar':
+            return true; // Avatar has default, always complete
 
         case 'training-goal':
             return data.trainingGoal !== null;
@@ -627,7 +650,7 @@ export function isStepComplete(step: OnboardingStep, data: OnboardingData): bool
             return data.availableDays !== null;
 
         case 'long-run-day':
-            return data.longRunDay !== '';
+            return data.longRunDays.length > 0;
 
         case 'current-pain':
             return data.hasCurrentPain !== null;

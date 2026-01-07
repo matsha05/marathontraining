@@ -4,7 +4,9 @@
  * THE LONG GAME - Durability Lab
  * 
  * Premium durability education and assessment page
- * Modeled after the methodology page - a one-stop shop for runner durability
+ * 
+ * ANTI-MARKETING: Every element provides real educational value.
+ * Each standard is clickable with how-to-test, why-it-matters, and what-to-fix.
  * 
  * Based on:
  * - Jay Dicharry's "Running Rewired"
@@ -12,7 +14,6 @@
  */
 
 import React, { useState } from "react";
-import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     ChevronDown,
@@ -24,7 +25,22 @@ import {
     Target,
     Shield,
     Footprints,
-    ArrowRight,
+    Check,
+    RotateCcw,
+    Ruler,
+    Flame,
+    Droplet,
+    Rocket,
+    Move,
+    ArrowUpRight,
+    ArrowDown,
+    Circle,
+    Ban,
+    X,
+    Play,
+    AlertCircle,
+    CheckCircle,
+    HelpCircle,
 } from "lucide-react";
 import { SiteHeader } from "@/components/ui/SiteHeader";
 import { Footer } from "@/components/ui/Footer";
@@ -66,7 +82,7 @@ const DURABILITY_COACHES: DurabilityCoach[] = [
             'Single-leg stability as the foundation',
         ],
         keyInsight: '"If you can\'t hit baseline positions cleanly, your body compensates under load."',
-        bio: 'Jay Dicharry is a physical therapist and biomechanist who has worked with elite runners including Olympians and world champions. He directs the REP Biomechanics Lab in Bend, Oregon and has spent over two decades studying the mechanics of running injury and performance.',
+        bio: 'Jay Dicharry is a physical therapist and biomechanist who has worked with elite runners including Olympians and world champions. He directs the REP Biomechanics Lab in Bend, Oregon.',
         whatThisMeans: 'Every assessment tests your ability to control movement under single-leg load—the exact demand of running. When you fail a test, you\'ll get correctives that build precision movement patterns, not just flexibility.',
         website: 'https://www.runningrewired.com/',
     },
@@ -86,36 +102,171 @@ const DURABILITY_COACHES: DurabilityCoach[] = [
             'Tissue quality and "no hotspots"',
         ],
         keyInsight: '"These aren\'t advanced—they\'re the minimum."',
-        bio: 'Kelly Starrett is a Doctor of Physical Therapy, coach, and author who has revolutionized how athletes think about mobility and movement. He co-founded The Ready State (formerly MobilityWOD) and has worked with professional sports teams, military operators, and Olympic athletes.',
+        bio: 'Kelly Starrett is a Doctor of Physical Therapy, coach, and author who has revolutionized how athletes think about mobility and movement. He co-founded The Ready State (formerly MobilityWOD).',
         whatThisMeans: 'The 12 Standards give you a simple daily checklist. Can you assume the key shapes? Do you have hotspots changing your mechanics? 10-15 minutes of daily maintenance keeps you running for life.',
         website: 'https://thereadystate.com/',
     },
 ];
 
 // =============================================================================
-// STARRETT'S 12 STANDARDS
+// STARRETT'S 12 STANDARDS - WITH REAL EDUCATIONAL CONTENT
 // =============================================================================
 
 interface Standard {
     id: number;
     name: string;
-    description: string;
-    icon: string;
+    shortDescription: string;
+    icon: React.ReactNode;
+    // Educational content - what makes this useful
+    whatItMeans: string;
+    howToTest: string;
+    passCriteria: string;
+    whyItMatters: string;
+    ifYouFail: string;
+    relatedModule?: string;
 }
 
 const TWELVE_STANDARDS: Standard[] = [
-    { id: 1, name: 'Neutral Feet', description: 'Natural foot position without collapse', icon: '🦶' },
-    { id: 2, name: 'Flat Shoes', description: 'Zero-drop footwear philosophy', icon: '👟' },
-    { id: 3, name: 'Supple T-Spine', description: 'Upper back rotation for arm swing', icon: '🔄' },
-    { id: 4, name: 'Efficient Squat', description: 'Full-depth squat as mobility gate', icon: '⬇️' },
-    { id: 5, name: 'Hip Flexion', description: 'Knee-to-chest range of motion', icon: '🦵' },
-    { id: 6, name: 'Hip Extension', description: 'Extend hip without arching back', icon: '↗️' },
-    { id: 7, name: 'Ankle ROM', description: '4+ inches in knee-to-wall test', icon: '📏' },
-    { id: 8, name: 'Warm Up', description: 'Daily movement preparation', icon: '🔥' },
-    { id: 9, name: 'Compression', description: 'Recovery tool utilization', icon: '🧦' },
-    { id: 10, name: 'No Hotspots', description: 'Zero tissue adhesions or trigger points', icon: '🎯' },
-    { id: 11, name: 'Hydration', description: 'Tissue quality through hydration', icon: '💧' },
-    { id: 12, name: 'Jump & Land', description: 'Explosive capacity and control', icon: '🚀' },
+    {
+        id: 1,
+        name: 'Neutral Feet',
+        shortDescription: 'Natural foot position without collapse',
+        icon: <Footprints size={24} />,
+        whatItMeans: 'Your feet should naturally point forward (not duck-footed) when walking and running. The arch should be active and supported, not collapsed.',
+        howToTest: 'Stand barefoot, look down at your feet. Are they pointing straight ahead or rotated outward? Walk naturally - do your feet stay parallel?',
+        passCriteria: 'Feet point within 5-10° of straight ahead during walking and standing.',
+        whyItMatters: 'Outward-rotated feet indicate tight external hip rotators and/or collapsed arches. This changes knee tracking and can lead to IT band, knee, and hip pain.',
+        ifYouFail: 'Focus on hip mobility (couch stretch) and foot strengthening (toe yoga). Consciously point feet forward during walks.',
+        relatedModule: 'foot_intrinsics',
+    },
+    {
+        id: 2,
+        name: 'Flat Shoes',
+        shortDescription: 'Zero-drop footwear philosophy',
+        icon: <Move size={24} />,
+        whatItMeans: 'Spending time in flat (zero-drop) shoes allows your foot muscles to work properly. High heels and elevated running shoes shorten your calf and Achilles.',
+        howToTest: 'Can you comfortably stand and walk in flat shoes for 30+ minutes without calf discomfort?',
+        passCriteria: 'Comfortable in zero-drop shoes for extended periods without calf strain.',
+        whyItMatters: 'Chronically shortened calves limit ankle mobility and increase Achilles strain during running. The foot needs full range to work correctly.',
+        ifYouFail: 'Gradually increase flat shoe time. Do calf stretches and eccentric calf raises. Don\'t force it - transition slowly over weeks.',
+        relatedModule: 'calf_strength',
+    },
+    {
+        id: 3,
+        name: 'Supple T-Spine',
+        shortDescription: 'Upper back rotation for arm swing',
+        icon: <RotateCcw size={24} />,
+        whatItMeans: 'Your thoracic spine (upper back) must rotate freely to allow efficient arm swing. Stiff upper back = compensations in lower back and hips.',
+        howToTest: 'Sit upright, cross arms over chest. Rotate torso left and right without moving hips. You should achieve 45-50° rotation each way.',
+        passCriteria: '45°+ rotation each direction with no lumbar movement.',
+        whyItMatters: 'Running requires counter-rotation between upper and lower body. Stiff thoracic spine forces rotation into the lower back, causing low back pain.',
+        ifYouFail: 'Thread-the-needle stretches, foam roller thoracic extensions, cat-cow. Do 2-3 minutes daily.',
+        relatedModule: 'thoracic_mobility',
+    },
+    {
+        id: 4,
+        name: 'Efficient Squat',
+        shortDescription: 'Full-depth squat as mobility gate',
+        icon: <ArrowDown size={24} />,
+        whatItMeans: 'You should be able to squat to full depth (hips below knees) with heels down, knees tracking over toes, and spine neutral.',
+        howToTest: 'Squat as deep as you can go. Heels stay down. Knees push out over 2nd toe. No excessive forward lean or back rounding.',
+        passCriteria: 'Full-depth squat, heels down, knees tracking well, balanced weight.',
+        whyItMatters: 'The squat tests hip, ankle, and thoracic mobility simultaneously. If you can\'t squat well, those limitations show up in your running gait.',
+        ifYouFail: 'Work on ankle dorsiflexion, hip flexor stretching, and squat practice. Goblet squats with a counterweight help.',
+        relatedModule: 'hip_stability',
+    },
+    {
+        id: 5,
+        name: 'Hip Flexion',
+        shortDescription: 'Knee-to-chest range of motion',
+        icon: <Activity size={24} />,
+        whatItMeans: 'You need adequate hip flexion to lift your knee during running. Limited hip flexion forces compensation through the lower back.',
+        howToTest: 'Lie on back, pull one knee to chest while keeping opposite leg flat. Can you get thigh to chest without the other leg lifting?',
+        passCriteria: 'Thigh reaches chest with opposite leg staying flat on ground.',
+        whyItMatters: 'Running requires ~65° of hip flexion at peak knee lift. Limited range means shorter stride or lower back compensation.',
+        ifYouFail: 'Deep squat holds, pigeon pose, 90-90 hip stretches. Often linked to tight hip rotators.',
+        relatedModule: 'hip_flexor_mobility',
+    },
+    {
+        id: 6,
+        name: 'Hip Extension',
+        shortDescription: 'Extend hip without arching back',
+        icon: <ArrowUpRight size={24} />,
+        whatItMeans: 'You need ~20° hip extension for full push-off. Most people fake this by arching their lower back instead of actually extending the hip.',
+        howToTest: 'Dicharry\'s doorway test: Stand in doorframe, tuck pelvis (flatten lower back), step one foot forward. Feel the stretch in front of back thigh.',
+        passCriteria: 'Only gentle stretch in hip flexor, no "huge pull" sensation.',
+        whyItMatters: 'Limited hip extension = shorter stride + lower back arching + hip flexor strain. This is a top cause of running low back pain.',
+        ifYouFail: 'Couch stretch (2 min each side), kneeling hip flexor stretch with posterior pelvic tilt. Daily until test is clean.',
+        relatedModule: 'hip_flexor_mobility',
+    },
+    {
+        id: 7,
+        name: 'Ankle ROM',
+        shortDescription: '4+ inches in knee-to-wall test',
+        icon: <Ruler size={24} />,
+        whatItMeans: 'Your ankle needs adequate dorsiflexion (knee over toe) for proper running mechanics. This is one of the most commonly limited areas.',
+        howToTest: 'Face a wall, foot 4-5 inches away. Touch knee to wall without lifting heel. Knee tracks over 2nd toe.',
+        passCriteria: '4+ inches from wall with knee touching, heel down, no knee cave.',
+        whyItMatters: 'Limited ankle mobility forces early heel lift, overpronation, or knee cave. This links to shin splints, Achilles issues, and knee pain.',
+        ifYouFail: 'Knee-to-wall mobilizations (2-3 sets × 10 slow reps each side), calf stretching, and banded ankle distractions.',
+        relatedModule: 'ankle_mobility',
+    },
+    {
+        id: 8,
+        name: 'Warm Up',
+        shortDescription: '10 minutes before quality sessions',
+        icon: <Flame size={24} />,
+        whatItMeans: 'Dynamic warm-up before running prepares tissues for load. This isn\'t about stretching - it\'s about activating muscles and increasing tissue temperature.',
+        howToTest: 'Do you consistently warm up before runs? Does your warm-up include dynamic movement (leg swings, lunges, skips)?',
+        passCriteria: 'Consistent 10-minute dynamic warm-up before quality sessions.',
+        whyItMatters: 'Cold tissue is more vulnerable. A proper warm-up reduces injury risk by ~50%. It also improves performance for the session.',
+        ifYouFail: 'Build a simple warm-up routine: 5 min easy jog + leg swings + lunges + A-skips. Make it non-negotiable before workouts.',
+    },
+    {
+        id: 9,
+        name: 'Compression',
+        shortDescription: 'Recovery tool utilization',
+        icon: <Circle size={24} />,
+        whatItMeans: 'Using compression (socks, sleeves, boots) post-run can accelerate recovery by reducing swelling and improving lymphatic flow.',
+        howToTest: 'Do you use any compression tools after hard sessions or long runs?',
+        passCriteria: 'Consistent use of compression post-hard sessions.',
+        whyItMatters: 'Recovery is when adaptation happens. Compression is a simple tool that speeds up the process with minimal effort.',
+        ifYouFail: 'Start with compression socks after long runs. Consider compression boots for high-volume training blocks.',
+    },
+    {
+        id: 10,
+        name: 'No Hotspots',
+        shortDescription: 'Zero tissue adhesions or trigger points',
+        icon: <Ban size={24} />,
+        whatItMeans: 'Hotspots are areas of tissue restriction, trigger points, or adhesions that change your movement patterns. They must be addressed regularly.',
+        howToTest: 'Use a foam roller or lacrosse ball on calves, quads, glutes, and upper back. Any spots that are significantly more tender than surrounding tissue?',
+        passCriteria: 'No significant hotspots that cause guarding or movement changes.',
+        whyItMatters: 'Hotspots alter movement. Your body routes around them, creating compensations that lead to injury elsewhere.',
+        ifYouFail: '2-3 minutes of pressure work on each hotspot. Technique: pressure + slow movement through range. Daily until resolved.',
+    },
+    {
+        id: 11,
+        name: 'Hydration',
+        shortDescription: 'Tissue quality through hydration',
+        icon: <Droplet size={24} />,
+        whatItMeans: 'Connective tissue needs water to maintain elasticity and glide. Chronic dehydration makes tissue stiff and injury-prone.',
+        howToTest: 'Is your urine light yellow to clear most of the day? Are you drinking water consistently between coffee/meals?',
+        passCriteria: 'Light yellow urine consistently, drinking water throughout day.',
+        whyItMatters: 'Dehydrated tissue is stiffer and doesn\'t absorb shock as well. It\'s also slower to heal. This is basic but often ignored.',
+        ifYouFail: 'Drink water first thing in morning. Keep a bottle visible. Aim for half your body weight in ounces daily.',
+    },
+    {
+        id: 12,
+        name: 'Jump & Land',
+        shortDescription: 'Explosive capacity and control',
+        icon: <Rocket size={24} />,
+        whatItMeans: 'Running is repeated single-leg jumping. You need the capacity to absorb and produce force explosively with good mechanics.',
+        howToTest: 'Single-leg hop and stick the landing. Can you land quietly and balanced without knee collapse or excessive wobble?',
+        passCriteria: 'Clean single-leg hop and landing on each leg, quiet and controlled.',
+        whyItMatters: 'This tests the integration of everything: foot control, hip stability, and coordination. If you can\'t hop cleanly, your running mechanics have issues.',
+        ifYouFail: 'Build up: two-leg hops → single-leg hops → depth drops. Focus on quiet, controlled landings before adding height.',
+        relatedModule: 'balance_progression',
+    },
 ];
 
 // =============================================================================
@@ -183,7 +334,6 @@ function CoachCard({ coach, isExpanded, onToggle }: {
                             className="px-6 pb-6 pt-4"
                             style={{ borderTop: '1px solid var(--border-base)' }}
                         >
-                            {/* Focus Areas */}
                             <div className="mb-6">
                                 <p className="text-xs uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>
                                     Focus Areas
@@ -197,7 +347,6 @@ function CoachCard({ coach, isExpanded, onToggle }: {
                                 </ul>
                             </div>
 
-                            {/* Key Insight */}
                             <div
                                 className="p-4 rounded-xl mb-6"
                                 style={{
@@ -210,27 +359,6 @@ function CoachCard({ coach, isExpanded, onToggle }: {
                                 </p>
                             </div>
 
-                            {/* Bio */}
-                            <div className="mb-6">
-                                <p className="text-xs uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>
-                                    Background
-                                </p>
-                                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                                    {coach.bio}
-                                </p>
-                            </div>
-
-                            {/* What This Means */}
-                            <div className="mb-6">
-                                <p className="text-xs uppercase tracking-widest mb-3" style={{ color: coach.color }}>
-                                    What this means for your training
-                                </p>
-                                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                                    {coach.whatThisMeans}
-                                </p>
-                            </div>
-
-                            {/* Source / Link */}
                             <div className="pt-4" style={{ borderTop: '1px solid var(--border-base)' }}>
                                 <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-muted)' }}>
                                     <BookOpen className="w-4 h-4" />
@@ -257,30 +385,154 @@ function CoachCard({ coach, isExpanded, onToggle }: {
     );
 }
 
-function StandardsGrid() {
+function StandardModal({ standard, onClose }: { standard: Standard; onClose: () => void }) {
+    return (
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: 'rgba(0,0,0,0.8)' }}
+            onClick={onClose}
+        >
+            <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="max-w-lg w-full max-h-[85vh] overflow-y-auto rounded-2xl"
+                style={{ background: 'var(--bg-base)' }}
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* Header */}
+                <div className="sticky top-0 p-4 flex items-center justify-between" style={{
+                    background: 'var(--bg-base)',
+                    borderBottom: '1px solid var(--border-base)'
+                }}>
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-xl" style={{ background: 'var(--color-accent-subtle)', color: 'var(--color-accent)' }}>
+                            {standard.icon}
+                        </div>
+                        <div>
+                            <p className="text-xs" style={{ color: 'var(--text-subtle)' }}>Standard #{standard.id}</p>
+                            <h3 className="text-lg font-medium" style={{ color: 'var(--text-base)' }}>
+                                {standard.name}
+                            </h3>
+                        </div>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="p-2 rounded-lg hover:bg-[var(--bg-elevated)]"
+                    >
+                        <X size={20} style={{ color: 'var(--text-muted)' }} />
+                    </button>
+                </div>
+
+                {/* Content */}
+                <div className="p-5 space-y-5">
+                    {/* What it means */}
+                    <div>
+                        <div className="flex items-center gap-2 mb-2">
+                            <HelpCircle size={16} style={{ color: 'var(--color-accent)' }} />
+                            <p className="text-sm font-medium" style={{ color: 'var(--text-base)' }}>
+                                What this actually means
+                            </p>
+                        </div>
+                        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                            {standard.whatItMeans}
+                        </p>
+                    </div>
+
+                    {/* How to test */}
+                    <div className="p-4 rounded-xl" style={{ background: 'var(--bg-elevated)' }}>
+                        <div className="flex items-center gap-2 mb-2">
+                            <Play size={16} style={{ color: 'var(--color-accent)' }} />
+                            <p className="text-sm font-medium" style={{ color: 'var(--text-base)' }}>
+                                How to test yourself
+                            </p>
+                        </div>
+                        <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>
+                            {standard.howToTest}
+                        </p>
+                        <div className="flex items-start gap-2 pt-3" style={{ borderTop: '1px solid var(--border-base)' }}>
+                            <CheckCircle size={14} className="mt-0.5 flex-shrink-0" style={{ color: '#4ade80' }} />
+                            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                                <strong style={{ color: '#4ade80' }}>Pass:</strong> {standard.passCriteria}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Why it matters */}
+                    <div>
+                        <div className="flex items-center gap-2 mb-2">
+                            <AlertCircle size={16} style={{ color: '#fbbf24' }} />
+                            <p className="text-sm font-medium" style={{ color: 'var(--text-base)' }}>
+                                Why runners care
+                            </p>
+                        </div>
+                        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                            {standard.whyItMatters}
+                        </p>
+                    </div>
+
+                    {/* If you fail */}
+                    <div className="p-4 rounded-xl" style={{
+                        background: 'rgba(239, 68, 68, 0.05)',
+                        border: '1px solid rgba(239, 68, 68, 0.15)'
+                    }}>
+                        <div className="flex items-center gap-2 mb-2">
+                            <Target size={16} style={{ color: '#ef4444' }} />
+                            <p className="text-sm font-medium" style={{ color: 'var(--text-base)' }}>
+                                If you don't pass
+                            </p>
+                        </div>
+                        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                            {standard.ifYouFail}
+                        </p>
+                    </div>
+                </div>
+
+                {/* Footer */}
+                <div className="p-4" style={{ borderTop: '1px solid var(--border-base)' }}>
+                    <p className="text-xs text-center" style={{ color: 'var(--text-subtle)' }}>
+                        From Kelly Starrett's "Ready to Run"
+                    </p>
+                </div>
+            </motion.div>
+        </motion.div>
+    );
+}
+
+function StandardsGrid({ onSelectStandard }: { onSelectStandard: (standard: Standard) => void }) {
     return (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {TWELVE_STANDARDS.map((standard, index) => (
-                <motion.div
+                <motion.button
                     key={standard.id}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.05 }}
-                    className="p-4 rounded-xl text-center"
+                    whileHover={{ y: -2 }}
+                    onClick={() => onSelectStandard(standard)}
+                    className="p-4 rounded-xl text-center text-left cursor-pointer transition-all group"
                     style={{
                         background: 'var(--v3-bg-card)',
                         border: '1px solid var(--border-base)',
                     }}
                 >
-                    <div className="text-2xl mb-2">{standard.icon}</div>
+                    <div className="mb-3 group-hover:scale-110 transition-transform" style={{ color: 'var(--color-accent)' }}>
+                        {standard.icon}
+                    </div>
                     <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-base)' }}>
                         {standard.name}
                     </p>
                     <p className="text-xs" style={{ color: 'var(--text-subtle)' }}>
-                        {standard.description}
+                        {standard.shortDescription}
                     </p>
-                </motion.div>
+                    <p className="text-xs mt-2 group-hover:text-[var(--color-accent)] transition-colors" style={{ color: 'var(--text-subtle)' }}>
+                        Tap to learn how →
+                    </p>
+                </motion.button>
             ))}
         </div>
     );
@@ -346,7 +598,7 @@ function AssessmentCard({
                 <ul className="space-y-2 mb-6 flex-1">
                     {features.map((feature, i) => (
                         <li key={i} className="text-sm flex items-start gap-2" style={{ color: 'var(--text-subtle)' }}>
-                            <span style={{ color: 'var(--color-accent)' }}>✓</span>{feature}
+                            <Check size={14} className="flex-shrink-0 mt-0.5" style={{ color: 'var(--color-accent)' }} />{feature}
                         </li>
                     ))}
                 </ul>
@@ -354,8 +606,8 @@ function AssessmentCard({
                 <button
                     onClick={onStart}
                     className={`w-full py-3 rounded-xl font-medium transition-all ${isPrimary
-                            ? 'v3-btn v3-btn-primary'
-                            : 'v3-btn v3-btn-secondary'
+                        ? 'v3-btn v3-btn-primary'
+                        : 'v3-btn v3-btn-secondary'
                         }`}
                 >
                     Start {title}
@@ -399,12 +651,6 @@ function PrescriptionExplainer() {
                     <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                         {step.description}
                     </p>
-                    {index < steps.length - 1 && (
-                        <ArrowRight
-                            className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2"
-                            style={{ color: 'var(--text-subtle)' }}
-                        />
-                    )}
                 </motion.div>
             ))}
         </div>
@@ -419,6 +665,7 @@ export function DurabilityLabContent({ onStartAssessment }: {
     onStartAssessment: (mode: 'quick' | 'full') => void
 }) {
     const [expandedCoach, setExpandedCoach] = useState<string | null>(null);
+    const [selectedStandard, setSelectedStandard] = useState<Standard | null>(null);
 
     return (
         <div className="v3-root min-h-screen" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>
@@ -439,7 +686,7 @@ export function DurabilityLabContent({ onStartAssessment }: {
                         className="text-xs uppercase tracking-widest mb-4"
                         style={{ color: 'var(--color-accent)' }}
                     >
-                        The Durability Lab
+                        Durability
                     </motion.p>
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}
@@ -505,7 +752,7 @@ export function DurabilityLabContent({ onStartAssessment }: {
                 </div>
             </section>
 
-            {/* The 12 Standards */}
+            {/* The 12 Standards - NOW EDUCATIONAL */}
             <section className="px-6 py-20">
                 <div className="max-w-5xl mx-auto">
                     <div className="text-center mb-12">
@@ -516,12 +763,11 @@ export function DurabilityLabContent({ onStartAssessment }: {
                             The 12 Standards
                         </h2>
                         <p className="text-base max-w-2xl mx-auto" style={{ color: 'var(--text-muted)' }}>
-                            These aren't advanced goals—they're the minimum standards for running durability.
-                            How many can you pass today?
+                            Tap any standard to learn how to test yourself and what to do if you don't pass.
                         </p>
                     </div>
 
-                    <StandardsGrid />
+                    <StandardsGrid onSelectStandard={setSelectedStandard} />
                 </div>
             </section>
 
@@ -544,12 +790,12 @@ export function DurabilityLabContent({ onStartAssessment }: {
                         <AssessmentCard
                             type="quick"
                             title="Quick Check"
-                            duration="~2 minutes · 3 tests"
-                            description="Daily readiness scan. Take this before any quality run to confirm you're ready to perform."
+                            duration="~2 minutes"
+                            description="Three tests that tell you if you're ready to run today. Do this before quality sessions."
                             features={[
-                                'Toe Yoga (foot control)',
-                                'Single Leg Balance (stability)',
-                                'Squat Shape (mobility)',
+                                'Toe Yoga - can you control your foot?',
+                                'Single Leg Balance - stable for 45 seconds?',
+                                'Squat Shape - heels down, no pain?',
                             ]}
                             isPrimary={true}
                             onStart={() => onStartAssessment('quick')}
@@ -557,12 +803,12 @@ export function DurabilityLabContent({ onStartAssessment }: {
                         <AssessmentCard
                             type="full"
                             title="Full Assessment"
-                            duration="~10 minutes · 12 tests"
-                            description="Complete durability screen covering foot to spine. Take weekly or after any injury scare."
+                            duration="~10 minutes"
+                            description="Complete screen covering foot to spine. Do weekly or after any injury concern."
                             features={[
-                                'All body regions tested',
-                                'Strength & mobility gates',
-                                'Personalized prescription',
+                                'All 12 body regions tested',
+                                'Specific pass/fail criteria',
+                                'Personalized exercise prescription',
                             ]}
                             isPrimary={false}
                             onStart={() => onStartAssessment('full')}
@@ -579,7 +825,7 @@ export function DurabilityLabContent({ onStartAssessment }: {
                             How the Prescription System Works
                         </h2>
                         <p className="text-base max-w-2xl mx-auto" style={{ color: 'var(--text-muted)' }}>
-                            Every failed or partial test generates specific corrective exercises with coaching cues
+                            Every failed test generates specific corrective exercises with coaching cues
                             directly from the research.
                         </p>
                     </div>
@@ -607,6 +853,16 @@ export function DurabilityLabContent({ onStartAssessment }: {
             </section>
 
             <Footer />
+
+            {/* Standard Detail Modal */}
+            <AnimatePresence>
+                {selectedStandard && (
+                    <StandardModal
+                        standard={selectedStandard}
+                        onClose={() => setSelectedStandard(null)}
+                    />
+                )}
+            </AnimatePresence>
         </div>
     );
 }

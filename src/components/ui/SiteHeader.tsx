@@ -234,32 +234,6 @@ export function SiteHeader({
                     {/* Navigation - hidden in back mode */}
                     {!backHref && !loading && (
                         <nav className="hidden md:flex items-center gap-1">
-                            {/* Logged-in only: Dashboard & My Plan */}
-                            {isLoggedIn && (
-                                <>
-                                    <Link
-                                        href="/dashboard"
-                                        className="px-3 py-2 text-sm font-medium rounded-lg transition-colors"
-                                        style={{
-                                            color: isActive('/dashboard') ? 'var(--color-accent)' : 'var(--text-base)',
-                                            background: isActive('/dashboard') ? 'var(--color-accent-subtle)' : 'transparent',
-                                        }}
-                                    >
-                                        Dashboard
-                                    </Link>
-                                    <Link
-                                        href="/plan"
-                                        className="px-3 py-2 text-sm font-medium rounded-lg transition-colors"
-                                        style={{
-                                            color: isActive('/plan') ? 'var(--color-accent)' : 'var(--text-base)',
-                                            background: isActive('/plan') ? 'var(--color-accent-subtle)' : 'transparent',
-                                        }}
-                                    >
-                                        My Plan
-                                    </Link>
-                                </>
-                            )}
-
                             {/* Explore dropdown - always visible */}
                             <div className="relative" ref={exploreRef}>
                                 <button
@@ -403,6 +377,46 @@ export function SiteHeader({
 
                                         {/* Menu items */}
                                         <div className="p-2">
+                                            <Link
+                                                href="/dashboard"
+                                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors"
+                                                style={{
+                                                    color: isActive('/dashboard') ? 'var(--color-accent)' : 'var(--text-base)',
+                                                    background: isActive('/dashboard') ? 'var(--color-accent-subtle)' : 'transparent',
+                                                }}
+                                                onMouseEnter={(e) => !isActive('/dashboard') && (e.currentTarget.style.background = 'var(--bg-muted)')}
+                                                onMouseLeave={(e) => !isActive('/dashboard') && (e.currentTarget.style.background = 'transparent')}
+                                            >
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <rect x="3" y="3" width="7" height="7" />
+                                                    <rect x="14" y="3" width="7" height="7" />
+                                                    <rect x="14" y="14" width="7" height="7" />
+                                                    <rect x="3" y="14" width="7" height="7" />
+                                                </svg>
+                                                Dashboard
+                                            </Link>
+                                            <Link
+                                                href="/plan"
+                                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors"
+                                                style={{
+                                                    color: isActive('/plan') ? 'var(--color-accent)' : 'var(--text-base)',
+                                                    background: isActive('/plan') ? 'var(--color-accent-subtle)' : 'transparent',
+                                                }}
+                                                onMouseEnter={(e) => !isActive('/plan') && (e.currentTarget.style.background = 'var(--bg-muted)')}
+                                                onMouseLeave={(e) => !isActive('/plan') && (e.currentTarget.style.background = 'transparent')}
+                                            >
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                                    <polyline points="14 2 14 8 20 8" />
+                                                    <line x1="16" y1="13" x2="8" y2="13" />
+                                                    <line x1="16" y1="17" x2="8" y2="17" />
+                                                    <polyline points="10 9 9 9 8 9" />
+                                                </svg>
+                                                My Plan
+                                            </Link>
+
+                                            <div className="my-2 border-t" style={{ borderColor: 'var(--border-base)' }} />
+
                                             <Link
                                                 href="/settings"
                                                 className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors"

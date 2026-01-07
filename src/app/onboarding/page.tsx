@@ -45,6 +45,7 @@ import { useAuth } from '@/domain/auth/context';
 
 // Screen components
 import { WelcomeScreen, MileGateScreen, NameScreen, DemographicsScreen } from '@/components/onboarding/screens/identity';
+import { AvatarSelectionScreen } from '@/components/onboarding/screens/avatar';
 import { TrainingGoalScreen, RaceDetailsScreen, FitnessDurationScreen } from '@/components/onboarding/screens/goal';
 import {
     CalibrationMethodScreen,
@@ -459,8 +460,18 @@ function OnboardingContent() {
                 {step === 'demographics' && (
                     <DemographicsScreen
                         data={data}
-                        onAgeChange={(age) => setData(prev => ({ ...prev, age }))}
+                        onDobChange={(dateOfBirth) => setData(prev => ({ ...prev, dateOfBirth }))}
                         onSexChange={(sex) => setData(prev => ({ ...prev, sex: sex as Sex }))}
+                        onContinue={goToNext}
+                        onBack={goBack}
+                    />
+                )}
+
+                {/* AVATAR SELECTION */}
+                {step === 'avatar' && (
+                    <AvatarSelectionScreen
+                        value={data.avatar}
+                        onChange={(avatar) => setData(prev => ({ ...prev, avatar }))}
                         onContinue={goToNext}
                         onBack={goBack}
                     />
@@ -621,8 +632,8 @@ function OnboardingContent() {
 
                 {step === 'long-run-day' && (
                     <LongRunDayScreen
-                        value={data.longRunDay}
-                        onChange={(longRunDay) => setData(prev => ({ ...prev, longRunDay }))}
+                        value={data.longRunDays}
+                        onChange={(longRunDays) => setData(prev => ({ ...prev, longRunDays }))}
                         onContinue={goToNext}
                         onBack={goBack}
                     />
@@ -741,6 +752,7 @@ function OnboardingContent() {
                                         name: data.name || 'Athlete', // Default if empty
                                         age: data.age || null,
                                         sex: data.sex || null,
+                                        avatar: data.avatar || 'marathon', // Default avatar
                                     }, { onConflict: 'id' });
 
                                     // 2. Save goal race if we have race details

@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { COACHES } from '@/config/coach-spec';
 import { isPhilosophyAvailableForDistance } from '@/domain/philosophy/recommendation';
@@ -73,6 +73,11 @@ function getDifficultyColor(difficulty: 'beginner' | 'intermediate' | 'advanced'
 export default function PlansPage() {
     const [selectedDistance, setSelectedDistance] = useState<TargetDistance | 'all'>('marathon');
     const [expandedCoach, setExpandedCoach] = useState<string | null>(null);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const availableCoaches = useMemo(() => {
         if (selectedDistance === 'all') return COACH_PHILOSOPHIES;
@@ -86,6 +91,11 @@ export default function PlansPage() {
         if (selectedDistance === 'all') return plans;
         return plans.filter(p => p.distance === selectedDistance);
     };
+
+    // Prevent SSG from rendering with useTheme
+    if (!mounted) {
+        return <div className="v3-root min-h-screen" style={{ background: 'var(--bg-base)' }} />;
+    }
 
     return (
         <div className="v3-root min-h-screen" style={{ background: 'var(--bg-base)' }}>

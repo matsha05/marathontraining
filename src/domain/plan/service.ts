@@ -14,8 +14,17 @@
  */
 
 import { OnboardingData } from '@/domain/onboarding/types';
+import { calculateAgeFromDob } from '@/domain/onboarding/utils';
 import { PlanGenerationInput, TrainingPlan } from '@/domain/plan/types';
 import { generatePlan } from '@/domain/plan/generator';
+
+/**
+ * Calculate age from date of birth string.
+ * Alias for consistency with existing naming.
+ */
+function calculateAgeFromDateOfBirth(dob: string): number {
+    return calculateAgeFromDob(dob);
+}
 
 // V2 Repository - Supabase + localStorage hybrid
 import {
@@ -92,10 +101,18 @@ export function transformOnboardingToPlanInput(
     }
 
     // Transform with type coercion (validation already passed)
+    // Calculate age from DOB if available, otherwise use stored age
+    const age = data.dateOfBirth
+        ? calculateAgeFromDateOfBirth(data.dateOfBirth)
+        : data.age!;
+
+    // Get long run day - prefer new array format, fallback to old string
+    const longRunDay = data.longRunDays?.[0] || data.longRunDay || 'saturday';
+
     const input: PlanGenerationInput = {
         // Identity
         name: data.name,
-        age: data.age!,
+        age,
         sex: data.sex!,
 
         // VDOT
@@ -106,6 +123,7 @@ export function transformOnboardingToPlanInput(
         goalDistance: data.trainingGoal!,
         raceName: data.raceName || undefined,
         raceDate: data.raceDate || undefined,
+        planStartDate: data.planStartDate || undefined,
         fitnessDuration: data.fitnessDuration || undefined,
 
         // Training load
@@ -115,7 +133,7 @@ export function transformOnboardingToPlanInput(
 
         // Schedule
         availableDays: clampAvailableDays(data.availableDays!),
-        longRunDay: data.longRunDay || 'saturday',
+        longRunDay,
 
         // Safety
         currentPain: data.hasCurrentPain ?? false,

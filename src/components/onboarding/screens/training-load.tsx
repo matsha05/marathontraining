@@ -241,12 +241,12 @@ export function AvailableDaysScreen({
 }
 
 // =============================================================================
-// LONG RUN DAY SCREEN
+// LONG RUN DAY SCREEN - Multi-select week grid
 // =============================================================================
 
 interface LongRunDayScreenProps {
-    value: string;
-    onChange: (value: string) => void;
+    value: string[];  // Changed to array
+    onChange: (value: string[]) => void;
     onContinue: () => void;
     onBack: () => void;
 }
@@ -257,13 +257,23 @@ export function LongRunDayScreen({
     onContinue,
     onBack
 }: LongRunDayScreenProps) {
+    const canContinue = value.length > 0 && value.length <= 2;
+
+    const toggleDay = (day: string) => {
+        if (value.includes(day)) {
+            onChange(value.filter(d => d !== day));
+        } else if (value.length < 2) {
+            onChange([...value, day]);
+        }
+    };
+
     useKeyboardNavigation({
-        onEnter: value !== '' ? onContinue : undefined,
+        onEnter: canContinue ? onContinue : undefined,
         onBack,
         onNumber: (num) => {
             const option = LONG_RUN_DAY_OPTIONS[num - 1];
             if (option) {
-                onChange(option.value);
+                toggleDay(option.value);
             }
         },
     });
@@ -271,25 +281,54 @@ export function LongRunDayScreen({
     return (
         <QuestionScreen onBack={onBack}>
             <QuestionHeader
-                title="Which day works best for your long run?"
-                subtitle="This is typically your biggest training day of the week."
+                title="Which day(s) work best for your long run?"
+                subtitle="Select 1-2 days. This is typically your biggest training day."
             />
 
-            <OptionGrid>
+            {/* Week grid - all 7 days */}
+            <div className="grid grid-cols-7 gap-1 mb-4">
                 {LONG_RUN_DAY_OPTIONS.map((option, index) => (
-                    <OptionButton
+                    <button
                         key={option.value}
-                        label={option.label}
-                        shortcut={String(index + 1)}
-                        selected={value === option.value}
-                        onClick={() => onChange(option.value)}
-                    />
+                        onClick={() => toggleDay(option.value)}
+                        className="flex flex-col items-center p-3 rounded-lg transition-all"
+                        style={{
+                            background: value.includes(option.value)
+                                ? 'var(--color-accent)'
+                                : 'var(--bg-elevated)',
+                            border: `1px solid ${value.includes(option.value) ? 'var(--color-accent)' : 'var(--border-base)'}`,
+                            color: value.includes(option.value)
+                                ? 'white'
+                                : 'var(--text-base)',
+                        }}
+                    >
+                        <span className="text-xs font-medium mb-1" style={{
+                            color: value.includes(option.value) ? 'rgba(255,255,255,0.7)' : 'var(--text-subtle)'
+                        }}>
+                            {String(index + 1)}
+                        </span>
+                        <span className="text-sm font-medium">
+                            {option.label.slice(0, 3)}
+                        </span>
+                    </button>
                 ))}
-            </OptionGrid>
+            </div>
+
+            {value.length === 2 && (
+                <p className="text-xs mb-4" style={{ color: 'var(--text-subtle)' }}>
+                    ✓ Two days selected. Your plan will alternate long runs between these days.
+                </p>
+            )}
+
+            {value.length === 0 && (
+                <p className="text-xs mb-4" style={{ color: 'var(--text-muted)' }}>
+                    Select at least one day for your long run.
+                </p>
+            )}
 
             <ContinueButton
                 onClick={onContinue}
-                disabled={value === ''}
+                disabled={!canContinue}
             />
         </QuestionScreen>
     );

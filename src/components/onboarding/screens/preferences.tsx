@@ -338,7 +338,7 @@ export function CoachRevealScreen({ data, onConfirm, onBack }: CoachRevealScreen
                 <p className="v3-label mb-3">Your Plan Structure</p>
                 <div className="grid grid-cols-3 gap-4 text-center">
                     <div>
-                        <p className="v3-body-lg font-medium">{coach.runDays}</p>
+                        <p className="v3-body-lg font-medium">{data.availableDays} days/week</p>
                         <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>Run days</p>
                     </div>
                     <div>
@@ -642,7 +642,9 @@ export function CompleteScreen({ data, onViewDashboard, onViewPlan }: CompleteSc
                 <div className="space-y-1 mt-2 v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                     <p>• Starting VDOT: {data.vdot}</p>
                     <p>• {data.availableDays} training days per week</p>
-                    <p>• Long runs on {data.longRunDay}</p>
+                    <p>• Long runs on {data.longRunDays?.length > 0
+                        ? data.longRunDays.map(d => d.charAt(0).toUpperCase() + d.slice(1)).join(' & ')
+                        : data.longRunDay || 'Weekend'}</p>
                     {data.includeStrength && <p>• Strength training included</p>}
                 </div>
             </SuccessBanner>

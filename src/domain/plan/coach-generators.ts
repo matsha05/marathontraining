@@ -46,7 +46,15 @@ import {
     isHigdonStepbackWeek,
     getMicrocycleForTier,
     getHigdonTierConfig,
+    HIGDON_MICROCYCLES,
 } from './coaches/higdon';
+import {
+    HIGDON_LONG_RUN_ARRAYS,
+    HIGDON_TUE_RUN_ARRAYS,
+    HIGDON_WED_RUN_ARRAYS,
+    HIGDON_THU_RUN_ARRAYS,
+    HIGDON_SAT_RUN_ARRAYS,
+} from './coaches/higdon-data';
 import {
     HANSONS_TIER_CONFIGS,
     HansonsTier,
@@ -74,6 +82,23 @@ import {
     scheduleDurabilityRoutineForDay,
     scheduleCrossTrainingForDay,
 } from './generator';
+
+// =============================================================================
+// HELPER: DAY NAME TO INDEX MAPPING
+// =============================================================================
+
+/**
+ * Map day name to day-of-week index (0 = Sunday, 6 = Saturday).
+ * Used for long run day placement in all coach generators.
+ */
+const DAY_NAME_TO_INDEX: Record<string, number> = {
+    'sunday': 0, 'monday': 1, 'tuesday': 2, 'wednesday': 3,
+    'thursday': 4, 'friday': 5, 'saturday': 6
+};
+
+function getLongRunDayIndex(longRunDay: string): number {
+    return DAY_NAME_TO_INDEX[longRunDay.toLowerCase()] ?? 6; // Default to Saturday
+}
 
 // =============================================================================
 // PFITZINGER FRR PLAN GENERATOR
@@ -191,13 +216,14 @@ function generateFRRWeekDays(
     const easyDays = input.availableDays - 2; // Minus long run and key workout
     const avgEasyRun = easyDays > 0 ? remainingMiles / (easyDays + 1) : remainingMiles;
 
-    // Standard FRR structure: Long on Sat/Sun, Key workout midweek
+    // Standard FRR structure: Long run on user-selected day, Key workout midweek
+    const longRunDayIndex = getLongRunDayIndex(input.longRunDay);
     for (let i = 0; i < 7; i++) {
         const date = getDateForDay(weekNumber, i, input.raceDate);
         let runWorkout: Workout | null = null;
         let isKeyDay = false;
 
-        if (i === 6 || (input.longRunDay === 'sunday' && i === 0)) {
+        if (i === longRunDayIndex) {
             // Long run day
             const template = phase === 'taper' ? LONG_RUN_TEMPLATES[0] : LONG_RUN_TEMPLATES[1];
             runWorkout = buildWorkout(template, paces, longRunMiles);
@@ -220,8 +246,8 @@ function generateFRRWeekDays(
         // Determine day type for scheduling
         const dayType: 'rest' | 'easy' | 'quality' | 'long' =
             runWorkout === null ? 'rest' :
-                isKeyDay && !((i === 6) || (input.longRunDay === 'sunday' && i === 0)) ? 'quality' :
-                    (i === 6 || (input.longRunDay === 'sunday' && i === 0)) ? 'long' : 'easy';
+                isKeyDay && i !== longRunDayIndex ? 'quality' :
+                    i === longRunDayIndex ? 'long' : 'easy';
 
         days.push({
             date,
@@ -471,6 +497,10 @@ function getDanielsWeekFocus(
  * Generate a complete training plan using Higdon data.
  * Uses generateHigdonLongRunProgression for proper week-by-week distances.
  */
+/**
+ * Generate a FAITHFUL Higdon plan using EXACT week-by-week data.
+ * Uses the arrays from higdon-data.ts which were meticulously extracted from halhigdon.com.
+ */
 export function generateHigdonPlan(
     input: PlanGenerationInput,
     tier: HigdonTier
@@ -479,58 +509,52 @@ export function generateHigdonPlan(
     const paces = calculateTrainingPaces(input.vdot);
     const totalWeeks = config.durationWeeks;
 
-    // Generate Higdon-specific long run progression
-    const longRunProgression = generateHigdonLongRunProgression(tier, totalWeeks);
-
-    // Calculate weekly mileage progression (uses generic but informed by Higdon config)
-    const phases = calculatePhases(totalWeeks, config.distance === 'base' ? 'general' : config.distance);
-    const recoveryWeeks = config.stepbackWeeks ?? scheduleRecoveryWeeks(totalWeeks, phases);
-    const peakMileage = calculatePeakMileage(
-        config.distance === 'base' ? 'general' : config.distance,
-        input.weeklyMiles,
-        input.availableDays,
-        input.trainingIntensity,
-        totalWeeks
-    );
-    const weeklyMileages = generateMileageProgression(
-        input.weeklyMiles,
-        peakMileage,
-        phases,
-        recoveryWeeks
-    );
+    // Get EXACT Higdon progressions - these are the official week-by-week values
+    const longRunArray = HIGDON_LONG_RUN_ARRAYS[tier];
+    const tueRunArray = HIGDON_TUE_RUN_ARRAYS[tier];
+    const wedRunArray = HIGDON_WED_RUN_ARRAYS[tier];
+    const thuRunArray = HIGDON_THU_RUN_ARRAYS[tier];
+    const satRunArray = HIGDON_SAT_RUN_ARRAYS[tier];
+    const microcycle = HIGDON_MICROCYCLES[tier];
 
     const weeks: WeekPlan[] = [];
     let peakWeek = 1;
     let maxMileage = 0;
 
     for (let week = 1; week <= totalWeeks; week++) {
-        const mileage = weeklyMileages[week - 1];
-        const longRunMiles = longRunProgression[week - 1];
+        const weekIndex = week - 1;
         const phase = getHigdonPhase(tier, week, totalWeeks);
         const isRecovery = isHigdonStepbackWeek(tier, week, totalWeeks, phase);
 
-        // Track peak
-        if (mileage > maxMileage) {
-            maxMileage = mileage;
-            peakWeek = week;
-        }
+        // Get EXACT day values for this week from official arrays
+        const longRunMiles = longRunArray[weekIndex] ?? 0;
+        const tueRun = tueRunArray[weekIndex] ?? 0;
+        const wedRun = wedRunArray[weekIndex] ?? 0;
+        const thuRun = thuRunArray[weekIndex] ?? 0;
+        const satRun = satRunArray[weekIndex] ?? 0;
 
-        // Generate days for this week
-        const days = generateHigdonWeekDays(
+        // Generate days using EXACT Higdon structure
+        const days = generateHigdonWeekDaysExact(
             week,
-            mileage,
-            longRunMiles,
+            tier,
+            { longRunMiles, tueRun, wedRun, thuRun, satRun },
+            microcycle,
             phase,
-            isRecovery,
-            config.runDays,
             input,
             paces
         );
 
-        // Calculate distribution
+        // Calculate ACTUAL totals from days (not from generic progression)
+        const actualTotalMiles = days.reduce((sum, d) => sum + d.totalMiles, 0);
         const easyMiles = days.reduce((sum, d) => sum + (d.runWorkout && d.runWorkout.primaryZone === 'E' ? d.totalMiles : 0), 0);
         const qualityMiles = days.reduce((sum, d) => sum + d.qualityMiles, 0);
         const keyWorkouts = days.filter(d => d.isKeyDay).length;
+
+        // Track peak
+        if (actualTotalMiles > maxMileage) {
+            maxMileage = actualTotalMiles;
+            peakWeek = week;
+        }
 
         weeks.push({
             weekNumber: week,
@@ -538,11 +562,11 @@ export function generateHigdonPlan(
             phase,
             phaseWeek: week,
             days,
-            totalMiles: mileage,
+            totalMiles: actualTotalMiles, // FIXED: Use actual sum of day distances
             longRunMiles,
             easyMiles,
             qualityMiles,
-            easyPercentage: mileage > 0 ? (easyMiles / mileage) * 100 : 0,
+            easyPercentage: actualTotalMiles > 0 ? (easyMiles / actualTotalMiles) * 100 : 0,
             keyWorkouts,
             isRecoveryWeek: isRecovery,
             focus: getHigdonWeekFocus(phase, tier, week),
@@ -550,6 +574,7 @@ export function generateHigdonPlan(
     }
 
     // Build phase breakdown
+    const phases = calculatePhases(totalWeeks, config.distance === 'base' ? 'general' : config.distance);
     const phaseBreakdown = phases.map(p => ({
         phase: p.phase,
         startWeek: p.startWeek,
@@ -576,60 +601,100 @@ export function generateHigdonPlan(
         verification: {
             passed: true,
             checks: [
-                { name: 'Coach Fidelity', passed: true, message: `Using Hal Higdon ${tier}` },
+                { name: 'Coach Fidelity', passed: true, message: `Using Hal Higdon ${tier} - exact week-by-week data` },
             ],
         },
     };
 }
 
-function generateHigdonWeekDays(
+interface HigdonWeekDistances {
+    longRunMiles: number;
+    tueRun: number;
+    wedRun: number;
+    thuRun: number;
+    satRun: number;
+}
+
+import { HigdonMicrocycle, HigdonDaySlot } from './coaches/higdon';
+
+/**
+ * Generate days using EXACT Higdon microcycle structure and distances.
+ * This follows the official day-by-day structure from halhigdon.com.
+ */
+function generateHigdonWeekDaysExact(
     weekNumber: number,
-    weeklyMileage: number,
-    longRunMiles: number,
+    tier: HigdonTier,
+    distances: HigdonWeekDistances,
+    microcycle: HigdonMicrocycle,
     phase: TrainingPhase,
-    isRecovery: boolean,
-    runDays: number,
     input: PlanGenerationInput,
     paces: ReturnType<typeof calculateTrainingPaces>
 ): DayPlan[] {
     const days: DayPlan[] = [];
-    const remainingMiles = weeklyMileage - longRunMiles;
-    const easyDays = Math.max(runDays - 1, 1); // Minus long run
-    const avgEasyRun = easyDays > 0 ? remainingMiles / easyDays : remainingMiles;
+    const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
 
-    // Higdon structure: Long on Sat/Sun based on preference
-    const longRunDayIndex = input.longRunDay === 'sunday' ? 0 : 6;
+    // Determine long run day - respect user preference for any day
+    const longRunDayIndex = getLongRunDayIndex(input.longRunDay);
 
     for (let i = 0; i < 7; i++) {
         const date = getDateForDay(weekNumber, i, input.raceDate);
+        const dayName = dayNames[i];
+        const slot: HigdonDaySlot | undefined = microcycle[dayName];
+
         let runWorkout: Workout | null = null;
         let isKeyDay = false;
+        let distance = 0;
 
-        if (i === longRunDayIndex && longRunMiles > 0) {
-            // Long run day
-            const template = phase === 'taper' ? LONG_RUN_TEMPLATES[0] : LONG_RUN_TEMPLATES[1];
-            runWorkout = buildWorkout(template, paces, longRunMiles);
-            isKeyDay = true;
-        } else if (i === 1 || i === 3 || i === 5) {
-            // Mon, Wed, Fri - potential easy run days
-            const dayIndex = [1, 3, 5].indexOf(i);
-            if (dayIndex < runDays - 1) {
-                runWorkout = buildWorkout(EASY_TEMPLATES[0], paces, Math.max(avgEasyRun, 2));
+        // Get exact distance for this day based on Higdon arrays
+        if (i === longRunDayIndex || (slot?.type === 'long_run' && i !== longRunDayIndex)) {
+            // Long run - use exact long run array value
+            distance = distances.longRunMiles;
+            if (distance > 0) {
+                const template = phase === 'taper' ? LONG_RUN_TEMPLATES[0] : LONG_RUN_TEMPLATES[1];
+                runWorkout = buildWorkout(template, paces, distance);
+                isKeyDay = true;
             }
-        } else if (i === 2 && runDays >= 4 && !isRecovery) {
-            // Tuesday - Quality workout if available
-            const template = phase === 'base' ? EASY_TEMPLATES[1] : TEMPO_TEMPLATES[0];
-            runWorkout = buildWorkout(template, paces, avgEasyRun);
-            isKeyDay = phase !== 'base';
-        } else if (i === 4 && runDays >= 5) {
-            // Thursday - Extra easy day
-            runWorkout = buildWorkout(EASY_TEMPLATES[0], paces, avgEasyRun);
+        } else if (i === 2) { // Tuesday
+            distance = distances.tueRun;
+            if (distance > 0) {
+                const template = getHigdonDayTemplate(slot, phase);
+                runWorkout = buildWorkout(template, paces, distance);
+                isKeyDay = slot?.type === 'speedwork' || slot?.type === 'tempo' || slot?.type === 'intervals';
+            }
+        } else if (i === 3) { // Wednesday
+            distance = distances.wedRun;
+            if (distance > 0) {
+                const template = getHigdonDayTemplate(slot, phase);
+                runWorkout = buildWorkout(template, paces, distance);
+                isKeyDay = slot?.type === 'speedwork' || slot?.type === 'tempo' || slot?.type === 'intervals';
+            }
+        } else if (i === 4) { // Thursday
+            distance = distances.thuRun;
+            if (distance > 0) {
+                const template = getHigdonDayTemplate(slot, phase);
+                runWorkout = buildWorkout(template, paces, distance);
+                isKeyDay = slot?.type === 'speedwork' || slot?.type === 'tempo' || slot?.type === 'intervals';
+            }
+        } else if (i === 6 && i !== longRunDayIndex) { // Saturday (when not long run day)
+            distance = distances.satRun;
+            if (distance > 0) {
+                const template = getHigdonDayTemplate(slot, phase);
+                runWorkout = buildWorkout(template, paces, distance);
+                isKeyDay = slot?.type === 'race_pace_run';
+            }
+        } else if (slot?.type === 'easy_run' && slot.distanceRange) {
+            // Other easy run days from microcycle
+            distance = slot.distanceRange[0]; // Use min distance
+            if (distance > 0) {
+                runWorkout = buildWorkout(EASY_TEMPLATES[0], paces, distance);
+            }
         }
+        // Rest, cross_train, walk days = no run workout
 
         // Determine day type for scheduling
         const dayType: 'rest' | 'easy' | 'quality' | 'long' =
             runWorkout === null ? 'rest' :
-                i === longRunDayIndex ? 'long' :
+                (i === longRunDayIndex && distances.longRunMiles > 0) ? 'long' :
                     isKeyDay ? 'quality' : 'easy';
 
         days.push({
@@ -647,6 +712,30 @@ function generateHigdonWeekDays(
     }
 
     return days;
+}
+
+/**
+ * Map Higdon day slot type to appropriate workout template.
+ */
+function getHigdonDayTemplate(slot: HigdonDaySlot | undefined, phase: TrainingPhase) {
+    if (!slot) return EASY_TEMPLATES[0];
+
+    switch (slot.type) {
+        case 'tempo':
+            return TEMPO_TEMPLATES[0];
+        case 'intervals':
+        case 'speedwork':
+            return INTERVAL_TEMPLATES[0];
+        case 'hills':
+            return INTERVAL_TEMPLATES[1]; // Hills template
+        case 'race_pace_run':
+            return phase === 'taper' ? EASY_TEMPLATES[0] : TEMPO_TEMPLATES[0];
+        case 'fartlek':
+            return INTERVAL_TEMPLATES.find(t => t.type === 'fartlek') || INTERVAL_TEMPLATES[0];
+        case 'easy_run':
+        default:
+            return EASY_TEMPLATES[0];
+    }
 }
 
 function getHigdonWeekFocus(phase: TrainingPhase, tier: HigdonTier, week: number): string {

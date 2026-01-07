@@ -17,6 +17,7 @@ export type Database = {
       athletes: {
         Row: {
           age: number | null
+          avatar: string | null
           created_at: string
           equipment: string[]
           id: string
@@ -32,6 +33,7 @@ export type Database = {
         }
         Insert: {
           age?: number | null
+          avatar?: string | null
           created_at?: string
           equipment?: string[]
           id?: string
@@ -47,6 +49,7 @@ export type Database = {
         }
         Update: {
           age?: number | null
+          avatar?: string | null
           created_at?: string
           equipment?: string[]
           id?: string

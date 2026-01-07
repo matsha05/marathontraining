@@ -179,7 +179,7 @@ function generateWeek(
         phase: phase.phase,
         phaseWeek: weekNumber - phase.startWeek + 1,
         days,
-        totalMiles: targetMileage,
+        totalMiles: days.reduce((sum, d) => sum + d.totalMiles, 0),
         longRunMiles,
         easyMiles: distribution.easyMiles,
         qualityMiles: distribution.qualityMiles,
@@ -419,8 +419,12 @@ function getWeekStructure(
     longRunDay: string,
     isRecovery: boolean
 ): DaySlot[] {
-    // Default: Saturday = index 6, Sunday = index 0
-    const longDayIndex = longRunDay === 'sunday' ? 0 : longRunDay === 'saturday' ? 6 : 6;
+    // Map day name to index (0 = Sunday, 6 = Saturday)
+    const DAY_NAME_TO_INDEX: Record<string, number> = {
+        'sunday': 0, 'monday': 1, 'tuesday': 2, 'wednesday': 3,
+        'thursday': 4, 'friday': 5, 'saturday': 6
+    };
+    const longDayIndex = DAY_NAME_TO_INDEX[longRunDay.toLowerCase()] ?? 6; // Default to Saturday
 
     // Hansons-style structure: SOS on Tue/Thu
     // Mon = easy/rest, Tue = SOS, Wed = easy, Thu = SOS, Fri = rest, Sat = long, Sun = easy/rest

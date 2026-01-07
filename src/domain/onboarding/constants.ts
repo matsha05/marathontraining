@@ -241,9 +241,13 @@ export const AVAILABLE_DAYS_OPTIONS = [
 // =============================================================================
 
 export const LONG_RUN_DAY_OPTIONS = [
-    { value: 'saturday', label: 'Saturday' },
-    { value: 'sunday', label: 'Sunday' },
-    { value: 'other', label: 'Another day' },
+    { value: 'sunday', label: 'Sunday', index: 0 },
+    { value: 'monday', label: 'Monday', index: 1 },
+    { value: 'tuesday', label: 'Tuesday', index: 2 },
+    { value: 'wednesday', label: 'Wednesday', index: 3 },
+    { value: 'thursday', label: 'Thursday', index: 4 },
+    { value: 'friday', label: 'Friday', index: 5 },
+    { value: 'saturday', label: 'Saturday', index: 6 },
 ] as const;
 
 // =============================================================================

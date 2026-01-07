@@ -87,7 +87,7 @@ export const PHILOSOPHIES: Record<TrainingPhilosophy, PhilosophyMetadata> = {
     higdon: {
         id: 'higdon',
         name: 'Hal Higdon',
-        tagline: 'Accessibility',
+        tagline: 'Beginner-Friendly',
         color: '#ec4899',
         runDays: '4-5 days/week',
         longRunCap: '20 miles',

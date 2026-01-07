@@ -99,7 +99,7 @@ export function QuestionHeader({ title, subtitle, tooltip }: QuestionHeaderProps
 }
 
 // =============================================================================
-// TOOLTIP EXPANDER
+// TOOLTIP - HOVER STYLE (not dropdown)
 // =============================================================================
 
 interface TooltipExpanderProps {
@@ -108,30 +108,39 @@ interface TooltipExpanderProps {
 
 export function TooltipExpander({ tooltip }: TooltipExpanderProps) {
     return (
-        <details className="mt-4 group">
-            <summary
-                className="flex items-center justify-between gap-2 v3-body-sm cursor-pointer transition-colors p-3 rounded-lg"
-                style={{ color: 'var(--text-subtle)', background: 'var(--v3-bg-inset)' }}
+        <div className="mt-4 relative group">
+            {/* Trigger - info icon with label */}
+            <div
+                className="inline-flex items-center gap-2 v3-body-sm cursor-help p-2 rounded-lg transition-colors"
+                style={{ color: 'var(--text-subtle)' }}
             >
-                <span className="flex items-center gap-2">
-                    <Info className="w-4 h-4" />
-                    <span>{tooltip.title}</span>
-                </span>
-                <ChevronDown className="w-4 h-4 transition-transform group-open:rotate-180" />
-            </summary>
-            <div className="mt-3 pl-6 v3-body-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                <p>{tooltip.content}</p>
+                <Info className="w-4 h-4" />
+                <span>{tooltip.title}</span>
+            </div>
+
+            {/* Tooltip content - shown on hover */}
+            <div
+                className="absolute left-0 top-full mt-2 z-50 w-80 p-4 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
+                style={{
+                    background: 'var(--bg-elevated)',
+                    border: '1px solid var(--border-emphasis)',
+                    color: 'var(--text-muted)',
+                }}
+            >
+                <p className="v3-body-sm leading-relaxed">{tooltip.content}</p>
                 {tooltip.coach && tooltip.coachLink && (
                     <a
                         href={tooltip.coachLink}
-                        className="inline-flex items-center gap-1 mt-2 v3-accent hover:underline"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 mt-3 v3-accent hover:underline text-sm"
                     >
                         Learn about {tooltip.coach}
                         <ExternalLink className="w-3 h-3" />
                     </a>
                 )}
             </div>
-        </details>
+        </div>
     );
 }
 

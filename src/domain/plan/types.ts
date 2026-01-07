@@ -417,6 +417,7 @@ export interface PlanGenerationInput {
     goalDistance: '5k' | '10k' | 'half' | 'marathon' | 'general';
     raceName?: string;
     raceDate?: string;
+    planStartDate?: string;  // ISO date for when training starts (optional)
     fitnessDuration?: '8weeks' | '12weeks' | 'ongoing';
 
     weeklyMiles: number;
@@ -424,7 +425,7 @@ export interface PlanGenerationInput {
     longestRecentRun: number;
 
     availableDays: 3 | 4 | 5 | 6;
-    longRunDay: 'saturday' | 'sunday' | string;
+    longRunDay: string;  // Day name: 'saturday', 'sunday', 'monday', etc.
 
     currentPain: boolean;
     painLocation?: string;

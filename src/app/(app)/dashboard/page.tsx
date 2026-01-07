@@ -13,7 +13,8 @@ import { PlayIcon } from '@/components/ui/play';
 import { usePlan } from '@/domain/plan/context';
 import { useAuth } from '@/domain/auth/context';
 import { InsightsCard } from '@/components/insights/InsightsCard';
-import { WorkoutLog } from '@/domain/insights';
+import { IntensityDistributionCard } from '@/components/insights/IntensityDistributionCard';
+import { WorkoutLog, WorkoutForIntensity } from '@/domain/insights';
 import { formatPace, getDayName, getFullDayName } from '@/lib/format';
 import { motion } from 'framer-motion';
 import { PacesCard } from '@/components/paces/PacesCard';
@@ -293,6 +294,7 @@ export default function DashboardPage() {
                     distance: undefined,
                     workoutType: 'rest' as const,
                     date: dateStr,
+                    hasStrength: false,
                 };
             });
         }
@@ -311,11 +313,13 @@ export default function DashboardPage() {
                 distance: undefined,
                 workoutType: 'rest' as const,
                 date: '',
+                hasStrength: false,
             }));
         }
 
         // Calculate the start of this specific week based on plan start date
-        const planStart = plan?.startDate ? new Date(plan.startDate + 'T12:00:00') : new Date();
+        const planStartDate = plan?.weeks[0]?.weekOf;
+        const planStart = planStartDate ? new Date(planStartDate + 'T12:00:00') : new Date();
         const weekStart = new Date(planStart);
         weekStart.setDate(planStart.getDate() + (activeWeekNum - 1) * 7);
 
@@ -611,6 +615,23 @@ export default function DashboardPage() {
                         totalWeeks={plan?.weeks.length || 1}
                         onPrevWeek={() => setViewingWeek(prev => Math.max(1, (prev ?? currentWeek ?? 1) - 1))}
                         onNextWeek={() => setViewingWeek(prev => Math.min(plan?.weeks.length || 1, (prev ?? currentWeek ?? 1) + 1))}
+                    />
+                </motion.section>
+
+                {/* 80/20 Intensity Distribution - Seiler/Fitzgerald Integration */}
+                <motion.section
+                    className="mb-10"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.25 }}
+                >
+                    <IntensityDistributionCard
+                        workouts={workoutLogs.map((log): WorkoutForIntensity => ({
+                            sessionType: log.sessionType,
+                            durationMinutes: log.plannedDuration,
+                            completed: log.completed,
+                            date: log.date,
+                        }))}
                     />
                 </motion.section>
 

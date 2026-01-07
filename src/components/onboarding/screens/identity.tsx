@@ -301,20 +301,35 @@ export function NameScreen({ name, onNameChange, onContinue, onBack }: NameScree
 
 interface DemographicsScreenProps {
     data: OnboardingData;
-    onAgeChange: (age: number | null) => void;
+    onDobChange: (dob: string | null) => void;
     onSexChange: (sex: 'male' | 'female') => void;
     onContinue: () => void;
     onBack: () => void;
 }
 
+// Helper to calculate age from DOB
+function calculateAge(dob: string): number {
+    const birth = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+    }
+    return age;
+}
+
 export function DemographicsScreen({
     data,
-    onAgeChange,
+    onDobChange,
     onSexChange,
     onContinue,
     onBack
 }: DemographicsScreenProps) {
-    const canContinue = data.age !== null && data.age > 0 && data.sex !== null;
+    // Calculate age from DOB for display and validation
+    const age = data.dateOfBirth ? calculateAge(data.dateOfBirth) : null;
+    const isValidAge = age !== null && age >= 13 && age <= 99;
+    const canContinue = isValidAge && data.sex !== null;
 
     useKeyboardNavigation({
         onEnter: canContinue ? onContinue : undefined,
@@ -333,17 +348,30 @@ export function DemographicsScreen({
             />
 
             <div className="space-y-6">
-                {/* Age */}
+                {/* Date of Birth */}
                 <div>
-                    <label className="v3-label block mb-2">Age</label>
-                    <TextInput
-                        type="number"
-                        value={data.age?.toString() ?? ''}
-                        onChange={(v) => onAgeChange(v ? parseInt(v) : null)}
-                        placeholder="30"
-                        min={13}
-                        max={99}
+                    <label className="v3-label block mb-2">Date of Birth</label>
+                    <input
+                        type="date"
+                        value={data.dateOfBirth || ''}
+                        onChange={(e) => onDobChange(e.target.value || null)}
+                        className="v3-input w-full"
+                        max={new Date(new Date().setFullYear(new Date().getFullYear() - 13)).toISOString().split('T')[0]}
+                        min={new Date(new Date().setFullYear(new Date().getFullYear() - 99)).toISOString().split('T')[0]}
+                        style={{
+                            background: 'var(--bg-elevated)',
+                            border: '1px solid var(--border-base)',
+                            borderRadius: '0.75rem',
+                            padding: '0.75rem 1rem',
+                            color: 'var(--text-base)',
+                            fontSize: '1rem',
+                        }}
                     />
+                    {age !== null && (
+                        <p className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>
+                            Age: <span style={{ color: 'var(--text-base)' }}>{age} years old</span>
+                        </p>
+                    )}
                 </div>
 
                 {/* Sex */}

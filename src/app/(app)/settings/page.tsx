@@ -2,30 +2,37 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import Image from 'next/image';
 import { Toggle } from '@/components/ui/Toggle';
+import { Badge } from '@/components/ui/Badge';
 import { createSupabaseBrowserClient } from '@/infrastructure/supabase';
 import { usePlan } from '@/domain/plan/context';
-import { downloadPlanAsJSON } from '@/domain/plan/service';
+import { downloadPlanAsJSON, clearPlan } from '@/domain/plan/service';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertTriangle, X, Download } from 'lucide-react';
+import {
+    AlertTriangle, X, Download, RefreshCcw, ChevronRight,
+    Calendar, TrendingUp, Target, Zap, Activity, Moon, Check
+} from 'lucide-react';
+import { SiteHeader } from '@/components/ui/SiteHeader';
+import { AVATAR_OPTIONS, getAvatarPath, DEFAULT_AVATAR_ID } from '@/domain/user/avatars';
 
 /**
- * Settings Page V2
- * Week aesthetic: Dark, atmospheric, light typography
+ * Settings Page - V3 Premium Design
  * 
- * Features:
- * - Profile editing (name, age)
- * - Notification preferences (persisted to DB)
- * - Units preference (persisted to DB)
- * - Strava integration
- * - Account deletion with confirmation modal
+ * Design principles from globals.css V3:
+ * - User profile card with gradient avatar
+ * - VDOT as hero metric with accent glow
+ * - Rich training plan details with phase and coach info
+ * - Icons in list rows for visual scanning
+ * - Premium card styling with subtle depth
+ * - Destructive actions visually separated
  */
 
 interface ProfileData {
     name: string;
     email: string;
     age: number | null;
+    avatar: string | null;
 }
 
 interface PreferencesData {
@@ -34,19 +41,28 @@ interface PreferencesData {
     units: 'miles' | 'kilometers';
 }
 
+// Get initials from name
+function getInitials(name: string): string {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'TL';
+}
+
+// Format pace from seconds to min:sec
+function formatPace(seconds: number): string {
+    const min = Math.floor(seconds / 60);
+    const sec = Math.round(seconds % 60);
+    return `${min}:${sec.toString().padStart(2, '0')}`;
+}
+
 export default function SettingsPage() {
     const router = useRouter();
-    const { plan } = usePlan();
+    const { plan, refreshPlan } = usePlan();
 
     // Profile state
-    const [profile, setProfile] = useState<ProfileData>({
-        name: '',
-        email: '',
-        age: null,
-    });
+    const [profile, setProfile] = useState<ProfileData>({ name: '', email: '', age: null, avatar: null });
     const [profileLoading, setProfileLoading] = useState(true);
+    const [profileEditing, setProfileEditing] = useState(false);
     const [profileSaving, setProfileSaving] = useState(false);
-    const [profileMessage, setProfileMessage] = useState<string | null>(null);
+    const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
     // Preferences state
     const [preferences, setPreferences] = useState<PreferencesData>({
@@ -57,21 +73,14 @@ export default function SettingsPage() {
     const [prefSaving, setPrefSaving] = useState(false);
 
     // Strava state
-    const [stravaStatus, setStravaStatus] = useState<{
-        connected: boolean;
-        stravaAthleteId?: number | null;
-        lastActivityAt?: string | null;
-    } | null>(null);
+    const [stravaStatus, setStravaStatus] = useState<{ connected: boolean } | null>(null);
     const [stravaBusy, setStravaBusy] = useState(false);
-    const [stravaMessage, setStravaMessage] = useState<string | null>(null);
-    const [stravaAuthRequired, setStravaAuthRequired] = useState(false);
     const [isLocalhost, setIsLocalhost] = useState(false);
     const stravaConnected = Boolean(stravaStatus?.connected);
-    const [signOutBusy, setSignOutBusy] = useState(false);
-    const [exportBusy, setExportBusy] = useState(false);
-    const [exportMessage, setExportMessage] = useState<string | null>(null);
 
-    // Deletion state
+    const [signOutBusy, setSignOutBusy] = useState(false);
+    const [resetBusy, setResetBusy] = useState(false);
+    const [showResetModal, setShowResetModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteConfirmText, setDeleteConfirmText] = useState('');
     const [deleteBusy, setDeleteBusy] = useState(false);
@@ -79,42 +88,27 @@ export default function SettingsPage() {
 
     const currentVdot = plan?.vdot || null;
 
-    // Load profile and preferences
+    // Load profile
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const supabase = createSupabaseBrowserClient();
                 const { data: { user } } = await supabase.auth.getUser();
-
-                if (!user) {
-                    setProfileLoading(false);
-                    return;
-                }
+                if (!user) { setProfileLoading(false); return; }
 
                 const email = user.email || '';
-
-                // Query includes new columns - cast to any until types are regenerated
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const { data: athleteData } = await supabase
+                const { data: athlete } = await supabase
                     .from('athletes')
-                    .select('name, age, notify_training_reminders, notify_weekly_summary, units')
+                    .select('name, age, avatar, notify_training_reminders, notify_weekly_summary, units')
                     .eq('id', user.id)
-                    .single();
-
-                const athlete = athleteData as {
-                    name?: string;
-                    age?: number | null;
-                    notify_training_reminders?: boolean;
-                    notify_weekly_summary?: boolean;
-                    units?: string;
-                } | null;
+                    .single() as { data: { name?: string; age?: number; avatar?: string; notify_training_reminders?: boolean; notify_weekly_summary?: boolean; units?: string } | null };
 
                 setProfile({
                     name: athlete?.name || user.user_metadata?.name || email.split('@')[0] || '',
                     email,
                     age: athlete?.age || null,
+                    avatar: athlete?.avatar || null,
                 });
-
                 if (athlete) {
                     setPreferences({
                         notifyTrainingReminders: athlete.notify_training_reminders ?? true,
@@ -128,77 +122,31 @@ export default function SettingsPage() {
                 setProfileLoading(false);
             }
         };
-
         fetchData();
     }, []);
 
     // Strava status check
     useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const connect = params.get('connect');
-        const error = params.get('error');
-        const status = params.get('status');
         const host = window.location.hostname;
-        setIsLocalhost(host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || host.endsWith('.local'));
-        if (connect && error) {
-            const message = formatConnectError(connect, error);
-            if (connect === 'strava') {
-                setStravaMessage(message);
-            }
-        }
-        if (connect === 'strava' && status === 'connected') {
-            setStravaMessage('Strava connected.');
-        }
-        void refreshStravaStatus();
+        setIsLocalhost(host === 'localhost' || host === '127.0.0.1');
+        fetch('/api/strava/status').then(r => r.ok ? r.json() : null).then(d => d && setStravaStatus(d)).catch(() => { });
     }, []);
-
-    const refreshStravaStatus = async () => {
-        try {
-            setStravaAuthRequired(false);
-            const response = await fetch('/api/strava/status');
-            if (response.status === 401) {
-                setStravaAuthRequired(true);
-                setStravaStatus(null);
-                return;
-            }
-            if (!response.ok) throw new Error('Unable to load Strava status');
-            const data = await response.json() as { connected: boolean; stravaAthleteId?: number | null; lastActivityAt?: string | null };
-            setStravaStatus(data);
-        } catch (error) {
-            setStravaMessage(error instanceof Error ? error.message : 'Strava status failed');
-        }
-    };
 
     const handleSaveProfile = async () => {
         setProfileSaving(true);
-        setProfileMessage(null);
-
         try {
             const supabase = createSupabaseBrowserClient();
             const { data: { user } } = await supabase.auth.getUser();
-
-            if (!user) {
-                setProfileMessage('Not signed in');
-                return;
-            }
-
-            const { error } = await supabase
-                .from('athletes')
-                .upsert({
+            if (user) {
+                await supabase.from('athletes').upsert({
                     id: user.id,
                     name: profile.name,
                     age: profile.age,
+                    avatar: profile.avatar,
                 }, { onConflict: 'id' });
-
-            if (error) {
-                setProfileMessage('Failed to save profile');
-                console.error('Profile save error:', error);
-            } else {
-                setProfileMessage('Profile saved!');
-                setTimeout(() => setProfileMessage(null), 3000);
             }
+            setProfileEditing(false);
         } catch (error) {
-            setProfileMessage('Failed to save profile');
             console.error('Profile save error:', error);
         } finally {
             setProfileSaving(false);
@@ -206,60 +154,30 @@ export default function SettingsPage() {
     };
 
     const handlePreferenceChange = async (key: keyof PreferencesData, value: boolean | string) => {
-        // Optimistic update
         setPreferences(prev => ({ ...prev, [key]: value }));
         setPrefSaving(true);
-
         try {
             const supabase = createSupabaseBrowserClient();
             const { data: { user } } = await supabase.auth.getUser();
-
-            if (!user) return;
-
-            const updateData: Record<string, unknown> = {};
-            if (key === 'notifyTrainingReminders') updateData.notify_training_reminders = value;
-            if (key === 'notifyWeeklySummary') updateData.notify_weekly_summary = value;
-            if (key === 'units') updateData.units = value;
-
-            await supabase
-                .from('athletes')
-                .update(updateData)
-                .eq('id', user.id);
-        } catch (error) {
-            console.error('Failed to save preference:', error);
-            // Revert on error would go here
-        } finally {
-            setPrefSaving(false);
-        }
+            if (user) {
+                const updateData: Record<string, unknown> = {};
+                if (key === 'notifyTrainingReminders') updateData.notify_training_reminders = value;
+                if (key === 'notifyWeeklySummary') updateData.notify_weekly_summary = value;
+                if (key === 'units') updateData.units = value;
+                await supabase.from('athletes').update(updateData).eq('id', user.id);
+            }
+        } catch (error) { console.error('Preference save error:', error); }
+        finally { setPrefSaving(false); }
     };
 
-    const handleStravaConnect = () => {
-        window.location.href = '/api/strava/connect?from=settings';
-    };
-
+    const handleStravaConnect = () => { window.location.href = '/api/strava/connect?from=settings'; };
     const handleStravaDisconnect = async () => {
         setStravaBusy(true);
-        setStravaMessage(null);
         try {
-            const response = await fetch('/api/strava/disconnect', {
-                method: 'POST',
-            });
-            if (response.status === 401) {
-                setStravaAuthRequired(true);
-                setStravaStatus(null);
-                return;
-            }
-            if (!response.ok) throw new Error('Disconnect failed');
-            const payload = await response.json().catch(() => null) as { warning?: string | null } | null;
-            if (payload?.warning) {
-                setStravaMessage(`Disconnected locally. Strava deauthorization warning: ${payload.warning}`);
-            }
-            await refreshStravaStatus();
-        } catch (error) {
-            setStravaMessage(error instanceof Error ? error.message : 'Disconnect failed');
-        } finally {
-            setStravaBusy(false);
-        }
+            await fetch('/api/strava/disconnect', { method: 'POST' });
+            const r = await fetch('/api/strava/status');
+            if (r.ok) setStravaStatus(await r.json());
+        } catch { } finally { setStravaBusy(false); }
     };
 
     const handleSignOut = async () => {
@@ -268,458 +186,662 @@ export default function SettingsPage() {
             const supabase = createSupabaseBrowserClient();
             await supabase.auth.signOut();
             router.push('/auth');
-        } catch (error) {
-            console.error('Sign out failed:', error);
-        } finally {
-            setSignOutBusy(false);
-        }
+        } catch { } finally { setSignOutBusy(false); }
     };
 
-    const handleStravaSyncNow = async () => {
-        setStravaBusy(true);
-        setStravaMessage(null);
+    const handleResetPlan = async () => {
+        setResetBusy(true);
         try {
-            const response = await fetch('/api/strava/sync', {
-                method: 'POST',
-            });
-            if (response.status === 401) {
-                setStravaAuthRequired(true);
-                setStravaStatus(null);
-                return;
-            }
-            if (!response.ok) throw new Error('Strava sync failed');
-            const payload = await response.json().catch(() => null) as { imported?: number; total?: number; days?: number } | null;
-            if (payload) {
-                setStravaMessage(`Synced ${payload.imported ?? 0} of ${payload.total ?? 0} activities from the last ${payload.days ?? 0} days.`);
-            } else {
-                setStravaMessage('Strava sync complete.');
-            }
-            await refreshStravaStatus();
-        } catch (error) {
-            setStravaMessage(error instanceof Error ? error.message : 'Strava sync failed');
-        } finally {
-            setStravaBusy(false);
-        }
+            await clearPlan();
+            await refreshPlan();
+            setShowResetModal(false);
+            router.push('/onboarding');
+        } catch (error) { console.error('Reset failed:', error); }
+        finally { setResetBusy(false); }
     };
 
     const handleDeleteAccount = async () => {
         if (deleteConfirmText !== 'DELETE') return;
-
         setDeleteBusy(true);
         setDeleteError(null);
-
         try {
             const supabase = createSupabaseBrowserClient();
-
-            // Call the transaction-safe RPC function
             const { error } = await supabase.rpc('delete_user_account');
-
-            if (error) {
-                setDeleteError('Failed to delete account. Please try again.');
-                console.error('Delete account error:', error);
-                return;
-            }
-
-            // Sign out and redirect
+            if (error) { setDeleteError('Failed to delete account'); return; }
             await supabase.auth.signOut();
             router.push('/');
-        } catch (error) {
-            setDeleteError('An error occurred. Please try again.');
-            console.error('Delete account error:', error);
-        } finally {
-            setDeleteBusy(false);
-        }
+        } catch { setDeleteError('An error occurred'); }
+        finally { setDeleteBusy(false); }
     };
 
-    return (
-        <div className="v3-root min-h-screen">
-            {/* Header */}
-            <header className="v3-nav sticky top-0 z-50">
-                <div className="v3-container flex items-center justify-between py-4">
-                    <div className="flex items-center gap-4">
-                        <Link href="/dashboard" className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
-                            ← Back
-                        </Link>
-                        <span className="v3-heading-sm">Settings</span>
-                    </div>
-                    <Link href="/" className="v3-nav-logo">The Long Game</Link>
-                </div>
-            </header>
+    // Plan details
+    const currentPhase = plan?.weeks?.[0]?.phase || 'base';
+    const phaseLabels: Record<string, string> = { base: 'Foundation', build: 'Build', peak: 'Peak', taper: 'Taper' };
+    const distanceLabels: Record<string, string> = { '5k': '5K', '10k': '10K', half: 'Half Marathon', marathon: 'Marathon', general: 'General Fitness' };
 
-            <main className="v3-container-narrow py-10">
-                {/* Profile */}
+    return (
+        <div className="min-h-screen" style={{ background: 'var(--bg-base)' }}>
+            <SiteHeader backHref="/dashboard" title="Settings" />
+
+            <main className="max-w-lg mx-auto px-4 py-8 space-y-6">
+                {/* ============================================================
+                    HERO PROFILE CARD
+                    ============================================================ */}
                 <motion.section
-                    className="mb-10"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4 }}
+                    className="rounded-2xl p-6"
+                    style={{
+                        background: 'var(--bg-elevated)',
+                        border: '1px solid var(--border-base)',
+                    }}
                 >
-                    <h2 className="v3-heading-md mb-4">Profile</h2>
-                    <div className="v3-card p-6 space-y-6">
-                        {profileLoading ? (
-                            <div className="space-y-4">
-                                <div className="v3-skeleton" style={{ height: '40px' }} />
-                                <div className="v3-skeleton" style={{ height: '40px' }} />
+                    {profileLoading ? (
+                        <div className="flex items-center gap-4">
+                            <div className="skeleton w-16 h-16 rounded-full" />
+                            <div className="flex-1">
+                                <div className="skeleton h-5 w-32 mb-2" />
+                                <div className="skeleton h-4 w-48" />
                             </div>
-                        ) : (
-                            <>
-                                <div className="v3-form-group">
-                                    <label className="v3-form-label">Name</label>
-                                    <input
-                                        type="text"
-                                        value={profile.name}
-                                        onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                                        className="v3-input"
-                                        placeholder="Your name"
-                                    />
-                                </div>
-                                <div className="v3-form-group">
-                                    <label className="v3-form-label">Email</label>
-                                    <input
-                                        type="email"
-                                        value={profile.email}
-                                        disabled
-                                        className="v3-input v3-input-disabled"
-                                    />
-                                    <span className="v3-form-hint">Email cannot be changed here</span>
-                                </div>
-                                <div className="v3-form-group">
-                                    <label className="v3-form-label">Age</label>
-                                    <input
-                                        type="number"
-                                        value={profile.age || ''}
-                                        onChange={(e) => setProfile({ ...profile, age: e.target.value ? Number(e.target.value) : null })}
-                                        className="v3-input"
-                                        placeholder="—"
-                                    />
-                                </div>
-
-                                <div className="pt-2">
-                                    <button
-                                        onClick={handleSaveProfile}
-                                        disabled={profileSaving}
-                                        className="v3-btn v3-btn-secondary w-full"
-                                    >
-                                        {profileSaving ? 'Saving...' : 'Save Profile'}
-                                    </button>
-                                    {profileMessage && (
-                                        <p className={`v3-body-sm mt-2 text-center ${profileMessage.includes('saved') ? 'v3-accent' : ''}`} style={profileMessage.includes('saved') ? {} : { color: 'var(--v3-error)' }}>
-                                            {profileMessage}
-                                        </p>
-                                    )}
-                                </div>
-                            </>
-                        )}
-                    </div>
-                </motion.section>
-
-                {/* Fitness */}
-                <motion.section
-                    className="mb-10"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.1 }}
-                >
-                    <h2 className="v3-heading-md mb-4">Fitness</h2>
-                    <div className="v3-card p-6">
-                        <div className="flex items-center justify-between mb-6">
-                            <div>
-                                <p className="v3-heading-sm">Current VO2max (VDOT)</p>
-                                <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>Update every 4-6 weeks or after a race.</p>
-                            </div>
-                            <p className="v3-heading-lg v3-mono v3-accent">{currentVdot || '—'}</p>
                         </div>
-
-                        <button
-                            className="v3-btn v3-btn-secondary w-full"
-                            onClick={() => router.push('/onboarding')}
+                    ) : profileEditing ? (
+                        <div className="space-y-4">
+                            {/* Avatar Selection */}
+                            <div>
+                                <label className="text-xs font-medium block mb-3" style={{ color: 'var(--text-subtle)' }}>Avatar</label>
+                                <div className="grid grid-cols-6 gap-2">
+                                    {AVATAR_OPTIONS.map((avatar) => {
+                                        const isSelected = (profile.avatar || DEFAULT_AVATAR_ID) === avatar.id;
+                                        return (
+                                            <motion.button
+                                                key={avatar.id}
+                                                onClick={() => setProfile({ ...profile, avatar: avatar.id })}
+                                                className="relative aspect-square rounded-xl overflow-hidden focus:outline-none focus-visible:ring-2"
+                                                style={{
+                                                    border: isSelected
+                                                        ? '2px solid var(--color-accent)'
+                                                        : '1px solid var(--border-base)',
+                                                    // @ts-expect-error CSS variable
+                                                    '--tw-ring-color': 'var(--color-accent)',
+                                                }}
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
+                                            >
+                                                <Image
+                                                    src={avatar.path}
+                                                    alt={avatar.name}
+                                                    fill
+                                                    className="object-cover"
+                                                    sizes="60px"
+                                                />
+                                                {isSelected && (
+                                                    <motion.div
+                                                        className="absolute inset-0 flex items-center justify-center"
+                                                        style={{ background: 'color-mix(in srgb, var(--color-accent) 40%, transparent)' }}
+                                                        initial={{ opacity: 0 }}
+                                                        animate={{ opacity: 1 }}
+                                                    >
+                                                        <Check size={20} strokeWidth={3} style={{ color: 'var(--bg-base)' }} />
+                                                    </motion.div>
+                                                )}
+                                            </motion.button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                            <div>
+                                <label className="text-xs font-medium block mb-1" style={{ color: 'var(--text-subtle)' }}>Name</label>
+                                <input
+                                    type="text"
+                                    value={profile.name}
+                                    onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                                    className="input"
+                                    placeholder="Your name"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-xs font-medium block mb-1" style={{ color: 'var(--text-subtle)' }}>Age</label>
+                                <input
+                                    type="number"
+                                    value={profile.age || ''}
+                                    onChange={(e) => setProfile({ ...profile, age: e.target.value ? Number(e.target.value) : null })}
+                                    className="input"
+                                    placeholder="—"
+                                />
+                            </div>
+                            <div className="flex gap-3 pt-2">
+                                <button onClick={() => setProfileEditing(false)} className="btn btn-secondary flex-1">Cancel</button>
+                                <button onClick={handleSaveProfile} disabled={profileSaving} className="btn btn-primary flex-1">
+                                    {profileSaving ? 'Saving...' : 'Save'}
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div
+                            className="flex items-center gap-4 cursor-pointer group"
+                            onClick={() => setProfileEditing(true)}
                         >
-                            Recalibrate VO2max (rebuild plan)
-                        </button>
-                    </div>
+                            {/* Avatar or Initials */}
+                            <div className="relative w-16 h-16 rounded-full overflow-hidden transition-transform group-hover:scale-105">
+                                {profile.avatar ? (
+                                    <Image
+                                        src={getAvatarPath(profile.avatar)}
+                                        alt="Your avatar"
+                                        fill
+                                        className="object-cover"
+                                        sizes="64px"
+                                    />
+                                ) : (
+                                    <div
+                                        className="w-full h-full flex items-center justify-center text-xl font-semibold"
+                                        style={{
+                                            background: 'linear-gradient(135deg, var(--color-accent), var(--color-strength))',
+                                            color: 'var(--bg-base)',
+                                        }}
+                                    >
+                                        {getInitials(profile.name)}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <h2 className="text-xl font-semibold truncate">{profile.name || 'Add name'}</h2>
+                                <p className="text-sm truncate" style={{ color: 'var(--text-muted)' }}>{profile.email}</p>
+                            </div>
+                            <ChevronRight size={20} style={{ color: 'var(--text-subtle)' }} />
+                        </div>
+                    )}
                 </motion.section>
 
-                {/* Strava Integration */}
+                {/* ============================================================
+                    VDOT HERO METRIC
+                    ============================================================ */}
                 <motion.section
-                    className="mb-10"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.2 }}
+                    transition={{ duration: 0.4, delay: 0.05 }}
+                    className="rounded-2xl p-6 relative overflow-hidden"
+                    style={{
+                        background: 'var(--bg-elevated)',
+                        border: '1px solid var(--border-base)',
+                    }}
                 >
-                    <h2 className="v3-heading-md mb-4">Strava Integration</h2>
-                    <div className="v3-card p-6 space-y-4">
-                        <div className="flex flex-wrap items-center justify-between gap-3">
-                            <div>
-                                <p className="v3-heading-sm">Connect Strava</p>
-                                <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
-                                    Sync your runs automatically. Connect Garmin → Strava first in the Garmin Connect app.
-                                </p>
-                            </div>
-                            <span className={`v3-badge ${stravaConnected ? 'v3-badge-accent' : ''}`} style={!stravaConnected ? { background: 'var(--v3-error-subtle)', color: 'var(--v3-error)' } : {}}>
-                                {stravaAuthRequired ? 'Sign in required' : stravaConnected ? 'Connected' : 'Not connected'}
+                    {/* Subtle accent glow */}
+                    <div
+                        className="absolute inset-0 pointer-events-none"
+                        style={{
+                            background: 'radial-gradient(circle at 80% 20%, var(--color-accent-glow), transparent 60%)',
+                        }}
+                    />
+                    <div className="relative flex items-center justify-between">
+                        <div>
+                            <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: 'var(--text-subtle)' }}>
+                                Current VDOT
+                            </p>
+                            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                                Update every 4-6 weeks
+                            </p>
+                        </div>
+                        <div className="flex items-baseline gap-1">
+                            <span
+                                className="text-5xl font-light tabular-nums"
+                                style={{ color: 'var(--color-accent)', letterSpacing: '-0.02em' }}
+                            >
+                                {currentVdot || '—'}
                             </span>
                         </div>
-                        <div className="flex flex-wrap gap-3">
-                            <button
-                                className="v3-btn v3-btn-primary v3-btn-sm"
-                                onClick={handleStravaConnect}
-                                disabled={stravaBusy || stravaAuthRequired || stravaConnected || isLocalhost}
+                    </div>
+                    <button
+                        onClick={() => router.push('/onboarding')}
+                        className="btn btn-secondary w-full mt-4"
+                    >
+                        Recalibrate VDOT
+                    </button>
+                </motion.section>
+
+                {/* ============================================================
+                    TRAINING PLAN (RICH DETAILS)
+                    ============================================================ */}
+                {plan && (
+                    <motion.section
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: 0.1 }}
+                        className="rounded-2xl overflow-hidden"
+                        style={{
+                            background: 'var(--bg-elevated)',
+                            border: '1px solid var(--color-accent)',
+                        }}
+                    >
+                        {/* Plan header with accent */}
+                        <div
+                            className="px-6 py-4 flex items-center justify-between"
+                            style={{
+                                background: 'color-mix(in srgb, var(--color-accent) 8%, transparent)',
+                                borderBottom: '1px solid var(--border-base)',
+                            }}
+                        >
+                            <div className="flex items-center gap-3">
+                                <Activity size={20} style={{ color: 'var(--color-accent)' }} />
+                                <span className="font-semibold">Training Plan</span>
+                            </div>
+                            <Badge variant="accent">Active</Badge>
+                        </div>
+
+                        <div className="p-6 space-y-4">
+                            {/* Plan overview */}
+                            <div className="flex items-start justify-between">
+                                <div>
+                                    <h3 className="text-lg font-semibold">{distanceLabels[plan.goalDistance] || plan.goalDistance}</h3>
+                                    <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                                        {plan.totalWeeks} weeks • Peak: {Math.round(plan.peakMileage)} mi
+                                    </p>
+                                </div>
+                                <div
+                                    className="px-3 py-1.5 rounded-lg text-xs font-medium"
+                                    style={{
+                                        background: 'var(--color-accent-subtle)',
+                                        color: 'var(--color-accent)',
+                                    }}
+                                >
+                                    {phaseLabels[currentPhase] || currentPhase}
+                                </div>
+                            </div>
+
+                            {/* Plan stats grid */}
+                            <div
+                                className="grid grid-cols-3 gap-3 py-4"
+                                style={{ borderTop: '1px solid var(--border-base)', borderBottom: '1px solid var(--border-base)' }}
                             >
-                                Connect Strava
-                            </button>
-                            <button
-                                className="v3-btn v3-btn-secondary v3-btn-sm"
-                                onClick={handleStravaSyncNow}
-                                disabled={stravaBusy || stravaAuthRequired || !stravaConnected}
+                                <div className="text-center">
+                                    <div className="flex items-center justify-center gap-1 mb-1">
+                                        <Calendar size={14} style={{ color: 'var(--text-subtle)' }} />
+                                    </div>
+                                    <p className="text-lg font-semibold tabular-nums">{plan.totalWeeks}</p>
+                                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Weeks</p>
+                                </div>
+                                <div className="text-center">
+                                    <div className="flex items-center justify-center gap-1 mb-1">
+                                        <TrendingUp size={14} style={{ color: 'var(--text-subtle)' }} />
+                                    </div>
+                                    <p className="text-lg font-semibold tabular-nums">{Math.round(plan.peakMileage)}</p>
+                                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Peak Miles</p>
+                                </div>
+                                <div className="text-center">
+                                    <div className="flex items-center justify-center gap-1 mb-1">
+                                        <Zap size={14} style={{ color: 'var(--text-subtle)' }} />
+                                    </div>
+                                    <p className="text-lg font-semibold tabular-nums">{Math.round(plan.totalMiles)}</p>
+                                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Total Miles</p>
+                                </div>
+                            </div>
+
+                            {/* Training paces */}
+                            {plan.paces && (
+                                <div className="space-y-2">
+                                    <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--text-subtle)' }}>
+                                        Training Paces
+                                    </p>
+                                    <div className="flex flex-wrap gap-2">
+                                        <span className="px-2.5 py-1 rounded-md text-xs" style={{ background: 'var(--bg-muted)', color: 'var(--text-muted)' }}>
+                                            Easy: {formatPace(plan.paces.easy.min)}-{formatPace(plan.paces.easy.max)}
+                                        </span>
+                                        <span className="px-2.5 py-1 rounded-md text-xs" style={{ background: 'var(--bg-muted)', color: 'var(--text-muted)' }}>
+                                            Tempo: {formatPace(plan.paces.threshold)}
+                                        </span>
+                                        <span className="px-2.5 py-1 rounded-md text-xs" style={{ background: 'var(--bg-muted)', color: 'var(--text-muted)' }}>
+                                            Interval: {formatPace(plan.paces.interval)}
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Actions */}
+                            <div className="flex gap-3 pt-2">
+                                <button
+                                    onClick={async () => await downloadPlanAsJSON()}
+                                    className="btn btn-secondary btn-sm flex-1 flex items-center justify-center gap-2"
+                                >
+                                    <Download size={16} />
+                                    Export
+                                </button>
+                                <button
+                                    onClick={() => setShowResetModal(true)}
+                                    className="btn btn-sm flex-1 flex items-center justify-center gap-2"
+                                    style={{
+                                        background: 'color-mix(in srgb, var(--color-warning) 15%, transparent)',
+                                        color: 'var(--color-warning)',
+                                        border: '1px solid var(--color-warning)',
+                                    }}
+                                >
+                                    <RefreshCcw size={16} />
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+                    </motion.section>
+                )}
+
+                {/* No plan state */}
+                {!plan && !profileLoading && (
+                    <motion.section
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: 0.1 }}
+                        className="rounded-2xl p-6 text-center"
+                        style={{
+                            background: 'var(--bg-elevated)',
+                            border: '1px solid var(--border-base)',
+                        }}
+                    >
+                        <Target size={32} className="mx-auto mb-3" style={{ color: 'var(--text-subtle)' }} />
+                        <h3 className="font-semibold mb-1">No Training Plan</h3>
+                        <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>
+                            Create a personalized plan based on your goals
+                        </p>
+                        <button onClick={() => router.push('/onboarding')} className="btn btn-primary">
+                            Start Training
+                        </button>
+                    </motion.section>
+                )}
+
+                {/* ============================================================
+                    INTEGRATIONS
+                    ============================================================ */}
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.15 }}
+                    className="rounded-2xl overflow-hidden"
+                    style={{
+                        background: 'var(--bg-elevated)',
+                        border: '1px solid var(--border-base)',
+                    }}
+                >
+                    <div
+                        className="px-4 py-3.5 flex items-center justify-between"
+                        style={{ borderBottom: stravaConnected ? '1px solid var(--border-base)' : 'none' }}
+                    >
+                        <div className="flex items-center gap-3">
+                            <div
+                                className="w-8 h-8 rounded-lg flex items-center justify-center"
+                                style={{ background: stravaConnected ? '#FC4C02' : 'var(--bg-muted)' }}
                             >
-                                Sync now
-                            </button>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill={stravaConnected ? 'white' : 'var(--text-muted)'}>
+                                    <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066l-2.084 4.116z" />
+                                    <path d="M10.233 13.828L7.186 7.665l-3.046 6.163H0l7.186-14.16 7.187 14.16h-4.14z" opacity={stravaConnected ? "0.6" : "0.4"} />
+                                </svg>
+                            </div>
+                            <div>
+                                <p className="font-medium text-sm">Strava</p>
+                                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                                    {isLocalhost ? 'Production only' : stravaConnected ? 'Connected' : 'Sync your runs'}
+                                </p>
+                            </div>
+                        </div>
+                        {stravaConnected ? (
                             <button
-                                className="v3-btn v3-btn-ghost v3-btn-sm"
                                 onClick={handleStravaDisconnect}
-                                disabled={stravaBusy || stravaAuthRequired || !stravaConnected}
+                                disabled={stravaBusy}
+                                className="text-xs font-medium"
+                                style={{ color: 'var(--text-muted)' }}
                             >
                                 Disconnect
                             </button>
-                        </div>
-                        {stravaMessage && (
-                            <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>{stravaMessage}</p>
-                        )}
-                        {isLocalhost && (
-                            <p className="v3-mono" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
-                                Strava OAuth only works on production. Deploy to connect.
-                            </p>
+                        ) : !isLocalhost ? (
+                            <button
+                                onClick={handleStravaConnect}
+                                disabled={stravaBusy}
+                                className="text-xs font-medium px-3 py-1.5 rounded-lg"
+                                style={{ background: '#FC4C02', color: 'white' }}
+                            >
+                                Connect
+                            </button>
+                        ) : (
+                            <span className="text-xs" style={{ color: 'var(--text-subtle)' }}>Unavailable</span>
                         )}
                     </div>
                 </motion.section>
 
-                {/* Preferences */}
+                {/* ============================================================
+                    PREFERENCES
+                    ============================================================ */}
                 <motion.section
-                    className="mb-10"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.2 }}
+                    className="rounded-2xl overflow-hidden"
+                    style={{
+                        background: 'var(--bg-elevated)',
+                        border: '1px solid var(--border-base)',
+                    }}
+                >
+                    {/* Training Reminders */}
+                    <div
+                        className="px-4 py-3.5 flex items-center justify-between"
+                        style={{ borderBottom: '1px solid var(--border-base)' }}
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--bg-muted)' }}>
+                                <Zap size={16} style={{ color: 'var(--color-accent)' }} />
+                            </div>
+                            <div>
+                                <p className="font-medium text-sm">Training Reminders</p>
+                                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Daily workout notifications</p>
+                            </div>
+                        </div>
+                        <Toggle
+                            checked={preferences.notifyTrainingReminders}
+                            onChange={(checked) => handlePreferenceChange('notifyTrainingReminders', checked)}
+                            disabled={prefSaving}
+                        />
+                    </div>
+
+                    {/* Weekly Summary */}
+                    <div
+                        className="px-4 py-3.5 flex items-center justify-between"
+                        style={{ borderBottom: '1px solid var(--border-base)' }}
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--bg-muted)' }}>
+                                <Calendar size={16} style={{ color: 'var(--color-strength)' }} />
+                            </div>
+                            <div>
+                                <p className="font-medium text-sm">Weekly Summary</p>
+                                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Recap every Monday</p>
+                            </div>
+                        </div>
+                        <Toggle
+                            checked={preferences.notifyWeeklySummary}
+                            onChange={(checked) => handlePreferenceChange('notifyWeeklySummary', checked)}
+                            disabled={prefSaving}
+                        />
+                    </div>
+
+                    {/* Distance Units */}
+                    <div className="px-4 py-3.5 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--bg-muted)' }}>
+                                <Target size={16} style={{ color: 'var(--color-durability)' }} />
+                            </div>
+                            <p className="font-medium text-sm">Distance Units</p>
+                        </div>
+                        <div className="flex gap-1 p-0.5 rounded-lg" style={{ background: 'var(--bg-muted)' }}>
+                            <button
+                                onClick={() => handlePreferenceChange('units', 'miles')}
+                                className="px-3 py-1.5 rounded-md text-xs font-medium transition-all"
+                                style={{
+                                    background: preferences.units === 'miles' ? 'var(--bg-elevated)' : 'transparent',
+                                    color: preferences.units === 'miles' ? 'var(--text-base)' : 'var(--text-muted)',
+                                    boxShadow: preferences.units === 'miles' ? 'var(--shadow-sm)' : 'none',
+                                }}
+                            >
+                                mi
+                            </button>
+                            <button
+                                onClick={() => handlePreferenceChange('units', 'kilometers')}
+                                className="px-3 py-1.5 rounded-md text-xs font-medium transition-all"
+                                style={{
+                                    background: preferences.units === 'kilometers' ? 'var(--bg-elevated)' : 'transparent',
+                                    color: preferences.units === 'kilometers' ? 'var(--text-base)' : 'var(--text-muted)',
+                                    boxShadow: preferences.units === 'kilometers' ? 'var(--shadow-sm)' : 'none',
+                                }}
+                            >
+                                km
+                            </button>
+                        </div>
+                    </div>
+                </motion.section>
+
+                {/* ============================================================
+                    ACCOUNT ACTIONS
+                    ============================================================ */}
+                <motion.section
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.25 }}
+                    className="rounded-2xl overflow-hidden"
+                    style={{
+                        background: 'var(--bg-elevated)',
+                        border: '1px solid var(--border-base)',
+                    }}
                 >
-                    <h2 className="v3-heading-md mb-4">Preferences</h2>
-                    <div className="v3-card p-6 space-y-6">
-                        <div className="flex items-center justify-between gap-4">
-                            <div>
-                                <p className="v3-heading-sm">Training Reminders</p>
-                                <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
-                                    Get notified about upcoming workouts
-                                </p>
-                            </div>
-                            <Toggle
-                                checked={preferences.notifyTrainingReminders}
-                                onChange={(checked) => handlePreferenceChange('notifyTrainingReminders', checked)}
-                                disabled={prefSaving}
-                            />
+                    <button
+                        onClick={handleSignOut}
+                        disabled={signOutBusy}
+                        className="w-full px-4 py-3.5 flex items-center gap-3 text-left hover:bg-[var(--bg-muted)] transition-colors"
+                    >
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--bg-muted)' }}>
+                            <Moon size={16} style={{ color: 'var(--text-muted)' }} />
                         </div>
-                        <div className="flex items-center justify-between gap-4">
-                            <div>
-                                <p className="v3-heading-sm">Weekly Progress Summary</p>
-                                <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
-                                    Receive a recap every Monday
-                                </p>
-                            </div>
-                            <Toggle
-                                checked={preferences.notifyWeeklySummary}
-                                onChange={(checked) => handlePreferenceChange('notifyWeeklySummary', checked)}
-                                disabled={prefSaving}
-                            />
-                        </div>
-                        <div className="flex items-center justify-between gap-4">
-                            <div>
-                                <p className="v3-heading-sm">Units</p>
-                                <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
-                                    Distances and paces displayed in
-                                </p>
-                            </div>
-                            <div className="flex gap-2">
-                                <button
-                                    className={`v3-btn v3-btn-sm ${preferences.units === 'miles' ? 'v3-btn-primary' : 'v3-btn-ghost'}`}
-                                    onClick={() => handlePreferenceChange('units', 'miles')}
-                                    disabled={prefSaving}
-                                >
-                                    Miles
-                                </button>
-                                <button
-                                    className={`v3-btn v3-btn-sm ${preferences.units === 'kilometers' ? 'v3-btn-primary' : 'v3-btn-ghost'}`}
-                                    onClick={() => handlePreferenceChange('units', 'kilometers')}
-                                    disabled={prefSaving}
-                                >
-                                    Kilometers
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                        <span className="font-medium text-sm">{signOutBusy ? 'Signing out...' : 'Sign Out'}</span>
+                    </button>
                 </motion.section>
 
-                {/* Account */}
+                {/* ============================================================
+                    DANGER ZONE
+                    ============================================================ */}
                 <motion.section
-                    className="mb-10"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.3 }}
+                    className="rounded-2xl overflow-hidden"
+                    style={{
+                        background: 'var(--bg-elevated)',
+                        border: '1px solid var(--color-error)',
+                    }}
                 >
-                    <h2 className="v3-heading-md mb-4">Account</h2>
-                    <div className="v3-card p-6 space-y-4">
-                        {/* Export Plan */}
-                        {plan && (
-                            <div className="flex items-center justify-between pb-4" style={{ borderBottom: '1px solid var(--border-base)' }}>
-                                <div>
-                                    <p className="v3-heading-sm">Export Training Plan</p>
-                                    <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>Download a backup of your plan as JSON</p>
-                                </div>
-                                <button
-                                    className="v3-btn v3-btn-sm v3-btn-secondary flex items-center gap-2"
-                                    onClick={async () => {
-                                        setExportBusy(true);
-                                        setExportMessage(null);
-                                        try {
-                                            const success = await downloadPlanAsJSON();
-                                            if (success) {
-                                                setExportMessage('Plan exported successfully!');
-                                            } else {
-                                                setExportMessage('No plan to export');
-                                            }
-                                        } catch (error) {
-                                            console.error('Export failed:', error);
-                                            setExportMessage('Export failed');
-                                        } finally {
-                                            setExportBusy(false);
-                                            setTimeout(() => setExportMessage(null), 3000);
-                                        }
-                                    }}
-                                    disabled={exportBusy}
-                                >
-                                    {exportBusy ? 'Exporting...' : <><Download size={16} /> Export</>}
-                                </button>
-                            </div>
-                        )}
-                        {exportMessage && (
-                            <p className="v3-body-sm" style={{ color: exportMessage.includes('success') ? 'var(--v3-success)' : 'var(--text-muted)' }}>
-                                {exportMessage}
-                            </p>
-                        )}
-
-                        {/* Sign Out */}
+                    <button
+                        onClick={() => setShowDeleteModal(true)}
+                        className="w-full px-4 py-3.5 flex items-center gap-3 text-left hover:bg-[color-mix(in_srgb,var(--color-error)_5%,transparent)] transition-colors"
+                    >
+                        <div
+                            className="w-8 h-8 rounded-lg flex items-center justify-center"
+                            style={{ background: 'color-mix(in srgb, var(--color-error) 15%, transparent)' }}
+                        >
+                            <AlertTriangle size={16} style={{ color: 'var(--color-error)' }} />
+                        </div>
                         <div>
-                            <p className="v3-body-sm mb-3" style={{ color: 'var(--text-muted)' }}>
-                                Sign out on this device if you are done with setup.
-                            </p>
-                            <button
-                                className="v3-btn v3-btn-secondary w-full"
-                                onClick={handleSignOut}
-                                disabled={signOutBusy}
-                            >
-                                {signOutBusy ? 'Signing out...' : 'Sign out'}
-                            </button>
+                            <p className="font-medium text-sm" style={{ color: 'var(--color-error)' }}>Delete Account</p>
+                            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Permanently remove all data</p>
                         </div>
-                    </div>
+                    </button>
                 </motion.section>
 
-                {/* Danger Zone */}
-                <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.4 }}
-                >
-                    <h2 className="v3-heading-md mb-4" style={{ color: 'var(--v3-error)' }}>Danger Zone</h2>
-                    <div className="v3-card p-6" style={{ borderColor: 'var(--v3-error)' }}>
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="v3-heading-sm">Delete Account</p>
-                                <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>Permanently delete your account and all data</p>
-                            </div>
-                            <button
-                                className="v3-btn v3-btn-sm"
-                                style={{ background: 'var(--v3-error)', color: 'white' }}
-                                onClick={() => setShowDeleteModal(true)}
-                            >
-                                Delete
-                            </button>
-                        </div>
-                    </div>
-                </motion.section>
+                <div className="h-8" />
             </main>
 
-            {/* Delete Confirmation Modal */}
+            {/* Reset Plan Modal */}
+            <AnimatePresence>
+                {showResetModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+                        style={{ background: 'rgba(0, 0, 0, 0.6)' }}
+                        onClick={() => setShowResetModal(false)}
+                    >
+                        <motion.div
+                            initial={{ y: 100, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: 100, opacity: 0 }}
+                            className="max-w-sm w-full card p-6"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'var(--v3-warning-subtle)' }}>
+                                    <RefreshCcw size={20} style={{ color: 'var(--color-warning)' }} />
+                                </div>
+                                <h3 className="text-heading-sm">Reset Training Plan?</h3>
+                            </div>
+                            <p className="text-body-sm mb-6" style={{ color: 'var(--text-muted)' }}>
+                                This will clear your current plan. You&apos;ll go through onboarding to create a new one.
+                            </p>
+                            <div className="flex gap-3">
+                                <button onClick={() => setShowResetModal(false)} className="btn btn-secondary flex-1">Cancel</button>
+                                <button onClick={handleResetPlan} disabled={resetBusy} className="btn btn-primary flex-1">
+                                    {resetBusy ? 'Resetting...' : 'Reset'}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Delete Account Modal */}
             <AnimatePresence>
                 {showDeleteModal && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4"
-                        style={{ background: 'rgba(0, 0, 0, 0.8)' }}
+                        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+                        style={{ background: 'rgba(0, 0, 0, 0.6)' }}
                         onClick={() => setShowDeleteModal(false)}
                     >
                         <motion.div
-                            initial={{ scale: 0.95, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.95, opacity: 0 }}
-                            className="v3-card p-6 max-w-md w-full"
-                            style={{ borderColor: 'var(--v3-error)' }}
+                            initial={{ y: 100, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: 100, opacity: 0 }}
+                            className="max-w-sm w-full card p-6"
+                            style={{ borderColor: 'var(--color-error)' }}
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="flex items-start justify-between mb-4">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'var(--v3-error-subtle)' }}>
-                                        <AlertTriangle size={20} style={{ color: 'var(--v3-error)' }} />
+                                        <AlertTriangle size={20} style={{ color: 'var(--color-error)' }} />
                                     </div>
-                                    <h3 className="v3-heading-md">Delete Account</h3>
+                                    <h3 className="text-heading-sm">Delete Account</h3>
                                 </div>
-                                <button
-                                    onClick={() => setShowDeleteModal(false)}
-                                    className="p-1 rounded hover:bg-white/10"
-                                >
-                                    <X size={20} style={{ color: 'var(--text-muted)' }} />
-                                </button>
+                                <button onClick={() => setShowDeleteModal(false)} className="p-1"><X size={20} style={{ color: 'var(--text-muted)' }} /></button>
                             </div>
-
-                            <p className="v3-body-sm mb-4" style={{ color: 'var(--text-muted)' }}>
-                                This will permanently delete:
+                            <p className="text-body-sm mb-4" style={{ color: 'var(--text-muted)' }}>
+                                This permanently deletes all your data including plans, workouts, and preferences.
                             </p>
-                            <ul className="v3-body-sm mb-6 space-y-1" style={{ color: 'var(--text-muted)' }}>
-                                <li>• All your training plans and workouts</li>
-                                <li>• Your durability assessments</li>
-                                <li>• Your VDOT history and progress</li>
-                                <li>• All connected integrations</li>
-                            </ul>
-
-                            <p className="v3-body-sm mb-2" style={{ color: 'var(--text-muted)' }}>
-                                Type <strong style={{ color: 'var(--v3-error)' }}>DELETE</strong> to confirm:
+                            <p className="text-body-sm mb-2" style={{ color: 'var(--text-muted)' }}>
+                                Type <strong style={{ color: 'var(--color-error)' }}>DELETE</strong> to confirm:
                             </p>
                             <input
                                 type="text"
                                 value={deleteConfirmText}
                                 onChange={(e) => setDeleteConfirmText(e.target.value)}
-                                className="v3-input mb-4"
+                                className="input mb-4"
                                 placeholder="Type DELETE"
                                 autoComplete="off"
                             />
-
-                            {deleteError && (
-                                <p className="v3-body-sm mb-4" style={{ color: 'var(--v3-error)' }}>{deleteError}</p>
-                            )}
-
+                            {deleteError && <p className="text-body-sm mb-4" style={{ color: 'var(--color-error)' }}>{deleteError}</p>}
                             <div className="flex gap-3">
+                                <button onClick={() => setShowDeleteModal(false)} className="btn btn-secondary flex-1">Cancel</button>
                                 <button
-                                    className="v3-btn v3-btn-secondary flex-1"
-                                    onClick={() => setShowDeleteModal(false)}
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    className="v3-btn flex-1"
-                                    style={{
-                                        background: deleteConfirmText === 'DELETE' ? 'var(--v3-error)' : 'var(--bg-elevated)',
-                                        color: deleteConfirmText === 'DELETE' ? 'white' : 'var(--text-muted)',
-                                        cursor: deleteConfirmText === 'DELETE' ? 'pointer' : 'not-allowed',
-                                    }}
                                     onClick={handleDeleteAccount}
                                     disabled={deleteConfirmText !== 'DELETE' || deleteBusy}
+                                    className="btn flex-1"
+                                    style={{
+                                        background: deleteConfirmText === 'DELETE' ? 'var(--color-error)' : 'var(--bg-muted)',
+                                        color: deleteConfirmText === 'DELETE' ? 'white' : 'var(--text-muted)',
+                                    }}
                                 >
                                     {deleteBusy ? 'Deleting...' : 'Delete Forever'}
                                 </button>
@@ -730,21 +852,4 @@ export default function SettingsPage() {
             </AnimatePresence>
         </div>
     );
-}
-
-function formatConnectError(provider: string, error: string) {
-    const label = provider === 'strava' ? 'Strava' : 'Device';
-    if (error === 'missing_config') {
-        return `${label} isn't configured yet. Add the ${label.toUpperCase()} client ID, secret, and redirect URL, then try again.`;
-    }
-    if (error === 'unauthorized') {
-        return `Sign in to connect ${label}, then try again.`;
-    }
-    if (error === 'invalid_state' || error === 'expired_state') {
-        return `${label} connection expired. Try connecting again.`;
-    }
-    if (error === 'connect_failed') {
-        return `We couldn't start the ${label} connection. Try again in a moment.`;
-    }
-    return `We couldn't start the ${label} connection.`;
 }

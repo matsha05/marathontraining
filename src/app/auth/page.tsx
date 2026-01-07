@@ -24,7 +24,7 @@ function AuthForm() {
     const [email, setEmail] = useState('');
     const [otp, setOtp] = useState(() => Array.from({ length: OTP_LENGTH }, () => ''));
     const [step, setStep] = useState<'email' | 'otp'>('email');
-    const [loadingAction, setLoadingAction] = useState<'otp' | 'google' | 'verify' | null>(null);
+    const [loadingAction, setLoadingAction] = useState<'otp' | 'verify' | null>(null);
     const [message, setMessage] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -198,26 +198,7 @@ function AuthForm() {
         }
     };
 
-    const handleGoogleSignIn = async () => {
-        setLoadingAction('google');
-        setErrorMessage(null);
-        try {
-            const supabase = createSupabaseBrowserClient();
-            const { error } = await supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,
-                },
-            });
-            if (error) {
-                setErrorMessage(error.message);
-            }
-        } catch (error) {
-            setErrorMessage(error instanceof Error ? error.message : 'Google sign-in failed');
-        } finally {
-            setLoadingAction(null);
-        }
-    };
+
 
     return (
         <>
@@ -245,22 +226,6 @@ function AuthForm() {
             {/* Step 1: Email */}
             {step === 'email' && (
                 <>
-                    {/* Google OAuth */}
-                    <button
-                        type="button"
-                        onClick={handleGoogleSignIn}
-                        disabled={isLoading}
-                        className="v3-btn v3-btn-secondary w-full mb-6"
-                    >
-                        {loadingAction === 'google' ? 'Connecting...' : 'Continue with Google'}
-                    </button>
-
-                    <div className="flex items-center gap-4 mb-6">
-                        <div className="flex-1 h-px" style={{ background: 'var(--border-base)' }} />
-                        <span className="v3-label" style={{ color: 'var(--text-muted)' }}>OR</span>
-                        <div className="flex-1 h-px" style={{ background: 'var(--border-base)' }} />
-                    </div>
-
                     <form onSubmit={handleSendOtp} className="space-y-4">
                         <div className="v3-form-group">
                             <label htmlFor="auth-email" className="v3-form-label">EMAIL</label>
