@@ -127,18 +127,22 @@ export default function PlansPage() {
             {/* Distance Tabs */}
             <nav className="px-6 mb-8">
                 <div className="max-w-4xl mx-auto">
-                    <div
-                        className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide"
-                        style={{ scrollbarWidth: 'none' }}
-                    >
+                    {/* Padding accommodates hover scale/lift without clipping */}
+                    <div className="flex gap-2 py-2 px-1">
                         {DISTANCES.map((distance, i) => (
                             <motion.button
                                 key={distance.id}
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.3, delay: i * 0.05 }}
+                                whileHover={selectedDistance !== distance.id ? {
+                                    scale: 1.05,
+                                    y: -3,
+                                    boxShadow: '0 6px 20px rgba(0,0,0,0.1)',
+                                } : {}}
+                                whileTap={{ scale: 0.98 }}
                                 onClick={() => setSelectedDistance(distance.id)}
-                                className="px-5 py-3 rounded-xl whitespace-nowrap transition-all"
+                                className="px-5 py-3 rounded-xl whitespace-nowrap"
                                 style={{
                                     background: selectedDistance === distance.id
                                         ? 'var(--color-accent)'

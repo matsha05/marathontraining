@@ -279,22 +279,27 @@ function CoachCard({ coach, isExpanded, onToggle }: {
     onToggle: () => void;
 }) {
     return (
-        <div
-            className="rounded-2xl overflow-hidden transition-all duration-300"
+        <motion.div
+            className="rounded-2xl overflow-hidden"
             style={{
-                background: 'var(--v3-bg-card)',
-                border: `1px solid ${isExpanded ? coach.color : 'var(--border-base)'}`,
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-base)',
             }}
+            whileHover={!isExpanded ? {
+                y: -4,
+                boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+                transition: { type: "spring", stiffness: 400, damping: 25 }
+            } : {}}
         >
             <button
                 onClick={onToggle}
-                className="w-full text-left p-6 transition-colors hover:bg-[var(--bg-elevated)]"
+                className="w-full text-left p-6"
             >
                 <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                         <div className="flex items-center gap-3 mb-3">
                             <div
-                                className="w-3 h-3 rounded-full"
+                                className="w-2.5 h-2.5 rounded-full"
                                 style={{ background: coach.color }}
                             />
                             <h3 className="text-xl font-light" style={{ color: 'var(--text-base)' }}>
@@ -303,18 +308,18 @@ function CoachCard({ coach, isExpanded, onToggle }: {
                         </div>
                         <p
                             className="text-sm italic mb-4"
-                            style={{ color: coach.color }}
+                            style={{ color: 'var(--text-muted)' }}
                         >
                             "{coach.tagline}"
                         </p>
-                        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                        <p className="text-sm" style={{ color: 'var(--text-subtle)' }}>
                             {coach.keyConcept}
                         </p>
                     </div>
                     <motion.div
                         animate={{ rotate: isExpanded ? 180 : 0 }}
                         className="p-2 rounded-lg flex-shrink-0"
-                        style={{ background: 'var(--bg-elevated)' }}
+                        style={{ background: 'var(--bg-muted)' }}
                     >
                         <ChevronDown className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
                     </motion.div>
@@ -335,13 +340,13 @@ function CoachCard({ coach, isExpanded, onToggle }: {
                             style={{ borderTop: '1px solid var(--border-base)' }}
                         >
                             <div className="mb-6">
-                                <p className="text-xs uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>
+                                <p className="text-xs uppercase tracking-widest mb-3" style={{ color: 'var(--text-subtle)' }}>
                                     Focus Areas
                                 </p>
                                 <ul className="space-y-2">
                                     {coach.focusAreas.map((area, i) => (
                                         <li key={i} className="text-sm flex items-start gap-2" style={{ color: 'var(--text-muted)' }}>
-                                            <span style={{ color: coach.color }}>•</span>{area}
+                                            <span style={{ color: 'var(--text-subtle)' }}>•</span>{area}
                                         </li>
                                     ))}
                                 </ul>
@@ -350,8 +355,7 @@ function CoachCard({ coach, isExpanded, onToggle }: {
                             <div
                                 className="p-4 rounded-xl mb-6"
                                 style={{
-                                    background: `${coach.color}10`,
-                                    borderLeft: `3px solid ${coach.color}`,
+                                    background: 'var(--bg-muted)',
                                 }}
                             >
                                 <p className="text-sm italic" style={{ color: 'var(--text-muted)' }}>
@@ -370,7 +374,7 @@ function CoachCard({ coach, isExpanded, onToggle }: {
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="flex items-center gap-2 mt-2 text-sm hover:underline"
-                                        style={{ color: coach.color }}
+                                        style={{ color: 'var(--color-accent)' }}
                                         onClick={(e) => e.stopPropagation()}
                                     >
                                         <ExternalLink className="w-4 h-4" />Learn more
@@ -381,7 +385,7 @@ function CoachCard({ coach, isExpanded, onToggle }: {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </div>
+        </motion.div>
     );
 }
 

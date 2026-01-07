@@ -197,73 +197,76 @@ export default function WodLibraryPage() {
                     </p>
                 </motion.div>
 
-                {/* Filters */}
+                {/* Unified Filter Bar */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1, duration: 0.5, ease }}
-                    className="flex flex-wrap gap-4 mb-8"
+                    className="flex flex-wrap items-center gap-3 p-4 rounded-xl mb-6"
+                    style={{
+                        background: 'var(--bg-elevated)',
+                        border: '1px solid var(--border-base)',
+                    }}
                 >
                     {/* Equipment Tier */}
-                    <div className="flex flex-col gap-2">
-                        <label className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Equipment</label>
-                        <select
-                            value={equipmentTier}
-                            onChange={(e) => setEquipmentTier(e.target.value as EquipmentTier)}
-                            className="v3-input text-sm py-2 px-3 rounded-lg"
-                            style={{
-                                background: 'var(--bg-elevated)',
-                                border: '1px solid var(--border-base)',
-                                color: 'var(--text-base)'
-                            }}
-                        >
-                            {Object.entries(EQUIPMENT_TIERS).map(([key, { label }]) => (
-                                <option key={key} value={key}>{label}</option>
-                            ))}
-                        </select>
-                    </div>
+                    <select
+                        value={equipmentTier}
+                        onChange={(e) => setEquipmentTier(e.target.value as EquipmentTier)}
+                        className="text-sm py-2 px-3 rounded-lg appearance-none cursor-pointer"
+                        style={{
+                            background: 'var(--bg-muted)',
+                            border: 'none',
+                            color: 'var(--text-base)',
+                            minWidth: '140px',
+                        }}
+                    >
+                        {Object.entries(EQUIPMENT_TIERS).map(([key, { label }]) => (
+                            <option key={key} value={key}>{label}</option>
+                        ))}
+                    </select>
+
+                    {/* Divider */}
+                    <div className="w-px h-6" style={{ background: 'var(--border-base)' }} />
 
                     {/* Type Filter */}
-                    <div className="flex flex-col gap-2">
-                        <label className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Type</label>
-                        <select
-                            value={typeFilter}
-                            onChange={(e) => setTypeFilter(e.target.value as WodType | "all")}
-                            className="v3-input text-sm py-2 px-3 rounded-lg"
-                            style={{
-                                background: 'var(--bg-elevated)',
-                                border: '1px solid var(--border-base)',
-                                color: 'var(--text-base)'
-                            }}
-                        >
-                            <option value="all">All Types</option>
-                            {Object.entries(WOD_TYPE_LABELS).map(([type, { label }]) => (
-                                <option key={type} value={type}>{label}</option>
-                            ))}
-                        </select>
-                    </div>
+                    <select
+                        value={typeFilter}
+                        onChange={(e) => setTypeFilter(e.target.value as WodType | "all")}
+                        className="text-sm py-2 px-3 rounded-lg appearance-none cursor-pointer"
+                        style={{
+                            background: 'var(--bg-muted)',
+                            border: 'none',
+                            color: 'var(--text-base)',
+                            minWidth: '120px',
+                        }}
+                    >
+                        <option value="all">All Types</option>
+                        {Object.entries(WOD_TYPE_LABELS).map(([type, { label }]) => (
+                            <option key={type} value={type}>{label}</option>
+                        ))}
+                    </select>
+
+                    {/* Divider */}
+                    <div className="w-px h-6" style={{ background: 'var(--border-base)' }} />
 
                     {/* Favorites Toggle */}
-                    <div className="flex flex-col gap-2">
-                        <label className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Show</label>
-                        <button
-                            onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-                            className="text-sm py-2 px-4 rounded-lg transition-colors"
-                            style={{
-                                background: showFavoritesOnly ? 'var(--color-accent-subtle)' : 'var(--bg-elevated)',
-                                border: '1px solid var(--border-base)',
-                                color: showFavoritesOnly ? 'var(--color-accent)' : 'var(--text-muted)'
-                            }}
-                        >
-                            ★ Favorites {favorites.length > 0 && `(${favorites.length})`}
-                        </button>
-                    </div>
-                </motion.div>
+                    <button
+                        onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                        className="text-sm py-2 px-4 rounded-lg transition-all font-medium"
+                        style={{
+                            background: showFavoritesOnly ? 'var(--color-accent)' : 'var(--bg-muted)',
+                            color: showFavoritesOnly ? '#04110b' : 'var(--text-muted)',
+                        }}
+                    >
+                        ★ Favorites{favorites.length > 0 && ` (${favorites.length})`}
+                    </button>
 
-                {/* Results count */}
-                <p className="text-xs mb-4" style={{ color: 'var(--text-muted)' }}>
-                    {filteredWods.length} WOD{filteredWods.length !== 1 ? 's' : ''} available
-                </p>
+                    {/* Spacer + Results count */}
+                    <div className="flex-1" />
+                    <span className="text-xs" style={{ color: 'var(--text-subtle)' }}>
+                        {filteredWods.length} WOD{filteredWods.length !== 1 ? 's' : ''}
+                    </span>
+                </motion.div>
 
                 {/* WOD Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -330,12 +333,12 @@ function WodCard({ wod, index, isFavorite, isExpanded, onToggleFavorite, onToggl
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 * index, duration: 0.4, ease }}
+            whileHover={{ y: -3, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
             className="rounded-xl overflow-hidden flex flex-col"
             style={{
                 background: 'var(--bg-elevated)',
                 border: '1px solid var(--border-base)',
-                borderLeft: `4px solid ${typeInfo.color}`,
-                minHeight: '280px', // Fixed minimum height for consistency
+                minHeight: '280px',
             }}
         >
             {/* Header */}
@@ -355,12 +358,12 @@ function WodCard({ wod, index, isFavorite, isExpanded, onToggleFavorite, onToggl
 
                 {/* Badges row: Type, Duration, Fatigue, Phase */}
                 <div className="flex flex-wrap items-center gap-1.5 mb-3">
-                    {/* Type badge */}
+                    {/* Type badge - now subtle */}
                     <span
                         className="text-[10px] px-2 py-0.5 rounded-full font-medium"
                         style={{
-                            background: `${typeInfo.color}20`,
-                            color: typeInfo.color
+                            background: 'var(--bg-muted)',
+                            color: 'var(--text-muted)'
                         }}
                     >
                         {typeInfo.label}
@@ -402,7 +405,7 @@ function WodCard({ wod, index, isFavorite, isExpanded, onToggleFavorite, onToggl
 
                 {/* Focus - what this workout develops */}
                 {wod.focus && (
-                    <p className="text-xs mb-2" style={{ color: 'var(--color-accent)' }}>
+                    <p className="text-xs mb-2" style={{ color: 'var(--text-muted)' }}>
                         {wod.focus}
                     </p>
                 )}
