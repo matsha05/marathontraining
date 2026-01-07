@@ -333,3 +333,131 @@ export function LongRunDayScreen({
         </QuestionScreen>
     );
 }
+
+// =============================================================================
+// PLAN START DATE SCREEN
+// =============================================================================
+
+interface PlanStartDateScreenProps {
+    value: string | null;
+    raceDate: string | null;
+    onChange: (value: string | null) => void;
+    onContinue: () => void;
+    onBack: () => void;
+}
+
+// Helper to get next Monday
+function getNextMonday(): string {
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const daysUntilMonday = dayOfWeek === 0 ? 1 : (8 - dayOfWeek);
+    const nextMonday = new Date(today);
+    nextMonday.setDate(today.getDate() + daysUntilMonday);
+    return nextMonday.toISOString().split('T')[0];
+}
+
+// Helper to get this weekend (Saturday)
+function getThisWeekend(): string {
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const daysUntilSaturday = (6 - dayOfWeek + 7) % 7 || 7;
+    const saturday = new Date(today);
+    saturday.setDate(today.getDate() + (dayOfWeek === 6 ? 0 : daysUntilSaturday));
+    return saturday.toISOString().split('T')[0];
+}
+
+// Helper to format date nicely
+function formatDate(dateStr: string): string {
+    const date = new Date(dateStr + 'T12:00:00'); // Avoid timezone issues
+    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+}
+
+export function PlanStartDateScreen({
+    value,
+    raceDate,
+    onChange,
+    onContinue,
+    onBack
+}: PlanStartDateScreenProps) {
+    const nextMonday = getNextMonday();
+    const thisWeekend = getThisWeekend();
+
+    // Validate: start date must be before race date (if set)
+    const isValid = !value || !raceDate || new Date(value) < new Date(raceDate);
+    const canContinue = value !== null && isValid;
+
+    useKeyboardNavigation({
+        onEnter: canContinue ? onContinue : undefined,
+        onBack,
+        onNumber: (num) => {
+            if (num === 1) onChange(nextMonday);
+            if (num === 2) onChange(thisWeekend);
+        },
+    });
+
+    return (
+        <QuestionScreen onBack={onBack}>
+            <QuestionHeader
+                title="When would you like to start training?"
+                subtitle="Pick a date, and we'll build your plan from there."
+            />
+
+            {/* Quick options */}
+            <OptionGrid columns={2}>
+                <OptionButton
+                    label="Next Monday"
+                    description={formatDate(nextMonday)}
+                    shortcut="1"
+                    selected={value === nextMonday}
+                    onClick={() => onChange(nextMonday)}
+                    recommended
+                />
+                <OptionButton
+                    label="This Weekend"
+                    description={formatDate(thisWeekend)}
+                    shortcut="2"
+                    selected={value === thisWeekend}
+                    onClick={() => onChange(thisWeekend)}
+                />
+            </OptionGrid>
+
+            {/* Custom date picker */}
+            <div className="mt-6">
+                <label className="text-xs font-medium block mb-2" style={{ color: 'var(--text-subtle)' }}>
+                    Or pick a different date:
+                </label>
+                <input
+                    type="date"
+                    value={value || ''}
+                    onChange={(e) => onChange(e.target.value || null)}
+                    min={new Date().toISOString().split('T')[0]}
+                    max={raceDate || undefined}
+                    className="w-full p-3 rounded-xl"
+                    style={{
+                        background: 'var(--bg-elevated)',
+                        border: `1px solid ${value && value !== nextMonday && value !== thisWeekend ? 'var(--color-accent)' : 'var(--border-base)'}`,
+                        color: 'var(--text-base)',
+                        colorScheme: 'dark',
+                    }}
+                />
+            </div>
+
+            {!isValid && (
+                <p className="text-xs mt-3" style={{ color: 'var(--color-error)' }}>
+                    Start date must be before your race date.
+                </p>
+            )}
+
+            {value && isValid && raceDate && (
+                <p className="text-xs mt-3" style={{ color: 'var(--text-muted)' }}>
+                    That gives you {Math.ceil((new Date(raceDate).getTime() - new Date(value).getTime()) / (7 * 24 * 60 * 60 * 1000))} weeks of training.
+                </p>
+            )}
+
+            <ContinueButton
+                onClick={onContinue}
+                disabled={!canContinue}
+            />
+        </QuestionScreen>
+    );
+}

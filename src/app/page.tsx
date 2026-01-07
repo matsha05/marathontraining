@@ -315,13 +315,34 @@ export default function LandingPage() {
         bestFor="12 movement standards · Daily routines"
       >
         <div className="grid grid-cols-4 gap-2">
-          {Array.from({ length: 12 }).map((_, i) => (
+          {[
+            { id: 1, name: "Toe Yoga", tooltip: "Can you raise your big toe while keeping others down? Tests foot control and arch stability." },
+            { id: 2, name: "Balance", tooltip: "45 seconds single-leg stance, barefoot, eyes open. Tests proprioception and stability." },
+            { id: 3, name: "Squat", tooltip: "Full-depth squat, heels down, knees tracking over toes. Tests hip, ankle, and thoracic mobility." },
+            { id: 4, name: "Ankle DF", tooltip: "Knee-to-wall test: 4+ inches from wall. Tests ankle dorsiflexion for proper running mechanics." },
+            { id: 5, name: "Hallux DF", tooltip: "Big toe mobility: 50-70° of extension. Essential for push-off power and preventing plantar issues." },
+            { id: 6, name: "Calf Raise", tooltip: "20+ single-leg calf raises per side. Tests Achilles capacity and calf endurance." },
+            { id: 7, name: "SL Bridge", tooltip: "10-second single-leg bridge hold, hips level. Tests glute strength and hip stability." },
+            { id: 8, name: "Hip Flexor", tooltip: "Doorway test: can you extend your hip without arching your back? Tests hip extension mobility." },
+            { id: 9, name: "Hip Flexion", tooltip: "Knee to chest while opposite leg stays flat. Tests hip flexion range for proper leg swing." },
+            { id: 10, name: "Rotation", tooltip: "Thoracic spine rotation: 45°+ each way. Essential for arm swing and preventing low back compensation." },
+            { id: 11, name: "Core Ctrl", tooltip: "Can you maintain neutral spine under load? Tests deep core stabilizers, not six-pack muscles." },
+            { id: 12, name: "SL Hop", tooltip: "Single-leg hop and stick the landing. Integration test: foot, hip, and core working together." },
+          ].map((standard) => (
             <div
-              key={i}
-              className="h-8 rounded-lg flex items-center justify-center"
+              key={standard.id}
+              className="group relative h-10 rounded-lg flex items-center justify-center transition-all hover:bg-[var(--bg-elevated)]"
               style={{ background: 'var(--bg-muted)' }}
             >
-              <span className="text-[10px]" style={{ color: 'var(--text-subtle)' }}>{i + 1}</span>
+              <span className="text-[10px]" style={{ color: 'var(--text-subtle)' }}>{standard.id}</span>
+              {/* Tooltip */}
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50 w-48 text-center"
+                style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-base)', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
+                <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-base)' }}>{standard.name}</p>
+                <p className="text-[10px] leading-tight" style={{ color: 'var(--text-muted)' }}>{standard.tooltip}</p>
+                {/* Arrow */}
+                <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 -mt-1" style={{ background: 'var(--bg-elevated)', borderRight: '1px solid var(--border-base)', borderBottom: '1px solid var(--border-base)' }} />
+              </div>
             </div>
           ))}
         </div>
@@ -336,12 +357,27 @@ export default function LandingPage() {
       >
         <div className="flex gap-4">
           {[
-            { label: "Before", value: "Prep & Activation" },
-            { label: "After", value: "Recovery & Reset" },
+            {
+              label: "Before",
+              value: "Prep & Activation",
+              tooltip: "10-15 min routine: Deep squat hold (2 min), couch stretch (90s each side), ankle knee-to-wall (10 reps each side), leg swings, A-skips. Checks your squat depth, hip extension, and ankle mobility before you run."
+            },
+            {
+              label: "After",
+              value: "Recovery & Reset",
+              tooltip: "5-10 min routine: Foam roll calves and quads (2 min each), lacrosse ball glutes if hotspots present, pigeon stretch (90s each side). Compression socks post-hard sessions. Address tissue restrictions same-day."
+            },
           ].map((p) => (
-            <div key={p.label} className="flex-1 v3-card p-4 text-center">
+            <div key={p.label} className="group relative flex-1 v3-card p-4 text-center transition-all hover:border-[var(--color-coach-starrett)]">
               <p className="text-sm mb-1" style={{ color: 'var(--text-muted)' }}>{p.label}</p>
               <p style={{ color: 'var(--text-muted)' }}>{p.value}</p>
+              {/* Tooltip */}
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-3 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50 w-64 text-center"
+                style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-base)', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
+                <p className="text-[11px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>{p.tooltip}</p>
+                {/* Arrow */}
+                <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 -mt-1" style={{ background: 'var(--bg-elevated)', borderRight: '1px solid var(--border-base)', borderBottom: '1px solid var(--border-base)' }} />
+              </div>
             </div>
           ))}
         </div>

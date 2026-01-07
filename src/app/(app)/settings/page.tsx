@@ -32,8 +32,21 @@ import { AvatarId, DEFAULT_AVATAR_ID, parseAvatarId } from '@/domain/user/avatar
 interface ProfileData {
     name: string;
     email: string;
-    age: number | null;
+    dateOfBirth: string | null;  // ISO date
     avatar: AvatarId | null;
+}
+
+// Helper to calculate age from DOB
+function calculateAgeFromDob(dob: string): number {
+    const birth = new Date(dob);
+    if (isNaN(birth.getTime())) return 0;
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+    }
+    return Math.max(0, age);
 }
 
 interface PreferencesData {
@@ -56,7 +69,7 @@ export default function SettingsPage() {
     const { plan, refreshPlan } = usePlan();
 
     // Profile state
-    const [profile, setProfile] = useState<ProfileData>({ name: '', email: '', age: null, avatar: null });
+    const [profile, setProfile] = useState<ProfileData>({ name: '', email: '', dateOfBirth: null, avatar: null });
     const [profileLoading, setProfileLoading] = useState(true);
     const [profileEditing, setProfileEditing] = useState(false);
     const [profileSaving, setProfileSaving] = useState(false);
@@ -97,14 +110,14 @@ export default function SettingsPage() {
                 const email = user.email || '';
                 const { data: athlete } = await supabase
                     .from('athletes')
-                    .select('name, age, avatar, notify_training_reminders, notify_weekly_summary, units')
+                    .select('name, date_of_birth, age, avatar, notify_training_reminders, notify_weekly_summary, units')
                     .eq('id', user.id)
-                    .single() as { data: { name?: string; age?: number; avatar?: string; notify_training_reminders?: boolean; notify_weekly_summary?: boolean; units?: string } | null };
+                    .single() as { data: { name?: string; date_of_birth?: string; age?: number; avatar?: string; notify_training_reminders?: boolean; notify_weekly_summary?: boolean; units?: string } | null };
 
                 setProfile({
                     name: athlete?.name || user.user_metadata?.name || email.split('@')[0] || '',
                     email,
-                    age: athlete?.age || null,
+                    dateOfBirth: athlete?.date_of_birth || null,
                     avatar: athlete?.avatar ? parseAvatarId(athlete.avatar) : null,
                 });
                 if (athlete) {
@@ -136,10 +149,13 @@ export default function SettingsPage() {
             const supabase = createSupabaseBrowserClient();
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
+                // Calculate age from DOB for backwards compatibility
+                const calculatedAge = profile.dateOfBirth ? calculateAgeFromDob(profile.dateOfBirth) : null;
                 await supabase.from('athletes').upsert({
                     id: user.id,
                     name: profile.name,
-                    age: profile.age,
+                    date_of_birth: profile.dateOfBirth,
+                    age: calculatedAge,  // Keep age synced for backwards compat
                     avatar: profile.avatar,
                 }, { onConflict: 'id' });
             }
@@ -264,14 +280,22 @@ export default function SettingsPage() {
                                 />
                             </div>
                             <div>
-                                <label className="text-xs font-medium block mb-1" style={{ color: 'var(--text-subtle)' }}>Age</label>
+                                <label className="text-xs font-medium block mb-1" style={{ color: 'var(--text-subtle)' }}>Date of Birth</label>
                                 <input
-                                    type="number"
-                                    value={profile.age || ''}
-                                    onChange={(e) => setProfile({ ...profile, age: e.target.value ? Number(e.target.value) : null })}
+                                    type="date"
+                                    value={profile.dateOfBirth || ''}
+                                    onChange={(e) => setProfile({ ...profile, dateOfBirth: e.target.value || null })}
                                     className="input"
-                                    placeholder="—"
+                                    max={new Date(new Date().setFullYear(new Date().getFullYear() - 13)).toISOString().split('T')[0]}
+                                    style={{
+                                        colorScheme: 'dark',
+                                    }}
                                 />
+                                {profile.dateOfBirth && (
+                                    <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
+                                        Age: {calculateAgeFromDob(profile.dateOfBirth)} years old
+                                    </p>
+                                )}
                             </div>
                             <div className="flex gap-3 pt-2">
                                 <button onClick={() => setProfileEditing(false)} className="btn btn-secondary flex-1">Cancel</button>

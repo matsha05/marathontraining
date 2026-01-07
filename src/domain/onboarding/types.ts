@@ -332,6 +332,9 @@ export function getNextStep(
             return 'long-run-day';
 
         case 'long-run-day':
+            return 'plan-start-date';
+
+        case 'plan-start-date':
             return 'current-pain';
 
         case 'current-pain':
@@ -441,8 +444,11 @@ export function getPreviousStep(
         case 'long-run-day':
             return 'available-days';
 
-        case 'current-pain':
+        case 'plan-start-date':
             return 'long-run-day';
+
+        case 'current-pain':
+            return 'plan-start-date';
 
         case 'pain-details':
             return 'current-pain';
@@ -505,6 +511,7 @@ const STEP_PROGRESS: Record<OnboardingStep, number> = {
     'longest-run': 55,
     'available-days': 60,
     'long-run-day': 65,
+    'plan-start-date': 68,
     'current-pain': 70,
     'pain-details': 72,
     'injury-history': 75,
@@ -653,6 +660,9 @@ export function isStepComplete(step: OnboardingStep, data: OnboardingData): bool
 
         case 'long-run-day':
             return data.longRunDays.length > 0;
+
+        case 'plan-start-date':
+            return data.planStartDate !== null;
 
         case 'current-pain':
             return data.hasCurrentPain !== null;
