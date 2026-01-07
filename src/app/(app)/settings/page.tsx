@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { Toggle } from '@/components/ui/Toggle';
 import { Badge } from '@/components/ui/Badge';
 import { createSupabaseBrowserClient } from '@/infrastructure/supabase';
@@ -11,10 +10,12 @@ import { downloadPlanAsJSON, clearPlan } from '@/domain/plan/service';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     AlertTriangle, X, Download, RefreshCcw, ChevronRight,
-    Calendar, TrendingUp, Target, Zap, Activity, Moon, Check
+    Calendar, TrendingUp, Target, Zap, Activity, Moon
 } from 'lucide-react';
 import { SiteHeader } from '@/components/ui/SiteHeader';
-import { AVATAR_OPTIONS, getAvatarPath, DEFAULT_AVATAR_ID } from '@/domain/user/avatars';
+import { AvatarPicker } from '@/components/ui/AvatarPicker';
+import { AvatarDisplay } from '@/components/ui/AvatarDisplay';
+import { AvatarId, DEFAULT_AVATAR_ID, parseAvatarId } from '@/domain/user/avatars';
 
 /**
  * Settings Page - V3 Premium Design
@@ -32,7 +33,7 @@ interface ProfileData {
     name: string;
     email: string;
     age: number | null;
-    avatar: string | null;
+    avatar: AvatarId | null;
 }
 
 interface PreferencesData {
@@ -41,10 +42,7 @@ interface PreferencesData {
     units: 'miles' | 'kilometers';
 }
 
-// Get initials from name
-function getInitials(name: string): string {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'TL';
-}
+
 
 // Format pace from seconds to min:sec
 function formatPace(seconds: number): string {
@@ -107,7 +105,7 @@ export default function SettingsPage() {
                     name: athlete?.name || user.user_metadata?.name || email.split('@')[0] || '',
                     email,
                     age: athlete?.age || null,
-                    avatar: athlete?.avatar || null,
+                    avatar: athlete?.avatar ? parseAvatarId(athlete.avatar) : null,
                 });
                 if (athlete) {
                     setPreferences({
@@ -247,49 +245,14 @@ export default function SettingsPage() {
                         </div>
                     ) : profileEditing ? (
                         <div className="space-y-4">
-                            {/* Avatar Selection */}
-                            <div>
-                                <label className="text-xs font-medium block mb-3" style={{ color: 'var(--text-subtle)' }}>Avatar</label>
-                                <div className="grid grid-cols-6 gap-2">
-                                    {AVATAR_OPTIONS.map((avatar) => {
-                                        const isSelected = (profile.avatar || DEFAULT_AVATAR_ID) === avatar.id;
-                                        return (
-                                            <motion.button
-                                                key={avatar.id}
-                                                onClick={() => setProfile({ ...profile, avatar: avatar.id })}
-                                                className="relative aspect-square rounded-xl overflow-hidden focus:outline-none focus-visible:ring-2"
-                                                style={{
-                                                    border: isSelected
-                                                        ? '2px solid var(--color-accent)'
-                                                        : '1px solid var(--border-base)',
-                                                    // @ts-expect-error CSS variable
-                                                    '--tw-ring-color': 'var(--color-accent)',
-                                                }}
-                                                whileHover={{ scale: 1.05 }}
-                                                whileTap={{ scale: 0.95 }}
-                                            >
-                                                <Image
-                                                    src={avatar.path}
-                                                    alt={avatar.name}
-                                                    fill
-                                                    className="object-cover"
-                                                    sizes="60px"
-                                                />
-                                                {isSelected && (
-                                                    <motion.div
-                                                        className="absolute inset-0 flex items-center justify-center"
-                                                        style={{ background: 'color-mix(in srgb, var(--color-accent) 40%, transparent)' }}
-                                                        initial={{ opacity: 0 }}
-                                                        animate={{ opacity: 1 }}
-                                                    >
-                                                        <Check size={20} strokeWidth={3} style={{ color: 'var(--bg-base)' }} />
-                                                    </motion.div>
-                                                )}
-                                            </motion.button>
-                                        );
-                                    })}
-                                </div>
-                            </div>
+                            {/* Avatar Selection - using shared component */}
+                            <AvatarPicker
+                                value={profile.avatar}
+                                onChange={(id) => setProfile({ ...profile, avatar: id })}
+                                columns={6}
+                                size="sm"
+                                label="Avatar"
+                            />
                             <div>
                                 <label className="text-xs font-medium block mb-1" style={{ color: 'var(--text-subtle)' }}>Name</label>
                                 <input
@@ -322,27 +285,13 @@ export default function SettingsPage() {
                             className="flex items-center gap-4 cursor-pointer group"
                             onClick={() => setProfileEditing(true)}
                         >
-                            {/* Avatar or Initials */}
-                            <div className="relative w-16 h-16 rounded-full overflow-hidden transition-transform group-hover:scale-105">
-                                {profile.avatar ? (
-                                    <Image
-                                        src={getAvatarPath(profile.avatar)}
-                                        alt="Your avatar"
-                                        fill
-                                        className="object-cover"
-                                        sizes="64px"
-                                    />
-                                ) : (
-                                    <div
-                                        className="w-full h-full flex items-center justify-center text-xl font-semibold"
-                                        style={{
-                                            background: 'linear-gradient(135deg, var(--color-accent), var(--color-strength))',
-                                            color: 'var(--bg-base)',
-                                        }}
-                                    >
-                                        {getInitials(profile.name)}
-                                    </div>
-                                )}
+                            {/* Avatar - using shared component */}
+                            <div className="transition-transform group-hover:scale-105">
+                                <AvatarDisplay
+                                    avatarId={profile.avatar}
+                                    name={profile.name}
+                                    size={64}
+                                />
                             </div>
                             <div className="flex-1 min-w-0">
                                 <h2 className="text-xl font-semibold truncate">{profile.name || 'Add name'}</h2>

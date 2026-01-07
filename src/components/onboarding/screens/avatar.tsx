@@ -4,29 +4,22 @@
  * Avatar Selection Screen
  * 
  * Allows users to pick their profile avatar during onboarding.
- * Uses the preset avatars from /public/avatars.
- * 
- * Figma-level polish:
- * - Smooth cubic-bezier easing on all transitions
- * - Focus ring for keyboard accessibility
- * - Hover states with subtle scale
- * - Design system tokens only (no hardcoded colors)
+ * Uses the shared AvatarPicker component.
  */
 
-import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Check } from 'lucide-react';
 import {
     QuestionScreen,
     QuestionHeader,
     ContinueButton,
     useKeyboardNavigation,
 } from '../ui';
-import { AVATAR_OPTIONS, DEFAULT_AVATAR_ID } from '@/domain/user/avatars';
+import { AvatarPicker } from '@/components/ui/AvatarPicker';
+import { AvatarId, AVATAR_OPTIONS, DEFAULT_AVATAR_ID, parseAvatarId } from '@/domain/user/avatars';
 
 interface AvatarSelectionScreenProps {
-    value: string | null;
-    onChange: (avatarId: string) => void;
+    value: AvatarId | null;
+    onChange: (avatarId: AvatarId) => void;
     onContinue: () => void;
     onBack: () => void;
 }
@@ -37,8 +30,8 @@ export function AvatarSelectionScreen({
     onContinue,
     onBack
 }: AvatarSelectionScreenProps) {
-    // Default to first avatar if nothing selected
     const selectedId = value || DEFAULT_AVATAR_ID;
+    const selectedAvatar = AVATAR_OPTIONS.find(a => a.id === selectedId);
 
     useKeyboardNavigation({
         onEnter: onContinue,
@@ -58,83 +51,13 @@ export function AvatarSelectionScreen({
                 subtitle="Pick the runner that represents you."
             />
 
-            <div className="grid grid-cols-3 gap-4 mb-8">
-                {AVATAR_OPTIONS.map((avatar, index) => {
-                    const isSelected = selectedId === avatar.id;
-
-                    return (
-                        <motion.button
-                            key={avatar.id}
-                            onClick={() => onChange(avatar.id)}
-                            className="relative aspect-square rounded-2xl overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                            style={{
-                                border: isSelected
-                                    ? '3px solid var(--color-accent)'
-                                    : '2px solid var(--border-base)',
-                                // Focus ring uses accent color
-                                // @ts-expect-error CSS variable
-                                '--tw-ring-color': 'var(--color-accent)',
-                                '--tw-ring-offset-color': 'var(--bg-base)',
-                            }}
-                            initial={false}
-                            animate={{
-                                scale: isSelected ? 1.05 : 1,
-                                boxShadow: isSelected
-                                    ? '0 12px 40px color-mix(in srgb, var(--color-accent) 35%, transparent)'
-                                    : '0 0 0 transparent',
-                            }}
-                            whileHover={{ scale: isSelected ? 1.05 : 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            transition={{
-                                type: 'spring',
-                                stiffness: 400,
-                                damping: 25,
-                            }}
-                        >
-                            <Image
-                                src={avatar.path}
-                                alt={avatar.name}
-                                fill
-                                className="object-cover"
-                                sizes="(max-width: 768px) 30vw, 120px"
-                                priority={index < 3}
-                            />
-
-                            {/* Selection checkmark - animated entry */}
-                            {isSelected && (
-                                <motion.div
-                                    className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center"
-                                    style={{ background: 'var(--color-accent)' }}
-                                    initial={{ scale: 0, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    transition={{
-                                        type: 'spring',
-                                        stiffness: 500,
-                                        damping: 20,
-                                    }}
-                                >
-                                    <Check
-                                        size={14}
-                                        strokeWidth={3}
-                                        style={{ color: 'var(--bg-base)' }}
-                                    />
-                                </motion.div>
-                            )}
-
-                            {/* Keyboard shortcut badge */}
-                            <div
-                                className="absolute bottom-2 left-2 w-5 h-5 rounded font-mono flex items-center justify-center"
-                                style={{
-                                    background: 'var(--bg-overlay)',
-                                    color: 'var(--text-subtle)',
-                                    fontSize: '10px',
-                                }}
-                            >
-                                {index + 1}
-                            </div>
-                        </motion.button>
-                    );
-                })}
+            <div className="mb-8">
+                <AvatarPicker
+                    value={selectedId}
+                    onChange={onChange}
+                    columns={3}
+                    size="lg"
+                />
             </div>
 
             {/* Selected avatar name with fade transition */}
@@ -146,7 +69,7 @@ export function AvatarSelectionScreen({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2 }}
             >
-                {AVATAR_OPTIONS.find(a => a.id === selectedId)?.name}
+                {selectedAvatar?.name}
             </motion.p>
 
             <ContinueButton

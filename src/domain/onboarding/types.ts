@@ -5,6 +5,8 @@
  * Supports 5K through Marathon + General Fitness training.
  */
 
+import { AvatarId } from '@/domain/user/avatars';
+
 // =============================================================================
 // STEP DEFINITIONS
 // =============================================================================
@@ -183,7 +185,7 @@ export interface OnboardingData {
     baseWeeksNeeded: number | null;
 
     // User profile
-    avatar: string | null; // Avatar ID from avatars.ts
+    avatar: AvatarId | null; // Strict avatar ID from avatars.ts
 }
 
 // =============================================================================
