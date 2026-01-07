@@ -326,6 +326,10 @@ export interface TrainingPlan {
     injuryModifications?: string[];
     intensityLevel: 'conservative' | 'moderate' | 'aggressive';
 
+    // Coach/Philosophy identity (for display)
+    philosophy?: 'hansons' | 'higdon' | 'pfitzinger' | 'daniels' | 'fitzgerald' | 'magness';
+    planTier?: string; // e.g., "Intermediate 1", "55 mi/week"
+
     // Verification status
     verification: PlanVerification;
 }

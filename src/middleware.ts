@@ -9,7 +9,7 @@ import { getSafeRedirectPath } from '@/lib/redirects';
  * Handles all auth routing server-side (no client-side flash).
  */
 
-const protectedPaths = ['/dashboard', '/plan', '/settings', '/workout', '/onboarding'];
+const protectedPaths = ['/dashboard', '/plan', '/settings', '/workout', '/onboarding', '/regenerate'];
 
 export async function middleware(request: NextRequest) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -77,6 +77,7 @@ export const config = {
         '/settings/:path*',
         '/workout/:path*',
         '/onboarding/:path*',
+        '/regenerate/:path*',
         '/auth',
         '/login',
         '/signup'

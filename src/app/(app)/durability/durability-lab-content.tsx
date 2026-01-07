@@ -679,7 +679,7 @@ export function DurabilityLabContent({ onStartAssessment }: {
                 <div
                     className="absolute inset-0 pointer-events-none"
                     style={{
-                        background: 'radial-gradient(800px circle at 50% 55%, var(--color-accent-glow) 0%, transparent 60%)'
+                        background: 'radial-gradient(800px circle at 50% 55%, color-mix(in srgb, var(--color-accent) 4%, transparent) 0%, transparent 60%)'
                     }}
                 />
                 <div className="text-center w-full max-w-3xl relative z-10">
@@ -731,7 +731,7 @@ export function DurabilityLabContent({ onStartAssessment }: {
             </section>
 
             {/* The Two Philosophies */}
-            <section className="px-6 py-20" style={{ background: 'var(--bg-muted)' }}>
+            <section className="px-6 py-20" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                 <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl font-light mb-3" style={{ color: 'var(--text-base)' }}>
@@ -756,7 +756,7 @@ export function DurabilityLabContent({ onStartAssessment }: {
             </section>
 
             {/* The 12 Standards - NOW EDUCATIONAL */}
-            <section className="px-6 py-20">
+            <section className="px-6 py-20" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                 <div className="max-w-5xl mx-auto">
                     <div className="text-center mb-12">
                         <p className="text-xs uppercase tracking-widest mb-3" style={{ color: 'var(--color-coach-starrett, #10b981)' }}>
@@ -775,7 +775,7 @@ export function DurabilityLabContent({ onStartAssessment }: {
             </section>
 
             {/* Assessments */}
-            <section className="px-6 py-20" style={{ background: 'var(--bg-muted)' }}>
+            <section className="px-6 py-20" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                 <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-12">
                         <p className="text-xs uppercase tracking-widest mb-3" style={{ color: 'var(--color-coach-dicharry, #3b82f6)' }}>
@@ -838,7 +838,7 @@ export function DurabilityLabContent({ onStartAssessment }: {
             </section>
 
             {/* CTA */}
-            <section className="px-6 py-24" style={{ background: 'var(--bg-muted)' }}>
+            <section className="px-6 py-24" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                 <div className="max-w-3xl mx-auto text-center">
                     <h2 className="text-3xl font-light mb-6" style={{ color: 'var(--text-base)' }}>
                         Know your weak links

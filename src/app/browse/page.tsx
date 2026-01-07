@@ -136,9 +136,10 @@ export default function PlansPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.3, delay: i * 0.05 }}
                                 whileHover={selectedDistance !== distance.id ? {
-                                    scale: 1.05,
-                                    y: -3,
-                                    boxShadow: '0 6px 20px rgba(0,0,0,0.1)',
+                                    scale: 1.03,
+                                    y: -4,
+                                    boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                                    transition: { type: 'spring', stiffness: 400, damping: 25 }
                                 } : {}}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => setSelectedDistance(distance.id)}
@@ -202,6 +203,11 @@ export default function PlansPage() {
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ duration: 0.4, delay: i * 0.1 }}
                                             className="v3-card overflow-hidden"
+                                            whileHover={!isExpanded ? {
+                                                y: -4,
+                                                boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                                                transition: { type: 'spring', stiffness: 400, damping: 25 }
+                                            } : {}}
                                         >
                                             {/* Coach Header */}
                                             <button

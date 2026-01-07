@@ -286,7 +286,11 @@ export function createPlanFromOnboarding(
             plan = generatePlan(inputResult.data);
         }
 
-        // Step 4: Validate plan
+        // Step 4: Add philosophy metadata (for display)
+        plan.philosophy = philosophy as TrainingPlan['philosophy'];
+        plan.planTier = tierResult.displayName;
+
+        // Step 5: Validate plan
         if (!plan.verification.passed) {
             console.warn('Plan verification warnings:', plan.verification.checks);
         }

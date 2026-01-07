@@ -343,7 +343,7 @@ export default function SettingsPage() {
                     <div
                         className="absolute inset-0 pointer-events-none"
                         style={{
-                            background: 'radial-gradient(circle at 80% 20%, var(--color-accent-glow), transparent 60%)',
+                            background: 'radial-gradient(circle at 80% 20%, color-mix(in srgb, var(--color-accent) 4%, transparent), transparent 60%)',
                         }}
                     />
                     <div className="relative flex items-center justify-between">

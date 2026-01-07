@@ -333,7 +333,12 @@ function WodCard({ wod, index, isFavorite, isExpanded, onToggleFavorite, onToggl
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 * index, duration: 0.4, ease }}
-            whileHover={{ y: -3, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
+            whileHover={{
+                scale: 1.02,
+                y: -4,
+                boxShadow: '0 12px 32px rgba(0,0,0,0.15)',
+                transition: { type: 'spring', stiffness: 400, damping: 25 }
+            }}
             className="rounded-xl overflow-hidden flex flex-col"
             style={{
                 background: 'var(--bg-elevated)',

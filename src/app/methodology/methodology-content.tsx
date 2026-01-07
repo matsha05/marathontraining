@@ -111,7 +111,7 @@ export function MethodologyContent() {
 
             {/* Hero */}
             <section className="min-h-[70vh] flex flex-col items-center justify-center px-6 relative overflow-hidden">
-                <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(800px circle at 50% 55%, var(--color-accent-glow) 0%, transparent 60%)' }} />
+                <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(800px circle at 50% 55%, color-mix(in srgb, var(--color-accent) 4%, transparent) 0%, transparent 60%)' }} />
                 <div className="text-center w-full max-w-3xl relative z-10">
                     <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-xs uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>Our Methodology</motion.p>
                     <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, ease }} className="text-5xl md:text-6xl font-light mb-6 tracking-tight" style={{ color: 'var(--text-base)' }}>Built on science.</motion.h1>
@@ -126,7 +126,7 @@ export function MethodologyContent() {
             {/* Categories + Coaches */}
             {Object.entries(METHODOLOGY_CATEGORIES).map(([key, category]) => (
                 <React.Fragment key={key}>
-                    <section className="px-6 py-20" style={{ background: 'var(--bg-muted)' }}>
+                    <section className="px-6 py-20" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                         <div className="max-w-3xl mx-auto text-center">
                             <h2 className="text-3xl font-light mb-3" style={{ color: 'var(--text-base)' }}>{category.title}</h2>
                             <p className="text-base" style={{ color: 'var(--text-muted)' }}>{category.description}</p>
@@ -141,7 +141,7 @@ export function MethodologyContent() {
                             <section
                                 key={coach.id}
                                 className="px-6 py-12"
-                                style={{ borderTop: '1px solid var(--border-base)' }}
+                                style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}
                             >
                                 <div className="max-w-3xl mx-auto">
                                     <button
@@ -187,7 +187,7 @@ export function MethodologyContent() {
             ))}
 
             {/* Research */}
-            <section className="px-6 py-16" style={{ background: 'var(--bg-muted)' }}>
+            <section className="px-6 py-16" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                 <div className="max-w-3xl mx-auto">
                     <p className="text-xs uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>Research Foundation</p>
                     <h2 className="text-3xl font-light mb-8" style={{ color: 'var(--text-base)' }}>Peer-reviewed studies</h2>
@@ -209,7 +209,7 @@ export function MethodologyContent() {
             </section>
 
             {/* CTA */}
-            <section className="px-6 py-24" style={{ background: 'var(--bg-base)' }}>
+            <section className="px-6 py-24" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                 <div className="max-w-3xl mx-auto text-center">
                     <h2 className="text-3xl font-light mb-6" style={{ color: 'var(--text-base)' }}>Ready to train smarter?</h2>
                     <p className="text-lg mb-8" style={{ color: 'var(--text-muted)' }}>Get a personalized plan built on these proven methodologies.</p>

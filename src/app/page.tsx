@@ -45,7 +45,7 @@ export default function LandingPage() {
         {/* Subtle radial glow behind content */}
         <div
           className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(800px circle at 50% 55%, color-mix(in srgb, var(--color-accent) 15%, transparent) 0%, transparent 60%)' }}
+          style={{ background: 'radial-gradient(800px circle at 50% 55%, color-mix(in srgb, var(--color-accent) 4%, transparent) 0%, transparent 60%)' }}
         />
 
         <div className="text-center w-full max-w-4xl relative z-10">
@@ -107,8 +107,8 @@ export default function LandingPage() {
                     scale: 1.03,
                     y: -4,
                     boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                    transition: { type: "spring", stiffness: 400, damping: 25 }
                   }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
                 >
                   <p className="text-[10px] mb-3" style={{ color: 'var(--text-subtle)' }}>{d.day}</p>
                   <p
@@ -154,7 +154,7 @@ export default function LandingPage() {
       </section>
 
       {/* === RUNNING SCIENCE — PLAN STRUCTURE === */}
-      <section className="px-6 py-24" style={{ background: 'var(--bg-muted)' }}>
+      <section className="px-6 py-24">
         <div className="max-w-3xl mx-auto text-center">
           <p className="text-xs uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>Running Science</p>
           <h2 className="text-4xl md:text-5xl font-light mb-4" style={{ color: 'var(--text-base)' }}>Evidence-based training</h2>
@@ -270,7 +270,7 @@ export default function LandingPage() {
       </CoachSection>
 
       {/* Foundation section */}
-      <section className="px-6 py-24" style={{ background: 'var(--bg-muted)' }}>
+      <section className="px-6 py-24">
         <div className="max-w-3xl mx-auto text-center">
           <p className="text-xs uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>The Foundation</p>
           <h2 className="text-4xl md:text-5xl font-light mb-4" style={{ color: 'var(--text-base)' }}>Built on every plan</h2>
@@ -388,7 +388,7 @@ export default function LandingPage() {
       </CoachSection>
 
       {/* Strength section */}
-      <section className="px-6 py-24" style={{ background: 'var(--bg-muted)' }}>
+      <section className="px-6 py-24">
         <div className="max-w-3xl mx-auto text-center">
           <p className="text-xs uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>Strength Training</p>
           <h2 className="text-4xl md:text-5xl font-light mb-4" style={{ color: 'var(--text-base)' }}>Lift to run faster</h2>
@@ -440,7 +440,7 @@ export default function LandingPage() {
       </CoachSection>
 
       {/* Elite section */}
-      <section className="px-6 py-24" style={{ background: 'var(--bg-muted)' }}>
+      <section className="px-6 py-24">
         <div className="max-w-3xl mx-auto text-center">
           <p className="text-xs uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>Elite Methods</p>
           <h2 className="text-4xl md:text-5xl font-light mb-4" style={{ color: 'var(--text-base)' }}>World-class training</h2>
@@ -470,7 +470,7 @@ export default function LandingPage() {
       </CoachSection>
 
       {/* Final CTA */}
-      <section className="px-6 py-24" style={{ background: 'var(--bg-muted)' }}>
+      <section className="px-6 py-24">
         <div className="max-w-3xl mx-auto text-center">
           <p className="text-xs uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>Any Distance</p>
           <h2 className="text-4xl md:text-5xl font-light mb-4" style={{ color: 'var(--text-base)' }}>Base building to 50K.</h2>
@@ -508,7 +508,7 @@ function CoachSection({
   children?: React.ReactNode;
 }) {
   return (
-    <section className="px-6 py-20" style={{ borderTop: '1px solid var(--border-base)' }}>
+    <section className="px-6 py-20" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-2 h-2 rounded-full" style={{ background: color }} />

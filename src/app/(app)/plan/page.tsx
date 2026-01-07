@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePlan } from '@/domain/plan/context';
 import { TrainingPlan, WeekPlan, TrainingPhase } from '@/domain/plan/types';
 import { motion } from 'framer-motion';
+import { SiteHeader } from '@/components/ui/SiteHeader';
 
 /**
  * Training Plan View V2
@@ -135,13 +136,8 @@ export default function PlanPage() {
     if (status === 'loading') {
         return (
             <div className="v3-root min-h-screen">
-                <header className="v3-nav sticky top-0 z-50">
-                    <div className="v3-container flex items-center justify-between py-4">
-                        <Link href="/dashboard" className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>← Back</Link>
-                        <span className="v3-heading-sm">Training Plan</span>
-                    </div>
-                </header>
-                <main className="v3-container py-10">
+                <SiteHeader />
+                <main className="v3-container py-10" style={{ paddingTop: 'calc(var(--v3-space-10) + 80px)' }}>
                     <div className="space-y-6">
                         <div className="v3-skeleton" style={{ height: '80px', borderRadius: '12px' }} />
                         <div className="v3-skeleton" style={{ height: '200px', borderRadius: '12px' }} />
@@ -155,13 +151,8 @@ export default function PlanPage() {
     if (!plan) {
         return (
             <div className="v3-root min-h-screen">
-                <header className="v3-nav sticky top-0 z-50">
-                    <div className="v3-container flex items-center justify-between py-4">
-                        <Link href="/dashboard" className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>← Back</Link>
-                        <span className="v3-heading-sm">Training Plan</span>
-                    </div>
-                </header>
-                <main className="v3-container py-10">
+                <SiteHeader />
+                <main className="v3-container py-10" style={{ paddingTop: 'calc(var(--v3-space-10) + 80px)' }}>
                     <div className="v3-card p-10 text-center">
                         <h2 className="v3-heading-md mb-4">No Training Plan</h2>
                         <p className="v3-body-sm mb-6" style={{ color: 'var(--text-muted)' }}>
@@ -183,35 +174,53 @@ export default function PlanPage() {
 
     return (
         <div className="v3-root min-h-screen">
-            {/* Header */}
-            <header className="v3-nav sticky top-0 z-50">
-                <div className="v3-container flex items-center justify-between py-4">
-                    <div className="flex items-center gap-4">
-                        <Link href="/dashboard" className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>← Back</Link>
-                        <span className="v3-heading-sm">Training Plan</span>
+            <SiteHeader />
+
+            <main className="v3-container py-10" style={{ paddingTop: 'calc(var(--v3-space-10) + 80px)' }}>
+                {/* Plan Identity Header */}
+                <motion.div
+                    className="mb-8"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4 }}
+                >
+                    <div className="flex items-center gap-3 mb-2">
+                        <div
+                            className="w-3 h-3 rounded-full"
+                            style={{
+                                background: plan.philosophy
+                                    ? `var(--color-coach-${plan.philosophy}, var(--color-accent))`
+                                    : 'var(--color-accent)',
+                            }}
+                        />
+                        <p className="text-xs uppercase tracking-widest" style={{ color: 'var(--text-subtle)' }}>
+                            {plan.planTier || (plan.philosophy
+                                ? plan.philosophy.charAt(0).toUpperCase() + plan.philosophy.slice(1) + ' Training'
+                                : 'Training Plan')}
+                        </p>
                     </div>
-                    <div className="flex items-center gap-4">
-                        <Link href="/plans/history" className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
-                            History
-                        </Link>
-                        <span className="v3-label">{plan.raceName || `${plan.goalDistance.toUpperCase()} Training`}</span>
+                    <h1 className="v3-heading-xl mb-2" style={{ fontSize: '2rem' }}>
+                        {plan.raceName || `${plan.goalDistance.toUpperCase()} Training`}
+                    </h1>
+                    <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--text-muted)' }}>
+                        <span>{plan.totalWeeks} weeks</span>
+                        <span>·</span>
+                        <span>Peak: {plan.peakMileage} mi</span>
                         {weeksUntilRace !== null && weeksUntilRace > 0 && (
                             <>
-                                <span className="v3-mono" style={{ fontSize: '10px', color: 'var(--text-subtle)' }}>•</span>
-                                <span className="v3-body-sm v3-accent">{weeksUntilRace} weeks away</span>
+                                <span>·</span>
+                                <span className="v3-accent">{weeksUntilRace} weeks to race</span>
                             </>
                         )}
                     </div>
-                </div>
-            </header>
+                </motion.div>
 
-            <main className="v3-container py-10">
                 {/* Phase Timeline */}
                 <motion.section
                     className="mb-10"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4 }}
+                    transition={{ duration: 0.4, delay: 0.05 }}
                 >
                     <h2 className="v3-heading-md mb-4">Training Phases</h2>
                     <div className="flex gap-2 overflow-x-auto pb-2">
@@ -297,6 +306,45 @@ export default function PlanPage() {
                                 </Link>
                             </motion.div>
                         ))}
+
+                        {/* Race Day Card - shown when user has a race */}
+                        {plan.raceDate && (
+                            <motion.div
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.3, delay: 0.15 + weeks.length * 0.05 }}
+                            >
+                                <div
+                                    className="p-5 rounded-xl text-center"
+                                    style={{
+                                        background: 'linear-gradient(135deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 70%, #10b981) 100%)',
+                                        color: 'white',
+                                    }}
+                                >
+                                    <div className="flex items-center justify-center gap-4">
+                                        <div
+                                            className="w-12 h-12 rounded-xl flex items-center justify-center"
+                                            style={{ background: 'rgba(255,255,255,0.2)' }}
+                                        >
+                                            🏁
+                                        </div>
+                                        <div className="text-left">
+                                            <p className="text-xl font-medium">
+                                                {plan.raceName || 'Race Day'}
+                                            </p>
+                                            <p className="text-sm opacity-90">
+                                                {new Date(plan.raceDate).toLocaleDateString('en-US', {
+                                                    weekday: 'long',
+                                                    month: 'long',
+                                                    day: 'numeric',
+                                                    year: 'numeric'
+                                                })}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
                     </div>
                 </motion.section>
 

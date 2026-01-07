@@ -40,7 +40,7 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
             {/* Subtle radial glow behind content */}
             <div
                 className="absolute inset-0 pointer-events-none"
-                style={{ background: 'radial-gradient(600px circle at 50% 45%, var(--color-accent-glow) 0%, transparent 60%)' }}
+                style={{ background: 'radial-gradient(600px circle at 50% 45%, color-mix(in srgb, var(--color-accent) 4%, transparent) 0%, transparent 60%)' }}
             />
 
             {/* Step indicator at top */}

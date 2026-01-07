@@ -234,6 +234,32 @@ export function SiteHeader({
                     {/* Navigation - hidden in back mode */}
                     {!backHref && !loading && (
                         <nav className="hidden md:flex items-center gap-1">
+                            {/* Dashboard & My Plan - only for logged in users */}
+                            {isLoggedIn && (
+                                <>
+                                    <Link
+                                        href="/dashboard"
+                                        className="px-3 py-2 text-sm font-medium rounded-lg transition-colors"
+                                        style={{
+                                            color: isActive('/dashboard') ? 'var(--color-accent)' : 'var(--text-muted)',
+                                            background: isActive('/dashboard') ? 'var(--bg-muted)' : 'transparent',
+                                        }}
+                                    >
+                                        Dashboard
+                                    </Link>
+                                    <Link
+                                        href="/plan"
+                                        className="px-3 py-2 text-sm font-medium rounded-lg transition-colors"
+                                        style={{
+                                            color: isActive('/plan') ? 'var(--color-accent)' : 'var(--text-muted)',
+                                            background: isActive('/plan') ? 'var(--bg-muted)' : 'transparent',
+                                        }}
+                                    >
+                                        My Plan
+                                    </Link>
+                                </>
+                            )}
+
                             {/* Explore dropdown - always visible */}
                             <div className="relative" ref={exploreRef}>
                                 <button

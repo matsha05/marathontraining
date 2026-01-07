@@ -53,22 +53,30 @@ export function QuestionScreen({
 }: QuestionScreenProps) {
     return (
         <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2 }}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{
+                type: 'spring',
+                stiffness: 300,
+                damping: 30,
+                mass: 0.8,
+            }}
             className={`v3-root min-h-screen flex flex-col items-center justify-center px-6 py-12 ${className}`}
         >
             <div className="w-full max-w-lg">
                 {showBack && onBack && (
-                    <button
+                    <motion.button
                         onClick={onBack}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.1, duration: 0.2 }}
                         className="flex items-center gap-1 mb-8 transition-colors group"
                         style={{ color: 'var(--text-muted)' }}
                     >
                         <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                         <span className="v3-body-sm">Back</span>
-                    </button>
+                    </motion.button>
                 )}
                 {children}
             </div>
@@ -172,9 +180,14 @@ export function OptionButton({
     disabled,
 }: OptionButtonProps) {
     return (
-        <button
+        <motion.button
             onClick={onClick}
             disabled={disabled}
+            whileHover={!disabled && !selected ? {
+                scale: 1.02,
+                transition: { type: 'spring', stiffness: 400, damping: 25 }
+            } : {}}
+            whileTap={!disabled ? { scale: 0.98 } : {}}
             className="w-full p-4 rounded-xl text-left transition-all"
             style={{
                 background: selected ? 'var(--color-accent)' : 'var(--bg-elevated)',
@@ -233,7 +246,7 @@ export function OptionButton({
                     )}
                 </div>
             </div>
-        </button>
+        </motion.button>
     );
 }
 
@@ -655,10 +668,15 @@ export function ScreenTransition({ children, stepKey }: ScreenTransitionProps) {
         <AnimatePresence mode="wait">
             <motion.div
                 key={stepKey}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{
+                    type: 'spring',
+                    stiffness: 300,
+                    damping: 30,
+                    mass: 0.8,
+                }}
             >
                 {children}
             </motion.div>

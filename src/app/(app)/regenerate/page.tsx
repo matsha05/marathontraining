@@ -36,6 +36,9 @@ import {
     RaceDetailsScreen,
 } from '@/components/onboarding/screens/goal';
 import {
+    WeeklyMileageScreen,
+    RunsPerWeekScreen,
+    LongestRunScreen,
     AvailableDaysScreen,
     LongRunDayScreen,
     PlanStartDateScreen,
@@ -55,6 +58,9 @@ type RegenerateStep =
     | 'vdot-confirm'
     | 'training-goal'
     | 'race-details'
+    | 'weekly-mileage'
+    | 'runs-per-week'
+    | 'longest-run'
     | 'available-days'
     | 'long-run-day'
     | 'plan-start-date'
@@ -123,8 +129,11 @@ export default function RegeneratePlanPage() {
         switch (current) {
             case 'vdot-confirm': return 'training-goal';
             case 'training-goal':
-                return data.trainingGoal === 'general' ? 'available-days' : 'race-details';
-            case 'race-details': return 'available-days';
+                return data.trainingGoal === 'general' ? 'weekly-mileage' : 'race-details';
+            case 'race-details': return 'weekly-mileage';
+            case 'weekly-mileage': return 'runs-per-week';
+            case 'runs-per-week': return 'longest-run';
+            case 'longest-run': return 'available-days';
             case 'available-days': return 'long-run-day';
             case 'long-run-day': return 'plan-start-date';
             case 'plan-start-date': return 'training-intensity';
@@ -138,8 +147,11 @@ export default function RegeneratePlanPage() {
         switch (current) {
             case 'training-goal': return 'vdot-confirm';
             case 'race-details': return 'training-goal';
-            case 'available-days':
+            case 'weekly-mileage':
                 return data.trainingGoal === 'general' ? 'training-goal' : 'race-details';
+            case 'runs-per-week': return 'weekly-mileage';
+            case 'longest-run': return 'runs-per-week';
+            case 'available-days': return 'longest-run';
             case 'long-run-day': return 'available-days';
             case 'plan-start-date': return 'long-run-day';
             case 'training-intensity': return 'plan-start-date';
@@ -198,6 +210,7 @@ export default function RegeneratePlanPage() {
     // Progress calculation
     const stepOrder: RegenerateStep[] = [
         'vdot-confirm', 'training-goal', 'race-details',
+        'weekly-mileage', 'runs-per-week', 'longest-run',
         'available-days', 'long-run-day', 'plan-start-date',
         'training-intensity', 'strength-training'
     ];
@@ -294,7 +307,11 @@ export default function RegeneratePlanPage() {
                                             label="Recalibrate my VDOT"
                                             description="I've improved or have new race data"
                                             selected={false}
-                                            onClick={() => router.push('/onboarding?step=vdot-method')}
+                                            onClick={() => {
+                                                // TODO: Add inline VDOT recalibration flow
+                                                // For now, show a message that they can do this after
+                                                alert('After creating your plan, you can recalibrate from Settings > Profile.');
+                                            }}
                                         />
                                     </OptionGrid>
 
@@ -338,7 +355,56 @@ export default function RegeneratePlanPage() {
                             </motion.div>
                         )}
 
+                        {/* Weekly Mileage */}
+                        {step === 'weekly-mileage' && (
+                            <motion.div
+                                key="weekly-mileage"
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -20 }}
+                            >
+                                <WeeklyMileageScreen
+                                    value={data.weeklyMiles}
+                                    onChange={(weeklyMiles) => setData(prev => ({ ...prev, weeklyMiles }))}
+                                    onContinue={goToNext}
+                                    onBack={goBack}
+                                />
+                            </motion.div>
+                        )}
 
+                        {/* Runs Per Week */}
+                        {step === 'runs-per-week' && (
+                            <motion.div
+                                key="runs-per-week"
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -20 }}
+                            >
+                                <RunsPerWeekScreen
+                                    value={data.runsPerWeek}
+                                    onChange={(runsPerWeek) => setData(prev => ({ ...prev, runsPerWeek }))}
+                                    onContinue={goToNext}
+                                    onBack={goBack}
+                                />
+                            </motion.div>
+                        )}
+
+                        {/* Longest Run */}
+                        {step === 'longest-run' && (
+                            <motion.div
+                                key="longest-run"
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -20 }}
+                            >
+                                <LongestRunScreen
+                                    value={data.longestRecentRun}
+                                    onChange={(longestRecentRun) => setData(prev => ({ ...prev, longestRecentRun }))}
+                                    onContinue={goToNext}
+                                    onBack={goBack}
+                                />
+                            </motion.div>
+                        )}
 
                         {/* Available Days */}
                         {step === 'available-days' && (

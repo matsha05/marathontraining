@@ -433,6 +433,105 @@ export default function DashboardPage() {
                     </div>
                 </motion.div>
 
+                {/* Plan Identity Hero Card */}
+                {plan && (
+                    <motion.div
+                        className="mb-6"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.05 }}
+                    >
+                        <Link href="/plan" className="block">
+                            <div
+                                className="v3-card v3-card-interactive p-5"
+                                style={{
+                                    background: 'linear-gradient(135deg, var(--bg-elevated) 0%, var(--bg-muted) 100%)',
+                                    borderColor: 'var(--border-base)',
+                                }}
+                            >
+                                {/* Coach & Plan Header */}
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center gap-3">
+                                        {/* Coach color indicator */}
+                                        <div
+                                            className="w-2.5 h-2.5 rounded-full"
+                                            style={{
+                                                background: plan.philosophy
+                                                    ? `var(--color-coach-${plan.philosophy}, var(--color-accent))`
+                                                    : 'var(--color-accent)',
+                                            }}
+                                        />
+                                        <div>
+                                            <p className="text-xs uppercase tracking-widest" style={{ color: 'var(--text-subtle)' }}>
+                                                {plan.planTier || (plan.philosophy
+                                                    ? plan.philosophy.charAt(0).toUpperCase() + plan.philosophy.slice(1)
+                                                    : 'Training Plan')}
+                                            </p>
+                                            <p className="text-lg font-light" style={{ color: 'var(--text-base)' }}>
+                                                {plan.raceName || `${plan.goalDistance.toUpperCase()} Training`}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <svg className="w-5 h-5" style={{ color: 'var(--text-muted)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </div>
+
+                                {/* Key Metrics Row */}
+                                <div className="grid grid-cols-3 gap-4">
+                                    {/* Weeks to Race / Current Week */}
+                                    <div className="text-center p-3 rounded-xl" style={{ background: 'var(--bg-base)' }}>
+                                        <p className="text-2xl font-light v3-mono" style={{ color: 'var(--color-accent)' }}>
+                                            {plan.raceDate ? (() => {
+                                                const weeksToRace = Math.ceil((new Date(plan.raceDate).getTime() - Date.now()) / (7 * 24 * 60 * 60 * 1000));
+                                                return weeksToRace > 0 ? weeksToRace : currentWeek || 1;
+                                            })() : currentWeek || 1}
+                                        </p>
+                                        <p className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--text-subtle)' }}>
+                                            {plan.raceDate && Math.ceil((new Date(plan.raceDate).getTime() - Date.now()) / (7 * 24 * 60 * 60 * 1000)) > 0
+                                                ? 'weeks left'
+                                                : 'current week'}
+                                        </p>
+                                    </div>
+
+                                    {/* Current Phase */}
+                                    <div className="text-center p-3 rounded-xl" style={{ background: 'var(--bg-base)' }}>
+                                        <p className="text-2xl font-light" style={{ color: 'var(--text-base)' }}>
+                                            {currentWeekPlan?.phase
+                                                ? currentWeekPlan.phase.charAt(0).toUpperCase() + currentWeekPlan.phase.slice(1)
+                                                : 'Base'}
+                                        </p>
+                                        <p className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--text-subtle)' }}>
+                                            phase
+                                        </p>
+                                    </div>
+
+                                    {/* Weekly Mileage */}
+                                    <div className="text-center p-3 rounded-xl" style={{ background: 'var(--bg-base)' }}>
+                                        <p className="text-2xl font-light v3-mono" style={{ color: 'var(--text-base)' }}>
+                                            {currentWeekPlan?.totalMiles ? Math.round(currentWeekPlan.totalMiles) : plan.peakMileage}
+                                        </p>
+                                        <p className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--text-subtle)' }}>
+                                            miles
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Race Date */}
+                                {plan.raceDate && (
+                                    <div className="mt-4 pt-3 text-center" style={{ borderTop: '1px solid var(--border-base)' }}>
+                                        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                                            {plan.raceName || 'Race Day'} · {new Date(plan.raceDate).toLocaleDateString('en-US', {
+                                                month: 'long', day: 'numeric', year: 'numeric'
+                                            })}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        </Link>
+                    </motion.div>
+                )}
+
                 {/* Pre-workout readiness nudge on quality days (Starrett methodology) */}
                 {isQualityDay && (
                     <motion.div

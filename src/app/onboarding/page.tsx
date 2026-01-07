@@ -100,15 +100,18 @@ function calculateVdotFromData(data: OnboardingData): { vdot: number; confidence
         };
     }
 
-    // From easy pace (rough estimation)
+    // From easy pace (rough estimation based on Daniels tables)
     if (data.calibrationMethod === 'easy_pace' && data.easyPaceMinutes !== null) {
         const paceSeconds = (data.easyPaceMinutes * 60) + (data.easyPaceSeconds ?? 0);
-        // Rough conversion: easy pace of 10:00/mi ≈ VDOT 40
-        // Each 30 seconds faster ≈ +3 VDOT
-        const basePace = 600; // 10:00
-        const diff = basePace - paceSeconds;
-        const vdot = 40 + Math.round(diff / 10);
-        return { vdot: Math.max(25, Math.min(70, vdot)), confidence: 'medium' };
+        // Daniels easy pace reference points (seconds per mile -> VDOT):
+        // 8:00/mi (480s) ≈ VDOT 55
+        // 10:00/mi (600s) ≈ VDOT 40
+        // 12:00/mi (720s) ≈ VDOT 30
+        // This gives us ~8 seconds per VDOT point
+        const basePace = 600; // 10:00/mi = VDOT 40
+        const diffSeconds = basePace - paceSeconds;
+        const vdot = 40 + Math.round(diffSeconds / 8);
+        return { vdot: Math.max(25, Math.min(75, vdot)), confidence: 'medium' };
     }
 
     // From hard effort
@@ -306,8 +309,9 @@ function OnboardingContent() {
     const goToNext = useCallback(() => {
         const nextStep = getNextStep(step, data);
 
-        // Calculate VDOT before revealing
-        if (nextStep === 'vdot-reveal' && data.vdot === null) {
+        // Always recalculate VDOT when transitioning to vdot-reveal
+        // This ensures changes to calibration data are reflected
+        if (nextStep === 'vdot-reveal') {
             const { vdot, confidence } = calculateVdotFromData(data);
             setData(prev => ({ ...prev, vdot, vdotConfidence: confidence }));
         }
@@ -588,7 +592,11 @@ function OnboardingContent() {
                 {step === 'vdot-reveal' && (
                     <VdotRevealScreen
                         data={data}
-                        onRecalculate={() => setStep('calibration-method')}
+                        onRecalculate={() => {
+                            // Clear VDOT so it will be recalculated on next reveal
+                            setData(prev => ({ ...prev, vdot: null, vdotConfidence: null }));
+                            setStep('calibration-method');
+                        }}
                         onContinue={goToNext}
                         onBack={goBack}
                     />
