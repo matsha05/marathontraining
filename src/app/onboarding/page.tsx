@@ -742,9 +742,16 @@ function OnboardingContent() {
                         data={data}
                         readinessStatus={data.readinessStatus ?? 'ready'}
                         baseWeeksNeeded={data.baseWeeksNeeded ?? 0}
-                        onProceed={goToNext}
-                        onProceedAnyway={goToNext}
+                        onProceed={() => {
+                            setGenerationError(null); // Clear any previous errors
+                            goToNext();
+                        }}
+                        onProceedAnyway={() => {
+                            setGenerationError(null);
+                            goToNext();
+                        }}
                         onBack={goBack}
+                        error={generationError}
                     />
                 )}
 

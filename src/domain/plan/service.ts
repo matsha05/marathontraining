@@ -87,6 +87,11 @@ export type PlanErrorCode =
 export function transformOnboardingToPlanInput(
     data: OnboardingData
 ): ServiceResult<PlanGenerationInput> {
+    // Calculate age from DOB if not already set (before validation)
+    if (data.age === null && data.dateOfBirth) {
+        data.age = calculateAgeFromDateOfBirth(data.dateOfBirth);
+    }
+
     // Validate required fields
     const validation = validateOnboardingData(data);
     if (!validation.valid) {
@@ -94,7 +99,7 @@ export function transformOnboardingToPlanInput(
             success: false,
             error: {
                 code: 'INVALID_ONBOARDING_DATA',
-                message: 'Missing required onboarding fields',
+                message: `Missing required fields: ${validation.missingFields.join(', ')}`,
                 details: { missingFields: validation.missingFields },
             },
         };

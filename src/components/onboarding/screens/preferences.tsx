@@ -381,6 +381,7 @@ interface ReadinessCheckScreenProps {
     onProceed: () => void;
     onProceedAnyway: () => void;
     onBack: () => void;
+    error?: string | null; // Generation error to display
 }
 
 export function ReadinessCheckScreen({
@@ -389,7 +390,8 @@ export function ReadinessCheckScreen({
     baseWeeksNeeded,
     onProceed,
     onProceedAnyway,
-    onBack
+    onBack,
+    error
 }: ReadinessCheckScreenProps) {
     const goalLabel = TRAINING_GOALS.find(g => g.value === data.trainingGoal)?.label ?? 'Race';
     const weeksToRace = data.raceDate
@@ -405,6 +407,11 @@ export function ReadinessCheckScreen({
     if (readinessStatus === 'ready') {
         return (
             <QuestionScreen onBack={onBack}>
+                {error && (
+                    <WarningBanner title="Plan generation failed">
+                        {error}
+                    </WarningBanner>
+                )}
                 <div className="text-center">
                     <div
                         className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
@@ -448,6 +455,11 @@ export function ReadinessCheckScreen({
     if (readinessStatus === 'needs_base') {
         return (
             <QuestionScreen onBack={onBack}>
+                {error && (
+                    <WarningBanner title="Plan generation failed">
+                        {error}
+                    </WarningBanner>
+                )}
                 <div className="text-center">
                     <div
                         className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
