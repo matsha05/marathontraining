@@ -47,6 +47,7 @@ import {
 
 import { OnboardingData, INITIAL_ONBOARDING_DATA, TrainingGoal, TrainingIntensity } from '@/domain/onboarding/types';
 import { createPlanFromOnboarding, savePlan } from '@/domain/plan/service';
+import { parseAvatarId } from '@/domain/user/avatars';
 
 // Regeneration steps (much shorter than full onboarding)
 type RegenerateStep =
@@ -102,7 +103,7 @@ export default function RegeneratePlanPage() {
                     dateOfBirth: athlete?.date_of_birth || null,
                     age: athlete?.age || prev.age,
                     sex: (athlete?.sex as 'male' | 'female') || prev.sex,
-                    avatar: athlete?.avatar || prev.avatar,
+                    avatar: athlete?.avatar ? parseAvatarId(athlete.avatar) : prev.avatar,
                     vdot: vdot || prev.vdot,
                     vdotConfidence: vdot ? 'high' : prev.vdotConfidence,
                 }));
@@ -180,8 +181,8 @@ export default function RegeneratePlanPage() {
                 throw new Error(planResult.error?.message || 'Failed to generate plan');
             }
 
-            // Save to database
-            await savePlan(planResult.data, user.id);
+            // Save to database (user ID fetched internally)
+            await savePlan(planResult.data);
             await refreshPlan();
 
             setStep('complete');
