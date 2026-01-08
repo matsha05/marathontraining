@@ -13,9 +13,9 @@ export interface AuthResult {
     userId: string | null;
 }
 
-export interface AuthGuardResult extends AuthResult {
-    response: NextResponse | null;
-}
+export type AuthGuardResult =
+    | { athleteId: string; userId: string; response: null }
+    | { athleteId: null; userId: null; response: NextResponse };
 
 /**
  * Resolves the authenticated user's athlete ID from a request.
@@ -51,5 +51,7 @@ export async function requireAthleteId(
         return { athleteId: null, userId: null, response };
     }
 
-    return { ...result, response: null };
+    const athleteId = result.athleteId;
+    const userId = result.userId ?? athleteId;
+    return { athleteId, userId, response: null };
 }
