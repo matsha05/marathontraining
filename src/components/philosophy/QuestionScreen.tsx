@@ -80,6 +80,7 @@ export function QuestionScreen<T>({
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 + i * 0.05 }}
                             onClick={() => onSelect(option.value)}
+                            whileTap={{ scale: 0.98 }}
                             className="w-full p-5 rounded-xl border transition-all text-left group"
                             style={{
                                 background: 'var(--bg-muted)',

@@ -1,5 +1,7 @@
 export type ApiError = {
     message: string;
+    code?: string;
+    details?: unknown;
     data?: unknown;
 };
 
@@ -12,6 +14,40 @@ export interface ApiFetchOptions extends RequestInit {
 }
 
 const DEFAULT_TIMEOUT_MS = 15000;
+
+function normalizeApiError(payload: unknown, fallbackMessage: string) {
+    let message = fallbackMessage || 'Request failed';
+    let code: string | undefined;
+    let details: unknown;
+
+    if (payload && typeof payload === 'object') {
+        const payloadRecord = payload as Record<string, unknown>;
+        if ('error' in payloadRecord) {
+            const errorValue = payloadRecord.error;
+            if (typeof errorValue === 'string') {
+                message = errorValue;
+            } else if (errorValue && typeof errorValue === 'object') {
+                const errorRecord = errorValue as Record<string, unknown>;
+                if (typeof errorRecord.message === 'string') message = errorRecord.message;
+                if (typeof errorRecord.code === 'string') code = errorRecord.code;
+                if ('details' in errorRecord) details = errorRecord.details;
+            } else if (errorValue != null) {
+                message = String(errorValue);
+            }
+        } else if (typeof payloadRecord.message === 'string') {
+            message = payloadRecord.message;
+        }
+
+        if (details === undefined && 'details' in payloadRecord) {
+            details = payloadRecord.details;
+        }
+        if (code === undefined && typeof payloadRecord.code === 'string') {
+            code = payloadRecord.code;
+        }
+    }
+
+    return { message, code, details };
+}
 
 export async function apiFetch<T = unknown>(
     input: RequestInfo | URL,
@@ -36,14 +72,12 @@ export async function apiFetch<T = unknown>(
                 : await response.text().catch(() => null);
 
         if (!response.ok) {
-            const message = (payload && typeof payload === 'object' && 'error' in payload)
-                ? String((payload as { error: unknown }).error)
-                : response.statusText || 'Request failed';
+            const { message, code, details } = normalizeApiError(payload, response.statusText || 'Request failed');
 
             return {
                 ok: false,
                 status: response.status,
-                error: { message, data: payload ?? null },
+                error: { message, code, details, data: payload ?? null },
             };
         }
 
@@ -54,7 +88,7 @@ export async function apiFetch<T = unknown>(
         };
     } catch (error) {
         const message = error instanceof Error ? error.message : 'Network error';
-        return { ok: false, status: 0, error: { message } };
+        return { ok: false, status: 0, error: { message, code: 'NETWORK_ERROR' } };
     } finally {
         clearTimeout(timeout);
     }

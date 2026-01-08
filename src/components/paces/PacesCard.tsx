@@ -187,7 +187,7 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: Pa
 
     return (
         <motion.div
-            className="v3-card p-6"
+            className="v3-card p-6 container-inline"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
@@ -210,7 +210,6 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: Pa
                                     }}
                                     className="v3-body-sm flex items-center gap-1 transition-colors hover:underline"
                                     style={{ color: 'var(--text-muted)' }}
-                                    title="Click to update your max HR"
                                 >
                                     <HeartIcon size={12} filled pulsing style={{ color: '#ef4444' }} />
                                     Max HR {calculatedMaxHR}
@@ -225,7 +224,6 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: Pa
                         <button
                             onClick={onRecalibrate}
                             className="v3-btn v3-btn-secondary v3-btn-sm"
-                            title="Update your VDOT based on a recent race result"
                         >
                             Recalibrate
                         </button>
@@ -256,6 +254,7 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: Pa
                         <div className="flex gap-2">
                             <input
                                 type="number"
+                                inputMode="numeric"
                                 value={hrInput}
                                 onChange={(e) => setHRInput(e.target.value)}
                                 className="v3-input v3-mono w-24 text-center"
@@ -324,7 +323,7 @@ export function PacesCard({ vdot, age, maxHR, onRecalibrate, onMaxHRUpdate }: Pa
                 <h3 className="v3-heading-sm mb-4">
                     Predicted Race Times
                 </h3>
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-4 gap-4 cq-grid-4">
                     {Object.entries(raceTimes).map(([distance, time]) => (
                         <div key={distance} className="text-center">
                             <div className="v3-body-xs mb-1" style={{ color: 'var(--text-muted)' }}>

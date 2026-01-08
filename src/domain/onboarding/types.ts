@@ -6,6 +6,7 @@
  */
 
 import { AvatarId } from '@/domain/user/avatars';
+import { safeStorageGetJSON, safeStorageRemove, safeStorageSetJSON } from '@/lib/safe-storage';
 
 // =============================================================================
 // STEP DEFINITIONS
@@ -718,35 +719,42 @@ export function saveOnboardingProgress(step: OnboardingStep, data: OnboardingDat
         timestamp: Date.now(),
     };
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+    safeStorageSetJSON(STORAGE_KEY, saved);
 }
 
 export function loadOnboardingProgress(): { step: OnboardingStep; data: OnboardingData } | null {
     if (typeof window === 'undefined') return null;
 
-    try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (!saved) return null;
+    const stored = safeStorageGetJSON<unknown>(STORAGE_KEY);
+    if (!stored.success || stored.data === null) return null;
 
-        const parsed = JSON.parse(saved);
+    const parsed = stored.data;
+    if (typeof parsed !== 'object' || parsed === null) return null;
 
-        // Check if saved data is less than 7 days old
-        const weekOld = 7 * 24 * 60 * 60 * 1000;
-        if (Date.now() - parsed.timestamp > weekOld) {
-            clearOnboardingProgress();
-            return null;
-        }
+    const { step, data, timestamp } = parsed as {
+        step?: unknown;
+        data?: unknown;
+        timestamp?: unknown;
+    };
 
-        return {
-            step: parsed.step,
-            data: { ...INITIAL_ONBOARDING_DATA, ...parsed.data },
-        };
-    } catch {
+    if (typeof step !== 'string' || !(step in STEP_PROGRESS)) return null;
+    if (typeof timestamp !== 'number') return null;
+    if (typeof data !== 'object' || data === null || Array.isArray(data)) return null;
+
+    // Check if saved data is less than 7 days old
+    const weekOld = 7 * 24 * 60 * 60 * 1000;
+    if (Date.now() - timestamp > weekOld) {
+        clearOnboardingProgress();
         return null;
     }
+
+    return {
+        step: step as OnboardingStep,
+        data: { ...INITIAL_ONBOARDING_DATA, ...(data as Partial<OnboardingData>) },
+    };
 }
 
 export function clearOnboardingProgress(): void {
     if (typeof window === 'undefined') return;
-    localStorage.removeItem(STORAGE_KEY);
+    safeStorageRemove(STORAGE_KEY);
 }

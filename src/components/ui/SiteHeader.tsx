@@ -173,7 +173,7 @@ export function SiteHeader({
 
     return (
         <header
-            className="sticky top-0 left-0 right-0 z-50 border-b"
+            className="sticky top-0 left-0 right-0 z-50 border-b safe-area-top"
             style={{
                 background: theme === 'dark'
                     ? 'rgba(8, 8, 10, 0.9)'

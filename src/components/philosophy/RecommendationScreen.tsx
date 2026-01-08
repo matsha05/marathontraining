@@ -193,7 +193,7 @@ export function RecommendationScreen({
                         >
                             Still included regardless
                         </p>
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
                             {FOUNDATION_LAYERS.map((layer) => (
                                 <div key={layer.coach} className="text-center">
                                     <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{layer.focus}</p>
@@ -221,7 +221,7 @@ export function RecommendationScreen({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.24, ease: [0.2, 0.8, 0.2, 1] }}
-            className="min-h-screen flex flex-col items-center px-6 py-16"
+            className="min-h-screen-safe flex flex-col items-center px-6 py-16"
         >
             {/* Back button */}
             <button
@@ -354,7 +354,7 @@ export function RecommendationScreen({
                         >
                             Also included in every plan
                         </p>
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
                             {FOUNDATION_LAYERS.map((layer) => (
                                 <div key={layer.coach} className="text-center">
                                     <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{layer.focus}</p>

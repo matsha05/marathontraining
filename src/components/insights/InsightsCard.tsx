@@ -52,7 +52,7 @@ export function InsightsCard({ workoutLogs, className = '' }: InsightsCardProps)
             </div>
 
             {/* Key Metrics */}
-            <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 <div className="text-center">
                     <p className="text-2xl font-mono" style={{ color: 'var(--color-accent)' }}>{insights.completionRate30Days}%</p>
                     <p className="text-[10px]" style={{ color: 'var(--text-subtle)' }}>Completion</p>

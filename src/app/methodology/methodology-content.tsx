@@ -102,11 +102,11 @@ export function MethodologyContent() {
 
     // Prevent SSG from rendering with useTheme
     if (!mounted) {
-        return <div className="v3-root min-h-screen" style={{ background: 'var(--bg-base)' }} />;
+        return <div className="v3-root min-h-screen-safe" style={{ background: 'var(--bg-base)' }} />;
     }
 
     return (
-        <div className="v3-root min-h-screen" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>
+        <div className="v3-root min-h-screen-safe" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>
             <SiteHeader />
 
             {/* Hero */}

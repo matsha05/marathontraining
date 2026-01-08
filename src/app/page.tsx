@@ -1,12 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { SiteHeader } from "@/components/ui/SiteHeader";
 import { Footer } from "@/components/ui/Footer";
 import { Badge } from "@/components/ui/Badge";
 import { Metric } from "@/components/ui/Metric";
 import { colors } from "@/lib/design-tokens";
+import { X } from "lucide-react";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 /**
  * THE LONG GAME - Landing Page
@@ -37,7 +40,7 @@ const coachColors = {
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>
+    <div className="min-h-screen-safe" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>
       <SiteHeader />
 
       {/* Hero - Big text + Week preview with animations */}
@@ -80,7 +83,7 @@ export default function LandingPage() {
               Week 8 · Build Phase · 42 miles
             </p>
             {/* Mobile: Horizontal scroll | Desktop: Grid */}
-            <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-7 gap-2 py-2 px-1 -mx-4 md:mx-0 touch-pan-x" style={{ scrollbarWidth: 'none' }}>
+            <div className="mobile-scroll-x gap-2 py-2 -mx-4 px-4 scroll-hint-right md:mx-0 md:px-0 md:grid md:grid-cols-7 md:gap-2 md:overflow-visible">
               {[
                 { day: "M", type: "run", label: "5mi Easy", sub: "8:32/mi", strength: true },
                 { day: "T", type: "run", label: "6×800m", sub: "VO2", strength: false },
@@ -172,7 +175,7 @@ export default function LandingPage() {
         bestFor="Experienced runners, 6 days available, high mileage tolerance"
       >
         <div className="v3-card p-4">
-          <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-7 gap-2 text-center -mx-2 px-2 md:mx-0" style={{ scrollbarWidth: 'none' }}>
+          <div className="mobile-scroll-x gap-2 py-2 text-center -mx-2 px-2 scroll-hint-right md:mx-0 md:px-0 md:grid md:grid-cols-7 md:gap-2 md:overflow-visible">
             {["Easy", "Speed", "Rest", "Tempo", "Easy", "Easy", "Long"].map((day, i) => (
               <div key={i} className="snap-center flex-shrink-0 w-[60px] md:w-auto md:flex-shrink">
                 <p className="text-xs mb-1" style={{ color: 'var(--text-subtle)' }}>{["M", "T", "W", "T", "F", "S", "S"][i]}</p>
@@ -202,7 +205,7 @@ export default function LandingPage() {
         description="The most trusted name in marathon training. Gradual progression, more rest days, longer long runs (20+ miles). Programs for every level, from first-timer to PR-chaser."
         bestFor="First-timers, 4-5 days available, gradual build"
       >
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
             { level: "Novice", sub: "First marathon" },
             { level: "Intermediate", sub: "Building fitness" },
@@ -257,7 +260,7 @@ export default function LandingPage() {
         description="Bridges the gap between what coaches have known works and what scientists have proven. 4:01 high school miler, Nike Oregon Project assistant, evidence-based coaching."
         bestFor="Runners who want modern, individualized training"
       >
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {[
             { label: "Philosophy", value: "Coach the person" },
             { label: "Method", value: "Not the system" },
@@ -319,43 +322,7 @@ export default function LandingPage() {
         description="Running Rewired. 12 movement standards that address the most common limiters in runners. Pre-hab over rehab. Build a body that can handle the training load, not just survive it."
         bestFor="12 movement standards · Daily routines"
       >
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-          {[
-            { id: 1, name: "Toe Yoga", tooltip: "Can you raise your big toe while keeping others down? Tests foot control and arch stability." },
-            { id: 2, name: "Balance", tooltip: "45 seconds single-leg stance, barefoot, eyes open. Tests proprioception and stability." },
-            { id: 3, name: "Squat", tooltip: "Full-depth squat, heels down, knees tracking over toes. Tests hip, ankle, and thoracic mobility." },
-            { id: 4, name: "Ankle DF", tooltip: "Knee-to-wall test: 4+ inches from wall. Tests ankle dorsiflexion for proper running mechanics." },
-            { id: 5, name: "Hallux DF", tooltip: "Big toe mobility: 50-70° of extension. Essential for push-off power and preventing plantar issues." },
-            { id: 6, name: "Calf Raise", tooltip: "20+ single-leg calf raises per side. Tests Achilles capacity and calf endurance." },
-            { id: 7, name: "SL Bridge", tooltip: "10-second single-leg bridge hold, hips level. Tests glute strength and hip stability." },
-            { id: 8, name: "Hip Flexor", tooltip: "Doorway test: can you extend your hip without arching your back? Tests hip extension mobility." },
-            { id: 9, name: "Hip Flexion", tooltip: "Knee to chest while opposite leg stays flat. Tests hip flexion range for proper leg swing." },
-            { id: 10, name: "Rotation", tooltip: "Thoracic spine rotation: 45°+ each way. Essential for arm swing and preventing low back compensation." },
-            { id: 11, name: "Core Ctrl", tooltip: "Can you maintain neutral spine under load? Tests deep core stabilizers, not six-pack muscles." },
-            { id: 12, name: "SL Hop", tooltip: "Single-leg hop and stick the landing. Integration test: foot, hip, and core working together." },
-          ].map((standard) => (
-            <button
-              key={standard.id}
-              className="group relative h-12 md:h-10 rounded-lg flex flex-col items-center justify-center transition-all active:scale-95 touch-target"
-              style={{ background: 'var(--bg-muted)' }}
-              onClick={(e) => {
-                // Toggle tooltip visibility for mobile
-                const tooltip = e.currentTarget.querySelector('.mobile-tooltip');
-                if (tooltip) tooltip.classList.toggle('hidden');
-              }}
-            >
-              <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>{standard.name}</span>
-              <span className="text-xs" style={{ color: 'var(--text-subtle)' }}>{standard.id}</span>
-              {/* Desktop: Hover tooltip */}
-              <div className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50 w-48 text-center"
-                style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-base)', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
-                <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-base)' }}>{standard.name}</p>
-                <p className="text-xs leading-tight" style={{ color: 'var(--text-muted)' }}>{standard.tooltip}</p>
-                <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 -mt-1" style={{ background: 'var(--bg-elevated)', borderRight: '1px solid var(--border-base)', borderBottom: '1px solid var(--border-base)' }} />
-              </div>
-            </button>
-          ))}
-        </div>
+        <StandardsGrid />
       </CoachSection>
 
       {/* Starrett - Mobility */}
@@ -365,7 +332,7 @@ export default function LandingPage() {
         tag="Mobility"
         description="Becoming a Supple Leopard. Systematic mobility work that restores range of motion, tissue quality, and motor control. The foundation that lets you train hard without breaking down."
       >
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row gap-4">
           {[
             {
               label: "Before",
@@ -430,7 +397,7 @@ export default function LandingPage() {
         description="24 runner-friendly WODs with Rx/Scaled/Beginner tiers. Phase-appropriate scheduling: heavy in base, maintain in peak, protect in taper. We never schedule leg-heavy work before your long run."
         bestFor="24 WODs · 6 research sources · Phase-aware scheduling"
       >
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {[
             { phase: "Base", action: "Build strength" },
             { phase: "Build", action: "Convert power" },
@@ -498,6 +465,87 @@ export default function LandingPage() {
 // REUSABLE COMPONENTS
 // =============================================================================
 
+const STANDARDS_DATA = [
+  { id: 1, name: "Toe Yoga", tooltip: "Can you raise your big toe while keeping others down? Tests foot control and arch stability." },
+  { id: 2, name: "Balance", tooltip: "45 seconds single-leg stance, barefoot, eyes open. Tests proprioception and stability." },
+  { id: 3, name: "Squat", tooltip: "Full-depth squat, heels down, knees tracking over toes. Tests hip, ankle, and thoracic mobility." },
+  { id: 4, name: "Ankle DF", tooltip: "Knee-to-wall test: 4+ inches from wall. Tests ankle dorsiflexion for proper running mechanics." },
+  { id: 5, name: "Hallux DF", tooltip: "Big toe mobility: 50-70° of extension. Essential for push-off power and preventing plantar issues." },
+  { id: 6, name: "Calf Raise", tooltip: "20+ single-leg calf raises per side. Tests Achilles capacity and calf endurance." },
+  { id: 7, name: "SL Bridge", tooltip: "10-second single-leg bridge hold, hips level. Tests glute strength and hip stability." },
+  { id: 8, name: "Hip Flexor", tooltip: "Doorway test: can you extend your hip without arching your back? Tests hip extension mobility." },
+  { id: 9, name: "Hip Flexion", tooltip: "Knee to chest while opposite leg stays flat. Tests hip flexion range for proper leg swing." },
+  { id: 10, name: "Rotation", tooltip: "Thoracic spine rotation: 45°+ each way. Essential for arm swing and preventing low back compensation." },
+  { id: 11, name: "Core Ctrl", tooltip: "Can you maintain neutral spine under load? Tests deep core stabilizers, not six-pack muscles." },
+  { id: 12, name: "SL Hop", tooltip: "Single-leg hop and stick the landing. Integration test: foot, hip, and core working together." },
+];
+
+function StandardsGrid() {
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const selected = STANDARDS_DATA.find(s => s.id === selectedId);
+
+  return (
+    <>
+      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+        {STANDARDS_DATA.map((standard) => (
+          <button
+            key={standard.id}
+            className="group relative h-12 md:h-10 rounded-lg flex flex-col items-center justify-center transition-all active:scale-95 touch-target"
+            style={{
+              background: selectedId === standard.id ? 'var(--color-accent-subtle)' : 'var(--bg-muted)',
+              border: selectedId === standard.id ? '1px solid var(--color-accent)' : '1px solid transparent',
+            }}
+            onClick={() => setSelectedId(selectedId === standard.id ? null : standard.id)}
+          >
+            <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>{standard.name}</span>
+            <span className="text-xs" style={{ color: 'var(--text-subtle)' }}>{standard.id}</span>
+            {/* Desktop: Hover tooltip */}
+            <div className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50 w-48 text-center"
+              style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-base)', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
+              <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-base)' }}>{standard.name}</p>
+              <p className="text-xs leading-tight" style={{ color: 'var(--text-muted)' }}>{standard.tooltip}</p>
+              <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 -mt-1" style={{ background: 'var(--bg-elevated)', borderRight: '1px solid var(--border-base)', borderBottom: '1px solid var(--border-base)' }} />
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {/* Mobile: Bottom sheet tooltip */}
+      <AnimatePresence>
+        {selected && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+            className="mt-4 p-4 rounded-xl md:hidden"
+            style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-base)' }}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1">
+                <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-base)' }}>
+                  {selected.id}. {selected.name}
+                </p>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                  {selected.tooltip}
+                </p>
+              </div>
+              <button
+                onClick={() => setSelectedId(null)}
+                className="p-2 rounded-lg touch-target-sm"
+                style={{ background: 'var(--bg-muted)' }}
+              >
+                <X className="w-4 h-4" style={{ color: 'var(--text-subtle)' }} />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
+
 function CoachSection({
   color,
   name,
@@ -513,8 +561,10 @@ function CoachSection({
   bestFor?: string;
   children?: React.ReactNode;
 }) {
+  const { ref, className } = useScrollReveal();
+
   return (
-    <section className="px-6 py-20" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+    <section ref={ref} className={`px-6 py-20 ${className}`} style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-2 h-2 rounded-full" style={{ background: color }} />

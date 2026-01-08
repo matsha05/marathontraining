@@ -103,7 +103,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
         <div className="v3-root min-h-screen" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>
             {/* Progress bar - hide on beginner gate and result */}
             {step !== 'result' && step !== 'beginner_gate' && (
-                <div className="fixed top-0 left-0 right-0 z-50">
+                <div className="fixed top-0 left-0 right-0 z-50 safe-area-top">
                     <div className="h-1" style={{ background: 'var(--border-base)' }}>
                         <motion.div
                             className="h-full"
@@ -114,7 +114,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                         />
                     </div>
                     <div className="v3-container py-2">
-                        <p className="v3-mono text-center" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                        <p className="v3-mono text-center text-[11px]" style={{ color: 'var(--text-muted)' }}>
                             Step {currentIndex + 1} of 6
                         </p>
                     </div>

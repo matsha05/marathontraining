@@ -1,28 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAthleteId } from '@/infrastructure/auth';
-import { createSupabaseRequestClient } from '@/infrastructure/supabase/server';
 import { todayDateKey } from '@/lib/dates';
+import { fetchActivePlan } from '@/app/api/plan/helpers';
 
 export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
-    const auth = await requireAthleteId(request);
-    if (auth.response) return auth.response;
+    const activePlan = await fetchActivePlan<{ id: string }>(request, 'id');
+    if ('response' in activePlan) return activePlan.response;
+    if (!activePlan.plan) return NextResponse.json({ workout: null });
 
-    const supabase = createSupabaseRequestClient(request);
-    const { data: plan, error: planError } = await supabase
-        .from('training_plans')
-        .select('id')
-        .eq('athlete_id', auth.athleteId)
-        .eq('is_active', true)
-        .single();
-
-    if (planError) {
-        if (planError.code === 'PGRST116') {
-            return NextResponse.json({ workout: null });
-        }
-        return NextResponse.json({ error: planError.message }, { status: 500 });
-    }
+    const { supabase, plan } = activePlan;
 
     const today = todayDateKey();
     const { data, error } = await supabase

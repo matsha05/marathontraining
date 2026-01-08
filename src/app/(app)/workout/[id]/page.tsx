@@ -250,7 +250,7 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
                                 background: 'var(--color-accent)',
                                 boxShadow: '0 2px 8px rgba(25, 227, 140, 0.3)',
                             }}
-                            title="Log workout"
+                            aria-label="Log workout"
                         >
                             <svg className="w-5 h-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
@@ -260,7 +260,7 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
                 </div>
 
                 {/* Key Metrics Row */}
-                <div className="grid grid-cols-3 gap-4 mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                     <div className="v3-card p-4">
                         <div className="flex items-center gap-3">
                             <div
@@ -631,7 +631,7 @@ function WorkoutLoggingModal({
                     {/* Step 1: Completion */}
                     <div className="mb-6">
                         <p className="v3-label mb-3">Did you complete it?</p>
-                        <div className="grid grid-cols-3 gap-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                             {[
                                 { value: 'full', label: 'Full' },
                                 { value: 'partial', label: 'Partial' },

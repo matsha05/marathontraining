@@ -336,7 +336,7 @@ export function CoachRevealScreen({ data, onConfirm, onBack }: CoachRevealScreen
             {/* Plan preview */}
             <div className="v3-card p-5 mb-8">
                 <p className="v3-label mb-3">Your Plan Structure</p>
-                <div className="grid grid-cols-3 gap-4 text-center">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                     <div>
                         <p className="v3-body-lg font-medium">{data.availableDays} days/week</p>
                         <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>Run days</p>

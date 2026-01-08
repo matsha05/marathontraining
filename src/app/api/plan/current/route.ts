@@ -1,39 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAthleteId } from '@/infrastructure/auth';
-import { createSupabaseRequestClient } from '@/infrastructure/supabase/server';
 import { reconstructPlan } from '@/domain/plan/serialization';
+import { fetchActivePlan } from '@/app/api/plan/helpers';
+import type { Database } from '@/infrastructure/supabase/types';
 
 export const runtime = 'nodejs';
 
+type DbTrainingPlan = Database['public']['Tables']['training_plans']['Row'];
+
 export async function GET(request: NextRequest) {
-    const auth = await requireAthleteId(request);
-    if (auth.response) return auth.response;
+    const activePlan = await fetchActivePlan<DbTrainingPlan>(request, '*');
+    if ('response' in activePlan) return activePlan.response;
+    if (!activePlan.plan) return NextResponse.json({ plan: null });
 
-    const supabase = createSupabaseRequestClient(request);
-    const { data: planRow, error: planError } = await supabase
-        .from('training_plans')
-        .select('*')
-        .eq('athlete_id', auth.athleteId)
-        .eq('is_active', true)
-        .single();
-
-    if (planError) {
-        if (planError.code === 'PGRST116') {
-            return NextResponse.json({ plan: null });
-        }
-        return NextResponse.json({ error: planError.message }, { status: 500 });
-    }
+    const { supabase, plan } = activePlan;
 
     const { data: workouts, error: workoutsError } = await supabase
         .from('planned_workouts')
         .select('*')
-        .eq('plan_id', planRow.id)
+        .eq('plan_id', plan.id)
         .order('scheduled_date', { ascending: true });
 
     if (workoutsError) {
         return NextResponse.json({ error: workoutsError.message }, { status: 500 });
     }
 
-    const plan = reconstructPlan(planRow, workouts || []);
-    return NextResponse.json({ plan });
+    const fullPlan = reconstructPlan(plan, workouts || []);
+    return NextResponse.json({ plan: fullPlan });
 }

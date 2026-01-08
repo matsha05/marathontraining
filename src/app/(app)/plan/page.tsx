@@ -223,14 +223,14 @@ export default function PlanPage() {
                     transition={{ duration: 0.4, delay: 0.05 }}
                 >
                     <h2 className="v3-heading-md mb-4">Training Phases</h2>
-                    <div className="flex gap-2 overflow-x-auto pb-2">
+                    <div className="mobile-scroll-x gap-2 pb-2 -mx-4 px-4 scroll-hint-right md:mx-0 md:px-0 md:overflow-visible">
                         {phases.map((phase, i) => (
                             <motion.div
                                 key={phase.name}
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.3, delay: i * 0.05 }}
-                                className={`flex-1 min-w-[100px] p-4 rounded-xl transition-all ${phase.status === 'current'
+                                className={`flex-1 min-w-[100px] p-4 rounded-xl transition-all snap-center flex-shrink-0 md:shrink ${phase.status === 'current'
                                     ? 'v3-card-accent'
                                     : phase.status === 'completed'
                                         ? 'v3-card opacity-60'
@@ -292,11 +292,11 @@ export default function PlanPage() {
                                         <div className="flex items-center gap-8 text-center">
                                             <div>
                                                 <p className="v3-heading-md v3-mono">{week.mileage}</p>
-                                                <p className="v3-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>miles</p>
+                                                <p className="v3-mono text-[10px]" style={{ color: 'var(--text-muted)' }}>miles</p>
                                             </div>
                                             <div>
                                                 <p className="v3-heading-md v3-mono">{week.quality}</p>
-                                                <p className="v3-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>quality</p>
+                                                <p className="v3-mono text-[10px]" style={{ color: 'var(--text-muted)' }}>quality</p>
                                             </div>
                                             <svg className="w-5 h-5" style={{ color: 'var(--text-subtle)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -355,26 +355,26 @@ export default function PlanPage() {
                     transition={{ duration: 0.4, delay: 0.2 }}
                 >
                     <h2 className="v3-heading-md mb-4">Plan Overview</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="v3-card p-5">
                             <p className="v3-heading-lg v3-mono mb-1">{plan.totalWeeks}</p>
                             <p className="v3-label mb-1">Weeks</p>
-                            <p className="v3-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Total plan length</p>
+                            <p className="v3-mono text-[10px]" style={{ color: 'var(--text-muted)' }}>Total plan length</p>
                         </div>
                         <div className="v3-card p-5">
                             <p className="v3-heading-lg v3-mono mb-1">{plan.peakMileage}</p>
                             <p className="v3-label mb-1">Peak Mi</p>
-                            <p className="v3-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Week {plan.peakWeek}</p>
+                            <p className="v3-mono text-[10px]" style={{ color: 'var(--text-muted)' }}>Week {plan.peakWeek}</p>
                         </div>
                         <div className="v3-card p-5">
                             <p className="v3-heading-lg v3-mono mb-1">{totalQualitySessions}</p>
                             <p className="v3-label mb-1">Quality</p>
-                            <p className="v3-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Total sessions</p>
+                            <p className="v3-mono text-[10px]" style={{ color: 'var(--text-muted)' }}>Total sessions</p>
                         </div>
                         <div className="v3-card p-5">
                             <p className="v3-heading-lg v3-mono mb-1">{totalStrengthSessions}</p>
                             <p className="v3-label mb-1">Strength</p>
-                            <p className="v3-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Total sessions</p>
+                            <p className="v3-mono text-[10px]" style={{ color: 'var(--text-muted)' }}>Total sessions</p>
                         </div>
                     </div>
                 </motion.section>

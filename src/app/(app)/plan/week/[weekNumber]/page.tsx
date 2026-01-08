@@ -213,11 +213,10 @@ export default function WeekDetailPage() {
                                 <div className="flex items-start gap-4">
                                     {/* Day Label */}
                                     <div
-                                        className="w-12 h-12 rounded-xl flex items-center justify-center v3-mono shrink-0"
+                                        className="w-12 h-12 rounded-xl flex items-center justify-center v3-mono text-[11px] shrink-0"
                                         style={{
                                             background: day.isRest ? 'var(--bg-muted)' : 'var(--color-accent-subtle)',
                                             fontWeight: 600,
-                                            fontSize: '11px',
                                         }}
                                     >
                                         {day.dayName}
@@ -228,7 +227,7 @@ export default function WeekDetailPage() {
                                         {day.isRest ? (
                                             <div>
                                                 <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>Rest Day</p>
-                                                <p className="v3-mono" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>Recovery is training</p>
+                                                <p className="v3-mono text-[11px]" style={{ color: 'var(--text-subtle)' }}>Recovery is training</p>
                                             </div>
                                         ) : (
                                             <>
@@ -276,7 +275,7 @@ export default function WeekDetailPage() {
                     transition={{ duration: 0.4, delay: 0.3 }}
                 >
                     <h2 className="v3-heading-md mb-4">Week Summary</h2>
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="v3-card p-5 text-center">
                             <p className="v3-heading-lg v3-mono mb-1">{Math.round(weekPlan.totalMiles)}</p>
                             <p className="v3-label">Total Miles</p>

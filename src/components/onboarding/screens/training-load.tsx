@@ -287,7 +287,7 @@ export function LongRunDayScreen({
             />
 
             {/* Week grid - all 7 days, horizontal scroll on mobile */}
-            <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-7 gap-2 mb-4 -mx-4 px-4 md:mx-0 md:px-0 touch-pan-x" style={{ scrollbarWidth: 'none' }}>
+            <div className="mobile-scroll-x gap-2 pb-2 mb-4 -mx-4 px-4 scroll-hint-right md:mx-0 md:px-0 md:grid md:grid-cols-7 md:gap-2 md:overflow-visible">
                 {LONG_RUN_DAY_OPTIONS.map((option, index) => (
                     <button
                         key={option.value}

@@ -201,7 +201,7 @@ export function DatePicker({
                             <button
                                 type="button"
                                 onClick={goToPrevMonth}
-                                className="p-2 rounded-lg transition-colors hover:bg-white/10"
+                                className="p-2 rounded-lg transition-colors hover:bg-white/10 touch-target-sm"
                                 style={{ color: 'var(--text-muted)' }}
                             >
                                 <ChevronLeft className="w-4 h-4" />
@@ -212,7 +212,7 @@ export function DatePicker({
                             <button
                                 type="button"
                                 onClick={goToNextMonth}
-                                className="p-2 rounded-lg transition-colors hover:bg-white/10"
+                                className="p-2 rounded-lg transition-colors hover:bg-white/10 touch-target-sm"
                                 style={{ color: 'var(--text-muted)' }}
                             >
                                 <ChevronRight className="w-4 h-4" />
@@ -240,7 +240,7 @@ export function DatePicker({
                                     type="button"
                                     disabled={dayInfo.isDisabled}
                                     onClick={() => dayInfo.isCurrentMonth && !dayInfo.isDisabled && selectDate(dayInfo.day)}
-                                    className="aspect-square flex items-center justify-center text-sm rounded-lg transition-all"
+                                    className="aspect-square min-h-[44px] min-w-[44px] flex items-center justify-center text-sm rounded-lg transition-all touch-target-sm"
                                     style={{
                                         color: dayInfo.isSelected
                                             ? '#04110b'

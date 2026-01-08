@@ -17,31 +17,15 @@ import { motion } from "framer-motion";
 import { SiteHeader as AppHeader } from "@/components/ui/SiteHeader";
 import { WOD_LIBRARY, filterByEquipment } from "@/domain/plan/wod-library";
 import { WodWorkout, WodType } from "@/domain/plan/types";
+import {
+    loadWodFavoritesFromStorage,
+    parseWodFavorites,
+    saveWodFavoritesToStorage,
+} from "@/domain/plan/wod-favorites";
 import { createSupabaseBrowserClient } from "@/infrastructure/supabase";
 import type { User } from "@supabase/supabase-js";
-import { z } from "zod";
 
 const ease = [0.25, 0.46, 0.45, 0.94] as const;
-
-// Schema for favorites validation
-const FavoritesSchema = z.array(z.string());
-
-// Helper: Load favorites from localStorage with validation
-function loadFavoritesFromStorage(): string[] {
-    try {
-        const saved = localStorage.getItem(FAVORITES_KEY);
-        if (!saved) return [];
-        const parsed = FavoritesSchema.safeParse(JSON.parse(saved));
-        if (parsed.success) {
-            return parsed.data;
-        }
-        console.warn('[WodLibrary] Invalid favorites format in localStorage, resetting');
-        return [];
-    } catch (error) {
-        console.error('[WodLibrary] Failed to load favorites from localStorage:', error);
-        return [];
-    }
-}
 
 // Equipment tier definitions
 const EQUIPMENT_TIERS = {
@@ -74,8 +58,6 @@ const WOD_TYPE_LABELS: Record<WodType, { label: string; color: string }> = {
     "WOD_GLYCOLYTIC_METCON": { label: "MetCon", color: "var(--v3-red)" },
 };
 
-const FAVORITES_KEY = "long-game-wod-favorites";
-
 export default function WodLibraryPage() {
     const [equipmentTier, setEquipmentTier] = useState<EquipmentTier>("all");
     const [typeFilter, setTypeFilter] = useState<WodType | "all">("all");
@@ -105,19 +87,19 @@ export default function WodLibraryPage() {
                     // Use type assertion since column may not be in generated types yet
                     const athleteData = athlete as { wod_favorites?: string[] } | null;
                     if (athleteData?.wod_favorites) {
-                        const validated = FavoritesSchema.safeParse(athleteData.wod_favorites);
-                        if (validated.success) {
-                            setFavorites(validated.data);
+                        const validated = parseWodFavorites(athleteData.wod_favorites);
+                        if (validated) {
+                            setFavorites(validated);
                         }
                     }
                 } catch (error) {
                     // Column doesn't exist yet or other error - use localStorage fallback
                     console.warn('[WodLibrary] Supabase favorites not available, using localStorage:', error);
-                    setFavorites(loadFavoritesFromStorage());
+                    setFavorites(loadWodFavoritesFromStorage());
                 }
             } else {
                 // Guest: load from localStorage
-                setFavorites(loadFavoritesFromStorage());
+                setFavorites(loadWodFavoritesFromStorage());
             }
         });
 
@@ -147,11 +129,11 @@ export default function WodLibraryPage() {
                     .eq('user_id', user.id);
             } catch {
                 // Column doesn't exist yet - fallback to localStorage
-                localStorage.setItem(FAVORITES_KEY, JSON.stringify(next));
+                saveWodFavoritesToStorage(next);
             }
         } else {
             // Save to localStorage
-            localStorage.setItem(FAVORITES_KEY, JSON.stringify(next));
+            saveWodFavoritesToStorage(next);
         }
     }, [favorites, user]);
 
@@ -389,9 +371,9 @@ function WodCard({ wod, index, isFavorite, isExpanded, onToggleFavorite, onToggl
                             background: `${fatigueInfo.bg}15`,
                             color: fatigueInfo.bg
                         }}
-                        title={`${fatigueInfo.label} - Run interference level`}
                     >
                         {fatigueInfo.emoji} {fatigueInfo.label}
+                        <span className="sr-only">run interference level</span>
                     </span>
 
                     {/* Phase restriction (if applicable) */}

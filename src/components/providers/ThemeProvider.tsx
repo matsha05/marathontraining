@@ -9,6 +9,7 @@
  */
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { safeStorageGet, safeStorageSet } from "@/lib/safe-storage";
 
 type Theme = "light" | "dark";
 
@@ -29,7 +30,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     // Initialize theme from localStorage or default to light
     useEffect(() => {
         setMounted(true);
-        const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
+        const storedResult = safeStorageGet(STORAGE_KEY);
+        const stored = (storedResult.success ? storedResult.data : null) as Theme | null;
         if (stored === "light" || stored === "dark") {
             setThemeState(stored);
             applyTheme(stored);
@@ -49,7 +51,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     const setTheme = (newTheme: Theme) => {
         setThemeState(newTheme);
-        localStorage.setItem(STORAGE_KEY, newTheme);
+        safeStorageSet(STORAGE_KEY, newTheme);
         applyTheme(newTheme);
     };
 

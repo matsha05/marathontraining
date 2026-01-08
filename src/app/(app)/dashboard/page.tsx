@@ -532,7 +532,7 @@ export default function DashboardPage() {
                                                 background: 'var(--color-accent)',
                                                 boxShadow: '0 2px 8px rgba(25, 227, 140, 0.3)',
                                             }}
-                                            title="Mark as complete"
+                                            aria-label="Mark as complete"
                                         >
                                             <CheckIcon size={20} className="text-black" />
                                         </button>
@@ -549,7 +549,7 @@ export default function DashboardPage() {
                                             style={{
                                                 background: 'var(--color-accent)',
                                             }}
-                                            title="Click to undo"
+                                            aria-label="Undo completion"
                                         >
                                             <CheckIcon size={20} className="text-black group-hover:hidden" />
                                             <svg

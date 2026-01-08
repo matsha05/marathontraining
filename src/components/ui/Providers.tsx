@@ -10,6 +10,7 @@
 import { ToastProvider } from './Toast';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { AuthProvider } from '@/domain/auth/context';
+import { PullToRefresh } from './PullToRefresh';
 
 export function Providers({ children }: { children: React.ReactNode }) {
     return (
@@ -17,9 +18,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
             <AuthProvider>
                 <ToastProvider>
                     {children}
+                    <PullToRefresh />
                 </ToastProvider>
             </AuthProvider>
         </ThemeProvider>
     );
 }
-

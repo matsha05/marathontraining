@@ -120,10 +120,10 @@ function PlanCard({ plan, isActive, onRestore, isRestoring }: PlanCardProps) {
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="text-right hidden sm:block">
-                        <p className="v3-mono" style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                        <p className="v3-mono text-xs" style={{ color: 'var(--text-muted)' }}>
                             VDOT {plan.vdot_at_creation}
                         </p>
-                        <p className="v3-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                        <p className="v3-mono text-[10px]" style={{ color: 'var(--text-muted)' }}>
                             {timeAgo(plan.created_at)}
                         </p>
                     </div>
@@ -175,14 +175,14 @@ function PlanCard({ plan, isActive, onRestore, isRestoring }: PlanCardProps) {
                                     <p className="v3-label mb-2">{weekNumbers.length} Weeks • {workouts.length} Workouts</p>
                                     {weekNumbers.slice(0, 5).map(weekNum => (
                                         <div key={weekNum} className="flex items-center justify-between py-2 border-b" style={{ borderColor: 'var(--border-base)' }}>
-                                            <span className="v3-mono" style={{ fontSize: '12px' }}>Week {weekNum}</span>
+                                            <span className="v3-mono text-xs">Week {weekNum}</span>
                                             <span className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                                                 {workoutsByWeek[weekNum].length} workouts
                                             </span>
                                         </div>
                                     ))}
                                     {weekNumbers.length > 5 && (
-                                        <p className="v3-mono text-center py-2" style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
+                                        <p className="v3-mono text-center py-2 text-[11px]" style={{ color: 'var(--text-subtle)' }}>
                                             + {weekNumbers.length - 5} more weeks
                                         </p>
                                     )}

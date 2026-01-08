@@ -35,6 +35,9 @@ export function WeekGridPreview({
     animate = true,
     compact = false,
 }: WeekGridPreviewProps) {
+    const gapClass = compact ? 'gap-1 md:gap-1' : 'gap-2 md:gap-2';
+    const cardWidthClass = compact ? 'w-[70px]' : 'w-[84px]';
+
     const dayCards = days.map((d, i) => {
         const content = (
             <div
@@ -72,12 +75,17 @@ export function WeekGridPreview({
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05, duration: 0.4, ease }}
+                    className={`snap-center flex-shrink-0 ${cardWidthClass} md:w-auto md:flex-shrink`}
                 >
                     {content}
                 </motion.div>
             );
         }
-        return <div key={i}>{content}</div>;
+        return (
+            <div key={i} className={`snap-center flex-shrink-0 ${cardWidthClass} md:w-auto md:flex-shrink`}>
+                {content}
+            </div>
+        );
     });
 
     return (
@@ -87,7 +95,13 @@ export function WeekGridPreview({
                     {weekLabel}
                 </p>
             )}
-            <div className={`grid grid-cols-7 gap-${compact ? '1' : '2'}`}>
+            <div
+                className={`
+                    mobile-scroll-x ${gapClass} pb-2 -mx-4 px-4 scroll-hint-right
+                    md:mx-0 md:px-0 md:overflow-visible md:grid md:grid-cols-7
+                `}
+                style={{ scrollbarWidth: 'none' }}
+            >
                 {dayCards}
             </div>
         </div>

@@ -121,8 +121,8 @@ export function PhaseTimeline({ phases, currentWeek, totalWeeks }: PhaseTimeline
 
                                 {/* Week range */}
                                 <p
-                                    className="text-caption"
-                                    style={{ color: 'var(--text-subtle)', fontSize: '10px' }}
+                                    className="text-caption text-[10px]"
+                                    style={{ color: 'var(--text-subtle)' }}
                                 >
                                     {phase.startWeek === phase.endWeek
                                         ? `Wk ${phase.startWeek}`

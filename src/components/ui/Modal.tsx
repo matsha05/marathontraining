@@ -31,6 +31,8 @@ interface ModalProps {
     closeOnEsc?: boolean;
     /** Custom class for modal content */
     className?: string;
+    /** Use bottom sheet layout on mobile */
+    mobileBottomSheet?: boolean;
 }
 
 // =============================================================================
@@ -57,6 +59,7 @@ export function Modal({
     closeOnBackdrop = true,
     closeOnEsc = true,
     className = '',
+    mobileBottomSheet = true,
 }: ModalProps) {
     const modalRef = useRef<HTMLDivElement>(null);
     const previousActiveElement = useRef<Element | null>(null);
@@ -124,9 +127,12 @@ export function Modal({
     if (!isOpen) return null;
 
     // Use portal for proper stacking
+    const shellClass = mobileBottomSheet ? 'modal-shell' : '';
+    const contentClass = mobileBottomSheet ? 'modal-content' : '';
+
     return createPortal(
         <div
-            className="fixed inset-0 z-[9998] flex items-center justify-center p-4"
+            className={`fixed inset-0 z-[9998] flex items-center justify-center p-4 ${shellClass}`}
             onClick={handleBackdropClick}
             role="dialog"
             aria-modal="true"
@@ -143,7 +149,7 @@ export function Modal({
                 ref={modalRef}
                 tabIndex={-1}
                 className={`
-                    relative w-full ${SIZE_CLASSES[size]} 
+                    relative w-full ${SIZE_CLASSES[size]} ${contentClass}
                     rounded-xl shadow-2xl
                     transform transition-all duration-200
                     ${className}
@@ -153,6 +159,8 @@ export function Modal({
                     border: '1px solid var(--border-base)',
                 }}
             >
+                {mobileBottomSheet && <div className="modal-handle md:hidden" />}
+
                 {/* Header */}
                 {title && (
                     <div
@@ -168,7 +176,7 @@ export function Modal({
                         </h2>
                         <button
                             onClick={onClose}
-                            className="p-2 rounded-lg hover:bg-white/5 transition-colors"
+                            className="p-2 rounded-lg hover:bg-white/5 transition-colors touch-target-sm"
                             style={{ color: 'var(--text-muted)' }}
                             aria-label="Close modal"
                         >

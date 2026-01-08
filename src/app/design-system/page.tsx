@@ -353,7 +353,7 @@ export default function DesignSystemPlayground() {
                     <p className="v3-label mb-6">Animated Icons</p>
                     <p className="v3-body-sm mb-6">Use sparingly — 1-2 key moments per page. Click to trigger animations.</p>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                         {/* Check */}
                         <div
                             className="v3-card v3-card-interactive text-center cursor-pointer"
@@ -465,7 +465,7 @@ export default function DesignSystemPlayground() {
                 <div className="v3-container">
                     <p className="v3-label mb-6">Domain Colors</p>
 
-                    <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
                         {[
                             { name: "Running", class: "v3-running", bg: "v3-bg-running" },
                             { name: "Strength", class: "v3-strength", bg: "v3-bg-strength" },

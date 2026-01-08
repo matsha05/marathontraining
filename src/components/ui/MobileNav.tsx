@@ -21,6 +21,7 @@ import {
     Flame,
 } from 'lucide-react';
 import { AvatarDisplay } from './AvatarDisplay';
+import { useHaptics } from '@/hooks/useHaptics';
 
 interface MobileNavProps {
     user?: {
@@ -46,6 +47,7 @@ const EXPLORE_ITEMS = [
 export function MobileNav({ user, onSignOut }: MobileNavProps) {
     const [open, setOpen] = useState(false);
     const pathname = usePathname();
+    const { hapticTap } = useHaptics();
 
     const isActive = (href: string) => pathname?.startsWith(href);
 
@@ -53,6 +55,7 @@ export function MobileNav({ user, onSignOut }: MobileNavProps) {
         <Drawer.Root open={open} onOpenChange={setOpen}>
             <Drawer.Trigger asChild>
                 <button
+                    onClick={() => hapticTap()}
                     className="md:hidden flex items-center justify-center touch-target p-2 -ml-2 rounded-lg transition-colors hover:bg-[var(--bg-muted)]"
                     aria-label="Open navigation menu"
                 >
@@ -63,7 +66,7 @@ export function MobileNav({ user, onSignOut }: MobileNavProps) {
             <Drawer.Portal>
                 <Drawer.Overlay className="fixed inset-0 z-40" />
                 <Drawer.Content
-                    className="fixed inset-x-0 bottom-0 z-50 mt-24 flex h-[85vh] flex-col rounded-t-2xl safe-area-bottom"
+                    className="fixed inset-x-0 bottom-0 z-50 mt-24 flex h-[85vh] flex-col rounded-t-2xl safe-area-bottom will-change-transform"
                     style={{ background: 'var(--bg-base)' }}
                 >
                     {/* Drag Handle */}
@@ -75,7 +78,10 @@ export function MobileNav({ user, onSignOut }: MobileNavProps) {
                             Navigation
                         </Drawer.Title>
                         <button
-                            onClick={() => setOpen(false)}
+                            onClick={() => {
+                                hapticTap();
+                                setOpen(false);
+                            }}
                             className="p-2 rounded-lg touch-target-sm transition-colors hover:bg-[var(--bg-muted)]"
                             aria-label="Close navigation"
                         >

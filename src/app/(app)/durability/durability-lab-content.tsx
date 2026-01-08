@@ -424,7 +424,7 @@ function StandardModal({ standard, onClose }: { standard: Standard; onClose: () 
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-lg hover:bg-[var(--bg-elevated)]"
+                        className="p-2 rounded-lg hover:bg-[var(--bg-elevated)] touch-target-sm"
                     >
                         <X size={20} style={{ color: 'var(--text-muted)' }} />
                     </button>
@@ -507,7 +507,7 @@ function StandardModal({ standard, onClose }: { standard: Standard; onClose: () 
 
 function StandardsGrid({ onSelectStandard }: { onSelectStandard: (standard: Standard) => void }) {
     return (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {TWELVE_STANDARDS.map((standard, index) => (
                 <motion.button
                     key={standard.id}
@@ -516,6 +516,7 @@ function StandardsGrid({ onSelectStandard }: { onSelectStandard: (standard: Stan
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.05 }}
                     whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => onSelectStandard(standard)}
                     className="p-4 rounded-xl text-center text-left cursor-pointer transition-all group"
                     style={{
@@ -629,7 +630,7 @@ function PrescriptionExplainer() {
     ];
 
     return (
-        <div className="grid md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             {steps.map((step, index) => (
                 <motion.div
                     key={index}
@@ -742,7 +743,7 @@ export function DurabilityLabContent({ onStartAssessment }: {
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {DURABILITY_COACHES.map((coach) => (
                             <CoachCard
                                 key={coach.id}
@@ -789,7 +790,7 @@ export function DurabilityLabContent({ onStartAssessment }: {
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <AssessmentCard
                             type="quick"
                             title="Quick Check"

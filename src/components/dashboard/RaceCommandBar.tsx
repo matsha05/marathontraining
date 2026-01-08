@@ -109,7 +109,7 @@ export function RaceCommandBar({
                 </div>
 
                 {/* Metrics Grid */}
-                <div className="grid grid-cols-5 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                     {/* Weeks to Race */}
                     <div className="text-center">
                         <p

@@ -224,9 +224,19 @@ export default function RegeneratePlanPage() {
     return (
         <div className="min-h-screen" style={{ background: 'var(--bg-base)' }}>
             {/* Header with progress */}
-            <header className="fixed top-0 left-0 right-0 z-50 px-4 py-3" style={{ background: 'var(--bg-base)' }}>
+            <header
+                className="fixed top-0 left-0 right-0 z-50 px-4 pb-3"
+                style={{
+                    background: 'var(--bg-base)',
+                    paddingTop: 'calc(env(safe-area-inset-top, 0px) + 0.75rem)',
+                }}
+            >
                 <div className="max-w-lg mx-auto flex items-center gap-4">
-                    <button onClick={goBack} className="p-2 -ml-2 rounded-lg hover:bg-white/5">
+                    <button
+                        onClick={goBack}
+                        className="p-2 -ml-2 rounded-lg hover:bg-white/5 touch-target-sm"
+                        aria-label="Go back"
+                    >
                         <ArrowLeft size={20} style={{ color: 'var(--text-muted)' }} />
                     </button>
                     <div className="flex-1">

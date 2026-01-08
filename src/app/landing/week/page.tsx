@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -18,19 +19,23 @@ export default function WeekLanding() {
     useLandingNav("/landing/week");
 
     return (
-        <div className="min-h-screen bg-[#08080a] text-white">
+        <div className="min-h-screen-safe bg-[#08080a] text-white">
             {/* Title Badge */}
             <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1, duration: 0.5 }}
-                className="fixed top-4 left-1/2 -translate-x-1/2 z-[60] px-3 py-1 bg-white/5 border border-white/10 rounded-full"
+                className="fixed left-1/2 -translate-x-1/2 z-[60] px-3 py-1 bg-white/5 border border-white/10 rounded-full"
+                style={{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }}
             >
                 <span className="text-[10px] text-white/40 uppercase tracking-widest font-mono">Week</span>
             </motion.div>
 
             {/* Nav */}
-            <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-5">
+            <nav
+                className="fixed top-0 left-0 right-0 z-50 px-6 pb-5"
+                style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 1.25rem)' }}
+            >
                 <div className="max-w-5xl mx-auto flex items-center justify-between">
                     <Link href="/showcase" className="text-xs text-white/20 hover:text-white/40 transition-colors">
                         ←
@@ -87,7 +92,10 @@ export default function WeekLanding() {
                         <p className="text-xs text-white/20 mb-4 font-mono">
                             Week 8 · Build Phase · 42 miles
                         </p>
-                        <div className="grid grid-cols-7 gap-1">
+                        <div
+                            className="mobile-scroll-x gap-2 pb-2 -mx-4 px-4 scroll-hint-right md:mx-0 md:px-0 md:grid md:grid-cols-7 md:gap-1 md:overflow-visible"
+                            style={{ '--scroll-hint-color': '#08080a' } as CSSProperties }
+                        >
                             {[
                                 { day: "M", type: "run", label: "5mi Easy", sub: "8:32/mi", strength: true },
                                 { day: "T", type: "run", label: "6×800m", sub: "VO2", strength: false },
@@ -107,6 +115,7 @@ export default function WeekLanding() {
                                         hover:bg-white/[0.06] hover:scale-[1.02]
                                         ${d.type === "rest" ? "bg-white/[0.02]" : "bg-white/[0.04]"}
                                         ${d.type === "long" ? "bg-[#19e38c]/10 hover:bg-[#19e38c]/15" : ""}
+                                        snap-center flex-shrink-0 w-[90px] md:w-auto md:flex-shrink
                                     `}
                                 >
                                     <p className="text-[10px] text-white/30 mb-3">{d.day}</p>
@@ -180,9 +189,12 @@ export default function WeekLanding() {
                         because the cumulative week matters more than any single run.
                     </p>
                     <div className="p-4 rounded-lg bg-white/[0.02] border border-white/5">
-                        <div className="grid grid-cols-7 gap-2 text-center">
+                        <div
+                            className="mobile-scroll-x gap-2 pb-2 -mx-4 px-4 scroll-hint-right md:mx-0 md:px-0 md:grid md:grid-cols-7 md:gap-2 md:overflow-visible text-center"
+                            style={{ '--scroll-hint-color': '#08080a' } as CSSProperties }
+                        >
                             {["Easy", "Speed", "Rest", "Tempo", "Easy", "Easy", "Long"].map((day, i) => (
-                                <div key={i}>
+                                <div key={i} className="snap-center flex-shrink-0 w-[72px] md:w-auto md:flex-shrink">
                                     <p className="text-[10px] text-white/30 mb-1">{["M", "T", "W", "T", "F", "S", "S"][i]}</p>
                                     <p className={`text-xs ${day === "Rest" ? "text-white/20" : day === "Long" ? "text-[#3a6bff]" : "text-white/50"}`}>
                                         {day}
@@ -207,7 +219,7 @@ export default function WeekLanding() {
                         The most trusted name in marathon training. Gradual progression, more rest days,
                         longer long runs (20+ miles). Programs for every level, from first-timer to PR-chaser.
                     </p>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div className="p-4 rounded-lg bg-white/[0.02] border border-white/5 text-center">
                             <p className="text-lg font-light text-white/60">Novice</p>
                             <p className="text-[10px] text-white/30 mt-1">First marathon</p>
@@ -291,7 +303,7 @@ export default function WeekLanding() {
                         Bridges the gap between what coaches have known works and what scientists have proven.
                         4:01 high school miler, Nike Oregon Project assistant, evidence-based coaching.
                     </p>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="p-4 rounded-lg bg-white/[0.02] border border-white/5 text-center">
                             <p className="text-sm text-white/40 mb-1">Philosophy</p>
                             <p className="text-white/60">Coach the person</p>
@@ -377,7 +389,7 @@ export default function WeekLanding() {
                         Running Rewired. 12 movement standards that address the most common limiters in runners.
                         Pre-hab over rehab. Build a body that can handle the training load, not just survive it.
                     </p>
-                    <div className="grid grid-cols-4 gap-2">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                         {Array.from({ length: 12 }).map((_, i) => (
                             <div key={i} className="h-8 rounded-lg bg-white/[0.03] flex items-center justify-center">
                                 <span className="text-[10px] text-white/30">{i + 1}</span>
@@ -400,7 +412,7 @@ export default function WeekLanding() {
                         Becoming a Supple Leopard. Systematic mobility work that restores range of motion,
                         tissue quality, and motor control. The foundation that lets you train hard without breaking down.
                     </p>
-                    <div className="flex gap-4">
+                    <div className="flex flex-col sm:flex-row gap-4">
                         <div className="flex-1 p-4 rounded-lg bg-white/[0.02] border border-white/5 text-center">
                             <p className="text-sm text-white/40 mb-1">Before</p>
                             <p className="text-white/60">Prep & Activation</p>
@@ -434,7 +446,7 @@ export default function WeekLanding() {
                         Heavy strength improves running economy. Research shows 4×4 half-squats at 4RM, 3x/week
                         improves economy by 5%. Scheduled strategically — never before key sessions.
                     </p>
-                    <div className="flex gap-4">
+                    <div className="flex flex-col sm:flex-row gap-4">
                         <div className="flex-1 p-4 rounded-lg bg-white/[0.02] border border-white/5 text-center">
                             <p className="text-2xl font-light text-white/60">4×4</p>
                             <p className="text-xs text-white/30 mt-1">protocol</p>
@@ -459,7 +471,7 @@ export default function WeekLanding() {
                         24 runner-friendly WODs with Rx/Scaled/Beginner tiers. Phase-appropriate scheduling:
                         heavy in base, maintain in peak, protect in taper. We never schedule leg-heavy work before your long run.
                     </p>
-                    <div className="grid grid-cols-4 gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                         <div className="p-3 rounded-lg bg-white/[0.02] border border-white/5 text-center">
                             <p className="text-sm text-white/60">Base</p>
                             <p className="text-[10px] text-white/30 mt-1">Build strength</p>
@@ -502,7 +514,7 @@ export default function WeekLanding() {
                         The method behind the Ingebrigtsen brothers (Olympic and World Champions). Double threshold:
                         two lactate-guided sessions in one day. Precise intensity via lactate monitoring at 2.5-3.5 mmol/L.
                     </p>
-                    <div className="flex gap-4">
+                    <div className="flex flex-col sm:flex-row gap-4">
                         <div className="flex-1 p-4 rounded-lg bg-white/[0.02] border border-white/5 text-center">
                             <p className="text-2xl font-light text-white/60">2×</p>
                             <p className="text-xs text-white/30 mt-1">threshold/day</p>

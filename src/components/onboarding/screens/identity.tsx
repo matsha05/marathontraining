@@ -87,7 +87,7 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
                     <p className="text-xs mb-4 font-mono" style={{ color: 'var(--text-subtle)' }}>
                         What you'll get · Calibrated to your fitness
                     </p>
-                    <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-7 gap-2 -mx-4 md:mx-0 px-4 md:px-0 touch-pan-x" style={{ scrollbarWidth: 'none' }}>
+                    <div className="mobile-scroll-x gap-2 pb-2 -mx-4 px-4 scroll-hint-right md:mx-0 md:px-0 md:grid md:grid-cols-7 md:gap-2 md:overflow-visible">
                         {[
                             { day: "M", type: "run", label: "Easy", sub: "?" },
                             { day: "T", type: "run", label: "Speed", sub: "?" },
@@ -149,8 +149,8 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1.2, duration: 0.5 }}
-                    className="v3-mono mt-8"
-                    style={{ fontSize: '11px', color: 'var(--text-subtle)' }}
+                    className="v3-mono mt-8 text-[11px]"
+                    style={{ color: 'var(--text-subtle)' }}
                 >
                     Takes about 3 minutes
                 </motion.p>
@@ -287,6 +287,7 @@ export function NameScreen({ name, onNameChange, onContinue, onBack }: NameScree
                 onChange={onNameChange}
                 placeholder="First name"
                 autoFocus
+                autoComplete="given-name"
             />
 
             <ContinueButton

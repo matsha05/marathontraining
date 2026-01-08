@@ -283,6 +283,7 @@ export default function SettingsPage() {
                                     onChange={(e) => setProfile({ ...profile, name: e.target.value })}
                                     className="input"
                                     placeholder="Your name"
+                                    autoComplete="name"
                                 />
                             </div>
                             <div>
@@ -296,6 +297,7 @@ export default function SettingsPage() {
                                     style={{
                                         colorScheme: 'dark',
                                     }}
+                                    autoComplete="bday"
                                 />
                                 {profile.dateOfBirth && (
                                     <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
@@ -429,7 +431,7 @@ export default function SettingsPage() {
 
                             {/* Plan stats grid */}
                             <div
-                                className="grid grid-cols-3 gap-3 py-4"
+                                className="grid grid-cols-1 sm:grid-cols-3 gap-3 py-4"
                                 style={{ borderTop: '1px solid var(--border-base)', borderBottom: '1px solid var(--border-base)' }}
                             >
                                 <div className="text-center">
@@ -794,7 +796,9 @@ export default function SettingsPage() {
                                     </div>
                                     <h3 className="text-heading-sm">Delete Account</h3>
                                 </div>
-                                <button onClick={() => setShowDeleteModal(false)} className="p-1"><X size={20} style={{ color: 'var(--text-muted)' }} /></button>
+                                <button onClick={() => setShowDeleteModal(false)} className="p-1 touch-target-sm" aria-label="Close delete account dialog">
+                                    <X size={20} style={{ color: 'var(--text-muted)' }} />
+                                </button>
                             </div>
                             <p className="text-body-sm mb-4" style={{ color: 'var(--text-muted)' }}>
                                 This permanently deletes all your data including plans, workouts, and preferences.

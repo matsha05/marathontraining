@@ -164,8 +164,30 @@ export function WeeklyCalendar({
         }
     }, [isMobile, days]);
 
+    // Handle swipe gesture for week navigation
+    const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: { offset: { x: number }; velocity: { x: number } }) => {
+        const threshold = 50;
+        const velocityThreshold = 500;
+
+        // Swipe left (next week) - only if we have navigation
+        if ((info.offset.x < -threshold || info.velocity.x < -velocityThreshold) && onNextWeek && currentWeek && totalWeeks && currentWeek < totalWeeks) {
+            onNextWeek();
+        }
+        // Swipe right (prev week)
+        if ((info.offset.x > threshold || info.velocity.x > velocityThreshold) && onPrevWeek && currentWeek && currentWeek > 1) {
+            onPrevWeek();
+        }
+    };
+
     return (
-        <div className="v3-card p-4 md:p-5">
+        <motion.div
+            className="v3-card p-4 md:p-5 will-change-transform"
+            drag={hasNavigation && isMobile ? "x" : false}
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.1}
+            onDragEnd={handleDragEnd}
+            whileTap={hasNavigation && isMobile ? { cursor: "grabbing" } : undefined}
+        >
             {/* Header with optional week navigation */}
             <div className="flex items-center justify-between mb-4">
                 {weekLabel && (
@@ -179,7 +201,7 @@ export function WeeklyCalendar({
                         <button
                             onClick={onPrevWeek}
                             disabled={currentWeek <= 1}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
+                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all touch-target"
                             style={{
                                 background: currentWeek > 1 ? 'var(--bg-muted)' : 'transparent',
                                 color: currentWeek > 1 ? 'var(--text-base)' : 'var(--text-subtle)',
@@ -198,7 +220,7 @@ export function WeeklyCalendar({
                         <button
                             onClick={onNextWeek}
                             disabled={currentWeek >= totalWeeks}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
+                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all touch-target"
                             style={{
                                 background: currentWeek < totalWeeks ? 'var(--bg-muted)' : 'transparent',
                                 color: currentWeek < totalWeeks ? 'var(--text-base)' : 'var(--text-subtle)',
@@ -215,11 +237,17 @@ export function WeeklyCalendar({
                 )}
             </div>
 
+            {/* Swipe hint for mobile (shows briefly on first load) */}
+            {hasNavigation && isMobile && (
+                <p className="text-xs text-center mb-2 opacity-60" style={{ color: 'var(--text-subtle)' }}>
+                    ← Swipe to navigate weeks →
+                </p>
+            )}
+
             {/* Mobile: Horizontal scroll with snap | Desktop: 7-col grid */}
             <div
                 ref={scrollRef}
-                className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-7 gap-2 pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:overflow-visible scroll-smooth touch-pan-x"
-                style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
+                className="mobile-scroll-x gap-2 pb-2 -mx-4 px-4 scroll-hint-right md:mx-0 md:px-0 md:grid md:grid-cols-7 md:gap-2 md:overflow-visible scroll-smooth"
             >
                 {days.map((day, index) => {
                     const isClickable = day.status !== 'rest' && (day.workoutId || day.date || onDayClick);
@@ -344,6 +372,7 @@ export function WeeklyCalendar({
                                 delay: 0.05 + index * 0.04,
                                 ease: [0.25, 0.46, 0.45, 0.94]
                             }}
+                            whileTap={{ scale: 0.98 }}
                             className="text-center p-3 rounded-xl transition-all hover:scale-[1.03] hover:shadow-md h-full"
                             style={{ ...cardStyles, minHeight: '100px' }}
                         >
@@ -352,7 +381,7 @@ export function WeeklyCalendar({
                     );
                 })}
             </div>
-        </div>
+        </motion.div >
     );
 }
 

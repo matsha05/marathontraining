@@ -313,14 +313,16 @@ export function IntensityBadge({ zone, showTooltip = true }: IntensityBadgeProps
 
     return (
         <span
-            className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono font-semibold"
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono font-semibold tooltip-trigger"
             style={{
                 background: `${color}20`,
                 color: color,
             }}
-            title={showTooltip ? zoneNames[zone] : undefined}
+            data-tooltip={showTooltip ? zoneNames[zone] : undefined}
+            aria-label={zoneNames[zone]}
         >
             {zone}
+            {showTooltip && <span className="ml-1 text-[10px] md:hidden">{zoneNames[zone]}</span>}
         </span>
     );
 }

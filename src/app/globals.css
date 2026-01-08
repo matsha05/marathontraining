@@ -144,7 +144,10 @@
   color-scheme: light;
 
   /* Header sizing for offsets */
-  --header-height: 64px;
+  --header-height: calc(64px + env(safe-area-inset-top, 0px));
+
+  /* Scroll hint base color */
+  --scroll-hint-color: var(--bg-base);
 
   /* Domain Tint Tokens (Light Mode) */
   --domain-running-tint: color-mix(in srgb, var(--color-running) 12%, transparent);
@@ -2682,6 +2685,14 @@ a:focus-visible {
   height: -webkit-fill-available;
 }
 
+@media (max-width: 768px) {
+  .min-h-screen {
+    min-height: 100vh;
+    min-height: 100dvh;
+    min-height: -webkit-fill-available;
+  }
+}
+
 /* -----------------------------------------------------------------------------
    Safe Area Insets - For notch/Dynamic Island devices
    ----------------------------------------------------------------------------- */
@@ -2728,17 +2739,16 @@ a:focus-visible {
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
   scrollbar-width: none;
   overscroll-behavior-x: contain;
-  gap: 0.75rem;
-  padding-bottom: 0.5rem;
 }
 
 .mobile-scroll-x::-webkit-scrollbar {
   display: none;
 }
 
-.mobile-scroll-x > * {
+.mobile-scroll-x>* {
   scroll-snap-align: start;
   flex-shrink: 0;
 }
@@ -2756,7 +2766,13 @@ a:focus-visible {
 .scroll-snap-x {
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
   overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.scroll-snap-x::-webkit-scrollbar {
+  display: none;
 }
 
 /* -----------------------------------------------------------------------------
@@ -2773,7 +2789,7 @@ a:focus-visible {
   top: 0;
   bottom: 0;
   width: 48px;
-  background: linear-gradient(to right, transparent, var(--bg-base));
+  background: linear-gradient(to right, transparent, var(--scroll-hint-color, var(--bg-base)));
   pointer-events: none;
   z-index: 1;
 }
@@ -2789,7 +2805,7 @@ a:focus-visible {
   top: 0;
   bottom: 0;
   width: 48px;
-  background: linear-gradient(to left, transparent, var(--bg-base));
+  background: linear-gradient(to left, transparent, var(--scroll-hint-color, var(--bg-base)));
   pointer-events: none;
   z-index: 1;
 }
@@ -2800,11 +2816,13 @@ a:focus-visible {
 .touch-target {
   min-height: 48px;
   min-width: 48px;
+  touch-action: manipulation;
 }
 
 .touch-target-sm {
   min-height: 44px;
   min-width: 44px;
+  touch-action: manipulation;
 }
 
 /* -----------------------------------------------------------------------------
@@ -2817,6 +2835,43 @@ html {
 /* Remove tap highlight where unwanted */
 .no-tap-highlight {
   -webkit-tap-highlight-color: transparent;
+}
+
+/* -----------------------------------------------------------------------------
+   Tooltip (non-native)
+   ----------------------------------------------------------------------------- */
+.tooltip-trigger {
+  position: relative;
+  cursor: help;
+}
+
+.tooltip-trigger::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  transform: translateX(-50%) translateY(4px);
+  padding: 0.35rem 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  border-radius: 0.5rem;
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  border: 1px solid var(--border-base);
+  box-shadow: var(--shadow-sm);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease, transform 120ms ease;
+  z-index: 50;
+}
+
+@media (hover: hover) {
+  .tooltip-trigger:hover::after,
+  .tooltip-trigger:focus-visible::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 /* -----------------------------------------------------------------------------
@@ -2849,21 +2904,23 @@ html {
    Typography Floor - Never below 12px on mobile
    ----------------------------------------------------------------------------- */
 @media (max-width: 768px) {
+
   /* Ensure minimum readability */
   .v3-text-xs,
   .text-\[9px\],
   .text-\[10px\],
   .text-\[11px\] {
-    font-size: 0.75rem !important; /* 12px floor */
+    font-size: 0.75rem !important;
+    /* 12px floor */
   }
-  
+
   /* Small button fix */
   .v3-btn-sm {
     font-size: 0.75rem;
     min-height: 2.5rem;
     padding: 0.5rem 0.875rem;
   }
-  
+
   /* Ensure body text is readable */
   .v3-body-xs {
     font-size: 0.75rem;
@@ -2893,14 +2950,18 @@ html {
 /* -----------------------------------------------------------------------------
    Text Wrap Balance - Premium heading typography
    ----------------------------------------------------------------------------- */
-h1, h2, h3,
+h1,
+h2,
+h3,
 .v3-heading-xl,
 .v3-heading-lg,
 .v3-heading-md {
   text-wrap: balance;
 }
 
-p, .v3-body, .v3-body-md {
+p,
+.v3-body,
+.v3-body-md {
   text-wrap: pretty;
 }
 
@@ -2908,16 +2969,17 @@ p, .v3-body, .v3-body-md {
    Mobile-specific Card Adjustments
    ----------------------------------------------------------------------------- */
 @media (max-width: 768px) {
+
   /* Increase card padding for touch */
   .v3-card {
     padding: 1rem;
   }
-  
+
   /* Reduce section spacing */
   .v3-section {
     padding: 2rem 1rem;
   }
-  
+
   .v3-container {
     padding-left: 1rem;
     padding-right: 1rem;
@@ -2933,11 +2995,81 @@ p, .v3-body, .v3-body-md {
 }
 
 /* -----------------------------------------------------------------------------
+   Will-Change Hints - Opt-in for smoothness
+   ----------------------------------------------------------------------------- */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+/* -----------------------------------------------------------------------------
+   Avatar Grid Columns
+   ----------------------------------------------------------------------------- */
+.avatar-grid {
+  grid-template-columns: repeat(var(--avatar-columns, 6), minmax(0, 1fr));
+}
+
+@media (max-width: 768px) {
+  .avatar-grid {
+    grid-template-columns: repeat(var(--avatar-columns-mobile, 3), minmax(0, 1fr));
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Scroll Reveal (mobile-only)
+   ----------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .scroll-reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 320ms ease, transform 320ms ease;
+  }
+
+  .scroll-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal {
+    transition: none;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Container Query Utilities
+   ----------------------------------------------------------------------------- */
+.container-inline {
+  container-type: inline-size;
+}
+
+@container (max-width: 560px) {
+  .cq-grid-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cq-grid-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (max-width: 420px) {
+  .cq-grid-4,
+  .cq-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* -----------------------------------------------------------------------------
    Pull-to-Refresh Indicator Styling
    ----------------------------------------------------------------------------- */
 .ptr-indicator {
   position: fixed;
-  top: 0;
+  top: env(safe-area-inset-top, 0);
   left: 50%;
   transform: translateX(-50%);
   z-index: 100;
@@ -2960,9 +3092,37 @@ p, .v3-body, .v3-body-md {
 }
 
 /* -----------------------------------------------------------------------------
+   Modal: Bottom sheet on mobile
+   ----------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .modal-shell {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal-content {
+    width: 100%;
+    max-width: 100%;
+    max-height: 92dvh;
+    border-radius: 20px 20px 0 0;
+    overflow-y: auto;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  .modal-handle {
+    width: 44px;
+    height: 4px;
+    border-radius: 9999px;
+    margin: 12px auto 4px;
+    background: var(--border-base);
+  }
+}
+
+/* -----------------------------------------------------------------------------
    iOS Input Zoom Prevention
    ----------------------------------------------------------------------------- */
 @media (max-width: 768px) {
+
   input[type="text"],
   input[type="email"],
   input[type="number"],
@@ -2971,6 +3131,94 @@ p, .v3-body, .v3-body-md {
   input[type="password"],
   select,
   textarea {
-    font-size: 16px !important; /* Prevents iOS zoom */
+    font-size: 16px !important;
+    /* Prevents iOS zoom */
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   View Transitions API - Smooth page navigation
+   Supported in Chrome 111+, Safari 18+
+   ----------------------------------------------------------------------------- */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: fade-out 0.2s ease-out forwards;
+}
+
+::view-transition-new(root) {
+  animation: fade-in 0.2s ease-in forwards;
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Named view transitions for specific elements */
+.view-transition-card {
+  view-transition-name: card;
+}
+
+.view-transition-header {
+  view-transition-name: header;
+}
+
+/* Slide transitions for navigation */
+::view-transition-old(slide-left) {
+  animation: slide-out-left 0.25s ease-out forwards;
+}
+
+::view-transition-new(slide-left) {
+  animation: slide-in-right 0.25s ease-out forwards;
+}
+
+@keyframes slide-out-left {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateX(-30px);
+    opacity: 0;
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(30px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Reduced motion respect */
+@media (prefers-reduced-motion: reduce) {
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
   }
 }

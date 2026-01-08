@@ -98,7 +98,7 @@ export function DurabilityStatusCard({
             </div>
 
             {/* Status Grid */}
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 {/* Quick Check Status */}
                 <div className="p-3 rounded-lg" style={{ background: 'var(--bg-elevated)' }}>
                     <div className="flex items-center gap-2 mb-1">

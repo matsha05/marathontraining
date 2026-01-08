@@ -14,6 +14,7 @@
  * - Proper ARIA labels
  */
 
+import type { CSSProperties } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
@@ -47,6 +48,10 @@ export function AvatarPicker({
 }: AvatarPickerProps) {
     const selectedId = value || DEFAULT_AVATAR_ID;
     const config = sizeConfig[size];
+    const gridStyle = {
+        '--avatar-columns': columns,
+        '--avatar-columns-mobile': Math.min(columns, 3),
+    } as CSSProperties;
 
     return (
         <div>
@@ -59,8 +64,8 @@ export function AvatarPicker({
                 </label>
             )}
             <div
-                className={`grid ${config.gap}`}
-                style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
+                className={`grid avatar-grid ${config.gap}`}
+                style={gridStyle}
                 role="radiogroup"
                 aria-label="Select avatar"
             >
@@ -138,11 +143,10 @@ export function AvatarPicker({
                             {/* Keyboard shortcut badge (only for large/onboarding) */}
                             {size === 'lg' && (
                                 <div
-                                    className="absolute bottom-2 left-2 w-5 h-5 rounded font-mono flex items-center justify-center"
+                                    className="absolute bottom-2 left-2 w-5 h-5 rounded font-mono flex items-center justify-center text-[10px]"
                                     style={{
                                         background: 'var(--bg-overlay)',
                                         color: 'var(--text-subtle)',
-                                        fontSize: '10px',
                                     }}
                                     aria-hidden="true"
                                 >

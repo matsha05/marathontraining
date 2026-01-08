@@ -7,10 +7,12 @@
  * Week aesthetic: Dark, atmospheric, light typography
  */
 
-import { ReactNode, useEffect, useCallback } from 'react';
+import { ReactNode, useEffect, useCallback, useState, useId, useRef } from 'react';
 import { ChevronLeft, ChevronDown, Info, ExternalLink, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CoachTooltip } from '@/domain/onboarding/types';
+import { useIsMobile } from '@/hooks/useIsMobile';
+import { useHaptics } from '@/hooks/useHaptics';
 
 // =============================================================================
 // PROGRESS BAR
@@ -22,7 +24,7 @@ interface ProgressBarProps {
 
 export function ProgressBar({ progress }: ProgressBarProps) {
     return (
-        <div className="fixed top-0 left-0 right-0 h-1 z-50" style={{ background: 'var(--bg-elevated)' }}>
+        <div className="fixed top-0 left-0 right-0 h-1 z-50 safe-area-top" style={{ background: 'var(--bg-elevated)' }}>
             <motion.div
                 className="h-full"
                 style={{ background: 'var(--color-accent)' }}
@@ -62,7 +64,7 @@ export function QuestionScreen({
                 damping: 30,
                 mass: 0.8,
             }}
-            className={`v3-root min-h-screen flex flex-col items-center justify-center px-6 py-12 ${className}`}
+            className={`v3-root min-h-screen-safe flex flex-col items-center justify-center px-6 py-12 ${className}`}
         >
             <div className="w-full max-w-lg">
                 {showBack && onBack && (
@@ -71,7 +73,8 @@ export function QuestionScreen({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.1, duration: 0.2 }}
-                        className="flex items-center gap-1 mb-8 transition-colors group"
+                        whileTap={{ scale: 0.98 }}
+                        className="flex items-center gap-1 mb-8 transition-colors group touch-target-sm"
                         style={{ color: 'var(--text-muted)' }}
                     >
                         <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
@@ -115,20 +118,54 @@ interface TooltipExpanderProps {
 }
 
 export function TooltipExpander({ tooltip }: TooltipExpanderProps) {
+    const tooltipId = useId();
+    const [isOpen, setIsOpen] = useState(false);
+    const isMobile = useIsMobile();
+    const wrapperRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!isMobile) {
+            setIsOpen(false);
+        }
+    }, [isMobile]);
+
+    useEffect(() => {
+        if (!isMobile || !isOpen) return;
+
+        const handleOutside = (event: MouseEvent) => {
+            if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleOutside);
+        return () => document.removeEventListener('mousedown', handleOutside);
+    }, [isMobile, isOpen]);
+
+    const tooltipVisibility = isMobile
+        ? (isOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none')
+        : 'opacity-0 invisible group-hover:opacity-100 group-hover:visible';
+
     return (
-        <div className="mt-4 relative group">
+        <div ref={wrapperRef} className="mt-4 relative group">
             {/* Trigger - info icon with label */}
-            <div
-                className="inline-flex items-center gap-2 v3-body-sm cursor-help p-2 rounded-lg transition-colors"
+            <button
+                type="button"
+                onClick={() => isMobile && setIsOpen((prev) => !prev)}
+                className="inline-flex items-center gap-2 v3-body-sm cursor-help p-2 rounded-lg transition-colors touch-target-sm"
                 style={{ color: 'var(--text-subtle)' }}
+                aria-expanded={isMobile ? isOpen : undefined}
+                aria-controls={tooltipId}
             >
                 <Info className="w-4 h-4" />
                 <span>{tooltip.title}</span>
-            </div>
+            </button>
 
             {/* Tooltip content - shown on hover */}
             <div
-                className="absolute left-0 top-full mt-2 z-50 w-80 p-4 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
+                id={tooltipId}
+                role="tooltip"
+                className={`absolute left-0 top-full mt-2 z-50 w-80 p-4 rounded-xl shadow-lg transition-all duration-200 ${tooltipVisibility}`}
                 style={{
                     background: 'var(--bg-elevated)',
                     border: '1px solid var(--border-emphasis)',
@@ -179,9 +216,17 @@ export function OptionButton({
     recommended,
     disabled,
 }: OptionButtonProps) {
+    const { hapticTap } = useHaptics();
+
+    const handleClick = () => {
+        if (disabled) return;
+        hapticTap();
+        onClick();
+    };
+
     return (
         <motion.button
-            onClick={onClick}
+            onClick={handleClick}
             disabled={disabled}
             whileHover={!disabled && !selected ? {
                 scale: 1.02,
@@ -205,9 +250,8 @@ export function OptionButton({
             <div className="flex items-start gap-3">
                 {shortcut && (
                     <span
-                        className="flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center v3-mono"
+                        className="flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center v3-mono text-[11px]"
                         style={{
-                            fontSize: '11px',
                             background: selected ? 'rgba(0,0,0,0.2)' : 'var(--v3-bg-base)',
                             color: selected ? 'var(--v3-bg-base)' : 'var(--text-muted)',
                         }}
@@ -225,9 +269,8 @@ export function OptionButton({
                         <span className="v3-body-md" style={{ fontWeight: 500 }}>{label}</span>
                         {recommended && !selected && (
                             <span
-                                className="v3-mono px-2 py-0.5 rounded-full"
+                                className="v3-mono px-2 py-0.5 rounded-full text-[10px]"
                                 style={{
-                                    fontSize: '10px',
                                     background: 'var(--color-accent-subtle)',
                                     color: 'var(--color-accent)'
                                 }}
@@ -284,6 +327,8 @@ interface TextInputProps {
     placeholder?: string;
     type?: 'text' | 'number' | 'date';
     autoFocus?: boolean;
+    autoComplete?: string;
+    inputMode?: 'none' | 'text' | 'tel' | 'url' | 'email' | 'numeric' | 'decimal' | 'search';
     suffix?: string;
     min?: number;
     max?: number;
@@ -297,12 +342,16 @@ export function TextInput({
     placeholder,
     type = 'text',
     autoFocus,
+    autoComplete,
+    inputMode,
     suffix,
     min,
     max,
     step,
     error,
 }: TextInputProps) {
+    const resolvedInputMode = inputMode ?? (type === 'number' ? 'decimal' : undefined);
+
     return (
         <div>
             <div className="flex items-center gap-3">
@@ -312,6 +361,8 @@ export function TextInput({
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={placeholder}
                     autoFocus={autoFocus}
+                    autoComplete={autoComplete}
+                    inputMode={resolvedInputMode}
                     min={min}
                     max={max}
                     step={step}
@@ -362,6 +413,7 @@ export function TimeInput({
                     <>
                         <input
                             type="number"
+                            inputMode="numeric"
                             value={hours ?? ''}
                             onChange={(e) => onHoursChange(e.target.value ? parseInt(e.target.value) : null)}
                             placeholder="H"
@@ -375,6 +427,7 @@ export function TimeInput({
                 )}
                 <input
                     type="number"
+                    inputMode="numeric"
                     value={minutes ?? ''}
                     onChange={(e) => onMinutesChange(e.target.value ? parseInt(e.target.value) : null)}
                     placeholder="MM"
@@ -386,6 +439,7 @@ export function TimeInput({
                 <span className="v3-heading-md" style={{ color: 'var(--text-muted)' }}>:</span>
                 <input
                     type="number"
+                    inputMode="numeric"
                     value={seconds ?? ''}
                     onChange={(e) => onSecondsChange(e.target.value ? parseInt(e.target.value) : null)}
                     placeholder="SS"
@@ -419,9 +473,16 @@ export function ContinueButton({
     loading,
     label = 'Continue'
 }: ContinueButtonProps) {
+    const { hapticTap } = useHaptics();
+
     return (
         <button
-            onClick={onClick}
+            onClick={() => {
+                if (!disabled && !loading) {
+                    hapticTap();
+                }
+                onClick();
+            }}
             disabled={disabled || loading}
             className="v3-btn v3-btn-primary v3-btn-lg w-full mt-8"
             style={{
@@ -437,7 +498,7 @@ export function ContinueButton({
             ) : (
                 <span className="flex items-center justify-center gap-2">
                     <span>{label}</span>
-                    <span className="v3-mono" style={{ fontSize: '11px', opacity: 0.7 }}>↵</span>
+                    <span className="v3-mono text-[11px]" style={{ opacity: 0.7 }}>↵</span>
                 </span>
             )}
         </button>
@@ -570,9 +631,8 @@ export function CollapsibleInstructions({ title, steps, tips }: CollapsibleInstr
                     {steps.map((step, i) => (
                         <li key={i} className="flex gap-3 v3-body-sm" style={{ color: 'var(--text-muted)' }}>
                             <span
-                                className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center v3-mono"
+                                className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center v3-mono text-[10px]"
                                 style={{
-                                    fontSize: '10px',
                                     background: 'var(--color-accent-subtle)',
                                     color: 'var(--color-accent)',
                                     fontWeight: 500,

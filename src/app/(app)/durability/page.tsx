@@ -240,7 +240,7 @@ export default function DurabilityPage() {
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-3 gap-3">
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                         <button
                                             onClick={() => handleQuickResult('pass')}
                                             className="v3-btn v3-btn-secondary py-4"
@@ -454,7 +454,7 @@ export default function DurabilityPage() {
                             </div>
 
                             {/* Summary stats */}
-                            <div className="grid grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <div className="v3-card p-4 text-center">
                                     <p className="text-2xl font-mono" style={{ color: '#4ade80' }}>{passCount}</p>
                                     <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Pass</p>

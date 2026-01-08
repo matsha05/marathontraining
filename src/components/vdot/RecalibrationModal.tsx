@@ -151,7 +151,7 @@ export function RecalibrationModal({ isOpen, currentVdot, onClose, onConfirm }: 
                             {/* Distance Selection */}
                             <div className="mb-6">
                                 <label className="v3-form-label mb-2 block">Distance</label>
-                                <div className="grid grid-cols-4 gap-2">
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                                     {(inputType === 'race'
                                         ? (['5k', '10k', 'half', 'marathon'] as const)
                                         : (['mile', '5k'] as const)
@@ -178,6 +178,7 @@ export function RecalibrationModal({ isOpen, currentVdot, onClose, onConfirm }: 
                                 <div className="flex items-center gap-2">
                                     <input
                                         type="number"
+                                        inputMode="numeric"
                                         placeholder="MM"
                                         value={timeMinutes}
                                         onChange={(e) => setTimeMinutes(e.target.value)}
@@ -188,6 +189,7 @@ export function RecalibrationModal({ isOpen, currentVdot, onClose, onConfirm }: 
                                     <span className="v3-heading-md">:</span>
                                     <input
                                         type="number"
+                                        inputMode="numeric"
                                         placeholder="SS"
                                         value={timeSeconds}
                                         onChange={(e) => setTimeSeconds(e.target.value)}
