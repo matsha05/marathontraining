@@ -22,6 +22,9 @@ export async function middleware(request: NextRequest) {
     });
 
     if (!supabaseUrl || !supabaseAnonKey) {
+        if (process.env.NODE_ENV === 'production') {
+            return new NextResponse('Missing Supabase environment configuration.', { status: 500 });
+        }
         return response;
     }
 
@@ -83,4 +86,3 @@ export const config = {
         '/signup'
     ],
 };
-

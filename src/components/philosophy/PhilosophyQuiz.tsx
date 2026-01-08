@@ -14,6 +14,7 @@ import { calculateRecommendation } from '@/domain/philosophy/recommendation';
 import { useState, useCallback } from 'react';
 import { QuestionScreen } from './QuestionScreen';
 import { RecommendationScreen } from './RecommendationScreen';
+import { toDateKey } from '@/lib/dates';
 
 /**
  * Philosophy Quiz - V2 Design System
@@ -310,7 +311,7 @@ export function PhilosophyQuiz({ onComplete, onSkip }: PhilosophyQuizProps) {
                                     value={answers.raceDate || ''}
                                     className="v3-input text-center text-lg py-4 px-6 w-full max-w-xs mx-auto"
                                     style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-base)' }}
-                                    min={new Date().toISOString().split('T')[0]}
+                                    min={toDateKey(new Date())}
                                     onChange={(e) => {
                                         if (e.target.value) {
                                             setAnswers(prev => ({ ...prev, raceDate: e.target.value }));

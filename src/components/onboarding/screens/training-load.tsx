@@ -18,6 +18,7 @@ import {
 } from '../ui';
 import { OnboardingData } from '@/domain/onboarding/types';
 import { STEP_TOOLTIPS } from '@/domain/onboarding/types';
+import { toDateKey } from '@/lib/dates';
 import {
     RUNS_PER_WEEK_OPTIONS,
     AVAILABLE_DAYS_OPTIONS,
@@ -285,13 +286,13 @@ export function LongRunDayScreen({
                 subtitle="Select 1-2 days. This is typically your biggest training day."
             />
 
-            {/* Week grid - all 7 days */}
-            <div className="grid grid-cols-7 gap-1 mb-4">
+            {/* Week grid - all 7 days, horizontal scroll on mobile */}
+            <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-7 gap-2 mb-4 -mx-4 px-4 md:mx-0 md:px-0 touch-pan-x" style={{ scrollbarWidth: 'none' }}>
                 {LONG_RUN_DAY_OPTIONS.map((option, index) => (
                     <button
                         key={option.value}
                         onClick={() => toggleDay(option.value)}
-                        className="flex flex-col items-center p-3 rounded-lg transition-all"
+                        className="flex flex-col items-center p-3 min-w-[56px] rounded-lg transition-all snap-center flex-shrink-0 md:flex-shrink active:scale-95 touch-target"
                         style={{
                             background: value.includes(option.value)
                                 ? 'var(--color-accent)'
@@ -353,7 +354,7 @@ function getNextMonday(): string {
     const daysUntilMonday = dayOfWeek === 0 ? 1 : (8 - dayOfWeek);
     const nextMonday = new Date(today);
     nextMonday.setDate(today.getDate() + daysUntilMonday);
-    return nextMonday.toISOString().split('T')[0];
+    return toDateKey(nextMonday);
 }
 
 // Helper to get this weekend (Saturday)
@@ -363,7 +364,7 @@ function getThisWeekend(): string {
     const daysUntilSaturday = (6 - dayOfWeek + 7) % 7 || 7;
     const saturday = new Date(today);
     saturday.setDate(today.getDate() + (dayOfWeek === 6 ? 0 : daysUntilSaturday));
-    return saturday.toISOString().split('T')[0];
+    return toDateKey(saturday);
 }
 
 // Helper to format date nicely
@@ -430,7 +431,7 @@ export function PlanStartDateScreen({
                     type="date"
                     value={value || ''}
                     onChange={(e) => onChange(e.target.value || null)}
-                    min={new Date().toISOString().split('T')[0]}
+                    min={toDateKey(new Date())}
                     max={raceDate || undefined}
                     className="w-full p-3 rounded-xl"
                     style={{

@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { exchangeStravaToken } from '@/infrastructure/strava/api';
 import { consumeStravaOauthState, upsertStravaTokens } from '@/infrastructure/strava/store';
 import { stravaConfig } from '@/infrastructure/strava/config';
-import { resolveAthleteId } from '@/infrastructure/auth';
+import { requireAthleteId } from '@/infrastructure/auth';
 import { parseStateContext } from '@/infrastructure/strava/oauth';
 import { isSafeRedirectPath } from '@/lib/redirects';
+import { stravaCallbackQuerySchema } from '@/infrastructure/strava/schemas';
 
 export const runtime = 'nodejs';
 
@@ -14,9 +15,16 @@ export async function GET(request: NextRequest) {
 
     try {
         const { searchParams } = new URL(request.url);
-        const code = searchParams.get('code');
-        const state = searchParams.get('state');
-        const error = searchParams.get('error');
+        const query = Object.fromEntries(searchParams.entries());
+        const parsedQuery = stravaCallbackQuerySchema.safeParse(query);
+        if (!parsedQuery.success) {
+            return NextResponse.json(
+                { error: 'Invalid query', details: parsedQuery.error.flatten() },
+                { status: 400 }
+            );
+        }
+
+        const { code, state, error } = parsedQuery.data;
         const stateContext = state ? parseStateContext(state) : null;
         successRedirect = resolveRedirectBase(
             request,
@@ -39,10 +47,10 @@ export async function GET(request: NextRequest) {
             return redirectWithParams(failureRedirect, { connect: 'strava', error: 'missing_code' });
         }
 
-        const { athleteId } = await resolveAthleteId(request);
-        if (!athleteId) {
-            return redirectWithParams(failureRedirect, { connect: 'strava', error: 'unauthorized' });
-        }
+        const auth = await requireAthleteId(request, {
+            onUnauthorized: () => redirectWithParams(failureRedirect, { connect: 'strava', error: 'unauthorized' }),
+        });
+        if (auth.response) return auth.response;
 
         const oauthState = await consumeStravaOauthState(state);
         if (!oauthState) {
@@ -53,7 +61,7 @@ export async function GET(request: NextRequest) {
             return redirectWithParams(failureRedirect, { connect: 'strava', error: 'expired_state' });
         }
 
-        if (oauthState.athlete_id !== athleteId) {
+        if (oauthState.athlete_id !== auth.athleteId) {
             return redirectWithParams(failureRedirect, { connect: 'strava', error: 'state_mismatch' });
         }
 
@@ -65,7 +73,7 @@ export async function GET(request: NextRequest) {
         const accessTokenExpiresAt = new Date(tokens.expires_at * 1000).toISOString();
 
         await upsertStravaTokens({
-            athleteId,
+            athleteId: auth.athleteId,
             stravaAthleteId: tokens.athlete.id,
             accessToken: tokens.access_token,
             refreshToken: tokens.refresh_token,

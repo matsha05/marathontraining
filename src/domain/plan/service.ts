@@ -17,6 +17,7 @@ import { OnboardingData } from '@/domain/onboarding/types';
 import { calculateAgeFromDob } from '@/domain/onboarding/utils';
 import { PlanGenerationInput, TrainingPlan } from '@/domain/plan/types';
 import { generatePlan } from '@/domain/plan/generator';
+import { toDateKey } from '@/lib/dates';
 
 /**
  * Calculate age from date of birth string.
@@ -482,7 +483,7 @@ export async function downloadPlanAsJSON(): Promise<boolean> {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `the-long-game-plan-${new Date().toISOString().split('T')[0]}.json`;
+        link.download = `the-long-game-plan-${toDateKey(new Date())}.json`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -493,4 +494,3 @@ export async function downloadPlanAsJSON(): Promise<boolean> {
         return false;
     }
 }
-

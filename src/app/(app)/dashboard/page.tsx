@@ -22,6 +22,7 @@ import { SiteHeader } from '@/components/ui/SiteHeader';
 import { WeeklyCalendar } from '@/components/ui/WeeklyCalendar';
 import confetti from 'canvas-confetti';
 import { RaceCommandBar, CoachingWhisper, MileageGauge, PhaseTimeline, extractPhasesFromWeeks } from '@/components/dashboard';
+import { toDateKey } from '@/lib/dates';
 
 /**
  * THE LONG GAME - Dashboard V2
@@ -176,7 +177,7 @@ export default function DashboardPage() {
                     .from('completed_workouts')
                     .select('id, completed_date, actual_session, planned_workout_id')
                     .eq('athlete_id', athleteId)
-                    .gte('completed_date', sixtyDaysAgo.toISOString().split('T')[0])
+                    .gte('completed_date', toDateKey(sixtyDaysAgo))
                     .order('completed_date', { ascending: false });
 
                 if (completedWorkouts && completedWorkouts.length > 0) {
@@ -282,7 +283,7 @@ export default function DashboardPage() {
             return [0, 1, 2, 3, 4, 5, 6].map(i => {
                 const dayDate = new Date(startOfWeek);
                 dayDate.setDate(startOfWeek.getDate() + i);
-                const dateStr = dayDate.toISOString().split('T')[0];
+                const dateStr = toDateKey(dayDate);
 
                 return {
                     day: getDayName(i).toUpperCase(),
@@ -331,9 +332,9 @@ export default function DashboardPage() {
             // Calculate the actual date for this day
             const dayDate = new Date(weekStart);
             dayDate.setDate(weekStart.getDate() + dayNum);
-            const dateStr = dayDate.toISOString().split('T')[0];
+            const dateStr = toDateKey(dayDate);
 
-            const isToday = isCurrentWeek && today.toISOString().split('T')[0] === dateStr;
+            const isToday = isCurrentWeek && toDateKey(today) === dateStr;
             const isPast = dayDate < today && !isToday;
 
             if (!dayPlan || !dayPlan.runWorkout) {

@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/Badge';
 import { createSupabaseBrowserClient } from '@/infrastructure/supabase';
 import { usePlan } from '@/domain/plan/context';
 import { downloadPlanAsJSON, clearPlan } from '@/domain/plan/service';
+import { apiFetch } from '@/lib/api';
+import { addYears, toDateKey } from '@/lib/dates';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     AlertTriangle, X, Download, RefreshCcw, ChevronRight,
@@ -140,7 +142,11 @@ export default function SettingsPage() {
     useEffect(() => {
         const host = window.location.hostname;
         setIsLocalhost(host === 'localhost' || host === '127.0.0.1');
-        fetch('/api/strava/status').then(r => r.ok ? r.json() : null).then(d => d && setStravaStatus(d)).catch(() => { });
+        apiFetch<{ connected: boolean }>('/api/strava/status')
+            .then((result) => {
+                if (result.ok) setStravaStatus(result.data);
+            })
+            .catch(() => { });
     }, []);
 
     const handleSaveProfile = async () => {
@@ -188,9 +194,9 @@ export default function SettingsPage() {
     const handleStravaDisconnect = async () => {
         setStravaBusy(true);
         try {
-            await fetch('/api/strava/disconnect', { method: 'POST' });
-            const r = await fetch('/api/strava/status');
-            if (r.ok) setStravaStatus(await r.json());
+            await apiFetch('/api/strava/disconnect', { method: 'POST' });
+            const status = await apiFetch<{ connected: boolean }>('/api/strava/status');
+            if (status.ok) setStravaStatus(status.data);
         } catch { } finally { setStravaBusy(false); }
     };
 
@@ -286,7 +292,7 @@ export default function SettingsPage() {
                                     value={profile.dateOfBirth || ''}
                                     onChange={(e) => setProfile({ ...profile, dateOfBirth: e.target.value || null })}
                                     className="input"
-                                    max={new Date(new Date().setFullYear(new Date().getFullYear() - 13)).toISOString().split('T')[0]}
+                                    max={toDateKey(addYears(new Date(), -13))}
                                     style={{
                                         colorScheme: 'dark',
                                     }}

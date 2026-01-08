@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { stravaConfig } from './config';
+import { assertStravaConfig, stravaConfig } from './config';
 
 const STATE_SEPARATOR = '.';
 
@@ -8,9 +8,7 @@ export function generateState(): string {
 }
 
 export function buildAuthorizationUrl(state: string, redirectUri: string): string {
-    if (!stravaConfig.clientId) {
-        throw new Error('Missing STRAVA_CLIENT_ID');
-    }
+    assertStravaConfig(['clientId']);
     if (!redirectUri) {
         throw new Error('Missing STRAVA_REDIRECT_URI');
     }

@@ -21,6 +21,7 @@ import {
 import { DatePicker } from '@/components/ui/DatePicker';
 import { OnboardingData, TrainingGoal, FitnessDuration } from '@/domain/onboarding/types';
 import { STEP_TOOLTIPS } from '@/domain/onboarding/types';
+import { toDateKey } from '@/lib/dates';
 import {
     TRAINING_GOALS,
     FITNESS_DURATION_OPTIONS,
@@ -132,7 +133,7 @@ export function RaceDetailsScreen({
 
     const minDate = new Date();
     minDate.setDate(minDate.getDate() + 1);
-    const minDateStr = minDate.toISOString().split('T')[0];
+    const minDateStr = toDateKey(minDate);
 
     // Calculate weeks to race
     const weeksToRace = data.raceDate

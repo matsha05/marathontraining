@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stravaConfig } from '@/infrastructure/strava/config';
-import { normalizeStravaWebhookPayload } from '@/infrastructure/strava/webhook';
+import { parseStravaWebhookPayload } from '@/infrastructure/strava/webhook';
+import { stravaWebhookQuerySchema } from '@/infrastructure/strava/schemas';
 import { insertStravaWebhookEvent, markStravaWebhookEventProcessed } from '@/infrastructure/strava/store';
 import { processStravaWebhookEvent } from '@/infrastructure/strava/processor';
 
@@ -9,9 +10,17 @@ const MAX_WEBHOOK_BYTES = 256 * 1024;
 
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
-    const mode = searchParams.get('hub.mode');
-    const challenge = searchParams.get('hub.challenge');
-    const token = searchParams.get('hub.verify_token');
+    const parsedQuery = stravaWebhookQuerySchema.safeParse(Object.fromEntries(searchParams.entries()));
+    if (!parsedQuery.success) {
+        return NextResponse.json(
+            { error: 'Invalid query', details: parsedQuery.error.flatten() },
+            { status: 400 }
+        );
+    }
+
+    const mode = parsedQuery.data['hub.mode'];
+    const challenge = parsedQuery.data['hub.challenge'];
+    const token = parsedQuery.data['hub.verify_token'];
 
     if (mode !== 'subscribe' || !challenge) {
         return NextResponse.json({ ok: true });
@@ -46,11 +55,15 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
     }
 
-    const event = normalizeStravaWebhookPayload(payload);
-    if (!event) {
-        return NextResponse.json({ ok: true, ignored: true });
+    const parsedPayload = parseStravaWebhookPayload(payload);
+    if (!parsedPayload.success) {
+        return NextResponse.json(
+            { error: 'Invalid webhook payload', details: parsedPayload.error },
+            { status: 400 }
+        );
     }
 
+    const event = parsedPayload.data;
     const eventId = await insertStravaWebhookEvent(event.aspectType, event.ownerId, event.objectId, event.payload);
 
     if (stravaConfig.processingMode === 'inline' || stravaConfig.processingMode === 'dual') {

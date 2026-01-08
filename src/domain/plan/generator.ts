@@ -106,7 +106,7 @@ export function generatePlan(input: PlanGenerationInput): TrainingPlan {
 
     // Step 9: Build the complete plan
     const plan: TrainingPlan = {
-        id: `plan-${Date.now()}`,
+        id: `plan-${crypto.randomUUID()}`,
         createdAt: new Date().toISOString(),
         athleteName: input.name,
         vdot: input.vdot,

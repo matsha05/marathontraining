@@ -23,6 +23,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { createSupabaseBrowserClient } from '@/infrastructure/supabase';
+import { toDateKey } from '@/lib/dates';
 import {
     Zap,
     ClipboardList,
@@ -569,7 +570,7 @@ export default function DurabilityPage() {
                                                 .from('durability_assessments')
                                                 .insert({
                                                     athlete_id: user.id,
-                                                    assessed_date: new Date().toISOString().split('T')[0],
+                                                    assessed_date: toDateKey(new Date()),
                                                     results: results,
                                                     assigned_modules: prescribedModuleIds,
                                                 });

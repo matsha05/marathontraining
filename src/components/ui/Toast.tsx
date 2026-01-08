@@ -111,7 +111,7 @@ function ToastContainer({ toasts, onDismiss }: { toasts: Toast[]; onDismiss: (id
 
     return (
         <div
-            className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-3"
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-3 w-[90vw] max-w-[400px] safe-area-top"
             role="region"
             aria-label="Notifications"
         >
@@ -166,7 +166,7 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: (id: string)
             {/* Dismiss button */}
             <button
                 onClick={handleDismiss}
-                className="flex-shrink-0 p-1 rounded hover:bg-white/10 transition-colors"
+                className="flex-shrink-0 p-2.5 -mr-1.5 rounded-lg hover:bg-white/10 transition-colors touch-target-sm"
                 style={{ color: 'var(--text-muted)' }}
                 aria-label="Dismiss"
             >

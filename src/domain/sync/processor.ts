@@ -61,8 +61,8 @@ async function processItem(item: QueuedWrite): Promise<boolean> {
     if (item.type === 'plan') {
         try {
             // Dynamic import to avoid circular dependencies
-            const { saveToSupabaseDirectly } = await import('@/domain/plan/repository');
-            const result = await saveToSupabaseDirectly(item.payload);
+            const { savePlanViaApiDirectly } = await import('@/domain/plan/repository');
+            const result = await savePlanViaApiDirectly(item.payload);
             return result.success;
         } catch (error) {
             console.error('[SyncProcessor] Failed to process plan:', error);

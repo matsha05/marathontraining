@@ -3,21 +3,27 @@ import { stravaConfig } from '@/infrastructure/strava/config';
 import { getSupabaseServerClient } from '@/infrastructure/supabase/server';
 import { markStravaWebhookEventProcessed } from '@/infrastructure/strava/store';
 import { processStravaWebhookEvent } from '@/infrastructure/strava/processor';
-import { normalizeStravaWebhookPayload } from '@/infrastructure/strava/webhook';
+import { parseStravaWebhookPayload } from '@/infrastructure/strava/webhook';
+import { stravaProcessQuerySchema } from '@/infrastructure/strava/schemas';
 
 export const runtime = 'nodejs';
 
 const DEFAULT_LIMIT = 25;
 
 export async function POST(request: NextRequest) {
-    if (!isAuthorized(request)) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const supabase = getSupabaseServerClient();
     const { searchParams } = new URL(request.url);
-    const limitParam = Number(searchParams.get('limit'));
-    const limit = Number.isFinite(limitParam) && limitParam > 0 ? Math.min(limitParam, 100) : DEFAULT_LIMIT;
+    const parsedQuery = stravaProcessQuerySchema.safeParse(Object.fromEntries(searchParams.entries()));
+    if (!parsedQuery.success) {
+        return NextResponse.json(
+            { error: 'Invalid query', details: parsedQuery.error.flatten() },
+            { status: 400 }
+        );
+    }
+    if (!isAuthorized(request, parsedQuery.data.key)) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const limit = parsedQuery.data.limit ?? DEFAULT_LIMIT;
     const { data: events, error } = await supabase
         .from('strava_webhook_events')
         .select('*')
@@ -31,16 +37,16 @@ export async function POST(request: NextRequest) {
 
     let processed = 0;
     for (const row of events ?? []) {
-        if (!row.payload || typeof row.payload !== 'object') {
-            await markStravaWebhookEventProcessed(row.id, 'ignored', 'Invalid webhook payload');
+        const parsedPayload = parseStravaWebhookPayload(row.payload);
+        if (!parsedPayload.success) {
+            await markStravaWebhookEventProcessed(
+                row.id,
+                'ignored',
+                `Invalid webhook payload: ${JSON.stringify(parsedPayload.error)}`
+            );
             continue;
         }
-
-        const event = normalizeStravaWebhookPayload(row.payload as Record<string, unknown>);
-        if (!event) {
-            await markStravaWebhookEventProcessed(row.id, 'ignored', 'Unable to parse webhook payload');
-            continue;
-        }
+        const event = parsedPayload.data;
 
         try {
             const result = await processStravaWebhookEvent(event);
@@ -59,7 +65,7 @@ export async function GET(request: NextRequest) {
     return POST(request);
 }
 
-function isAuthorized(request: NextRequest) {
+function isAuthorized(request: NextRequest, keyFromQuery?: string) {
     if (process.env.VERCEL === '1' && request.headers.get('x-vercel-cron') === '1') {
         return true;
     }
@@ -71,6 +77,6 @@ function isAuthorized(request: NextRequest) {
     const header = request.headers.get('x-strava-processing-secret');
     if (header && header === secret) return true;
 
-    const { searchParams } = new URL(request.url);
-    return searchParams.get('key') === secret;
+    const key = keyFromQuery ?? new URL(request.url).searchParams.get('key');
+    return key === secret;
 }

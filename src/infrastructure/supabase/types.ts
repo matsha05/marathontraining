@@ -721,6 +721,13 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      save_training_plan: {
+        Args: {
+          plan: Json
+          workouts: Json
+        }
+        Returns: undefined
+      }
       restore_training_plan: {
         Args: {
           plan_backup: Json

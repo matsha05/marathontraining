@@ -1,23 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStravaTokensByAthleteId, getLatestStravaActivity } from '@/infrastructure/strava/store';
-import { resolveAthleteId } from '@/infrastructure/auth';
+import { requireAthleteId } from '@/infrastructure/auth';
 
 export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
-    const { athleteId } = await resolveAthleteId(request);
+    const auth = await requireAthleteId(request);
+    if (auth.response) return auth.response;
 
-    if (!athleteId) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const tokenRow = await getStravaTokensByAthleteId(athleteId);
+    const tokenRow = await getStravaTokensByAthleteId(auth.athleteId);
 
     if (!tokenRow) {
         return NextResponse.json({ connected: false });
     }
 
-    const lastActivity = await getLatestStravaActivity(athleteId);
+    const lastActivity = await getLatestStravaActivity(auth.athleteId);
 
     return NextResponse.json({
         connected: true,

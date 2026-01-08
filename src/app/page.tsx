@@ -41,7 +41,7 @@ export default function LandingPage() {
       <SiteHeader />
 
       {/* Hero - Big text + Week preview with animations */}
-      <section className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden">
+      <section className="min-h-screen-safe flex flex-col items-center justify-center px-4 md:px-6 relative overflow-hidden pt-20">
         {/* Subtle radial glow behind content */}
         <div
           className="absolute inset-0 pointer-events-none"
@@ -54,7 +54,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6, ease }}
-            className="text-5xl md:text-7xl font-light mb-4 tracking-tight"
+            className="text-4xl sm:text-5xl md:text-7xl font-light mb-4 tracking-tight"
             style={{ color: 'var(--text-base)' }}
           >
             The Long Game
@@ -79,8 +79,8 @@ export default function LandingPage() {
             <p className="text-xs mb-4 font-mono" style={{ color: 'var(--text-subtle)' }}>
               Week 8 · Build Phase · 42 miles
             </p>
-            {/* Grid with padding to accommodate hover scale */}
-            <div className="grid grid-cols-7 gap-1 py-2 px-1">
+            {/* Mobile: Horizontal scroll | Desktop: Grid */}
+            <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-7 gap-2 py-2 px-1 -mx-4 md:mx-0 touch-pan-x" style={{ scrollbarWidth: 'none' }}>
               {[
                 { day: "M", type: "run", label: "5mi Easy", sub: "8:32/mi", strength: true },
                 { day: "T", type: "run", label: "6×800m", sub: "VO2", strength: false },
@@ -95,7 +95,7 @@ export default function LandingPage() {
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 + (i * 0.05), duration: 0.4, ease }}
-                  className="p-4 rounded-xl text-center"
+                  className="p-3 md:p-4 rounded-xl text-center snap-center flex-shrink-0 w-[90px] md:w-auto md:flex-shrink"
                   style={{
                     background: d.type === "long"
                       ? 'color-mix(in srgb, var(--color-accent) 12%, transparent)'
@@ -109,8 +109,9 @@ export default function LandingPage() {
                     boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
                     transition: { type: "spring", stiffness: 400, damping: 25 }
                   }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <p className="text-[10px] mb-3" style={{ color: 'var(--text-subtle)' }}>{d.day}</p>
+                  <p className="text-xs mb-2 md:mb-3" style={{ color: 'var(--text-subtle)' }}>{d.day}</p>
                   <p
                     className="text-sm mb-1 whitespace-nowrap"
                     style={{ color: d.type === "rest" ? 'var(--text-subtle)' : 'var(--text-muted)' }}
@@ -118,11 +119,11 @@ export default function LandingPage() {
                     {d.label}
                   </p>
                   {d.sub && (
-                    <p className="text-[10px] font-mono" style={{ color: 'var(--text-subtle)' }}>{d.sub}</p>
+                    <p className="text-xs font-mono" style={{ color: 'var(--text-subtle)' }}>{d.sub}</p>
                   )}
                   {d.strength && (
                     <div className="mt-2 pt-2" style={{ borderTop: '1px solid var(--border-base)' }}>
-                      <p className="text-[10px]" style={{ color: 'var(--color-strength)' }}>+ Strength</p>
+                      <p className="text-xs" style={{ color: 'var(--color-strength)' }}>+ Strength</p>
                     </div>
                   )}
                 </motion.div>
@@ -171,10 +172,10 @@ export default function LandingPage() {
         bestFor="Experienced runners, 6 days available, high mileage tolerance"
       >
         <div className="v3-card p-4">
-          <div className="grid grid-cols-7 gap-2 text-center">
+          <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-7 gap-2 text-center -mx-2 px-2 md:mx-0" style={{ scrollbarWidth: 'none' }}>
             {["Easy", "Speed", "Rest", "Tempo", "Easy", "Easy", "Long"].map((day, i) => (
-              <div key={i}>
-                <p className="text-[10px] mb-1" style={{ color: 'var(--text-subtle)' }}>{["M", "T", "W", "T", "F", "S", "S"][i]}</p>
+              <div key={i} className="snap-center flex-shrink-0 w-[60px] md:w-auto md:flex-shrink">
+                <p className="text-xs mb-1" style={{ color: 'var(--text-subtle)' }}>{["M", "T", "W", "T", "F", "S", "S"][i]}</p>
                 <p
                   className="text-xs"
                   style={{
@@ -318,7 +319,7 @@ export default function LandingPage() {
         description="Running Rewired. 12 movement standards that address the most common limiters in runners. Pre-hab over rehab. Build a body that can handle the training load, not just survive it."
         bestFor="12 movement standards · Daily routines"
       >
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
           {[
             { id: 1, name: "Toe Yoga", tooltip: "Can you raise your big toe while keeping others down? Tests foot control and arch stability." },
             { id: 2, name: "Balance", tooltip: "45 seconds single-leg stance, barefoot, eyes open. Tests proprioception and stability." },
@@ -333,21 +334,26 @@ export default function LandingPage() {
             { id: 11, name: "Core Ctrl", tooltip: "Can you maintain neutral spine under load? Tests deep core stabilizers, not six-pack muscles." },
             { id: 12, name: "SL Hop", tooltip: "Single-leg hop and stick the landing. Integration test: foot, hip, and core working together." },
           ].map((standard) => (
-            <div
+            <button
               key={standard.id}
-              className="group relative h-10 rounded-lg flex items-center justify-center transition-all hover:bg-[var(--bg-elevated)]"
+              className="group relative h-12 md:h-10 rounded-lg flex flex-col items-center justify-center transition-all active:scale-95 touch-target"
               style={{ background: 'var(--bg-muted)' }}
+              onClick={(e) => {
+                // Toggle tooltip visibility for mobile
+                const tooltip = e.currentTarget.querySelector('.mobile-tooltip');
+                if (tooltip) tooltip.classList.toggle('hidden');
+              }}
             >
-              <span className="text-[10px]" style={{ color: 'var(--text-subtle)' }}>{standard.id}</span>
-              {/* Tooltip */}
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50 w-48 text-center"
+              <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>{standard.name}</span>
+              <span className="text-xs" style={{ color: 'var(--text-subtle)' }}>{standard.id}</span>
+              {/* Desktop: Hover tooltip */}
+              <div className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50 w-48 text-center"
                 style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-base)', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
                 <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-base)' }}>{standard.name}</p>
-                <p className="text-[10px] leading-tight" style={{ color: 'var(--text-muted)' }}>{standard.tooltip}</p>
-                {/* Arrow */}
+                <p className="text-xs leading-tight" style={{ color: 'var(--text-muted)' }}>{standard.tooltip}</p>
                 <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 -mt-1" style={{ background: 'var(--bg-elevated)', borderRight: '1px solid var(--border-base)', borderBottom: '1px solid var(--border-base)' }} />
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </CoachSection>

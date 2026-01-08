@@ -19,6 +19,7 @@ import {
 } from '../ui';
 import { OnboardingData } from '@/domain/onboarding/types';
 import { STEP_TOOLTIPS } from '@/domain/onboarding/types';
+import { addYears, toDateKey } from '@/lib/dates';
 
 // Animation ease curve
 const ease = [0.25, 0.46, 0.45, 0.94] as const;
@@ -35,7 +36,7 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
     useKeyboardNavigation({ onEnter: onContinue });
 
     return (
-        <div className="v3-root min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden"
+        <div className="v3-root min-h-screen-safe flex flex-col items-center justify-center px-4 md:px-6 relative overflow-hidden pt-16"
             style={{ background: 'var(--bg-base)' }}>
             {/* Subtle radial glow behind content */}
             <div
@@ -86,7 +87,7 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
                     <p className="text-xs mb-4 font-mono" style={{ color: 'var(--text-subtle)' }}>
                         What you'll get · Calibrated to your fitness
                     </p>
-                    <div className="grid grid-cols-7 gap-1">
+                    <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-7 gap-2 -mx-4 md:mx-0 px-4 md:px-0 touch-pan-x" style={{ scrollbarWidth: 'none' }}>
                         {[
                             { day: "M", type: "run", label: "Easy", sub: "?" },
                             { day: "T", type: "run", label: "Speed", sub: "?" },
@@ -101,7 +102,8 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
                                 initial={{ opacity: 0, y: 15 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.6 + (i * 0.05), duration: 0.4, ease }}
-                                className="p-3 rounded-lg text-center border"
+                                whileTap={{ scale: 0.95 }}
+                                className="p-3 rounded-lg text-center border snap-center flex-shrink-0 w-[80px] md:w-auto md:flex-shrink touch-target"
                                 style={{
                                     background: d.type === "long"
                                         ? 'color-mix(in srgb, var(--color-accent) 15%, var(--bg-elevated))'
@@ -113,7 +115,7 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
                                         : 'var(--border-base)',
                                 }}
                             >
-                                <p className="text-[10px] font-semibold mb-2" style={{ color: 'var(--text-muted)' }}>{d.day}</p>
+                                <p className="text-xs font-semibold mb-2" style={{ color: 'var(--text-muted)' }}>{d.day}</p>
                                 <p
                                     className="text-sm font-medium mb-0.5"
                                     style={{ color: d.type === "long" ? 'var(--color-accent)' : d.type === "rest" ? 'var(--text-subtle)' : 'var(--text-base)' }}
@@ -356,8 +358,8 @@ export function DemographicsScreen({
                         value={data.dateOfBirth || ''}
                         onChange={(e) => onDobChange(e.target.value || null)}
                         className="v3-input w-full"
-                        max={new Date(new Date().setFullYear(new Date().getFullYear() - 13)).toISOString().split('T')[0]}
-                        min={new Date(new Date().setFullYear(new Date().getFullYear() - 99)).toISOString().split('T')[0]}
+                        max={toDateKey(addYears(new Date(), -13))}
+                        min={toDateKey(addYears(new Date(), -99))}
                         style={{
                             background: 'var(--bg-elevated)',
                             border: '1px solid var(--border-base)',

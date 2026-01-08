@@ -1,32 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildAuthorizationUrl, generateState, withStateContext } from '@/infrastructure/strava/oauth';
 import { saveStravaOauthState } from '@/infrastructure/strava/store';
-import { resolveAthleteId } from '@/infrastructure/auth';
-import { stravaConfig } from '@/infrastructure/strava/config';
+import { requireAthleteId } from '@/infrastructure/auth';
+import { requireStravaConfig, stravaConfig } from '@/infrastructure/strava/config';
+import { stravaConnectQuerySchema } from '@/infrastructure/strava/schemas';
 import { getSafeRedirectPath } from '@/lib/redirects';
 
 export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
-    const { athleteId } = await resolveAthleteId(request);
+    const auth = await requireAthleteId(request, { onUnauthorized: redirectToLogin });
+    if (auth.response) return auth.response;
 
-    if (!athleteId) {
-        return redirectToLogin(request);
-    }
-
-    if (!stravaConfig.clientId || !stravaConfig.clientSecret) {
+    const configCheck = requireStravaConfig(['clientId', 'clientSecret']);
+    if (!configCheck.ok) {
         return redirectToError(request, 'missing_config');
     }
 
     try {
         const url = new URL(request.url);
-        const from = url.searchParams.get('from');
+        const parsed = stravaConnectQuerySchema.safeParse(Object.fromEntries(url.searchParams.entries()));
+        if (!parsed.success) {
+            return NextResponse.json(
+                { error: 'Invalid query', details: parsed.error.flatten() },
+                { status: 400 }
+            );
+        }
+        const { from, next } = parsed.data;
         const fallbackReturn = from === 'settings' ? '/settings' : '/onboarding';
-        const returnPath = getSafeRedirectPath(url.searchParams.get('next'), fallbackReturn);
+        const returnPath = getSafeRedirectPath(next, fallbackReturn);
         const state = withStateContext(generateState(), { from, next: returnPath });
         const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
 
-        await saveStravaOauthState(state, athleteId, expiresAt);
+        await saveStravaOauthState(state, auth.athleteId, expiresAt);
 
         const redirectUri = resolveRedirectUri(request);
         const authUrl = buildAuthorizationUrl(state, redirectUri);

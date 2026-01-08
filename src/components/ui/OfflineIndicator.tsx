@@ -114,7 +114,7 @@ export function SyncStatusIndicator() {
     // Offline state takes priority
     if (!isOnline) {
         return (
-            <div className="fixed bottom-4 left-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium backdrop-blur-sm"
+            <div className="fixed bottom-4 left-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium backdrop-blur-sm mb-safe"
                 style={{
                     background: 'var(--v3-warning-subtle)',
                     border: '1px solid var(--v3-warning-muted)',
@@ -129,7 +129,7 @@ export function SyncStatusIndicator() {
     // Saving state
     if (state === 'saving') {
         return (
-            <div className="fixed bottom-4 left-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium backdrop-blur-sm"
+            <div className="fixed bottom-4 left-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium backdrop-blur-sm mb-safe"
                 style={{
                     background: 'var(--color-strength-subtle)',
                     border: '1px solid rgba(58, 107, 255, 0.3)',
@@ -144,7 +144,7 @@ export function SyncStatusIndicator() {
     // Synced state (shows briefly)
     if (state === 'synced' && showSynced) {
         return (
-            <div className="fixed bottom-4 left-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium backdrop-blur-sm"
+            <div className="fixed bottom-4 left-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium backdrop-blur-sm mb-safe"
                 style={{
                     background: 'var(--color-accent-subtle)',
                     border: '1px solid rgba(25, 227, 140, 0.3)',
@@ -161,7 +161,7 @@ export function SyncStatusIndicator() {
         return (
             <button
                 onClick={processQueue}
-                className="fixed bottom-4 left-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium backdrop-blur-sm cursor-pointer transition-colors"
+                className="fixed bottom-4 left-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium backdrop-blur-sm cursor-pointer transition-colors mb-safe touch-target"
                 style={{
                     background: 'var(--v3-warning-subtle)',
                     border: '1px solid var(--v3-warning-muted)',
@@ -179,7 +179,7 @@ export function SyncStatusIndicator() {
         return (
             <button
                 onClick={processQueue}
-                className="fixed bottom-4 left-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium backdrop-blur-sm cursor-pointer transition-colors"
+                className="fixed bottom-4 left-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium backdrop-blur-sm cursor-pointer transition-colors mb-safe touch-target"
                 style={{
                     background: 'var(--v3-error-subtle)',
                     border: '1px solid var(--v3-error-muted)',

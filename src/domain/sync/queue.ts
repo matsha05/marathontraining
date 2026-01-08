@@ -10,56 +10,17 @@
  * - Corrupted data filtering with logging
  */
 
-import { z } from 'zod';
 import { QueuedWrite, QueuedWriteSchema, validateQueue } from './types';
+import { safeStorageGet, safeStorageRemove, safeStorageSet } from '@/lib/safe-storage';
 
 const QUEUE_KEY = 'long-game-sync-queue';
 
-// =============================================================================
-// LOCALSTORAGE HELPERS (with quota handling)
-// =============================================================================
-
-interface StorageResult {
-    success: boolean;
-    error?: 'QUOTA_EXCEEDED' | 'UNAVAILABLE' | 'UNKNOWN';
-}
-
-/**
- * Safely write to localStorage with quota handling.
- * Returns success/failure with error type.
- */
-function safeLocalStorageSet(key: string, value: string): StorageResult {
-    if (typeof window === 'undefined') {
-        return { success: false, error: 'UNAVAILABLE' };
+function persistQueue(queue: QueuedWrite[]) {
+    const result = safeStorageSet(QUEUE_KEY, JSON.stringify(queue));
+    if (!result.success && result.error === 'QUOTA_EXCEEDED') {
+        emitSyncEvent('quota_exceeded');
     }
-
-    try {
-        localStorage.setItem(key, value);
-        return { success: true };
-    } catch (error) {
-        if (error instanceof DOMException) {
-            if (error.name === 'QuotaExceededError' || error.code === 22) {
-                console.error('[SyncQueue] localStorage quota exceeded!');
-                emitSyncEvent('quota_exceeded');
-                return { success: false, error: 'QUOTA_EXCEEDED' };
-            }
-        }
-        console.error('[SyncQueue] localStorage write failed:', error);
-        return { success: false, error: 'UNKNOWN' };
-    }
-}
-
-/**
- * Safely read from localStorage with validation.
- */
-function safeLocalStorageGet(key: string): string | null {
-    if (typeof window === 'undefined') return null;
-    try {
-        return localStorage.getItem(key);
-    } catch (error) {
-        console.error('[SyncQueue] localStorage read failed:', error);
-        return null;
-    }
+    return result;
 }
 
 // =============================================================================
@@ -89,13 +50,13 @@ export function queueWrite(write: Omit<QueuedWrite, 'queuedAt' | 'retryCount'>):
     const filtered = queue.filter(w => w.id !== write.id);
     filtered.push(validation.data);
 
-    const result = safeLocalStorageSet(QUEUE_KEY, JSON.stringify(filtered));
+    const result = persistQueue(filtered);
 
     if (!result.success && result.error === 'QUOTA_EXCEEDED') {
         // Try to recover by clearing old items
         console.warn('[SyncQueue] Attempting recovery by pruning old items...');
         const pruned = filtered.slice(-10); // Keep only last 10
-        const retryResult = safeLocalStorageSet(QUEUE_KEY, JSON.stringify(pruned));
+        const retryResult = persistQueue(pruned);
         return retryResult.success;
     }
 
@@ -107,11 +68,11 @@ export function queueWrite(write: Omit<QueuedWrite, 'queuedAt' | 'retryCount'>):
  * Corrupted items are filtered out and logged.
  */
 export function getQueue(): QueuedWrite[] {
-    const stored = safeLocalStorageGet(QUEUE_KEY);
-    if (!stored) return [];
+    const stored = safeStorageGet(QUEUE_KEY);
+    if (!stored.success || !stored.data) return [];
 
     try {
-        const parsed = JSON.parse(stored);
+        const parsed = JSON.parse(stored.data);
         return validateQueue(parsed);
     } catch (error) {
         console.error('[SyncQueue] Failed to parse queue, clearing:', error);
@@ -125,7 +86,7 @@ export function getQueue(): QueuedWrite[] {
  */
 export function removeFromQueue(id: string): void {
     const queue = getQueue().filter(w => w.id !== id);
-    safeLocalStorageSet(QUEUE_KEY, JSON.stringify(queue));
+    persistQueue(queue);
 }
 
 /**
@@ -135,7 +96,7 @@ export function incrementRetryCount(id: string): void {
     const queue = getQueue().map(w =>
         w.id === id ? { ...w, retryCount: w.retryCount + 1 } : w
     );
-    safeLocalStorageSet(QUEUE_KEY, JSON.stringify(queue));
+    persistQueue(queue);
 }
 
 /**
@@ -150,10 +111,9 @@ export function getPendingCount(): number {
  */
 export function clearQueue(): void {
     if (typeof window === 'undefined') return;
-    try {
-        localStorage.removeItem(QUEUE_KEY);
-    } catch (error) {
-        console.error('[SyncQueue] Failed to clear queue:', error);
+    const result = safeStorageRemove(QUEUE_KEY);
+    if (!result.success) {
+        console.error('[SyncQueue] Failed to clear queue:', result.message);
     }
 }
 
@@ -161,8 +121,8 @@ export function clearQueue(): void {
  * Get estimated storage used by queue (bytes).
  */
 export function getQueueStorageSize(): number {
-    const stored = safeLocalStorageGet(QUEUE_KEY);
-    return stored ? new Blob([stored]).size : 0;
+    const stored = safeStorageGet(QUEUE_KEY);
+    return stored.success && stored.data ? new Blob([stored.data]).size : 0;
 }
 
 // =============================================================================

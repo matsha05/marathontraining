@@ -2,6 +2,8 @@
  * Strava webhook utilities
  */
 
+import { stravaWebhookPayloadSchema } from './schemas';
+
 export interface StravaWebhookEvent {
     objectType: string;
     aspectType: string;
@@ -11,36 +13,26 @@ export interface StravaWebhookEvent {
     payload: Record<string, unknown>;
 }
 
-export function normalizeStravaWebhookPayload(payload: unknown): StravaWebhookEvent | null {
-    if (!payload || typeof payload !== 'object') return null;
-
-    const event = payload as Record<string, unknown>;
-    const objectType = asString(event.object_type);
-    const aspectType = asString(event.aspect_type);
-    const objectId = asNumber(event.object_id);
-    const ownerId = asNumber(event.owner_id);
-
-    if (!objectType || !aspectType || objectId === null || ownerId === null) return null;
+export function parseStravaWebhookPayload(payload: unknown): { success: true; data: StravaWebhookEvent } | { success: false; error: Record<string, unknown> } {
+    const parsed = stravaWebhookPayloadSchema.safeParse(payload);
+    if (!parsed.success) {
+        return { success: false, error: parsed.error.flatten() };
+    }
 
     return {
-        objectType,
-        aspectType,
-        objectId,
-        ownerId,
-        eventTime: asNumber(event.event_time) ?? undefined,
-        payload: event,
+        success: true,
+        data: {
+            objectType: parsed.data.object_type,
+            aspectType: parsed.data.aspect_type,
+            objectId: parsed.data.object_id,
+            ownerId: parsed.data.owner_id,
+            eventTime: parsed.data.event_time ?? undefined,
+            payload: parsed.data as Record<string, unknown>,
+        },
     };
 }
 
-function asString(value: unknown): string | null {
-    if (typeof value === 'string' && value.trim() !== '') return value;
-    return null;
-}
-
-function asNumber(value: unknown): number | null {
-    if (typeof value === 'number' && Number.isFinite(value)) return value;
-    if (typeof value === 'string' && value.trim() !== '' && Number.isFinite(Number(value))) {
-        return Number(value);
-    }
-    return null;
+export function normalizeStravaWebhookPayload(payload: unknown): StravaWebhookEvent | null {
+    const parsed = parseStravaWebhookPayload(payload);
+    return parsed.success ? parsed.data : null;
 }

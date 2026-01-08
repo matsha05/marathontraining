@@ -2,7 +2,7 @@
  * Strava API client helpers
  */
 
-import { stravaConfig } from './config';
+import { assertStravaConfig, stravaConfig } from './config';
 
 export interface StravaTokenResponse {
     access_token: string;
@@ -18,9 +18,7 @@ export interface StravaTokenResponse {
 }
 
 export async function exchangeStravaToken(code: string): Promise<StravaTokenResponse> {
-    if (!stravaConfig.clientId || !stravaConfig.clientSecret) {
-        throw new Error('Missing STRAVA_CLIENT_ID or STRAVA_CLIENT_SECRET');
-    }
+    assertStravaConfig(['clientId', 'clientSecret']);
 
     const response = await fetch(stravaConfig.tokenUrl, {
         method: 'POST',
@@ -42,9 +40,7 @@ export async function exchangeStravaToken(code: string): Promise<StravaTokenResp
 }
 
 export async function refreshStravaToken(refreshToken: string): Promise<StravaTokenResponse> {
-    if (!stravaConfig.clientId || !stravaConfig.clientSecret) {
-        throw new Error('Missing STRAVA_CLIENT_ID or STRAVA_CLIENT_SECRET');
-    }
+    assertStravaConfig(['clientId', 'clientSecret']);
 
     const response = await fetch(stravaConfig.tokenUrl, {
         method: 'POST',

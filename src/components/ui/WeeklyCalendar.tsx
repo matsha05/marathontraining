@@ -1,8 +1,10 @@
 "use client";
 
+import { useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { CheckIcon } from '@/components/ui/check';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 /**
  * WeeklyCalendar - Week-at-a-glance component (V3)
@@ -143,9 +145,27 @@ export function WeeklyCalendar({
     onNextWeek,
 }: WeeklyCalendarProps) {
     const hasNavigation = currentWeek !== undefined && totalWeeks !== undefined;
+    const isMobile = useIsMobile();
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const todayRef = useRef<HTMLDivElement>(null);
+
+    // Auto-scroll to today on mobile
+    useEffect(() => {
+        if (isMobile && todayRef.current && scrollRef.current) {
+            // Small delay to ensure layout is complete
+            const timer = setTimeout(() => {
+                todayRef.current?.scrollIntoView({
+                    inline: 'center',
+                    behavior: 'smooth',
+                    block: 'nearest',
+                });
+            }, 100);
+            return () => clearTimeout(timer);
+        }
+    }, [isMobile, days]);
 
     return (
-        <div className="v3-card p-5">
+        <div className="v3-card p-4 md:p-5">
             {/* Header with optional week navigation */}
             <div className="flex items-center justify-between mb-4">
                 {weekLabel && (
@@ -195,7 +215,12 @@ export function WeeklyCalendar({
                 )}
             </div>
 
-            <div className="grid grid-cols-7 gap-2">
+            {/* Mobile: Horizontal scroll with snap | Desktop: 7-col grid */}
+            <div
+                ref={scrollRef}
+                className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-7 gap-2 pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:overflow-visible scroll-smooth touch-pan-x"
+                style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
+            >
                 {days.map((day, index) => {
                     const isClickable = day.status !== 'rest' && (day.workoutId || day.date || onDayClick);
                     const cardContent = (
@@ -284,6 +309,7 @@ export function WeeklyCalendar({
                         return (
                             <motion.div
                                 key={day.day}
+                                ref={day.status === 'today' ? todayRef : undefined}
                                 initial={{ opacity: 0, y: 15 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{
@@ -291,10 +317,11 @@ export function WeeklyCalendar({
                                     delay: 0.05 + index * 0.04,
                                     ease: [0.25, 0.46, 0.45, 0.94]
                                 }}
+                                className="snap-center flex-shrink-0 w-[85px] md:w-auto md:flex-shrink"
                             >
                                 <Link
                                     href={href}
-                                    className="text-center p-3 rounded-xl transition-all hover:scale-[1.03] hover:shadow-md block h-full"
+                                    className="text-center p-3 rounded-xl transition-all hover:scale-[1.03] active:scale-[0.98] hover:shadow-md block h-full touch-target"
                                     style={{ ...cardStyles, minHeight: '100px' }}
                                 >
                                     {cardContent}

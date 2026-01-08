@@ -9,6 +9,7 @@ import type { User } from '@supabase/supabase-js';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { SettingsIcon } from '@/components/ui/settings';
 import { FlameIcon } from '@/components/ui/flame';
+import { MobileNav } from './MobileNav';
 
 /**
  * SiteHeader - THE single header component for the entire site
@@ -181,14 +182,22 @@ export function SiteHeader({
                 borderColor: 'var(--border-base)'
             }}
         >
-            <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div className="max-w-5xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
                 {/* Left side */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 md:gap-3">
+                    {/* Mobile Navigation - only show when not in back mode */}
+                    {!backHref && !loading && (
+                        <MobileNav
+                            user={user ? { email: user.email || '', name: user.user_metadata?.name, avatarId: user.user_metadata?.avatarId } : null}
+                            onSignOut={handleLogout}
+                        />
+                    )}
+
                     {backHref ? (
                         // Back navigation mode
                         <Link
                             href={backHref}
-                            className="flex items-center gap-2 transition-colors"
+                            className="flex items-center gap-2 transition-colors touch-target"
                             style={{ color: 'var(--text-muted)' }}
                         >
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -198,8 +207,8 @@ export function SiteHeader({
                         </Link>
                     ) : (
                         // Regular logo
-                        <Link href={logoHref} className="flex items-center gap-3 group">
-                            <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-105 transition-transform shadow-sm">
+                        <Link href={logoHref} className="flex items-center gap-2 md:gap-3 group">
+                            <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-105 transition-transform shadow-sm">
                                 <Image
                                     src="/icon-192.png"
                                     alt="The Long Game"
@@ -208,7 +217,7 @@ export function SiteHeader({
                                     className="object-cover"
                                 />
                             </div>
-                            <span className="font-semibold" style={{ color: 'var(--text-base)' }}>
+                            <span className="font-semibold hidden sm:inline" style={{ color: 'var(--text-base)' }}>
                                 {title || 'The Long Game'}
                             </span>
                         </Link>
