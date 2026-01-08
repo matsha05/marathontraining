@@ -223,7 +223,7 @@ export default function PlanPage() {
                     transition={{ duration: 0.4, delay: 0.05 }}
                 >
                     <h2 className="v3-heading-md mb-4">Training Phases</h2>
-                    <div className="mobile-scroll-x gap-2 pb-2 -mx-4 px-4 scroll-hint-right md:mx-0 md:px-0 md:overflow-visible">
+                    <div className="mobile-scroll-x gap-2 pb-2 -mx-4 px-4 scroll-hint-right md:flex md:mx-0 md:px-0 md:overflow-visible">
                         {phases.map((phase, i) => (
                             <motion.div
                                 key={phase.name}

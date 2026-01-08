@@ -2734,23 +2734,25 @@ a:focus-visible {
 /* -----------------------------------------------------------------------------
    Horizontal Scroll with Snap - Premium swipe experience
    ----------------------------------------------------------------------------- */
-.mobile-scroll-x {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-x;
-  scrollbar-width: none;
-  overscroll-behavior-x: contain;
-}
+@media (max-width: 768px) {
+  .mobile-scroll-x {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
 
-.mobile-scroll-x::-webkit-scrollbar {
-  display: none;
-}
+  .mobile-scroll-x::-webkit-scrollbar {
+    display: none;
+  }
 
-.mobile-scroll-x>* {
-  scroll-snap-align: start;
-  flex-shrink: 0;
+  .mobile-scroll-x>* {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
 }
 
 /* Scroll snap alignment variants */
@@ -2778,36 +2780,38 @@ a:focus-visible {
 /* -----------------------------------------------------------------------------
    Scroll Fade Hints - Visual indicator for scrollable content
    ----------------------------------------------------------------------------- */
-.scroll-hint-right {
-  position: relative;
-}
+@media (max-width: 768px) {
+  .scroll-hint-right {
+    position: relative;
+  }
 
-.scroll-hint-right::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 48px;
-  background: linear-gradient(to right, transparent, var(--scroll-hint-color, var(--bg-base)));
-  pointer-events: none;
-  z-index: 1;
-}
+  .scroll-hint-right::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 48px;
+    background: linear-gradient(to right, transparent, var(--scroll-hint-color, var(--bg-base)));
+    pointer-events: none;
+    z-index: 1;
+  }
 
-.scroll-hint-left {
-  position: relative;
-}
+  .scroll-hint-left {
+    position: relative;
+  }
 
-.scroll-hint-left::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 48px;
-  background: linear-gradient(to left, transparent, var(--scroll-hint-color, var(--bg-base)));
-  pointer-events: none;
-  z-index: 1;
+  .scroll-hint-left::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 48px;
+    background: linear-gradient(to left, transparent, var(--scroll-hint-color, var(--bg-base)));
+    pointer-events: none;
+    z-index: 1;
+  }
 }
 
 /* -----------------------------------------------------------------------------
