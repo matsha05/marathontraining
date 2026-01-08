@@ -273,7 +273,8 @@ export function DatePicker({
                                     const baseYear = Math.floor(viewDate.getFullYear() / 12) * 12;
                                     const year = baseYear + i;
                                     const isSelected = value && parseDateLocal(value).getFullYear() === year;
-                                    const isDisabled = (minDateObj && year < minDateObj.getFullYear()) || (maxDateObj && year > maxDateObj.getFullYear());
+                                    const isDisabled = (minDateObj ? year < minDateObj.getFullYear() : false)
+                                        || (maxDateObj ? year > maxDateObj.getFullYear() : false);
                                     return (
                                         <button
                                             key={year}
@@ -304,8 +305,8 @@ export function DatePicker({
                                 {MONTHS.map((month, i) => {
                                     const isSelected = value && parseDateLocal(value).getFullYear() === viewDate.getFullYear() && parseDateLocal(value).getMonth() === i;
                                     const testDate = new Date(viewDate.getFullYear(), i, 1);
-                                    const isDisabled = (minDateObj && testDate < new Date(minDateObj.getFullYear(), minDateObj.getMonth(), 1)) ||
-                                        (maxDateObj && testDate > new Date(maxDateObj.getFullYear(), maxDateObj.getMonth(), 1));
+                                    const isDisabled = (minDateObj ? testDate < new Date(minDateObj.getFullYear(), minDateObj.getMonth(), 1) : false)
+                                        || (maxDateObj ? testDate > new Date(maxDateObj.getFullYear(), maxDateObj.getMonth(), 1) : false);
                                     return (
                                         <button
                                             key={month}
