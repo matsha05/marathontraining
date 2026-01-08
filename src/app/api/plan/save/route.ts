@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { requireAthleteId } from '@/infrastructure/auth';
+import { withAuth } from '@/infrastructure/auth';
 import { createSupabaseRequestClient } from '@/infrastructure/supabase/server';
 import { trainingPlanSchema } from '@/domain/plan/schemas';
 import { buildPlannedWorkoutInserts, buildTrainingPlanInsert } from '@/domain/plan/persistence';
@@ -11,10 +11,7 @@ const bodySchema = z.object({
     plan: trainingPlanSchema,
 });
 
-export async function POST(request: NextRequest) {
-    const auth = await requireAthleteId(request);
-    if (auth.response) return auth.response;
-
+export const POST = withAuth(async (request: NextRequest, auth) => {
     let payload: unknown;
     try {
         payload = await request.json();
@@ -45,4 +42,4 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ ok: true });
-}
+});

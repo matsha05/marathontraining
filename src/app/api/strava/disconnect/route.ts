@@ -2,14 +2,11 @@ import { NextResponse } from 'next/server';
 import { deauthorizeStrava } from '@/infrastructure/strava/api';
 import { deleteStravaTokens, getStravaTokensByAthleteId } from '@/infrastructure/strava/store';
 import { getValidAccessToken } from '@/infrastructure/strava/token';
-import { requireAthleteId } from '@/infrastructure/auth';
+import { withAuth } from '@/infrastructure/auth';
 
 export const runtime = 'nodejs';
 
-export async function POST(request: Request) {
-    const auth = await requireAthleteId(request);
-    if (auth.response) return auth.response;
-
+export const POST = withAuth(async (request: Request, auth) => {
     let warning: string | null = null;
     const tokenRow = await getStravaTokensByAthleteId(auth.athleteId);
     if (tokenRow) {
@@ -24,4 +21,4 @@ export async function POST(request: Request) {
     await deleteStravaTokens(auth.athleteId);
 
     return NextResponse.json({ ok: true, warning });
-}
+});

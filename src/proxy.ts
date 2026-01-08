@@ -3,7 +3,7 @@ import { createServerClient } from '@supabase/ssr';
 import { getSafeRedirectPath } from '@/lib/redirects';
 
 /**
- * Next.js Middleware - Elite Auth Guard
+ * Next.js Proxy - Elite Auth Guard
  * 
  * Anti-marketing ethos: logged-in users go straight to app, not landing page.
  * Handles all auth routing server-side (no client-side flash).
@@ -11,7 +11,7 @@ import { getSafeRedirectPath } from '@/lib/redirects';
 
 const protectedPaths = ['/dashboard', '/plan', '/settings', '/workout', '/onboarding', '/regenerate'];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
@@ -47,8 +47,6 @@ export async function middleware(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
     const isProtected = protectedPaths.some(path => pathname.startsWith(path));
     const isAuthRoute = pathname === '/auth' || pathname === '/login' || pathname === '/signup';
-    const isLandingPage = pathname === '/';
-
     // Landing page: Let logged-in users stay on landing
     // They will see the "Dashboard" nav link in header
     // No forced redirect - better UX to let them choose

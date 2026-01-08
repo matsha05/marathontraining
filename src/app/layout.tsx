@@ -4,6 +4,7 @@ import { GeistSans, GeistMono } from "geist/font";
 import "./globals.css";
 import { SyncStatusIndicator } from "@/components/ui/OfflineIndicator";
 import { Providers } from "@/components/ui/Providers";
+import { SITE_URL } from "@/lib/site";
 
 
 const instrumentSans = Instrument_Sans({
@@ -49,6 +50,7 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "The Long Game | Precision Running Training",
   description:
     "Training that adapts to you. Built on Hansons, Daniels, Seiler, and Dicharry methodologies. Every pace calculated. Every workout prescribed.",
@@ -63,6 +65,9 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "The Long Game" }],
   manifest: "/manifest.json",
+  alternates: {
+    canonical: SITE_URL,
+  },
   icons: {
     icon: [
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
@@ -74,6 +79,8 @@ export const metadata: Metadata = {
     title: "The Long Game | Precision Running Training",
     description: "Training that adapts to you. Built on science. Not opinions.",
     type: "website",
+    url: SITE_URL,
+    siteName: "The Long Game",
   },
 };
 

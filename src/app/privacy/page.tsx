@@ -49,7 +49,7 @@ export default function PrivacyPolicyPage() {
                         <div className="v3-card">
                             <p className="v3-body">The Long Game</p>
                             <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
-                                Contact: <a href="mailto:privacy@thelonggame.app" className="v3-accent">privacy@thelonggame.app</a>
+                                Contact: <a href="mailto:privacy@thelonggame.win" className="v3-accent">privacy@thelonggame.win</a>
                             </p>
                         </div>
                     </section>
@@ -216,7 +216,7 @@ export default function PrivacyPolicyPage() {
                             <li><strong>Withdraw Consent:</strong> Revoke consent for health data processing at any time</li>
                         </ul>
                         <p className="v3-body-sm mt-4" style={{ color: 'var(--text-muted)' }}>
-                            To exercise these rights, email <a href="mailto:privacy@thelonggame.app" className="v3-accent">privacy@thelonggame.app</a>.
+                            To exercise these rights, email <a href="mailto:privacy@thelonggame.win" className="v3-accent">privacy@thelonggame.win</a>.
                             We will respond within 30 days.
                         </p>
                     </section>
@@ -280,7 +280,7 @@ export default function PrivacyPolicyPage() {
                         </p>
                         <div className="v3-card">
                             <p className="v3-body mb-2">
-                                Email: <a href="mailto:privacy@thelonggame.app" className="v3-accent">privacy@thelonggame.app</a>
+                                Email: <a href="mailto:privacy@thelonggame.win" className="v3-accent">privacy@thelonggame.win</a>
                             </p>
                         </div>
                         <p className="v3-body-sm mt-4" style={{ color: 'var(--text-muted)' }}>

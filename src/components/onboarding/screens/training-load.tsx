@@ -18,6 +18,7 @@ import {
 } from '../ui';
 import { OnboardingData } from '@/domain/onboarding/types';
 import { STEP_TOOLTIPS } from '@/domain/onboarding/types';
+import { WeekRow } from '@/components/ui/WeekRow';
 import { toDateKey } from '@/lib/dates';
 import {
     RUNS_PER_WEEK_OPTIONS,
@@ -287,7 +288,7 @@ export function LongRunDayScreen({
             />
 
             {/* Week grid - all 7 days, horizontal scroll on mobile */}
-            <div className="mobile-scroll-x gap-2 pb-2 mb-4 -mx-4 px-4 scroll-hint-right md:mx-0 md:px-0 md:grid md:grid-cols-7 md:gap-2 md:overflow-visible">
+            <WeekRow className="mb-4">
                 {LONG_RUN_DAY_OPTIONS.map((option, index) => (
                     <button
                         key={option.value}
@@ -313,7 +314,7 @@ export function LongRunDayScreen({
                         </span>
                     </button>
                 ))}
-            </div>
+            </WeekRow>
 
             {value.length === 2 && (
                 <p className="text-xs mb-4" style={{ color: 'var(--text-subtle)' }}>

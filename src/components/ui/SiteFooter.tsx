@@ -76,7 +76,7 @@ export function SiteFooter() {
                             Terms
                         </Link>
                         <a
-                            href="mailto:support@thelonggame.run"
+                            href="mailto:support@thelonggame.win"
                             className="v3-body-xs transition-colors hover:opacity-70"
                             style={{ color: 'var(--text-subtle)' }}
                         >

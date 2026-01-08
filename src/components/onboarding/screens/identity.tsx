@@ -20,6 +20,7 @@ import {
 import { OnboardingData } from '@/domain/onboarding/types';
 import { STEP_TOOLTIPS } from '@/domain/onboarding/types';
 import { addYears, toDateKey } from '@/lib/dates';
+import { WeekRow } from '@/components/ui/WeekRow';
 
 // Animation ease curve
 const ease = [0.25, 0.46, 0.45, 0.94] as const;
@@ -87,7 +88,7 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
                     <p className="text-xs mb-4 font-mono" style={{ color: 'var(--text-subtle)' }}>
                         What you'll get · Calibrated to your fitness
                     </p>
-                    <div className="mobile-scroll-x gap-2 pb-2 -mx-4 px-4 scroll-hint-right md:mx-0 md:px-0 md:grid md:grid-cols-7 md:gap-2 md:overflow-visible">
+                    <WeekRow>
                         {[
                             { day: "M", type: "run", label: "Easy", sub: "?" },
                             { day: "T", type: "run", label: "Speed", sub: "?" },
@@ -127,7 +128,7 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
                                 )}
                             </motion.div>
                         ))}
-                    </div>
+                    </WeekRow>
                 </motion.div>
 
                 {/* CTA */}

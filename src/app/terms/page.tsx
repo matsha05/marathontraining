@@ -131,8 +131,8 @@ export default function TermsPage() {
                         <h2 className="v3-heading-md mb-4">Contact</h2>
                         <p className="v3-body" style={{ color: 'var(--text-muted)' }}>
                             Questions about these terms? Contact us at{' '}
-                            <a href="mailto:legal@thelonggame.app" className="v3-accent">
-                                legal@thelonggame.app
+                            <a href="mailto:legal@thelonggame.win" className="v3-accent">
+                                legal@thelonggame.win
                             </a>
                         </p>
                     </section>

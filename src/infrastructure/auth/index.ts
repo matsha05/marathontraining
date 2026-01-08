@@ -17,6 +17,11 @@ export type AuthGuardResult =
     | { athleteId: string; userId: string; response: null }
     | { athleteId: null; userId: null; response: NextResponse };
 
+export interface AuthContext {
+    athleteId: string;
+    userId: string;
+}
+
 /**
  * Resolves the authenticated user's athlete ID from a request.
  * Works with both NextRequest and standard Request objects.
@@ -54,4 +59,15 @@ export async function requireAthleteId(
     const athleteId = result.athleteId;
     const userId = result.userId ?? athleteId;
     return { athleteId, userId, response: null };
+}
+
+export function withAuth<TRequest extends Request | NextRequest = NextRequest>(
+    handler: (request: TRequest, auth: AuthContext) => Promise<Response> | Response,
+    options: { onUnauthorized?: (request: TRequest) => NextResponse } = {}
+) {
+    return async (request: TRequest) => {
+        const auth = await requireAthleteId(request, options);
+        if (auth.response) return auth.response;
+        return handler(request, { athleteId: auth.athleteId, userId: auth.userId });
+    };
 }

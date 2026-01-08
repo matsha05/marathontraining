@@ -8,6 +8,7 @@ import { isPhilosophyAvailableForDistance } from '@/domain/philosophy/recommenda
 import type { TargetDistance, TrainingPhilosophy } from '@/domain/philosophy/types';
 import { SiteHeader } from '@/components/ui/SiteHeader';
 import { Footer } from '@/components/ui/Footer';
+import { MobileScroller } from '@/components/ui/MobileScroller';
 
 /**
  * Plan Library Page
@@ -128,7 +129,7 @@ export default function PlansPage() {
             <nav className="px-6 mb-8">
                 <div className="max-w-4xl mx-auto">
                     {/* Padding accommodates hover scale/lift without clipping */}
-                    <div className="mobile-scroll-x gap-2 pb-2 -mx-4 px-4 scroll-hint-right md:flex md:flex-wrap md:mx-0 md:px-0 md:overflow-visible">
+                    <MobileScroller className="gap-2 pb-2 md:flex md:flex-wrap">
                         {DISTANCES.map((distance, i) => (
                             <motion.button
                                 key={distance.id}
@@ -167,7 +168,7 @@ export default function PlansPage() {
                                 </span>
                             </motion.button>
                         ))}
-                    </div>
+                    </MobileScroller>
                 </div>
             </nav>
 

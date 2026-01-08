@@ -8,6 +8,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Tooltip } from '@/components/ui/Tooltip';
 import {
     getWorkoutContext,
     getPhaseContext,
@@ -312,18 +313,18 @@ export function IntensityBadge({ zone, showTooltip = true }: IntensityBadgeProps
     };
 
     return (
-        <span
-            className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono font-semibold tooltip-trigger"
+        <Tooltip
+            label={zoneNames[zone]}
+            showTooltip={showTooltip}
+            showMobileLabel={showTooltip}
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono font-semibold"
             style={{
                 background: `${color}20`,
                 color: color,
             }}
-            data-tooltip={showTooltip ? zoneNames[zone] : undefined}
-            aria-label={zoneNames[zone]}
         >
             {zone}
-            {showTooltip && <span className="ml-1 text-[10px] md:hidden">{zoneNames[zone]}</span>}
-        </span>
+        </Tooltip>
     );
 }
 

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { CheckIcon } from '@/components/ui/check';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { WeekRow } from '@/components/ui/WeekRow';
 
 /**
  * WeeklyCalendar - Week-at-a-glance component (V3)
@@ -245,9 +246,9 @@ export function WeeklyCalendar({
             )}
 
             {/* Mobile: Horizontal scroll with snap | Desktop: 7-col grid */}
-            <div
+            <WeekRow
                 ref={scrollRef}
-                className="mobile-scroll-x gap-2 pb-2 -mx-4 px-4 scroll-hint-right md:mx-0 md:px-0 md:grid md:grid-cols-7 md:gap-2 md:overflow-visible scroll-smooth"
+                className="scroll-smooth"
             >
                 {days.map((day, index) => {
                     const isClickable = day.status !== 'rest' && (day.workoutId || day.date || onDayClick);
@@ -380,7 +381,7 @@ export function WeeklyCalendar({
                         </motion.button>
                     );
                 })}
-            </div>
+            </WeekRow>
         </motion.div >
     );
 }

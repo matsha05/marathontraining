@@ -1,17 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildAuthorizationUrl, generateState, withStateContext } from '@/infrastructure/strava/oauth';
 import { saveStravaOauthState } from '@/infrastructure/strava/store';
-import { requireAthleteId } from '@/infrastructure/auth';
+import { withAuth } from '@/infrastructure/auth';
 import { requireStravaConfig, stravaConfig } from '@/infrastructure/strava/config';
 import { stravaConnectQuerySchema } from '@/infrastructure/strava/schemas';
 import { getSafeRedirectPath } from '@/lib/redirects';
 
 export const runtime = 'nodejs';
 
-export async function GET(request: NextRequest) {
-    const auth = await requireAthleteId(request, { onUnauthorized: redirectToLogin });
-    if (auth.response) return auth.response;
-
+export const GET = withAuth(async (request: NextRequest, auth) => {
     const configCheck = requireStravaConfig(['clientId', 'clientSecret']);
     if (!configCheck.ok) {
         return redirectToError(request, 'missing_config');
@@ -40,7 +37,7 @@ export async function GET(request: NextRequest) {
     } catch (error) {
         return redirectToError(request, error instanceof Error && /missing/i.test(error.message) ? 'missing_config' : 'connect_failed');
     }
-}
+}, { onUnauthorized: redirectToLogin });
 
 function redirectToLogin(request: NextRequest) {
     const url = new URL(request.url);

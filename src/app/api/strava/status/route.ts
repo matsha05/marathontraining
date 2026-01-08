@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStravaTokensByAthleteId, getLatestStravaActivity } from '@/infrastructure/strava/store';
-import { requireAthleteId } from '@/infrastructure/auth';
+import { withAuth } from '@/infrastructure/auth';
 
 export const runtime = 'nodejs';
 
-export async function GET(request: NextRequest) {
-    const auth = await requireAthleteId(request);
-    if (auth.response) return auth.response;
-
+export const GET = withAuth(async (request: NextRequest, auth) => {
     const tokenRow = await getStravaTokensByAthleteId(auth.athleteId);
 
     if (!tokenRow) {
@@ -22,4 +19,4 @@ export async function GET(request: NextRequest) {
         accessTokenExpiresAt: tokenRow.access_token_expires_at,
         lastActivityAt: lastActivity?.start_time ?? null,
     });
-}
+});

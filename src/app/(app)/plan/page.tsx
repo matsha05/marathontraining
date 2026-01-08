@@ -7,6 +7,7 @@ import { usePlan } from '@/domain/plan/context';
 import { TrainingPlan, WeekPlan, TrainingPhase } from '@/domain/plan/types';
 import { motion } from 'framer-motion';
 import { SiteHeader } from '@/components/ui/SiteHeader';
+import { MobileScroller } from '@/components/ui/MobileScroller';
 
 /**
  * Training Plan View V2
@@ -223,7 +224,7 @@ export default function PlanPage() {
                     transition={{ duration: 0.4, delay: 0.05 }}
                 >
                     <h2 className="v3-heading-md mb-4">Training Phases</h2>
-                    <div className="mobile-scroll-x gap-2 pb-2 -mx-4 px-4 scroll-hint-right md:flex md:mx-0 md:px-0 md:overflow-visible">
+                    <MobileScroller className="gap-2 pb-2 md:flex">
                         {phases.map((phase, i) => (
                             <motion.div
                                 key={phase.name}
@@ -247,7 +248,7 @@ export default function PlanPage() {
                                 </p>
                             </motion.div>
                         ))}
-                    </div>
+                    </MobileScroller>
                 </motion.section>
 
                 {/* Weekly Overview */}

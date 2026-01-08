@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/ui/SiteHeader";
 import { Footer } from "@/components/ui/Footer";
 import { Badge } from "@/components/ui/Badge";
 import { Metric } from "@/components/ui/Metric";
+import { WeekRow } from "@/components/ui/WeekRow";
 import { colors } from "@/lib/design-tokens";
 import { X } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -40,7 +41,7 @@ const coachColors = {
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen-safe" style={{ background: 'var(--bg-base)', color: 'var(--text-base)' }}>
+    <div className="min-h-screen-safe token-bg-base token-text-base">
       <SiteHeader />
 
       {/* Hero - Big text + Week preview with animations */}
@@ -57,8 +58,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6, ease }}
-            className="text-4xl sm:text-5xl md:text-7xl font-light mb-4 tracking-tight"
-            style={{ color: 'var(--text-base)' }}
+            className="text-4xl sm:text-5xl md:text-7xl font-light mb-4 tracking-tight token-text-base"
           >
             The Long Game
           </motion.h1>
@@ -66,8 +66,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.35, duration: 0.6, ease }}
-            className="text-lg mb-12"
-            style={{ color: 'var(--text-muted)' }}
+            className="text-lg mb-12 token-text-muted"
           >
             Training, structured.
           </motion.p>
@@ -79,11 +78,11 @@ export default function LandingPage() {
             transition={{ delay: 0.5, duration: 0.7, ease }}
             className="max-w-3xl mx-auto mb-12"
           >
-            <p className="text-xs mb-4 font-mono" style={{ color: 'var(--text-subtle)' }}>
+            <p className="text-xs mb-4 font-mono token-text-subtle">
               Week 8 · Build Phase · 42 miles
             </p>
             {/* Mobile: Horizontal scroll | Desktop: Grid */}
-            <div className="mobile-scroll-x gap-2 py-2 -mx-4 px-4 scroll-hint-right md:mx-0 md:px-0 md:grid md:grid-cols-7 md:gap-2 md:overflow-visible">
+            <WeekRow variant="landing">
               {[
                 { day: "M", type: "run", label: "5mi Easy", sub: "8:32/mi", strength: true },
                 { day: "T", type: "run", label: "6×800m", sub: "VO2", strength: false },
@@ -114,24 +113,21 @@ export default function LandingPage() {
                   }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <p className="text-xs mb-2 md:mb-3" style={{ color: 'var(--text-subtle)' }}>{d.day}</p>
-                  <p
-                    className="text-sm mb-1 whitespace-nowrap"
-                    style={{ color: d.type === "rest" ? 'var(--text-subtle)' : 'var(--text-muted)' }}
-                  >
+                  <p className="text-xs mb-2 md:mb-3 token-text-subtle">{d.day}</p>
+                  <p className={`text-sm mb-1 whitespace-nowrap ${d.type === "rest" ? "token-text-subtle" : "token-text-muted"}`}>
                     {d.label}
                   </p>
                   {d.sub && (
-                    <p className="text-xs font-mono" style={{ color: 'var(--text-subtle)' }}>{d.sub}</p>
+                    <p className="text-xs font-mono token-text-subtle">{d.sub}</p>
                   )}
                   {d.strength && (
-                    <div className="mt-2 pt-2" style={{ borderTop: '1px solid var(--border-base)' }}>
-                      <p className="text-xs" style={{ color: 'var(--color-strength)' }}>+ Strength</p>
+                    <div className="mt-2 pt-2 border-t token-border-base">
+                      <p className="text-xs token-text-strength">+ Strength</p>
                     </div>
                   )}
                 </motion.div>
               ))}
-            </div>
+            </WeekRow>
           </motion.div>
 
           {/* CTA - last to animate */}
@@ -153,16 +149,16 @@ export default function LandingPage() {
           transition={{ delay: 1.3, duration: 0.5 }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2"
         >
-          <p className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--text-subtle)' }}>Scroll</p>
+          <p className="text-[10px] uppercase tracking-widest token-text-subtle">Scroll</p>
         </motion.div>
       </section>
 
       {/* === RUNNING SCIENCE — PLAN STRUCTURE === */}
       <section className="px-6 py-24">
         <div className="max-w-3xl mx-auto text-center">
-          <p className="text-xs uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>Running Science</p>
-          <h2 className="text-4xl md:text-5xl font-light mb-4" style={{ color: 'var(--text-base)' }}>Evidence-based training</h2>
-          <p className="text-lg" style={{ color: 'var(--text-muted)' }}>7 methodologies. We'll match you with the right one during setup.</p>
+          <p className="text-xs uppercase tracking-widest mb-4 token-text-muted">Running Science</p>
+          <h2 className="text-4xl md:text-5xl font-light mb-4 token-text-base">Evidence-based training</h2>
+          <p className="text-lg token-text-muted">7 methodologies. We'll match you with the right one during setup.</p>
         </div>
       </section>
 
@@ -174,27 +170,7 @@ export default function LandingPage() {
         description="Six days a week. Train on tired legs, race on fresh ones. 16-mile long run cap — because the cumulative week matters more than any single run."
         bestFor="Experienced runners, 6 days available, high mileage tolerance"
       >
-        <div className="v3-card p-4">
-          <div className="mobile-scroll-x gap-2 py-2 text-center -mx-2 px-2 scroll-hint-right md:mx-0 md:px-0 md:grid md:grid-cols-7 md:gap-2 md:overflow-visible">
-            {["Easy", "Speed", "Rest", "Tempo", "Easy", "Easy", "Long"].map((day, i) => (
-              <div key={i} className="snap-center flex-shrink-0 w-[60px] md:w-auto md:flex-shrink">
-                <p className="text-xs mb-1" style={{ color: 'var(--text-subtle)' }}>{["M", "T", "W", "T", "F", "S", "S"][i]}</p>
-                <p
-                  className="text-xs"
-                  style={{
-                    color: day === "Rest"
-                      ? 'var(--text-subtle)'
-                      : day === "Long"
-                        ? coachColors.hansons
-                        : 'var(--text-muted)'
-                  }}
-                >
-                  {day}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
+        <CumulativeFatigueWeek coachColor={coachColors.hansons} />
       </CoachSection>
 
       {/* Higdon */}
@@ -212,8 +188,8 @@ export default function LandingPage() {
             { level: "Advanced", sub: "Chasing PRs" },
           ].map((p) => (
             <div key={p.level} className="v3-card p-4 text-center">
-              <p className="text-lg font-light" style={{ color: 'var(--text-muted)' }}>{p.level}</p>
-              <p className="text-[10px] mt-1" style={{ color: 'var(--text-subtle)' }}>{p.sub}</p>
+              <p className="text-lg font-light token-text-muted">{p.level}</p>
+              <p className="text-[10px] mt-1 token-text-subtle">{p.sub}</p>
             </div>
           ))}
         </div>
@@ -234,8 +210,8 @@ export default function LandingPage() {
             { range: "85+", unit: "mi/week" },
           ].map((p) => (
             <div key={p.range} className="flex-1 v3-card p-4 text-center">
-              <p className="text-lg font-mono" style={{ color: 'var(--text-muted)' }}>{p.range}</p>
-              <p className="text-[10px] mt-1" style={{ color: 'var(--text-subtle)' }}>{p.unit}</p>
+              <p className="text-lg font-mono token-text-muted">{p.range}</p>
+              <p className="text-[10px] mt-1 token-text-subtle">{p.unit}</p>
             </div>
           ))}
         </div>
@@ -249,7 +225,10 @@ export default function LandingPage() {
         description="Practical application of polarized training for everyday runners. Takes Seiler's research and makes it actionable with clear intensity guidelines."
         bestFor="Runners wanting science-backed intensity distribution"
       >
-        <PolarizedBar />
+        <div>
+          <p className="text-xs mb-3 font-mono token-text-subtle">Your weekly training split</p>
+          <PolarizedBar />
+        </div>
       </CoachSection>
 
       {/* Steve Magness */}
@@ -266,8 +245,8 @@ export default function LandingPage() {
             { label: "Method", value: "Not the system" },
           ].map((p) => (
             <div key={p.label} className="v3-card p-4 text-center">
-              <p className="text-sm mb-1" style={{ color: 'var(--text-muted)' }}>{p.label}</p>
-              <p style={{ color: 'var(--text-muted)' }}>{p.value}</p>
+              <p className="text-sm mb-1 token-text-muted">{p.label}</p>
+              <p className="token-text-muted">{p.value}</p>
             </div>
           ))}
         </div>
@@ -276,9 +255,9 @@ export default function LandingPage() {
       {/* Foundation section */}
       <section className="px-6 py-24">
         <div className="max-w-3xl mx-auto text-center">
-          <p className="text-xs uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>The Foundation</p>
-          <h2 className="text-4xl md:text-5xl font-light mb-4" style={{ color: 'var(--text-base)' }}>Built on every plan</h2>
-          <p className="text-lg" style={{ color: 'var(--text-muted)' }}>These apply to every training philosophy.</p>
+          <p className="text-xs uppercase tracking-widest mb-4 token-text-muted">The Foundation</p>
+          <h2 className="text-4xl md:text-5xl font-light mb-4 token-text-base">Built on every plan</h2>
+          <p className="text-lg token-text-muted">These apply to every training philosophy.</p>
         </div>
       </section>
 
@@ -297,8 +276,8 @@ export default function LandingPage() {
             { zone: "Marathon", pace: "8:01" },
           ].map((p) => (
             <div key={p.zone} className="v3-card p-3 text-center">
-              <p className="text-sm mb-1" style={{ color: 'var(--text-muted)' }}>{p.zone}</p>
-              <p className="font-mono" style={{ color: 'var(--text-muted)' }}>{p.pace}</p>
+              <p className="text-sm mb-1 token-text-muted">{p.zone}</p>
+              <p className="font-mono token-text-muted">{p.pace}</p>
             </div>
           ))}
         </div>
@@ -311,7 +290,7 @@ export default function LandingPage() {
         tag="Intensity"
         description="80/20 polarized. Elite endurance athletes spend 80% of training at low intensity, 20% high. The 'moderate' gray zone is avoided — too hard to recover from, too easy to drive adaptation."
       >
-        <PolarizedBar />
+        <EliteStudyVisualization />
       </CoachSection>
 
       {/* Dicharry - Durability */}
@@ -346,14 +325,16 @@ export default function LandingPage() {
             },
           ].map((p) => (
             <div key={p.label} className="group relative flex-1 v3-card p-4 text-center transition-all hover:border-[var(--color-coach-starrett)]">
-              <p className="text-sm mb-1" style={{ color: 'var(--text-muted)' }}>{p.label}</p>
-              <p style={{ color: 'var(--text-muted)' }}>{p.value}</p>
+              <p className="text-sm mb-1 token-text-muted">{p.label}</p>
+              <p className="token-text-muted">{p.value}</p>
               {/* Tooltip */}
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-3 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50 w-64 text-center"
-                style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-base)', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
-                <p className="text-[11px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>{p.tooltip}</p>
+              <div
+                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-3 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50 w-64 text-center token-bg-elevated border border-token-base"
+                style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
+              >
+                <p className="text-[11px] leading-relaxed token-text-muted">{p.tooltip}</p>
                 {/* Arrow */}
-                <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 -mt-1" style={{ background: 'var(--bg-elevated)', borderRight: '1px solid var(--border-base)', borderBottom: '1px solid var(--border-base)' }} />
+                <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 -mt-1 token-bg-elevated border-r border-b token-border-base" />
               </div>
             </div>
           ))}
@@ -363,9 +344,9 @@ export default function LandingPage() {
       {/* Strength section */}
       <section className="px-6 py-24">
         <div className="max-w-3xl mx-auto text-center">
-          <p className="text-xs uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>Strength Training</p>
-          <h2 className="text-4xl md:text-5xl font-light mb-4" style={{ color: 'var(--text-base)' }}>Lift to run faster</h2>
-          <p className="text-lg" style={{ color: 'var(--text-muted)' }}>Runner-specific strength programming proven to improve economy.</p>
+          <p className="text-xs uppercase tracking-widest mb-4 token-text-muted">Strength Training</p>
+          <h2 className="text-4xl md:text-5xl font-light mb-4 token-text-base">Lift to run faster</h2>
+          <p className="text-lg token-text-muted">Runner-specific strength programming proven to improve economy.</p>
         </div>
       </section>
 
@@ -382,8 +363,8 @@ export default function LandingPage() {
             { value: "5%", label: "economy gain" },
           ].map((p) => (
             <div key={p.value} className="flex-1 v3-card p-4 text-center">
-              <p className="text-2xl font-light" style={{ color: 'var(--text-muted)' }}>{p.value}</p>
-              <p className="text-xs mt-1" style={{ color: 'var(--text-subtle)' }}>{p.label}</p>
+              <p className="text-2xl font-light token-text-muted">{p.value}</p>
+              <p className="text-xs mt-1 token-text-subtle">{p.label}</p>
             </div>
           ))}
         </div>
@@ -405,8 +386,8 @@ export default function LandingPage() {
             { phase: "Taper", action: "Protect" },
           ].map((p) => (
             <div key={p.phase} className="v3-card p-3 text-center">
-              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{p.phase}</p>
-              <p className="text-[10px] mt-1" style={{ color: 'var(--text-subtle)' }}>{p.action}</p>
+              <p className="text-sm token-text-muted">{p.phase}</p>
+              <p className="text-[10px] mt-1 token-text-subtle">{p.action}</p>
             </div>
           ))}
         </div>
@@ -415,9 +396,9 @@ export default function LandingPage() {
       {/* Elite section */}
       <section className="px-6 py-24">
         <div className="max-w-3xl mx-auto text-center">
-          <p className="text-xs uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>Elite Methods</p>
-          <h2 className="text-4xl md:text-5xl font-light mb-4" style={{ color: 'var(--text-base)' }}>World-class training</h2>
-          <p className="text-lg" style={{ color: 'var(--text-muted)' }}>Methods from Olympic and World Championship programs.</p>
+          <p className="text-xs uppercase tracking-widest mb-4 token-text-muted">Elite Methods</p>
+          <h2 className="text-4xl md:text-5xl font-light mb-4 token-text-base">World-class training</h2>
+          <p className="text-lg token-text-muted">Methods from Olympic and World Championship programs.</p>
         </div>
       </section>
 
@@ -435,8 +416,8 @@ export default function LandingPage() {
             { value: "3", label: "Olympic sons" },
           ].map((p) => (
             <div key={p.value} className="flex-1 v3-card p-4 text-center">
-              <p className="text-2xl font-light" style={{ color: 'var(--text-muted)' }}>{p.value}</p>
-              <p className="text-xs mt-1" style={{ color: 'var(--text-subtle)' }}>{p.label}</p>
+              <p className="text-2xl font-light token-text-muted">{p.value}</p>
+              <p className="text-xs mt-1 token-text-subtle">{p.label}</p>
             </div>
           ))}
         </div>
@@ -445,9 +426,9 @@ export default function LandingPage() {
       {/* Final CTA */}
       <section className="px-6 py-24">
         <div className="max-w-3xl mx-auto text-center">
-          <p className="text-xs uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>Any Distance</p>
-          <h2 className="text-4xl md:text-5xl font-light mb-4" style={{ color: 'var(--text-base)' }}>Base building to 50K.</h2>
-          <p className="text-lg mb-8" style={{ color: 'var(--text-muted)' }}>
+          <p className="text-xs uppercase tracking-widest mb-4 token-text-muted">Any Distance</p>
+          <h2 className="text-4xl md:text-5xl font-light mb-4 token-text-base">Base building to 50K.</h2>
+          <p className="text-lg mb-8 token-text-muted">
             Race on the calendar or just building fitness. We'll meet you where you are.
           </p>
           <Link href="/onboarding" className="v3-btn v3-btn-primary v3-btn-lg">
@@ -490,21 +471,22 @@ function StandardsGrid() {
         {STANDARDS_DATA.map((standard) => (
           <button
             key={standard.id}
-            className="group relative h-12 md:h-10 rounded-lg flex flex-col items-center justify-center transition-all active:scale-95 touch-target"
-            style={{
-              background: selectedId === standard.id ? 'var(--color-accent-subtle)' : 'var(--bg-muted)',
-              border: selectedId === standard.id ? '1px solid var(--color-accent)' : '1px solid transparent',
-            }}
+            className={`group relative h-12 md:h-10 rounded-lg flex flex-col items-center justify-center transition-all active:scale-95 touch-target border ${selectedId === standard.id
+              ? "token-bg-accent-subtle border-[var(--color-accent)]"
+              : "token-bg-muted border-transparent"
+              }`}
             onClick={() => setSelectedId(selectedId === standard.id ? null : standard.id)}
           >
-            <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>{standard.name}</span>
-            <span className="text-xs" style={{ color: 'var(--text-subtle)' }}>{standard.id}</span>
+            <span className="text-xs font-medium token-text-muted">{standard.name}</span>
+            <span className="text-xs token-text-subtle">{standard.id}</span>
             {/* Desktop: Hover tooltip */}
-            <div className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50 w-48 text-center"
-              style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-base)', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
-              <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-base)' }}>{standard.name}</p>
-              <p className="text-xs leading-tight" style={{ color: 'var(--text-muted)' }}>{standard.tooltip}</p>
-              <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 -mt-1" style={{ background: 'var(--bg-elevated)', borderRight: '1px solid var(--border-base)', borderBottom: '1px solid var(--border-base)' }} />
+            <div
+              className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50 w-48 text-center token-bg-elevated border border-token-base"
+              style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
+            >
+              <p className="text-xs font-medium mb-1 token-text-base">{standard.name}</p>
+              <p className="text-xs leading-tight token-text-muted">{standard.tooltip}</p>
+              <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 -mt-1 token-bg-elevated border-r border-b token-border-base" />
             </div>
           </button>
         ))}
@@ -518,24 +500,22 @@ function StandardsGrid() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            className="mt-4 p-4 rounded-xl md:hidden"
-            style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-base)' }}
+            className="mt-4 p-4 rounded-xl md:hidden token-bg-elevated border border-token-base"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1">
-                <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-base)' }}>
+                <p className="text-sm font-medium mb-1 token-text-base">
                   {selected.id}. {selected.name}
                 </p>
-                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                <p className="text-sm leading-relaxed token-text-muted">
                   {selected.tooltip}
                 </p>
               </div>
               <button
                 onClick={() => setSelectedId(null)}
-                className="p-2 rounded-lg touch-target-sm"
-                style={{ background: 'var(--bg-muted)' }}
+                className="p-2 rounded-lg touch-target-sm token-bg-muted"
               >
-                <X className="w-4 h-4" style={{ color: 'var(--text-subtle)' }} />
+                <X className="w-4 h-4 token-text-subtle" />
               </button>
             </div>
           </motion.div>
@@ -564,39 +544,133 @@ function CoachSection({
   const { ref, className } = useScrollReveal();
 
   return (
-    <section ref={ref} className={`px-6 py-20 ${className}`} style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+    <section ref={ref} className={`px-6 py-20 ${className} border-t token-border-faint`}>
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-2 h-2 rounded-full" style={{ background: color }} />
-          <h2 className="text-2xl font-light" style={{ color: 'var(--text-base)' }}>{name}</h2>
-          <span className="text-xs uppercase tracking-wider" style={{ color: 'var(--text-subtle)' }}>{tag}</span>
+          <h2 className="text-2xl font-light token-text-base">{name}</h2>
+          <span className="text-xs uppercase tracking-wider token-text-subtle">{tag}</span>
         </div>
-        <p className="mb-6 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+        <p className="mb-6 leading-relaxed token-text-muted">
           {description}
         </p>
         {children}
         {bestFor && (
-          <p className="text-xs mt-3" style={{ color: 'var(--text-subtle)' }}>Best for: {bestFor}</p>
+          <p className="text-xs mt-3 token-text-subtle">Best for: {bestFor}</p>
         )}
       </div>
     </section>
   );
 }
 
+function CumulativeFatigueWeek({ coachColor }: { coachColor: string }) {
+  return (
+    <div className="grid grid-cols-2 gap-4">
+      {/* Traditional approach */}
+      <div
+        className="p-5 rounded-xl text-center"
+        style={{
+          background: 'var(--bg-muted)',
+          border: '1px solid var(--border-base)'
+        }}
+      >
+        <p className="text-[10px] uppercase tracking-widest mb-3" style={{ color: 'var(--text-subtle)' }}>
+          Traditional
+        </p>
+        <p className="text-3xl font-light mb-2" style={{ color: 'var(--text-muted)' }}>
+          20mi
+        </p>
+        <p className="text-xs" style={{ color: 'var(--text-subtle)' }}>
+          on fresh legs
+        </p>
+      </div>
+
+      {/* Hansons approach */}
+      <div
+        className="p-5 rounded-xl text-center"
+        style={{
+          background: `rgba(${parseInt(coachColor.slice(1, 3), 16)}, ${parseInt(coachColor.slice(3, 5), 16)}, ${parseInt(coachColor.slice(5, 7), 16)}, 0.06)`,
+          border: `1px solid rgba(${parseInt(coachColor.slice(1, 3), 16)}, ${parseInt(coachColor.slice(3, 5), 16)}, ${parseInt(coachColor.slice(5, 7), 16)}, 0.25)`
+        }}
+      >
+        <p className="text-[10px] uppercase tracking-widest mb-3" style={{ color: coachColor }}>
+          Hansons
+        </p>
+        <p className="text-3xl font-light mb-2" style={{ color: coachColor }}>
+          16mi
+        </p>
+        <p className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>
+          on <span style={{ color: coachColor }}>30mi</span> of tired legs
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function PolarizedBar() {
   return (
     <div className="flex gap-2">
-      <div
-        className="flex-[80] h-10 rounded-lg flex items-center justify-center"
-        style={{ background: 'var(--color-accent-subtle)' }}
-      >
-        <span className="text-sm" style={{ color: 'var(--color-accent-muted)' }}>80% Easy</span>
+      <div className="flex-[80] h-10 rounded-lg flex items-center justify-center token-bg-accent-subtle">
+        <span className="text-sm token-text-accent-muted">80% Easy</span>
       </div>
       <div
         className="flex-[20] h-10 rounded-lg flex items-center justify-center"
         style={{ background: 'rgba(239, 68, 68, 0.1)' }}
       >
         <span className="text-xs" style={{ color: 'rgba(239, 68, 68, 0.8)' }}>20% Hard</span>
+      </div>
+    </div>
+  );
+}
+
+function EliteStudyVisualization() {
+  const sports = [
+    { name: "Running", low: 77, high: 23 },
+    { name: "Cycling", low: 81, high: 19 },
+    { name: "XC Skiing", low: 83, high: 17 },
+  ];
+
+  return (
+    <div>
+      <p className="text-xs mb-3 font-mono" style={{ color: 'var(--text-subtle)' }}>
+        Elite athlete training distribution (Seiler, 2010)
+      </p>
+      <div className="space-y-2">
+        {sports.map((sport) => (
+          <div key={sport.name} className="flex items-center gap-3">
+            <span className="text-xs w-16 text-right" style={{ color: 'var(--text-subtle)' }}>
+              {sport.name}
+            </span>
+            <div className="flex-1 flex gap-1 h-6">
+              <div
+                className="rounded flex items-center justify-center"
+                style={{
+                  flex: sport.low,
+                  background: 'var(--color-accent-subtle)'
+                }}
+              >
+                <span className="text-[10px] font-mono" style={{ color: 'var(--color-accent-muted)' }}>
+                  {sport.low}%
+                </span>
+              </div>
+              <div
+                className="rounded flex items-center justify-center"
+                style={{
+                  flex: sport.high,
+                  background: 'rgba(239, 68, 68, 0.1)'
+                }}
+              >
+                <span className="text-[10px] font-mono" style={{ color: 'rgba(239, 68, 68, 0.8)' }}>
+                  {sport.high}%
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-between mt-3 text-[10px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+        <span>Low Intensity</span>
+        <span>High Intensity</span>
       </div>
     </div>
   );

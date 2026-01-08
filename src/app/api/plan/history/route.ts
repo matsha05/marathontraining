@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAthleteId } from '@/infrastructure/auth';
+import { withAuth } from '@/infrastructure/auth';
 import { createSupabaseRequestClient } from '@/infrastructure/supabase/server';
 
 export const runtime = 'nodejs';
 
-export async function GET(request: NextRequest) {
-    const auth = await requireAthleteId(request);
-    if (auth.response) return auth.response;
-
+export const GET = withAuth(async (request: NextRequest, auth) => {
     const supabase = createSupabaseRequestClient(request);
     const { data, error } = await supabase
         .from('training_plans')
@@ -20,4 +17,4 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ plans: data || [] });
-}
+});

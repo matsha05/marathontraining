@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useLandingNav } from "../useLandingNav";
+import { WeekRow } from "@/components/ui/WeekRow";
 
 /**
  * Week Polished Landing Page
@@ -92,8 +93,8 @@ export default function WeekLanding() {
                         <p className="text-xs text-white/20 mb-4 font-mono">
                             Week 8 · Build Phase · 42 miles
                         </p>
-                        <div
-                            className="mobile-scroll-x gap-2 pb-2 -mx-4 px-4 scroll-hint-right md:mx-0 md:px-0 md:grid md:grid-cols-7 md:gap-1 md:overflow-visible"
+                        <WeekRow
+                            className="md:gap-1"
                             style={{ '--scroll-hint-color': '#08080a' } as CSSProperties }
                         >
                             {[
@@ -132,7 +133,7 @@ export default function WeekLanding() {
                                     )}
                                 </motion.div>
                             ))}
-                        </div>
+                        </WeekRow>
                     </motion.div>
 
                     {/* CTA - last to animate */}
@@ -189,8 +190,8 @@ export default function WeekLanding() {
                         because the cumulative week matters more than any single run.
                     </p>
                     <div className="p-4 rounded-lg bg-white/[0.02] border border-white/5">
-                        <div
-                            className="mobile-scroll-x gap-2 pb-2 -mx-4 px-4 scroll-hint-right md:mx-0 md:px-0 md:grid md:grid-cols-7 md:gap-2 md:overflow-visible text-center"
+                        <WeekRow
+                            className="text-center"
                             style={{ '--scroll-hint-color': '#08080a' } as CSSProperties }
                         >
                             {["Easy", "Speed", "Rest", "Tempo", "Easy", "Easy", "Long"].map((day, i) => (
@@ -201,7 +202,7 @@ export default function WeekLanding() {
                                     </p>
                                 </div>
                             ))}
-                        </div>
+                        </WeekRow>
                     </div>
                     <p className="text-xs text-white/20 mt-3">Best for: Experienced runners, 6 days available, high mileage tolerance</p>
                 </div>

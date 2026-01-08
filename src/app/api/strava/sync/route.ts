@@ -3,7 +3,7 @@ import { getStravaTokensByAthleteId, upsertStravaActivity } from '@/infrastructu
 import { getValidAccessToken } from '@/infrastructure/strava/token';
 import { fetchStravaActivities } from '@/infrastructure/strava/api';
 import { mapStravaActivity } from '@/infrastructure/strava/processor';
-import { requireAthleteId } from '@/infrastructure/auth';
+import { withAuth } from '@/infrastructure/auth';
 import { stravaSyncQuerySchema } from '@/infrastructure/strava/schemas';
 
 export const runtime = 'nodejs';
@@ -11,10 +11,7 @@ export const runtime = 'nodejs';
 const DEFAULT_DAYS = 90;
 const DEFAULT_LIMIT = 50;
 
-export async function POST(request: NextRequest) {
-    const auth = await requireAthleteId(request);
-    if (auth.response) return auth.response;
-
+export const POST = withAuth(async (request: NextRequest, auth) => {
     const tokenRow = await getStravaTokensByAthleteId(auth.athleteId);
     if (!tokenRow) {
         return NextResponse.json({ error: 'Strava not connected' }, { status: 400 });
@@ -57,4 +54,4 @@ export async function POST(request: NextRequest) {
         total: activities.length,
         days,
     });
-}
+});

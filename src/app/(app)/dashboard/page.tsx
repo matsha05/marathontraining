@@ -213,7 +213,7 @@ export default function DashboardPage() {
     // Safety checks:
     // - Only redirect when status is DEFINITIVELY 'idle' (plan load complete, no plan found)
     // - Never redirect while 'loading' (plan load in progress)
-    // - Only redirect when authenticated (middleware handles unauthenticated)
+    // - Only redirect when authenticated (proxy handles unauthenticated)
     useEffect(() => {
         // Don't redirect while loading - wait for definitive answer
         if (status === 'loading') return;

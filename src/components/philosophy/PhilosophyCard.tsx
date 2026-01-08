@@ -1,6 +1,7 @@
 'use client';
 
 import { PhilosophyMetadata } from '@/domain/philosophy/types';
+import { WeekRow } from '@/components/ui/WeekRow';
 
 /**
  * PhilosophyCard - Training philosophy display component
@@ -212,7 +213,7 @@ export function PhilosophyCard({
                         >
                             Typical week
                         </p>
-                        <div className="mobile-scroll-x gap-2 pb-2 -mx-4 px-4 scroll-hint-right md:mx-0 md:px-0 md:grid md:grid-cols-7 md:gap-1 md:overflow-visible">
+                        <WeekRow className="md:gap-1">
                             {displayTypicalWeek.map((day, i) => {
                                 const [, ...rest] = day.split(': ');
                                 const activity = rest.join(': ');
@@ -253,7 +254,7 @@ export function PhilosophyCard({
                                     </div>
                                 );
                             })}
-                        </div>
+                        </WeekRow>
                     </div>
 
                     {/* Best for */}

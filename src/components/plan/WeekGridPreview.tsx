@@ -11,6 +11,7 @@
  */
 
 import { motion } from 'framer-motion';
+import { WeekRow } from '@/components/ui/WeekRow';
 
 const ease = [0.25, 0.46, 0.45, 0.94] as const;
 
@@ -35,7 +36,6 @@ export function WeekGridPreview({
     animate = true,
     compact = false,
 }: WeekGridPreviewProps) {
-    const gapClass = compact ? 'gap-1 md:gap-1' : 'gap-2 md:gap-2';
     const cardWidthClass = compact ? 'w-[70px]' : 'w-[84px]';
 
     const dayCards = days.map((d, i) => {
@@ -95,15 +95,12 @@ export function WeekGridPreview({
                     {weekLabel}
                 </p>
             )}
-            <div
-                className={`
-                    mobile-scroll-x ${gapClass} pb-2 -mx-4 px-4 scroll-hint-right
-                    md:mx-0 md:px-0 md:overflow-visible md:grid md:grid-cols-7
-                `}
+            <WeekRow
+                variant={compact ? 'compact' : 'app'}
                 style={{ scrollbarWidth: 'none' }}
             >
                 {dayCards}
-            </div>
+            </WeekRow>
         </div>
     );
 }

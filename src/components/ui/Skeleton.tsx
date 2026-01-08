@@ -1,5 +1,7 @@
 "use client";
 
+import { WeekRow } from '@/components/ui/WeekRow';
+
 /**
  * Skeleton Components
  *
@@ -88,14 +90,14 @@ export function DashboardSkeleton() {
                 {/* Week overview */}
                 <div className="card p-6">
                     <Skeleton className="h-6 w-32 mb-4" />
-                    <div className="mobile-scroll-x gap-2 pb-2 -mx-4 px-4 scroll-hint-right md:mx-0 md:px-0 md:grid md:grid-cols-7 md:gap-2 md:overflow-visible">
+                    <WeekRow>
                         {[...Array(7)].map((_, i) => (
                             <div key={i} className="text-center snap-center flex-shrink-0 w-[80px] md:w-auto md:flex-shrink">
                                 <Skeleton className="h-4 w-8 mx-auto mb-2" />
                                 <Skeleton className="h-12 w-full rounded-lg" />
                             </div>
                         ))}
-                    </div>
+                    </WeekRow>
                 </div>
             </div>
         </div>
@@ -130,13 +132,13 @@ export function PlanSkeleton() {
                                 <Skeleton className="h-6 w-32" />
                                 <Skeleton className="h-5 w-20" />
                             </div>
-                            <div className="mobile-scroll-x gap-2 pb-2 -mx-4 px-4 scroll-hint-right md:mx-0 md:px-0 md:grid md:grid-cols-7 md:gap-2 md:overflow-visible">
+                            <WeekRow>
                                 {[...Array(7)].map((_, j) => (
                                     <div key={j} className="snap-center flex-shrink-0 w-[80px] md:w-auto md:flex-shrink">
                                         <Skeleton className="h-20 rounded-lg" />
                                     </div>
                                 ))}
-                            </div>
+                            </WeekRow>
                         </div>
                     ))}
                 </div>
