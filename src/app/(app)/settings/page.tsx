@@ -228,9 +228,12 @@ export default function SettingsPage() {
         setDeleteBusy(true);
         setDeleteError(null);
         try {
+            const response = await apiFetch('/api/account/delete', { method: 'POST' });
+            if (!response.ok) {
+                setDeleteError(response.error.message || 'Failed to delete account');
+                return;
+            }
             const supabase = createSupabaseBrowserClient();
-            const { error } = await supabase.rpc('delete_user_account');
-            if (error) { setDeleteError('Failed to delete account'); return; }
             await supabase.auth.signOut();
             router.push('/');
         } catch { setDeleteError('An error occurred'); }
@@ -296,6 +299,7 @@ export default function SettingsPage() {
                                     onChange={(value) => setProfile({ ...profile, dateOfBirth: value || null })}
                                     minDate={minDobDate}
                                     maxDate={maxDobDate}
+                                    defaultViewYear={1990}
                                     placeholder="Select your date of birth"
                                     className="w-full"
                                 />

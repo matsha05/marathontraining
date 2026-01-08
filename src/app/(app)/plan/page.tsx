@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { usePlan } from '@/domain/plan/context';
 import { TrainingPlan, WeekPlan, TrainingPhase } from '@/domain/plan/types';
+import { calculateWeeksToRace, formatDateLong } from '@/domain/plan/date-utils';
 import { motion } from 'framer-motion';
 import { SiteHeader } from '@/components/ui/SiteHeader';
 import { MobileScroller } from '@/components/ui/MobileScroller';
@@ -106,10 +107,7 @@ function formatWeekDisplay(weeks: WeekPlan[], currentWeekNum: number): WeekDispl
 
 function getWeeksUntilRace(raceDate: string | undefined): number | null {
     if (!raceDate) return null;
-    const today = new Date();
-    const race = new Date(raceDate);
-    const diffMs = race.getTime() - today.getTime();
-    return Math.ceil(diffMs / (1000 * 60 * 60 * 24 * 7));
+    return calculateWeeksToRace(raceDate);
 }
 
 export default function PlanPage() {
@@ -334,12 +332,7 @@ export default function PlanPage() {
                                                 {plan.raceName || 'Race Day'}
                                             </p>
                                             <p className="text-sm opacity-90">
-                                                {new Date(plan.raceDate).toLocaleDateString('en-US', {
-                                                    weekday: 'long',
-                                                    month: 'long',
-                                                    day: 'numeric',
-                                                    year: 'numeric'
-                                                })}
+                                                {formatDateLong(plan.raceDate)}
                                             </p>
                                         </div>
                                     </div>

@@ -34,7 +34,19 @@ export function calculateWeeksToRace(raceDateStr: string): number {
     const todayUtc = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
     const diffTime = raceDate.getTime() - todayUtc.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return Math.floor(diffDays / 7);
+    return Math.max(0, Math.ceil(diffDays / 7));
+}
+
+export function formatDateLong(dateStr: string, locale = 'en-US'): string {
+    const date = parseDateOnly(dateStr);
+    if (!date) return dateStr;
+    return date.toLocaleDateString(locale, {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+        timeZone: 'UTC',
+    });
 }
 
 export function getWeekStartDate(weekNumber: number, raceDateStr?: string): string {

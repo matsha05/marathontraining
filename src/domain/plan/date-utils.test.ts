@@ -37,12 +37,12 @@ describe('week/day calculations', () => {
     });
 
     it('calculates weeks to race deterministically', () => {
-        expect(calculateWeeksToRace('2025-02-02')).toBe(4);
+        expect(calculateWeeksToRace('2025-02-02')).toBe(5);
     });
 
     it('derives week start and day dates', () => {
-        expect(getWeekStartDate(1, '2025-02-02')).toBe('2025-01-05');
-        expect(getDateForDay(1, 6, '2025-02-02')).toBe('2025-01-11');
-        expect(getDateForDay(4, 0, '2025-02-02')).toBe('2025-01-26');
+        expect(getWeekStartDate(1, '2025-02-02')).toBe('2024-12-29');
+        expect(getDateForDay(1, 6, '2025-02-02')).toBe('2025-01-04');
+        expect(getDateForDay(4, 0, '2025-02-02')).toBe('2025-01-19');
     });
 });

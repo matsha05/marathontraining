@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { TrainingPlan, WeekPlan, TrainingPhase } from '@/domain/plan/types';
+import { calculateWeeksToRace, formatDateLong } from '@/domain/plan/date-utils';
 
 /**
  * RaceCommandBar - Premium dense hero for the dashboard
@@ -28,7 +29,7 @@ export function RaceCommandBar({
 }: RaceCommandBarProps) {
     // Calculate weeks to race
     const weeksToRace = plan.raceDate
-        ? Math.max(0, Math.ceil((new Date(plan.raceDate).getTime() - Date.now()) / (7 * 24 * 60 * 60 * 1000)))
+        ? calculateWeeksToRace(plan.raceDate)
         : null;
 
     // Get coach color
@@ -163,12 +164,7 @@ export function RaceCommandBar({
                         style={{ borderTop: '1px solid var(--border-muted)' }}
                     >
                         <p className="text-caption">
-                            {plan.raceName || 'Race Day'} · {new Date(plan.raceDate).toLocaleDateString('en-US', {
-                                weekday: 'long',
-                                month: 'long',
-                                day: 'numeric',
-                                year: 'numeric'
-                            })}
+                            {plan.raceName || 'Race Day'} · {formatDateLong(plan.raceDate)}
                         </p>
                     </div>
                 )}

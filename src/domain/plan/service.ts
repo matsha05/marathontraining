@@ -15,8 +15,8 @@
 
 import { OnboardingData } from '@/domain/onboarding/types';
 import { calculateAgeFromDob } from '@/domain/onboarding/utils';
-import { PlanGenerationInput, TrainingPlan } from '@/domain/plan/types';
-import { generatePlan } from '@/domain/plan/generator';
+import { PlanGenerationInput, TrainingPlan, TrainingPhase, WeekPlan } from '@/domain/plan/types';
+import { generatePlan, calculateWeeksToRace, getDateForDay, getWeekStartDate } from '@/domain/plan/generator';
 import { toDateKey } from '@/lib/dates';
 
 /**
@@ -226,6 +226,128 @@ function mapCurrentMileage(data: OnboardingData): 'under_20' | '20_40' | 'over_4
     return 'under_20';
 }
 
+function buildBaseWeeks(basePlan: TrainingPlan, weeksNeeded: number): WeekPlan[] {
+    if (weeksNeeded <= 0 || basePlan.weeks.length === 0) return [];
+
+    const baseWeeks: WeekPlan[] = [];
+    let remaining = weeksNeeded;
+
+    while (remaining > 0) {
+        const take = Math.min(remaining, basePlan.weeks.length);
+        const slice = basePlan.weeks.slice(0, take).map(week => ({
+            ...week,
+            phase: 'base' as TrainingPhase,
+        }));
+        baseWeeks.push(...slice);
+        remaining -= take;
+    }
+
+    return baseWeeks;
+}
+
+function resequenceWeeks(weeks: WeekPlan[], raceDate?: string): WeekPlan[] {
+    return weeks.map((week, index) => {
+        const weekNumber = index + 1;
+        const weekOf = raceDate ? getWeekStartDate(weekNumber, raceDate) : week.weekOf;
+        const days = week.days.map(day => ({
+            ...day,
+            date: raceDate ? getDateForDay(weekNumber, day.dayOfWeek, raceDate) : day.date,
+        }));
+
+        return { ...week, weekNumber, weekOf, days };
+    });
+}
+
+function applyPhaseWeekNumbers(weeks: WeekPlan[]): WeekPlan[] {
+    let currentPhase: TrainingPhase | null = null;
+    let phaseWeek = 0;
+
+    return weeks.map(week => {
+        if (week.phase !== currentPhase) {
+            currentPhase = week.phase;
+            phaseWeek = 1;
+        } else {
+            phaseWeek += 1;
+        }
+        return { ...week, phaseWeek };
+    });
+}
+
+function buildPhaseBreakdownFromWeeks(weeks: WeekPlan[]): TrainingPlan['phases'] {
+    const phases: TrainingPlan['phases'] = [];
+    let currentPhase: TrainingPhase | null = null;
+    let startWeek = 1;
+
+    weeks.forEach((week, index) => {
+        if (week.phase !== currentPhase) {
+            if (currentPhase !== null) {
+                const endWeek = weeks[index - 1].weekNumber;
+                phases.push({
+                    phase: currentPhase,
+                    startWeek,
+                    endWeek,
+                    weeks: endWeek - startWeek + 1,
+                });
+            }
+            currentPhase = week.phase;
+            startWeek = week.weekNumber;
+        }
+
+        if (index === weeks.length - 1 && currentPhase) {
+            phases.push({
+                phase: currentPhase,
+                startWeek,
+                endWeek: week.weekNumber,
+                weeks: week.weekNumber - startWeek + 1,
+            });
+        }
+    });
+
+    return phases;
+}
+
+function derivePlanMetrics(weeks: WeekPlan[]): Pick<TrainingPlan, 'peakMileage' | 'peakWeek' | 'totalMiles'> {
+    let peakMileage = 0;
+    let peakWeek = 1;
+    let totalMiles = 0;
+
+    weeks.forEach(week => {
+        totalMiles += week.totalMiles;
+        if (week.totalMiles > peakMileage) {
+            peakMileage = week.totalMiles;
+            peakWeek = week.weekNumber;
+        }
+    });
+
+    return { peakMileage, peakWeek, totalMiles };
+}
+
+function extendHigdonPlanWithBase(
+    racePlan: TrainingPlan,
+    basePlan: TrainingPlan,
+    totalWeeks: number,
+    raceDate?: string
+): TrainingPlan {
+    const extraWeeks = Math.max(0, totalWeeks - racePlan.totalWeeks);
+    if (extraWeeks === 0) return racePlan;
+
+    const baseWeeks = buildBaseWeeks(basePlan, extraWeeks);
+    const combinedWeeks = resequenceWeeks([...baseWeeks, ...racePlan.weeks], raceDate);
+    const weeksWithPhaseWeek = applyPhaseWeekNumbers(combinedWeeks);
+    const phases = buildPhaseBreakdownFromWeeks(weeksWithPhaseWeek);
+    const metrics = derivePlanMetrics(weeksWithPhaseWeek);
+
+    return {
+        ...racePlan,
+        weeks: weeksWithPhaseWeek,
+        totalWeeks: weeksWithPhaseWeek.length,
+        phases,
+        peakMileage: metrics.peakMileage,
+        peakWeek: metrics.peakWeek,
+        totalMiles: metrics.totalMiles,
+    };
+}
+
 /**
  * Generate a training plan from onboarding data.
  * 
@@ -265,6 +387,7 @@ export function createPlanFromOnboarding(
     // Step 3: Generate using coach-specific generator
     try {
         let plan: TrainingPlan;
+        let extendedWithBase = false;
 
         // Route based on tier prefix
         if (tierResult.tier.startsWith('pfitz_frr_')) {
@@ -292,9 +415,26 @@ export function createPlanFromOnboarding(
             plan = generatePlan(inputResult.data);
         }
 
+        const weeksToRace = inputResult.data.raceDate
+            ? calculateWeeksToRace(inputResult.data.raceDate)
+            : null;
+
+        if (
+            philosophy === 'higdon' &&
+            inputResult.data.raceDate &&
+            !tierResult.tier.startsWith('base_') &&
+            weeksToRace !== null &&
+            weeksToRace > plan.totalWeeks
+        ) {
+            const baseTierResult = selectPlanTier({ ...tierInput, distance: 'base' });
+            const basePlan = generateCoachPlan(inputResult.data, baseTierResult.tier as HigdonTier);
+            plan = extendHigdonPlanWithBase(plan, basePlan, weeksToRace, inputResult.data.raceDate);
+            extendedWithBase = true;
+        }
+
         // Step 4: Add philosophy metadata (for display)
         plan.philosophy = philosophy as TrainingPlan['philosophy'];
-        plan.planTier = tierResult.displayName;
+        plan.planTier = extendedWithBase ? `${tierResult.displayName} + Base` : tierResult.displayName;
 
         // Step 5: Validate plan
         if (!plan.verification.passed) {
@@ -327,10 +467,7 @@ export function createPlanFromOnboarding(
 export function getCurrentWeek(plan: TrainingPlan): number {
     if (!plan.raceDate) return 1;
 
-    const today = new Date();
-    const raceDate = new Date(plan.raceDate);
-    const diffTime = raceDate.getTime() - today.getTime();
-    const weeksToRace = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
+    const weeksToRace = calculateWeeksToRace(plan.raceDate);
 
     // Work backward from race date
     const currentWeek = plan.totalWeeks - weeksToRace + 1;

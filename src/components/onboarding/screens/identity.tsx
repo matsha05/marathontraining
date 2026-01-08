@@ -363,6 +363,7 @@ export function DemographicsScreen({
                         onChange={(value) => onDobChange(value || null)}
                         minDate={minDobDate}
                         maxDate={maxDobDate}
+                        defaultViewYear={1990}
                         placeholder="Select your date of birth"
                     />
                     {age !== null && (
