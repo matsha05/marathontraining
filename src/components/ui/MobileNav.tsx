@@ -98,7 +98,7 @@ export function MobileNav({ user, onSignOut }: MobileNavProps) {
                                     <AvatarDisplay
                                         avatarId={user.avatarId}
                                         name={user.name || 'Runner'}
-                                        size="md"
+                                        size={48}
                                     />
                                     <div className="flex-1 min-w-0">
                                         <p className="font-medium truncate" style={{ color: 'var(--text-base)' }}>

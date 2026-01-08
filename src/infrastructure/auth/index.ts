@@ -43,9 +43,9 @@ export async function resolveAthleteId(
     }
 }
 
-export async function requireAthleteId(
-    request: Request | NextRequest,
-    options: { onUnauthorized?: (request: Request | NextRequest) => NextResponse } = {}
+export async function requireAthleteId<TRequest extends Request | NextRequest = NextRequest>(
+    request: TRequest,
+    options: { onUnauthorized?: (request: TRequest) => NextResponse } = {}
 ): Promise<AuthGuardResult> {
     const result = await resolveAthleteId(request);
 

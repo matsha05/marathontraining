@@ -1,11 +1,11 @@
 import { z } from 'zod';
 
-const numberFromParam = z.preprocess((value) => {
+const numberFromParam = (schema: z.ZodNumber) => z.preprocess((value) => {
     if (typeof value === 'string' && value.trim() !== '') {
         return Number(value);
     }
     return value;
-}, z.number().int());
+}, schema);
 
 export const stravaWebhookQuerySchema = z.object({
     'hub.mode': z.string().optional(),
@@ -16,9 +16,9 @@ export const stravaWebhookQuerySchema = z.object({
 export const stravaWebhookPayloadSchema = z.object({
     object_type: z.string().min(1),
     aspect_type: z.string().min(1),
-    object_id: numberFromParam.positive(),
-    owner_id: numberFromParam.positive(),
-    event_time: numberFromParam.positive().optional(),
+    object_id: numberFromParam(z.number().int().positive()),
+    owner_id: numberFromParam(z.number().int().positive()),
+    event_time: numberFromParam(z.number().int().positive()).optional(),
 }).passthrough();
 
 export const stravaConnectQuerySchema = z.object({
@@ -34,11 +34,11 @@ export const stravaCallbackQuerySchema = z.object({
 });
 
 export const stravaSyncQuerySchema = z.object({
-    days: numberFromParam.positive().max(365).optional(),
-    limit: numberFromParam.positive().max(200).optional(),
+    days: numberFromParam(z.number().int().positive().max(365)).optional(),
+    limit: numberFromParam(z.number().int().positive().max(200)).optional(),
 });
 
 export const stravaProcessQuerySchema = z.object({
-    limit: numberFromParam.positive().max(100).optional(),
+    limit: numberFromParam(z.number().int().positive().max(100)).optional(),
     key: z.string().optional(),
 });

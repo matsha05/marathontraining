@@ -5,7 +5,7 @@ const numberFromParam = z.preprocess((value) => {
         return Number(value);
     }
     return value;
-}, z.number().int());
+}, z.number().int().positive());
 
 const workoutSchema = z.object({
     name: z.string(),
@@ -61,6 +61,8 @@ export const trainingPlanSchema = z.object({
     paces: pacesSchema,
 }).passthrough();
 
+export type TrainingPlanPayload = z.infer<typeof trainingPlanSchema>;
+
 export const planIdQuerySchema = z.object({
     planId: z.string().min(1),
 });
@@ -70,5 +72,5 @@ export const workoutIdQuerySchema = z.object({
 });
 
 export const weekQuerySchema = z.object({
-    week: numberFromParam.positive(),
+    week: numberFromParam,
 });

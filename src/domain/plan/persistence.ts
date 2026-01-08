@@ -2,14 +2,18 @@
  * Plan persistence helpers (server-side).
  */
 
-import type { TrainingPlan, WeekPlan, DayPlan } from './types';
+import type { TrainingPlanPayload } from './schemas';
 import type { Database } from '@/infrastructure/supabase/types';
 import { toDateKey } from '@/lib/dates';
 
 type InsertTrainingPlan = Database['public']['Tables']['training_plans']['Insert'];
 type InsertPlannedWorkout = Database['public']['Tables']['planned_workouts']['Insert'];
 
-export function buildTrainingPlanInsert(plan: TrainingPlan, athleteId: string): InsertTrainingPlan {
+type PersistedPlan = TrainingPlanPayload;
+type PersistedWeek = PersistedPlan['weeks'][number];
+type PersistedDay = PersistedWeek['days'][number];
+
+export function buildTrainingPlanInsert(plan: PersistedPlan, athleteId: string): InsertTrainingPlan {
     return {
         id: plan.id,
         athlete_id: athleteId,
@@ -23,7 +27,7 @@ export function buildTrainingPlanInsert(plan: TrainingPlan, athleteId: string): 
 }
 
 export function buildPlannedWorkoutInserts(
-    plan: TrainingPlan,
+    plan: PersistedPlan,
     athleteId: string
 ): InsertPlannedWorkout[] {
     const workoutRows: InsertPlannedWorkout[] = [];
@@ -54,9 +58,9 @@ export function buildPlannedWorkoutInserts(
 }
 
 function buildPrescription(
-    day: DayPlan,
-    week: WeekPlan,
-    plan: TrainingPlan
+    day: PersistedDay,
+    week: PersistedWeek,
+    plan: PersistedPlan
 ): Record<string, unknown> {
     return {
         run: day.runWorkout ? {
