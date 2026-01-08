@@ -225,7 +225,7 @@ export function SiteHeader({
                 </div>
 
                 {/* Right side */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 md:gap-4">
                     {/* Streak badge - only show when logged in */}
                     {isLoggedIn && streak !== undefined && streak > 0 && (
                         <div
@@ -470,17 +470,17 @@ export function SiteHeader({
                             </div>
                         ) : (
                             // LOGGED OUT: Log In + Get Started
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 md:gap-3">
                                 <Link
                                     href="/auth"
-                                    className="text-sm transition-colors hover:opacity-70"
+                                    className="inline-flex items-center justify-center min-h-[36px] md:min-h-0 px-2 md:px-0 text-xs md:text-sm transition-colors hover:opacity-70 whitespace-nowrap"
                                     style={{ color: 'var(--text-muted)' }}
                                 >
                                     Log In
                                 </Link>
                                 <Link
                                     href="/onboarding"
-                                    className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                                    className="inline-flex items-center justify-center min-h-[36px] md:min-h-0 px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors whitespace-nowrap"
                                     style={{
                                         background: 'var(--color-accent)',
                                         color: 'white'

@@ -2,15 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { SiteHeader } from "@/components/ui/SiteHeader";
 import { Footer } from "@/components/ui/Footer";
 import { Badge } from "@/components/ui/Badge";
 import { Metric } from "@/components/ui/Metric";
 import { WeekRow } from "@/components/ui/WeekRow";
 import { colors } from "@/lib/design-tokens";
-import { X } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { useIsMobile, useIsTouchDevice } from "@/hooks/useIsMobile";
 
 /**
  * THE LONG GAME - Landing Page
@@ -97,7 +97,7 @@ export default function LandingPage() {
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 + (i * 0.05), duration: 0.4, ease }}
-                  className="p-3 md:p-4 rounded-xl text-center snap-center flex-shrink-0 w-[90px] md:w-auto md:flex-shrink"
+                  className="p-3 md:p-4 rounded-xl text-center snap-center flex-shrink-0 w-[104px] md:w-auto md:flex-shrink"
                   style={{
                     background: d.type === "long"
                       ? 'color-mix(in srgb, var(--color-accent) 12%, transparent)'
@@ -114,7 +114,7 @@ export default function LandingPage() {
                   whileTap={{ scale: 0.98 }}
                 >
                   <p className="text-xs mb-2 md:mb-3 token-text-subtle">{d.day}</p>
-                  <p className={`text-sm mb-1 whitespace-nowrap ${d.type === "rest" ? "token-text-subtle" : "token-text-muted"}`}>
+                  <p className={`text-[13px] md:text-sm mb-1 truncate leading-tight tracking-tight md:tracking-normal ${d.type === "rest" ? "token-text-subtle" : "token-text-muted"}`}>
                     {d.label}
                   </p>
                   {d.sub && (
@@ -188,7 +188,7 @@ export default function LandingPage() {
             { level: "Advanced", sub: "Chasing PRs" },
           ].map((p) => (
             <div key={p.level} className="v3-card p-4 text-center">
-              <p className="text-lg font-light token-text-muted">{p.level}</p>
+              <p className="text-base md:text-lg font-light token-text-muted">{p.level}</p>
               <p className="text-[10px] mt-1 token-text-subtle">{p.sub}</p>
             </div>
           ))}
@@ -311,34 +311,7 @@ export default function LandingPage() {
         tag="Mobility"
         description="Becoming a Supple Leopard. Systematic mobility work that restores range of motion, tissue quality, and motor control. The foundation that lets you train hard without breaking down."
       >
-        <div className="flex flex-col sm:flex-row gap-4">
-          {[
-            {
-              label: "Before",
-              value: "Prep & Activation",
-              tooltip: "10-15 min routine: Deep squat hold (2 min), couch stretch (90s each side), ankle knee-to-wall (10 reps each side), leg swings, A-skips. Checks your squat depth, hip extension, and ankle mobility before you run."
-            },
-            {
-              label: "After",
-              value: "Recovery & Reset",
-              tooltip: "5-10 min routine: Foam roll calves and quads (2 min each), lacrosse ball glutes if hotspots present, pigeon stretch (90s each side). Compression socks post-hard sessions. Address tissue restrictions same-day."
-            },
-          ].map((p) => (
-            <div key={p.label} className="group relative flex-1 v3-card p-4 text-center transition-all hover:border-[var(--color-coach-starrett)]">
-              <p className="text-sm mb-1 token-text-muted">{p.label}</p>
-              <p className="token-text-muted">{p.value}</p>
-              {/* Tooltip */}
-              <div
-                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-3 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50 w-64 text-center token-bg-elevated border border-token-base"
-                style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
-              >
-                <p className="text-[11px] leading-relaxed token-text-muted">{p.tooltip}</p>
-                {/* Arrow */}
-                <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 -mt-1 token-bg-elevated border-r border-b token-border-base" />
-              </div>
-            </div>
-          ))}
-        </div>
+        <MobilityCards />
       </CoachSection>
 
       {/* Strength section */}
@@ -463,7 +436,14 @@ const STANDARDS_DATA = [
 
 function StandardsGrid() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const isMobile = useIsMobile();
+  const isTouch = useIsTouchDevice();
+  const canTap = isMobile || isTouch;
   const selected = STANDARDS_DATA.find(s => s.id === selectedId);
+  const handleSelect = (id: number) => {
+    if (!canTap) return;
+    setSelectedId((prev) => (prev === id ? null : id));
+  };
 
   return (
     <>
@@ -471,11 +451,13 @@ function StandardsGrid() {
         {STANDARDS_DATA.map((standard) => (
           <button
             key={standard.id}
+            type="button"
             className={`group relative h-12 md:h-10 rounded-lg flex flex-col items-center justify-center transition-all active:scale-95 touch-target border ${selectedId === standard.id
               ? "token-bg-accent-subtle border-[var(--color-accent)]"
               : "token-bg-muted border-transparent"
               }`}
-            onClick={() => setSelectedId(selectedId === standard.id ? null : standard.id)}
+            aria-pressed={canTap ? selectedId === standard.id : undefined}
+            onClick={() => handleSelect(standard.id)}
           >
             <span className="text-xs font-medium token-text-muted">{standard.name}</span>
             <span className="text-xs token-text-subtle">{standard.id}</span>
@@ -491,36 +473,108 @@ function StandardsGrid() {
           </button>
         ))}
       </div>
+      {canTap && !selected && (
+        <p className="mt-3 text-[11px] token-text-subtle">
+          Tap a standard to see details.
+        </p>
+      )}
+      {canTap && selected && (
+        <div className="mt-3 v3-card p-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-xs uppercase tracking-widest token-text-subtle">
+              Standard {selected.id}
+            </p>
+            <button
+              type="button"
+              onClick={() => setSelectedId(null)}
+              className="text-[11px] uppercase tracking-widest token-text-subtle hover:opacity-70"
+            >
+              Close
+            </button>
+          </div>
+          <p className="text-sm leading-relaxed token-text-muted">
+            {selected.tooltip}
+          </p>
+        </div>
+      )}
+    </>
+  );
+}
 
-      {/* Mobile: Bottom sheet tooltip */}
-      <AnimatePresence>
-        {selected && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            className="mt-4 p-4 rounded-xl md:hidden token-bg-elevated border border-token-base"
+const STARRETT_MOBILITY = [
+  {
+    id: "before",
+    label: "Before",
+    value: "Prep & Activation",
+    tooltip: "10-15 min routine: Deep squat hold (2 min), couch stretch (90s each side), ankle knee-to-wall (10 reps each side), leg swings, A-skips. Checks your squat depth, hip extension, and ankle mobility before you run."
+  },
+  {
+    id: "after",
+    label: "After",
+    value: "Recovery & Reset",
+    tooltip: "5-10 min routine: Foam roll calves and quads (2 min each), lacrosse ball glutes if hotspots present, pigeon stretch (90s each side). Compression socks post-hard sessions. Address tissue restrictions same-day."
+  },
+];
+
+function MobilityCards() {
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const isMobile = useIsMobile();
+  const isTouch = useIsTouchDevice();
+  const canTap = isMobile || isTouch;
+  const selected = STARRETT_MOBILITY.find((item) => item.id === selectedId);
+  const handleSelect = (id: string) => {
+    if (!canTap) return;
+    setSelectedId((prev) => (prev === id ? null : id));
+  };
+
+  return (
+    <>
+      <div className="flex flex-col sm:flex-row gap-4">
+        {STARRETT_MOBILITY.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => handleSelect(item.id)}
+            aria-pressed={canTap ? selectedId === item.id : undefined}
+            className={`group relative flex-1 v3-card p-4 text-center transition-all hover:border-[var(--color-coach-starrett)] ${selectedId === item.id ? "border-[var(--color-coach-starrett)]" : ""}`}
           >
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex-1">
-                <p className="text-sm font-medium mb-1 token-text-base">
-                  {selected.id}. {selected.name}
-                </p>
-                <p className="text-sm leading-relaxed token-text-muted">
-                  {selected.tooltip}
-                </p>
-              </div>
-              <button
-                onClick={() => setSelectedId(null)}
-                className="p-2 rounded-lg touch-target-sm token-bg-muted"
-              >
-                <X className="w-4 h-4 token-text-subtle" />
-              </button>
+            <p className="text-sm mb-1 token-text-muted">{item.label}</p>
+            <p className="token-text-muted">{item.value}</p>
+            {/* Desktop: Hover tooltip */}
+            <div
+              className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-3 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50 w-64 text-center token-bg-elevated border border-token-base"
+              style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
+            >
+              <p className="text-[11px] leading-relaxed token-text-muted">{item.tooltip}</p>
+              <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 -mt-1 token-bg-elevated border-r border-b token-border-base" />
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </button>
+        ))}
+      </div>
+      {canTap && !selected && (
+        <p className="mt-3 text-[11px] token-text-subtle">
+          Tap a card to see the routine.
+        </p>
+      )}
+      {canTap && selected && (
+        <div className="mt-3 v3-card p-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-xs uppercase tracking-widest token-text-subtle">
+              {selected.label} routine
+            </p>
+            <button
+              type="button"
+              onClick={() => setSelectedId(null)}
+              className="text-[11px] uppercase tracking-widest token-text-subtle hover:opacity-70"
+            >
+              Close
+            </button>
+          </div>
+          <p className="text-sm leading-relaxed token-text-muted">
+            {selected.tooltip}
+          </p>
+        </div>
+      )}
     </>
   );
 }
@@ -565,7 +619,7 @@ function CoachSection({
 
 function CumulativeFatigueWeek({ coachColor }: { coachColor: string }) {
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {/* Traditional approach */}
       <div
         className="p-5 rounded-xl text-center"

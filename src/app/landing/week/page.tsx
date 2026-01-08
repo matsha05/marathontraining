@@ -1,11 +1,12 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useLandingNav } from "../useLandingNav";
 import { WeekRow } from "@/components/ui/WeekRow";
+import { useIsMobile, useIsTouchDevice } from "@/hooks/useIsMobile";
 
 /**
  * Week Polished Landing Page
@@ -116,11 +117,11 @@ export default function WeekLanding() {
                                         hover:bg-white/[0.06] hover:scale-[1.02]
                                         ${d.type === "rest" ? "bg-white/[0.02]" : "bg-white/[0.04]"}
                                         ${d.type === "long" ? "bg-[#19e38c]/10 hover:bg-[#19e38c]/15" : ""}
-                                        snap-center flex-shrink-0 w-[90px] md:w-auto md:flex-shrink
+                                        snap-center flex-shrink-0 w-[104px] md:w-auto md:flex-shrink
                                     `}
                                 >
                                     <p className="text-[10px] text-white/30 mb-3">{d.day}</p>
-                                    <p className={`text-sm mb-1 ${d.type === "rest" ? "text-white/20" : "text-white/70"}`}>
+                                    <p className={`text-[13px] md:text-sm mb-1 truncate leading-tight tracking-tight md:tracking-normal ${d.type === "rest" ? "text-white/20" : "text-white/70"}`}>
                                         {d.label}
                                     </p>
                                     {d.sub && (
@@ -195,7 +196,7 @@ export default function WeekLanding() {
                             style={{ '--scroll-hint-color': '#08080a' } as CSSProperties }
                         >
                             {["Easy", "Speed", "Rest", "Tempo", "Easy", "Easy", "Long"].map((day, i) => (
-                                <div key={i} className="snap-center flex-shrink-0 w-[72px] md:w-auto md:flex-shrink">
+                                <div key={i} className="snap-center flex-shrink-0 w-[80px] md:w-auto md:flex-shrink">
                                     <p className="text-[10px] text-white/30 mb-1">{["M", "T", "W", "T", "F", "S", "S"][i]}</p>
                                     <p className={`text-xs ${day === "Rest" ? "text-white/20" : day === "Long" ? "text-[#3a6bff]" : "text-white/50"}`}>
                                         {day}
@@ -222,15 +223,15 @@ export default function WeekLanding() {
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div className="p-4 rounded-lg bg-white/[0.02] border border-white/5 text-center">
-                            <p className="text-lg font-light text-white/60">Novice</p>
+                            <p className="text-base md:text-lg font-light text-white/60">Novice</p>
                             <p className="text-[10px] text-white/30 mt-1">First marathon</p>
                         </div>
                         <div className="p-4 rounded-lg bg-white/[0.02] border border-white/5 text-center">
-                            <p className="text-lg font-light text-white/60">Intermediate</p>
+                            <p className="text-base md:text-lg font-light text-white/60">Intermediate</p>
                             <p className="text-[10px] text-white/30 mt-1">Building fitness</p>
                         </div>
                         <div className="p-4 rounded-lg bg-white/[0.02] border border-white/5 text-center">
-                            <p className="text-lg font-light text-white/60">Advanced</p>
+                            <p className="text-base md:text-lg font-light text-white/60">Advanced</p>
                             <p className="text-[10px] text-white/30 mt-1">Chasing PRs</p>
                         </div>
                     </div>
@@ -390,13 +391,7 @@ export default function WeekLanding() {
                         Running Rewired. 12 movement standards that address the most common limiters in runners.
                         Pre-hab over rehab. Build a body that can handle the training load, not just survive it.
                     </p>
-                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                        {Array.from({ length: 12 }).map((_, i) => (
-                            <div key={i} className="h-8 rounded-lg bg-white/[0.03] flex items-center justify-center">
-                                <span className="text-[10px] text-white/30">{i + 1}</span>
-                            </div>
-                        ))}
-                    </div>
+                    <DicharryStandards />
                     <p className="text-xs text-white/20 mt-3">12 movement standards · Daily routines</p>
                 </div>
             </section>
@@ -413,16 +408,7 @@ export default function WeekLanding() {
                         Becoming a Supple Leopard. Systematic mobility work that restores range of motion,
                         tissue quality, and motor control. The foundation that lets you train hard without breaking down.
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <div className="flex-1 p-4 rounded-lg bg-white/[0.02] border border-white/5 text-center">
-                            <p className="text-sm text-white/40 mb-1">Before</p>
-                            <p className="text-white/60">Prep & Activation</p>
-                        </div>
-                        <div className="flex-1 p-4 rounded-lg bg-white/[0.02] border border-white/5 text-center">
-                            <p className="text-sm text-white/40 mb-1">After</p>
-                            <p className="text-white/60">Recovery & Reset</p>
-                        </div>
-                    </div>
+                    <StarrettMobilityCards />
                 </div>
             </section>
 
@@ -551,5 +537,169 @@ export default function WeekLanding() {
                 <p className="text-[10px] text-white/15">© 2026 The Long Game</p>
             </footer>
         </div>
+    );
+}
+
+const DICHARRY_STANDARDS = [
+    { id: 1, name: "Toe Yoga", tooltip: "Can you raise your big toe while keeping others down? Tests foot control and arch stability." },
+    { id: 2, name: "Balance", tooltip: "45 seconds single-leg stance, barefoot, eyes open. Tests proprioception and stability." },
+    { id: 3, name: "Squat", tooltip: "Full-depth squat, heels down, knees tracking over toes. Tests hip, ankle, and thoracic mobility." },
+    { id: 4, name: "Ankle DF", tooltip: "Knee-to-wall test: 4+ inches from wall. Tests ankle dorsiflexion for proper running mechanics." },
+    { id: 5, name: "Hallux DF", tooltip: "Big toe mobility: 50-70° of extension. Essential for push-off power and preventing plantar issues." },
+    { id: 6, name: "Calf Raise", tooltip: "20+ single-leg calf raises per side. Tests Achilles capacity and calf endurance." },
+    { id: 7, name: "SL Bridge", tooltip: "10-second single-leg bridge hold, hips level. Tests glute strength and hip stability." },
+    { id: 8, name: "Hip Flexor", tooltip: "Doorway test: can you extend your hip without arching your back? Tests hip extension mobility." },
+    { id: 9, name: "Hip Flexion", tooltip: "Knee to chest while opposite leg stays flat. Tests hip flexion range for proper leg swing." },
+    { id: 10, name: "Rotation", tooltip: "Thoracic spine rotation: 45°+ each way. Essential for arm swing and preventing low back compensation." },
+    { id: 11, name: "Core Ctrl", tooltip: "Can you maintain neutral spine under load? Tests deep core stabilizers, not six-pack muscles." },
+    { id: 12, name: "SL Hop", tooltip: "Single-leg hop and stick the landing. Integration test: foot, hip, and core working together." },
+];
+
+const STARRETT_MOBILITY = [
+    {
+        id: "before",
+        label: "Before",
+        value: "Prep & Activation",
+        tooltip: "10-15 min routine: Deep squat hold (2 min), couch stretch (90s each side), ankle knee-to-wall (10 reps each side), leg swings, A-skips. Checks your squat depth, hip extension, and ankle mobility before you run."
+    },
+    {
+        id: "after",
+        label: "After",
+        value: "Recovery & Reset",
+        tooltip: "5-10 min routine: Foam roll calves and quads (2 min each), lacrosse ball glutes if hotspots present, pigeon stretch (90s each side). Compression socks post-hard sessions. Address tissue restrictions same-day."
+    },
+];
+
+function DicharryStandards() {
+    const [selectedId, setSelectedId] = useState<number | null>(null);
+    const isMobile = useIsMobile();
+    const isTouch = useIsTouchDevice();
+    const canTap = isMobile || isTouch;
+    const selected = DICHARRY_STANDARDS.find((item) => item.id === selectedId);
+
+    const handleSelect = (id: number) => {
+        if (!canTap) return;
+        setSelectedId((prev) => (prev === id ? null : id));
+    };
+
+    return (
+        <>
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                {DICHARRY_STANDARDS.map((item) => (
+                    <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => handleSelect(item.id)}
+                        aria-pressed={canTap ? selectedId === item.id : undefined}
+                        aria-label={`${item.id}. ${item.name}`}
+                        className={`group relative h-10 rounded-lg flex items-center justify-center transition-all border ${selectedId === item.id
+                            ? "bg-white/[0.08] border-white/30"
+                            : "bg-white/[0.03] border-white/10"
+                            }`}
+                    >
+                        <span className="text-[11px] text-white/40">{item.id}</span>
+                        <span className="sr-only">{item.name}</span>
+                        <div
+                            className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-3 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50 w-56 text-center bg-[#101014] border border-white/10"
+                            style={{ boxShadow: '0 6px 18px rgba(0,0,0,0.4)' }}
+                        >
+                            <p className="text-xs text-white/70 font-medium mb-1">{item.name}</p>
+                            <p className="text-[11px] leading-relaxed text-white/50">{item.tooltip}</p>
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 -mt-1 bg-[#101014] border-r border-b border-white/10" />
+                        </div>
+                    </button>
+                ))}
+            </div>
+            {canTap && !selected && (
+                <p className="mt-3 text-[11px] text-white/30">
+                    Tap a standard to see details.
+                </p>
+            )}
+            {canTap && selected && (
+                <div className="mt-3 rounded-lg bg-white/[0.04] border border-white/10 p-4">
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-[11px] uppercase tracking-widest text-white/40">
+                            {selected.id}. {selected.name}
+                        </p>
+                        <button
+                            type="button"
+                            onClick={() => setSelectedId(null)}
+                            className="text-[10px] uppercase tracking-widest text-white/30 hover:text-white/50 transition-colors"
+                        >
+                            Close
+                        </button>
+                    </div>
+                    <p className="text-sm leading-relaxed text-white/60">
+                        {selected.tooltip}
+                    </p>
+                </div>
+            )}
+        </>
+    );
+}
+
+function StarrettMobilityCards() {
+    const [selectedId, setSelectedId] = useState<string | null>(null);
+    const isMobile = useIsMobile();
+    const isTouch = useIsTouchDevice();
+    const canTap = isMobile || isTouch;
+    const selected = STARRETT_MOBILITY.find((item) => item.id === selectedId);
+
+    const handleSelect = (id: string) => {
+        if (!canTap) return;
+        setSelectedId((prev) => (prev === id ? null : id));
+    };
+
+    return (
+        <>
+            <div className="flex flex-col sm:flex-row gap-4">
+                {STARRETT_MOBILITY.map((item) => (
+                    <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => handleSelect(item.id)}
+                        aria-pressed={canTap ? selectedId === item.id : undefined}
+                        className={`group relative flex-1 p-4 rounded-lg text-center transition-all border ${selectedId === item.id
+                            ? "bg-white/[0.04] border-white/30"
+                            : "bg-white/[0.02] border-white/5"
+                            }`}
+                    >
+                        <p className="text-sm text-white/40 mb-1">{item.label}</p>
+                        <p className="text-white/60">{item.value}</p>
+                        <div
+                            className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-3 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50 w-64 text-center bg-[#101014] border border-white/10"
+                            style={{ boxShadow: '0 6px 18px rgba(0,0,0,0.4)' }}
+                        >
+                            <p className="text-[11px] leading-relaxed text-white/60">{item.tooltip}</p>
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 -mt-1 bg-[#101014] border-r border-b border-white/10" />
+                        </div>
+                    </button>
+                ))}
+            </div>
+            {canTap && !selected && (
+                <p className="mt-3 text-[11px] text-white/30">
+                    Tap a card to see the routine.
+                </p>
+            )}
+            {canTap && selected && (
+                <div className="mt-3 rounded-lg bg-white/[0.04] border border-white/10 p-4">
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-[11px] uppercase tracking-widest text-white/40">
+                            {selected.label} routine
+                        </p>
+                        <button
+                            type="button"
+                            onClick={() => setSelectedId(null)}
+                            className="text-[10px] uppercase tracking-widest text-white/30 hover:text-white/50 transition-colors"
+                        >
+                            Close
+                        </button>
+                    </div>
+                    <p className="text-sm leading-relaxed text-white/60">
+                        {selected.tooltip}
+                    </p>
+                </div>
+            )}
+        </>
     );
 }

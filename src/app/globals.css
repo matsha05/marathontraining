@@ -243,6 +243,8 @@ html {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -251,6 +253,8 @@ body {
   color: var(--text-base);
   line-height: 1.6;
   letter-spacing: -0.011em;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 /* =============================================================================
