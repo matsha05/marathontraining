@@ -49,20 +49,30 @@ export function formatDateLong(dateStr: string, locale = 'en-US'): string {
     });
 }
 
-export function getWeekStartDate(weekNumber: number, raceDateStr?: string): string {
+export function getWeekStartDate(
+    weekNumber: number,
+    raceDateStr?: string,
+    totalWeeksOverride?: number
+): string {
     if (!raceDateStr) return '';
     const raceDate = parseDateOnly(raceDateStr);
     if (!raceDate) return '';
     // Count backward from race date
-    const totalWeeks = calculateWeeksToRace(raceDateStr);
+    const totalWeeks = totalWeeksOverride ?? calculateWeeksToRace(raceDateStr);
+    if (totalWeeks <= 0) return '';
     const weeksFromStart = weekNumber - 1;
     const weekStart = addDaysUtc(raceDate, -((totalWeeks - weeksFromStart) * 7));
     return formatDateUtc(weekStart);
 }
 
-export function getDateForDay(weekNumber: number, dayIndex: number, raceDateStr?: string): string {
+export function getDateForDay(
+    weekNumber: number,
+    dayIndex: number,
+    raceDateStr?: string,
+    totalWeeksOverride?: number
+): string {
     if (!raceDateStr) return '';
-    const weekStart = getWeekStartDate(weekNumber, raceDateStr);
+    const weekStart = getWeekStartDate(weekNumber, raceDateStr, totalWeeksOverride);
     if (!weekStart) return '';
     const weekStartDate = parseDateOnly(weekStart);
     if (!weekStartDate) return '';

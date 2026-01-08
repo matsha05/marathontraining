@@ -16,7 +16,7 @@
 import { OnboardingData } from '@/domain/onboarding/types';
 import { calculateAgeFromDob } from '@/domain/onboarding/utils';
 import { PlanGenerationInput, TrainingPlan, TrainingPhase, WeekPlan } from '@/domain/plan/types';
-import { generatePlan, calculateWeeksToRace, getDateForDay, getWeekStartDate } from '@/domain/plan/generator';
+import { generatePlan, calculateWeeksToRace, getDateForDay, getWeekStartDate, parseDateOnly } from '@/domain/plan/generator';
 import { toDateKey } from '@/lib/dates';
 
 /**
@@ -246,12 +246,13 @@ function buildBaseWeeks(basePlan: TrainingPlan, weeksNeeded: number): WeekPlan[]
 }
 
 function resequenceWeeks(weeks: WeekPlan[], raceDate?: string): WeekPlan[] {
+    const totalWeeks = weeks.length;
     return weeks.map((week, index) => {
         const weekNumber = index + 1;
-        const weekOf = raceDate ? getWeekStartDate(weekNumber, raceDate) : week.weekOf;
+        const weekOf = raceDate ? getWeekStartDate(weekNumber, raceDate, totalWeeks) : week.weekOf;
         const days = week.days.map(day => ({
             ...day,
-            date: raceDate ? getDateForDay(weekNumber, day.dayOfWeek, raceDate) : day.date,
+            date: raceDate ? getDateForDay(weekNumber, day.dayOfWeek, raceDate, totalWeeks) : day.date,
         }));
 
         return { ...week, weekNumber, weekOf, days };
@@ -465,6 +466,16 @@ export function createPlanFromOnboarding(
  * Get the current week from a training plan.
  */
 export function getCurrentWeek(plan: TrainingPlan): number {
+    const planStart = plan.weeks[0]?.weekOf;
+    if (planStart) {
+        const startDate = parseDateOnly(planStart);
+        if (startDate) {
+            const today = new Date();
+            const todayUtc = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+            if (todayUtc < startDate) return 0;
+        }
+    }
+
     if (!plan.raceDate) return 1;
 
     const weeksToRace = calculateWeeksToRace(plan.raceDate);

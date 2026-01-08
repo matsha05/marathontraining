@@ -27,17 +27,17 @@ const PHASE_DISPLAY: Record<TrainingPhase, { label: string; color: string }> = {
 };
 
 export function PhaseTimeline({ phases, currentWeek, totalWeeks }: PhaseTimelineProps) {
-    // Find current phase
-    const getCurrentPhase = () => {
+    const isPrePlan = currentWeek < 1;
+
+    const currentPhaseName = (() => {
+        if (isPrePlan) return null;
         for (const phase of phases) {
             if (currentWeek >= phase.startWeek && currentWeek <= phase.endWeek) {
                 return phase.name;
             }
         }
         return phases[0]?.name || 'base';
-    };
-
-    const currentPhaseName = getCurrentPhase();
+    })();
 
     return (
         <motion.div
@@ -56,8 +56,8 @@ export function PhaseTimeline({ phases, currentWeek, totalWeeks }: PhaseTimeline
                 {/* Phase dots and labels */}
                 <div className="flex items-center justify-between">
                     {phases.map((phase, index) => {
-                        const isActive = phase.name === currentPhaseName;
-                        const isPast = currentWeek > phase.endWeek;
+                        const isActive = !!currentPhaseName && phase.name === currentPhaseName;
+                        const isPast = !isPrePlan && currentWeek > phase.endWeek;
                         const display = PHASE_DISPLAY[phase.name] || PHASE_DISPLAY.base;
 
                         return (
@@ -130,7 +130,7 @@ export function PhaseTimeline({ phases, currentWeek, totalWeeks }: PhaseTimeline
                                 </p>
 
                                 {/* Current week indicator */}
-                                {isActive && (
+                                {isActive && currentWeek > 0 && (
                                     <p
                                         className="mt-1 text-caption font-medium"
                                         style={{ color: 'var(--color-accent)' }}

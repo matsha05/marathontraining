@@ -14,6 +14,7 @@ import { useAuth } from '@/domain/auth/context';
 import { IntensityDistributionCard } from '@/components/insights/IntensityDistributionCard';
 import { WorkoutLog, WorkoutForIntensity } from '@/domain/insights';
 import { getDayName, getFullDayName, formatPace } from '@/lib/format';
+import { calculateWeeksToRace, formatDateLong } from '@/domain/plan/date-utils';
 import { motion } from 'framer-motion';
 import { PacesCard } from '@/components/paces/PacesCard';
 import { RecalibrationModal } from '@/components/vdot/RecalibrationModal';
@@ -279,7 +280,7 @@ export default function DashboardPage() {
         const startOfWeek = new Date(today);
         startOfWeek.setDate(today.getDate() - todayDayOfWeek);
 
-        if (!currentWeekPlan) {
+        if (!plan || plan.weeks.length === 0) {
             return [0, 1, 2, 3, 4, 5, 6].map(i => {
                 const dayDate = new Date(startOfWeek);
                 dayDate.setDate(startOfWeek.getDate() + i);
@@ -299,9 +300,10 @@ export default function DashboardPage() {
             });
         }
 
-        // Use viewing week if navigating, otherwise current week
-        const activeWeekNum = viewingWeek ?? currentWeek ?? 1;
-        const activeWeekPlan = plan?.weeks.find(w => w.weekNumber === activeWeekNum) ?? currentWeekPlan;
+        // Use viewing week if navigating, otherwise current week (or Week 1 for pre-plan)
+        const baseWeekNum = currentWeek && currentWeek > 0 ? currentWeek : 1;
+        const activeWeekNum = viewingWeek ?? baseWeekNum;
+        const activeWeekPlan = plan.weeks.find(w => w.weekNumber === activeWeekNum) ?? plan.weeks[0];
 
         if (!activeWeekPlan) {
             return [0, 1, 2, 3, 4, 5, 6].map(i => ({
@@ -318,13 +320,13 @@ export default function DashboardPage() {
         }
 
         // Calculate the start of this specific week based on plan start date
-        const planStartDate = plan?.weeks[0]?.weekOf;
+        const planStartDate = plan.weeks[0]?.weekOf;
         const planStart = planStartDate ? new Date(planStartDate + 'T12:00:00') : new Date();
         const weekStart = new Date(planStart);
         weekStart.setDate(planStart.getDate() + (activeWeekNum - 1) * 7);
 
         // today is already defined at the start of the useMemo
-        const isCurrentWeek = activeWeekNum === currentWeek;
+        const isCurrentWeek = currentWeek !== null && currentWeek > 0 && activeWeekNum === currentWeek;
 
         return [0, 1, 2, 3, 4, 5, 6].map(dayNum => {
             const dayPlan = activeWeekPlan.days.find(d => d.dayOfWeek === dayNum);
@@ -384,7 +386,7 @@ export default function DashboardPage() {
                 date: dateStr,
             };
         });
-    }, [currentWeekPlan, viewingWeek, currentWeek, plan]);
+    }, [viewingWeek, currentWeek, plan]);
 
     // Determine if today is a quality session (Starrett: "before I go smash myself")
     const isQualityDay = useMemo(() => {
@@ -402,6 +404,13 @@ export default function DashboardPage() {
 
     const displayName = athlete?.name || plan?.athleteName || 'Athlete';
     const displayVdot = displayVdotOverride || athlete?.vdot || plan?.vdot || 45;
+    const planStartDate = plan?.weeks[0]?.weekOf;
+    const isPrePlan = currentWeek === 0 && !!planStartDate;
+    const planStartLabel = planStartDate ? formatDateLong(planStartDate) : null;
+    const weeksToStart = isPrePlan && planStartDate ? calculateWeeksToRace(planStartDate) : null;
+    const defaultWeekNum = currentWeek && currentWeek > 0 ? currentWeek : 1;
+    const calendarWeekNum = viewingWeek ?? defaultWeekNum;
+    const calendarWeekPlan = plan?.weeks.find(w => w.weekNumber === calendarWeekNum) ?? plan?.weeks[0] ?? null;
 
 
     return (
@@ -425,7 +434,7 @@ export default function DashboardPage() {
                 {plan && plan.weeks.length > 0 && (
                     <PhaseTimeline
                         phases={extractPhasesFromWeeks(plan.weeks.map(w => ({ weekNumber: w.weekNumber, phase: w.phase })))}
-                        currentWeek={currentWeek || 1}
+                        currentWeek={currentWeek ?? 1}
                         totalWeeks={plan.totalWeeks}
                     />
                 )}
@@ -454,13 +463,30 @@ export default function DashboardPage() {
                         <div className="flex items-center gap-2">
                             <CalendarDaysIcon size={16} className="v3-icon-color-muted" />
                             <span className="v3-label">
-                                {getFullDayName(new Date().getDay())} • Week {currentWeek || 1}
+                                {isPrePlan && planStartLabel
+                                    ? `Plan starts ${planStartLabel}`
+                                    : `${getFullDayName(new Date().getDay())} • Week ${currentWeek ?? 1}`}
                             </span>
                         </div>
                     </div>
 
                     <div className="space-y-3">
-                        {todaysWorkouts.length > 0 ? (
+                        {isPrePlan ? (
+                            <div className="v3-card p-8 text-center">
+                                <CalendarDaysIcon size={40} className="mx-auto mb-4 v3-accent" />
+                                <p className="v3-heading-sm mb-2">
+                                    {planStartLabel ? `Plan starts ${planStartLabel}` : 'Plan starts soon'}
+                                </p>
+                                {weeksToStart !== null && weeksToStart > 0 && (
+                                    <p className="v3-body-sm mb-2" style={{ color: 'var(--text-muted)' }}>
+                                        Starts in {weeksToStart} weeks
+                                    </p>
+                                )}
+                                <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
+                                    Check back then to begin this plan.
+                                </p>
+                            </div>
+                        ) : todaysWorkouts.length > 0 ? (
                             todaysWorkouts.map((workout, i) => (
                                 <motion.div
                                     key={workout.id}
@@ -581,7 +607,7 @@ export default function DashboardPage() {
                         phase={currentWeekPlan.phase}
                         workoutType={todayWorkout?.runWorkout?.type}
                         workoutNotes={todayWorkout?.runWorkout?.notes?.[0]}
-                        weekNumber={currentWeek || 1}
+                        weekNumber={currentWeek ?? 1}
                         totalWeeks={plan.totalWeeks}
                     />
                 )}
@@ -595,12 +621,12 @@ export default function DashboardPage() {
                 >
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="v3-heading-md">Week Overview</h2>
-                        {viewingWeek && viewingWeek !== currentWeek && (
+                        {viewingWeek !== null && viewingWeek !== defaultWeekNum && (
                             <button
                                 onClick={() => setViewingWeek(null)}
                                 className="v3-body-sm v3-accent hover:underline"
                             >
-                                Back to current week
+                                {isPrePlan ? 'Back to plan start' : 'Back to current week'}
                             </button>
                         )}
                     </div>
@@ -627,14 +653,17 @@ export default function DashboardPage() {
                             date: day.date,
                         }))}
                         weekLabel={(() => {
-                            const activeWeekNum = viewingWeek ?? currentWeek ?? 1;
-                            const activeWeekPlan = plan?.weeks.find(w => w.weekNumber === activeWeekNum);
-                            return `Week ${activeWeekNum} • ${activeWeekPlan?.phase.toUpperCase() || 'BASE'} • ${Math.round((activeWeekPlan?.totalMiles || 0) * 10) / 10} mi`;
+                            const phaseLabel = calendarWeekPlan?.phase?.toUpperCase() || 'BASE';
+                            const mileage = Math.round((calendarWeekPlan?.totalMiles || 0) * 10) / 10;
+                            if (isPrePlan && planStartLabel) {
+                                return `Week ${calendarWeekNum} starts ${planStartLabel} • ${phaseLabel} • ${mileage} mi`;
+                            }
+                            return `Week ${calendarWeekNum} • ${phaseLabel} • ${mileage} mi`;
                         })()}
-                        currentWeek={viewingWeek ?? currentWeek ?? 1}
+                        currentWeek={calendarWeekNum}
                         totalWeeks={plan?.weeks.length || 1}
-                        onPrevWeek={() => setViewingWeek(prev => Math.max(1, (prev ?? currentWeek ?? 1) - 1))}
-                        onNextWeek={() => setViewingWeek(prev => Math.min(plan?.weeks.length || 1, (prev ?? currentWeek ?? 1) + 1))}
+                        onPrevWeek={() => setViewingWeek(prev => Math.max(1, (prev ?? defaultWeekNum) - 1))}
+                        onNextWeek={() => setViewingWeek(prev => Math.min(plan?.weeks.length || 1, (prev ?? defaultWeekNum) + 1))}
                     />
                 </motion.section>
 
@@ -672,7 +701,14 @@ export default function DashboardPage() {
                                 'taper': '#22c55e',     // Green
                                 'race': '#a855f7',      // Purple
                             };
-                            const phaseColor = phaseColors[currentWeekPlan?.phase?.toLowerCase() || 'base'] || '#3b82f6';
+                            const phaseKey = (currentWeekPlan?.phase ?? plan.weeks[0]?.phase ?? 'base').toLowerCase();
+                            const phaseColor = phaseColors[phaseKey] || '#3b82f6';
+                            const phaseLabel = phaseKey.toUpperCase();
+                            const summaryText = currentWeek && currentWeek > 0
+                                ? `Week ${currentWeek} of ${plan.totalWeeks} • ${phaseLabel} phase`
+                                : planStartLabel
+                                    ? `Plan starts ${planStartLabel} • ${phaseLabel} phase`
+                                    : `Plan length ${plan.totalWeeks} weeks • ${phaseLabel} phase`;
 
                             return (
                                 <Link
@@ -689,7 +725,7 @@ export default function DashboardPage() {
                                                 {plan.raceName || `${plan.goalDistance.toUpperCase()} Training`}
                                             </p>
                                             <p className="v3-body-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-                                                Week {currentWeek} of {plan.totalWeeks} • <span style={{ color: phaseColor, fontWeight: 500 }}>{currentWeekPlan?.phase.toUpperCase()}</span> phase
+                                                {summaryText}
                                             </p>
                                         </div>
                                         <svg className="w-6 h-6" style={{ color: 'var(--text-subtle)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">

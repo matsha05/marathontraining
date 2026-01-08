@@ -144,7 +144,8 @@ export function generateFRRPlan(
             phase,
             keyWorkout,
             input,
-            paces
+            paces,
+            config.durationWeeks
         );
 
         // Calculate distribution
@@ -154,7 +155,7 @@ export function generateFRRPlan(
 
         weeks.push({
             weekNumber: week,
-            weekOf: getWeekStartDate(week, input.raceDate),
+            weekOf: getWeekStartDate(week, input.raceDate, config.durationWeeks),
             phase,
             phaseWeek: config.phases[frrPhase].indexOf(week) + 1,
             days,
@@ -209,7 +210,8 @@ function generateFRRWeekDays(
     phase: TrainingPhase,
     keyWorkout: { type: string; description: string } | null,
     input: PlanGenerationInput,
-    paces: ReturnType<typeof calculateTrainingPaces>
+    paces: ReturnType<typeof calculateTrainingPaces>,
+    totalWeeks: number
 ): DayPlan[] {
     const days: DayPlan[] = [];
     const remainingMiles = weeklyMileage - longRunMiles;
@@ -219,7 +221,7 @@ function generateFRRWeekDays(
     // Standard FRR structure: Long run on user-selected day, Key workout midweek
     const longRunDayIndex = getLongRunDayIndex(input.longRunDay);
     for (let i = 0; i < 7; i++) {
-        const date = getDateForDay(weekNumber, i, input.raceDate);
+        const date = getDateForDay(weekNumber, i, input.raceDate, totalWeeks);
         let runWorkout: Workout | null = null;
         let isKeyDay = false;
 
@@ -335,7 +337,8 @@ export function generateDanielsPlan(
             phase,
             q2workout,
             input,
-            paces
+            paces,
+            config.durationWeeks
         );
 
         // Calculate distribution
@@ -345,7 +348,7 @@ export function generateDanielsPlan(
 
         weeks.push({
             weekNumber: week,
-            weekOf: getWeekStartDate(week, input.raceDate),
+            weekOf: getWeekStartDate(week, input.raceDate, config.durationWeeks),
             phase,
             phaseWeek: week,
             days,
@@ -400,7 +403,8 @@ function generateDanielsWeekDays(
     phase: TrainingPhase,
     q2workout: ReturnType<typeof getDaniels2QWorkout>,
     input: PlanGenerationInput,
-    paces: ReturnType<typeof calculateTrainingPaces>
+    paces: ReturnType<typeof calculateTrainingPaces>,
+    totalWeeks: number
 ): DayPlan[] {
     const days: DayPlan[] = [];
 
@@ -413,7 +417,7 @@ function generateDanielsWeekDays(
 
     // Daniels 2Q structure: Q1 on Sunday, Q2 on Wednesday or Thursday
     for (let i = 0; i < 7; i++) {
-        const date = getDateForDay(weekNumber, i, input.raceDate);
+        const date = getDateForDay(weekNumber, i, input.raceDate, totalWeeks);
         let runWorkout: Workout | null = null;
         let isKeyDay = false;
 
@@ -541,7 +545,8 @@ export function generateHigdonPlan(
             microcycle,
             phase,
             input,
-            paces
+            paces,
+            totalWeeks
         );
 
         // Calculate ACTUAL totals from days (not from generic progression)
@@ -558,7 +563,7 @@ export function generateHigdonPlan(
 
         weeks.push({
             weekNumber: week,
-            weekOf: getWeekStartDate(week, input.raceDate),
+            weekOf: getWeekStartDate(week, input.raceDate, totalWeeks),
             phase,
             phaseWeek: week,
             days,
@@ -628,7 +633,8 @@ function generateHigdonWeekDaysExact(
     microcycle: HigdonMicrocycle,
     phase: TrainingPhase,
     input: PlanGenerationInput,
-    paces: ReturnType<typeof calculateTrainingPaces>
+    paces: ReturnType<typeof calculateTrainingPaces>,
+    totalWeeks: number
 ): DayPlan[] {
     const days: DayPlan[] = [];
     const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
@@ -637,7 +643,7 @@ function generateHigdonWeekDaysExact(
     const longRunDayIndex = getLongRunDayIndex(input.longRunDay);
 
     for (let i = 0; i < 7; i++) {
-        const date = getDateForDay(weekNumber, i, input.raceDate);
+        const date = getDateForDay(weekNumber, i, input.raceDate, totalWeeks);
         const dayName = dayNames[i];
         const slot: HigdonDaySlot | undefined = microcycle[dayName];
 
@@ -792,7 +798,8 @@ export function generateHansonsPlan(
             phase,
             tier,
             input,
-            paces
+            paces,
+            totalWeeks
         );
 
         // Calculate distribution
@@ -802,7 +809,7 @@ export function generateHansonsPlan(
 
         weeks.push({
             weekNumber: week,
-            weekOf: getWeekStartDate(week, input.raceDate),
+            weekOf: getWeekStartDate(week, input.raceDate, totalWeeks),
             phase,
             phaseWeek: week,
             days,
@@ -860,7 +867,8 @@ function generateHansonsWeekDays(
     phase: TrainingPhase,
     tier: HansonsTier,
     input: PlanGenerationInput,
-    paces: ReturnType<typeof calculateTrainingPaces>
+    paces: ReturnType<typeof calculateTrainingPaces>,
+    totalWeeks: number
 ): DayPlan[] {
     const days: DayPlan[] = [];
     const remainingMiles = weeklyMileage - longRunMiles;
@@ -869,7 +877,7 @@ function generateHansonsWeekDays(
 
     // Hansons structure: Long on Sunday, Quality on Tuesday + Thursday
     for (let i = 0; i < 7; i++) {
-        const date = getDateForDay(weekNumber, i, input.raceDate);
+        const date = getDateForDay(weekNumber, i, input.raceDate, totalWeeks);
         let runWorkout: Workout | null = null;
         let isKeyDay = false;
 
@@ -973,7 +981,8 @@ export function generatePfitzAMPlan(
             phase,
             tier,
             input,
-            paces
+            paces,
+            totalWeeks
         );
 
         // Calculate distribution
@@ -983,7 +992,7 @@ export function generatePfitzAMPlan(
 
         weeks.push({
             weekNumber: week,
-            weekOf: getWeekStartDate(week, input.raceDate),
+            weekOf: getWeekStartDate(week, input.raceDate, totalWeeks),
             phase,
             phaseWeek: week,
             days,
@@ -1040,7 +1049,8 @@ function generatePfitzAMWeekDays(
     phase: TrainingPhase,
     tier: PfitzTier,
     input: PlanGenerationInput,
-    paces: ReturnType<typeof calculateTrainingPaces>
+    paces: ReturnType<typeof calculateTrainingPaces>,
+    totalWeeks: number
 ): DayPlan[] {
     const days: DayPlan[] = [];
     const remainingMiles = weeklyMileage - longRunMiles;
@@ -1050,7 +1060,7 @@ function generatePfitzAMWeekDays(
 
     // Pfitz AM structure: Long on Sunday, Quality on Tuesday + Thursday/Friday
     for (let i = 0; i < 7; i++) {
-        const date = getDateForDay(weekNumber, i, input.raceDate);
+        const date = getDateForDay(weekNumber, i, input.raceDate, totalWeeks);
         let runWorkout: Workout | null = null;
         let isKeyDay = false;
 

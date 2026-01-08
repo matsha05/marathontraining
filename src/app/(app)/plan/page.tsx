@@ -117,18 +117,22 @@ export default function PlanPage() {
 
     const phases = useMemo(() => {
         if (!plan) return [];
-        return formatPhaseDisplay(plan, currentWeek || 1);
+        return formatPhaseDisplay(plan, currentWeek ?? 1);
     }, [plan, currentWeek]);
 
     const weeks = useMemo(() => {
         if (!plan) return [];
-        return formatWeekDisplay(plan.weeks, currentWeek || 1);
+        return formatWeekDisplay(plan.weeks, currentWeek ?? 1);
     }, [plan, currentWeek]);
 
     const weeksUntilRace = plan?.raceDate ? getWeeksUntilRace(plan.raceDate) : null;
+    const planStartDate = plan?.weeks[0]?.weekOf;
+    const isPrePlan = currentWeek === 0 && !!planStartDate;
+    const planStartLabel = planStartDate ? formatDateLong(planStartDate) : null;
+    const weeksToStart = isPrePlan && planStartDate ? calculateWeeksToRace(planStartDate) : null;
 
-    if (selectedWeek === null && currentWeek) {
-        setSelectedWeek(currentWeek);
+    if (selectedWeek === null && currentWeek !== null) {
+        setSelectedWeek(currentWeek > 0 ? currentWeek : 1);
     }
 
     // Loading state
@@ -213,6 +217,30 @@ export default function PlanPage() {
                         )}
                     </div>
                 </motion.div>
+
+                {isPrePlan && planStartLabel && (
+                    <motion.div
+                        className="mb-8"
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: 0.05 }}
+                    >
+                        <div className="v3-card p-6">
+                            <p className="v3-label mb-1" style={{ color: 'var(--text-muted)' }}>
+                                PLAN STARTS
+                            </p>
+                            <p className="v3-heading-sm">{planStartLabel}</p>
+                            {weeksToStart !== null && weeksToStart > 0 && (
+                                <p className="v3-body-sm mt-1" style={{ color: 'var(--text-muted)' }}>
+                                    Starts in {weeksToStart} weeks
+                                </p>
+                            )}
+                            <p className="v3-body-sm mt-2" style={{ color: 'var(--text-muted)' }}>
+                                Check back then to begin this plan.
+                            </p>
+                        </div>
+                    </motion.div>
+                )}
 
                 {/* Phase Timeline */}
                 <motion.section

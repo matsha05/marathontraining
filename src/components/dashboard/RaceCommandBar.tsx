@@ -31,6 +31,12 @@ export function RaceCommandBar({
     const weeksToRace = plan.raceDate
         ? calculateWeeksToRace(plan.raceDate)
         : null;
+    const planStartDate = plan.weeks[0]?.weekOf;
+    const isPrePlan = currentWeek === 0 && !!planStartDate;
+    const weeksToStart = isPrePlan && planStartDate
+        ? calculateWeeksToRace(planStartDate)
+        : null;
+    const planStartLabel = planStartDate ? formatDateLong(planStartDate) : null;
 
     // Get coach color
     const coachColor = plan.philosophy
@@ -43,14 +49,17 @@ export function RaceCommandBar({
         : 'Training Plan');
 
     // Current phase display
-    const currentPhase = currentWeekPlan?.phase
-        ? currentWeekPlan.phase.charAt(0).toUpperCase() + currentWeekPlan.phase.slice(1)
+    const phaseSource = currentWeekPlan ?? plan.weeks[0];
+    const currentPhase = phaseSource?.phase
+        ? phaseSource.phase.charAt(0).toUpperCase() + phaseSource.phase.slice(1)
         : 'Base';
 
     // Weekly mileage
-    const weeklyMileage = currentWeekPlan?.totalMiles
-        ? Math.round(currentWeekPlan.totalMiles)
+    const weeklyMileageSource = currentWeekPlan ?? plan.weeks[0];
+    const weeklyMileage = weeklyMileageSource?.totalMiles
+        ? Math.round(weeklyMileageSource.totalMiles)
         : plan.peakMileage;
+    const weekProgress = isPrePlan ? 0 : (currentWeek ?? 1);
 
     return (
         <motion.div
@@ -117,7 +126,7 @@ export function RaceCommandBar({
                             className="text-data text-2xl font-semibold"
                             style={{ color: weeksToRace !== null && weeksToRace <= 4 ? 'var(--color-accent)' : 'var(--text-base)' }}
                         >
-                            {weeksToRace !== null ? weeksToRace : currentWeek || 1}
+                            {weeksToRace !== null ? weeksToRace : weekProgress}
                         </p>
                         <p className="text-caption">
                             {weeksToRace !== null ? 'wks to race' : 'current wk'}
@@ -135,9 +144,9 @@ export function RaceCommandBar({
                     {/* Week Progress */}
                     <div className="text-center">
                         <p className="text-data text-2xl font-semibold" style={{ color: 'var(--text-base)' }}>
-                            {currentWeek || 1}<span className="text-caption">/{plan.totalWeeks}</span>
+                            {weekProgress}<span className="text-caption">/{plan.totalWeeks}</span>
                         </p>
-                        <p className="text-caption">week</p>
+                        <p className="text-caption">{isPrePlan ? 'plan wk' : 'week'}</p>
                     </div>
 
                     {/* Weekly Mileage */}
@@ -158,14 +167,22 @@ export function RaceCommandBar({
                 </div>
 
                 {/* Race Date Footer */}
-                {plan.raceDate && (
+                {(plan.raceDate || (isPrePlan && planStartLabel)) && (
                     <div
-                        className="mt-5 pt-4 text-center"
+                        className="mt-5 pt-4 text-center space-y-1"
                         style={{ borderTop: '1px solid var(--border-muted)' }}
                     >
-                        <p className="text-caption">
-                            {plan.raceName || 'Race Day'} · {formatDateLong(plan.raceDate)}
-                        </p>
+                        {isPrePlan && planStartLabel && (
+                            <p className="text-caption">
+                                Plan starts · {planStartLabel}
+                                {weeksToStart !== null && weeksToStart > 0 ? ` (${weeksToStart} wks)` : ''}
+                            </p>
+                        )}
+                        {plan.raceDate && (
+                            <p className="text-caption">
+                                {plan.raceName || 'Race Day'} · {formatDateLong(plan.raceDate)}
+                            </p>
+                        )}
                     </div>
                 )}
             </div>
