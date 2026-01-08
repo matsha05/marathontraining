@@ -12,12 +12,13 @@ import { addYears, toDateKey } from '@/lib/dates';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     AlertTriangle, X, Download, RefreshCcw, ChevronRight,
-    Calendar, TrendingUp, Target, Zap, Activity, Moon
+    Calendar, TrendingUp, Target, Zap, Activity, LogOut
 } from 'lucide-react';
 import { SiteHeader } from '@/components/ui/SiteHeader';
 import { AvatarPicker } from '@/components/ui/AvatarPicker';
 import { AvatarDisplay } from '@/components/ui/AvatarDisplay';
 import { AvatarId, DEFAULT_AVATAR_ID, parseAvatarId } from '@/domain/user/avatars';
+import { DatePicker } from '@/components/ui/DatePicker';
 
 /**
  * Settings Page - V3 Premium Design
@@ -69,6 +70,8 @@ function formatPace(seconds: number): string {
 export default function SettingsPage() {
     const router = useRouter();
     const { plan, refreshPlan } = usePlan();
+    const minDobDate = toDateKey(addYears(new Date(), -99));
+    const maxDobDate = toDateKey(addYears(new Date(), -13));
 
     // Profile state
     const [profile, setProfile] = useState<ProfileData>({ name: '', email: '', dateOfBirth: null, avatar: null });
@@ -288,16 +291,13 @@ export default function SettingsPage() {
                             </div>
                             <div>
                                 <label className="text-xs font-medium block mb-1" style={{ color: 'var(--text-subtle)' }}>Date of Birth</label>
-                                <input
-                                    type="date"
+                                <DatePicker
                                     value={profile.dateOfBirth || ''}
-                                    onChange={(e) => setProfile({ ...profile, dateOfBirth: e.target.value || null })}
-                                    className="input"
-                                    max={toDateKey(addYears(new Date(), -13))}
-                                    style={{
-                                        colorScheme: 'dark',
-                                    }}
-                                    autoComplete="bday"
+                                    onChange={(value) => setProfile({ ...profile, dateOfBirth: value || null })}
+                                    minDate={minDobDate}
+                                    maxDate={maxDobDate}
+                                    placeholder="Select your date of birth"
+                                    className="w-full"
                                 />
                                 {profile.dateOfBirth && (
                                     <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
@@ -693,7 +693,7 @@ export default function SettingsPage() {
                         className="w-full px-4 py-3.5 flex items-center gap-3 text-left hover:bg-[var(--bg-muted)] transition-colors"
                     >
                         <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--bg-muted)' }}>
-                            <Moon size={16} style={{ color: 'var(--text-muted)' }} />
+                            <LogOut size={16} style={{ color: 'var(--text-muted)' }} />
                         </div>
                         <span className="font-medium text-sm">{signOutBusy ? 'Signing out...' : 'Sign Out'}</span>
                     </button>

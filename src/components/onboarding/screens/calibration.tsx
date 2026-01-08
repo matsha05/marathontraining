@@ -617,42 +617,35 @@ export function VdotRevealScreen({
                 You can update VO2max anytime in Settings → Fitness and we&apos;ll adjust your plan.
             </p>
 
-            {/* Training Paces - Collapsible */}
-            <details className="mt-6">
-                <summary
-                    className="p-4 rounded-xl v3-card cursor-pointer flex items-center justify-between group"
-                >
-                    <span className="v3-body font-medium">Your training paces</span>
-                    <ChevronDown className="w-5 h-5 transition-transform group-open:rotate-180" style={{ color: 'var(--text-subtle)' }} />
-                </summary>
-                <div className="p-4 pt-2 v3-card" style={{ borderRadius: '0 0 12px 12px', marginTop: '-8px' }}>
-                    <div className="space-y-4">
-                        {/* Easy Pace */}
-                        <div className="flex justify-between items-center">
-                            <span className="v3-body">Easy</span>
-                            <span className="v3-body font-medium" style={{ fontFamily: 'var(--font-plex-mono)' }}>{formatPace(paces.easy.min)} - {formatPace(paces.easy.max)}/mi</span>
-                        </div>
+            {/* Training Paces - Always visible */}
+            <div className="mt-6 p-4 rounded-xl v3-card">
+                <p className="v3-body font-medium mb-4">Your training paces</p>
+                <div className="space-y-3">
+                    {/* Easy Pace */}
+                    <div className="flex justify-between items-center">
+                        <span className="v3-body" style={{ color: 'var(--text-muted)' }}>Easy</span>
+                        <span className="v3-body font-medium" style={{ fontFamily: 'var(--font-plex-mono)' }}>{formatPace(paces.easy.min)} - {formatPace(paces.easy.max)}/mi</span>
+                    </div>
 
-                        {/* Marathon Pace */}
-                        <div className="flex justify-between items-center">
-                            <span className="v3-body">Marathon Pace</span>
-                            <span className="v3-body font-medium" style={{ fontFamily: 'var(--font-plex-mono)' }}>{formatPace(paces.marathon)}/mi</span>
-                        </div>
+                    {/* Marathon Pace */}
+                    <div className="flex justify-between items-center">
+                        <span className="v3-body" style={{ color: 'var(--text-muted)' }}>Marathon Pace</span>
+                        <span className="v3-body font-medium" style={{ fontFamily: 'var(--font-plex-mono)' }}>{formatPace(paces.marathon)}/mi</span>
+                    </div>
 
-                        {/* Tempo/Threshold Pace */}
-                        <div className="flex justify-between items-center">
-                            <span className="v3-body">Tempo (Threshold)</span>
-                            <span className="v3-body font-medium" style={{ fontFamily: 'var(--font-plex-mono)' }}>{formatPace(paces.threshold)}/mi</span>
-                        </div>
+                    {/* Tempo/Threshold Pace */}
+                    <div className="flex justify-between items-center">
+                        <span className="v3-body" style={{ color: 'var(--text-muted)' }}>Tempo (Threshold)</span>
+                        <span className="v3-body font-medium" style={{ fontFamily: 'var(--font-plex-mono)' }}>{formatPace(paces.threshold)}/mi</span>
+                    </div>
 
-                        {/* Interval Pace */}
-                        <div className="flex justify-between items-center">
-                            <span className="v3-body">Interval</span>
-                            <span className="v3-body font-medium" style={{ fontFamily: 'var(--font-plex-mono)' }}>{formatPace(paces.interval)}/mi</span>
-                        </div>
+                    {/* Interval Pace */}
+                    <div className="flex justify-between items-center">
+                        <span className="v3-body" style={{ color: 'var(--text-muted)' }}>Interval</span>
+                        <span className="v3-body font-medium" style={{ fontFamily: 'var(--font-plex-mono)' }}>{formatPace(paces.interval)}/mi</span>
                     </div>
                 </div>
-            </details>
+            </div>
 
             <div className="mt-6 flex gap-3">
                 <button

@@ -27,6 +27,7 @@ interface DatePickerProps {
     value: string; // YYYY-MM-DD format
     onChange: (date: string) => void;
     minDate?: string; // YYYY-MM-DD format
+    maxDate?: string; // YYYY-MM-DD format
     placeholder?: string;
     className?: string;
 }
@@ -42,12 +43,14 @@ export function DatePicker({
     value,
     onChange,
     minDate,
+    maxDate,
     placeholder = 'Select date',
     className = '',
 }: DatePickerProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [viewDate, setViewDate] = useState(() => {
         if (value) return parseDateLocal(value);
+        if (maxDate) return parseDateLocal(maxDate);
         if (minDate) return parseDateLocal(minDate);
         return new Date();
     });
@@ -78,6 +81,7 @@ export function DatePicker({
     }, [isOpen]);
 
     const minDateObj = minDate ? parseDateLocal(minDate) : null;
+    const maxDateObj = maxDate ? parseDateLocal(maxDate) : null;
 
     const goToPrevMonth = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -127,7 +131,8 @@ export function DatePicker({
 
         for (let day = 1; day <= daysInMonth; day++) {
             const date = new Date(year, month, day);
-            const isDisabled = minDateObj ? date < minDateObj : false;
+            const isDisabled = (minDateObj ? date < minDateObj : false)
+                || (maxDateObj ? date > maxDateObj : false);
             const isSelected = selectedDate
                 ? date.toDateString() === selectedDate.toDateString()
                 : false;
@@ -156,6 +161,10 @@ export function DatePicker({
 
         return days;
     };
+
+    const today = new Date();
+    const isTodayAllowed = (!minDateObj || today >= minDateObj)
+        && (!maxDateObj || today <= maxDateObj);
 
     // Format display value - parse as local to avoid timezone shift
     const displayValue = value
@@ -289,23 +298,23 @@ export function DatePicker({
                                 Clear
                             </button>
                             <button
-                                type="button"
-                                onClick={() => {
-                                    const today = new Date();
-                                    if (!minDateObj || today >= minDateObj) {
+                                    type="button"
+                                    onClick={() => {
+                                        if (!isTodayAllowed) return;
                                         // Format in LOCAL time (not UTC) to avoid timezone shift
-                                        const year = today.getFullYear();
-                                        const month = String(today.getMonth() + 1).padStart(2, '0');
-                                        const day = String(today.getDate()).padStart(2, '0');
+                                        const todayDate = new Date();
+                                        const year = todayDate.getFullYear();
+                                        const month = String(todayDate.getMonth() + 1).padStart(2, '0');
+                                        const day = String(todayDate.getDate()).padStart(2, '0');
                                         onChange(`${year}-${month}-${day}`);
                                         setIsOpen(false);
-                                    }
-                                }}
-                                className="text-xs transition-colors hover:underline"
-                                style={{ color: 'var(--color-accent)' }}
-                            >
-                                Today
-                            </button>
+                                    }}
+                                    disabled={!isTodayAllowed}
+                                    className={`text-xs transition-colors ${isTodayAllowed ? 'hover:underline' : 'opacity-50 cursor-not-allowed'}`}
+                                    style={{ color: isTodayAllowed ? 'var(--color-accent)' : 'var(--text-subtle)' }}
+                                >
+                                    Today
+                                </button>
                         </div>
                     </motion.div>
                 )}

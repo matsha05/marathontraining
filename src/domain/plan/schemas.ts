@@ -1,11 +1,7 @@
 import { z } from 'zod';
+import { numberFromParam } from '@/lib/schema-utils';
 
-const numberFromParam = z.preprocess((value) => {
-    if (typeof value === 'string' && value.trim() !== '') {
-        return Number(value);
-    }
-    return value;
-}, z.number().int().positive());
+const positiveIntFromParam = numberFromParam(z.number().int().positive());
 
 const workoutSchema = z.object({
     name: z.string(),
@@ -72,5 +68,5 @@ export const workoutIdQuerySchema = z.object({
 });
 
 export const weekQuerySchema = z.object({
-    week: numberFromParam,
+    week: positiveIntFromParam,
 });

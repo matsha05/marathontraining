@@ -78,7 +78,7 @@ export function Toggle({
                 onClick={() => !disabled && onChange(!checked)}
                 onKeyDown={handleKeyDown}
                 className={`
-                    relative inline-flex flex-shrink-0 ${track} 
+                    relative inline-flex items-center flex-shrink-0 ${track} 
                     rounded-full transition-colors cursor-pointer
                     focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
                 `}
@@ -90,7 +90,7 @@ export function Toggle({
             >
                 <span
                     className={`
-                        inline-block ${thumb} rounded-full bg-white shadow 
+                        block ${thumb} rounded-full bg-white shadow 
                         transition-transform ${checked ? translate : 'translate-x-1'}
                     `}
                 />

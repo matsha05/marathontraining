@@ -19,7 +19,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Loader2, Check, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Loader2, Check } from 'lucide-react';
 import { createSupabaseBrowserClient } from '@/infrastructure/supabase';
 import { usePlan } from '@/domain/plan/context';
 
@@ -31,6 +31,10 @@ import {
     OptionGrid,
     ContinueButton,
 } from '@/components/onboarding/ui';
+import {
+    NameScreen,
+    DemographicsScreen,
+} from '@/components/onboarding/screens/identity';
 import {
     TrainingGoalScreen,
     RaceDetailsScreen,
@@ -49,12 +53,15 @@ import {
 } from '@/components/onboarding/screens/preferences';
 
 import { OnboardingData, INITIAL_ONBOARDING_DATA, TrainingGoal, TrainingIntensity } from '@/domain/onboarding/types';
+import { calculateAgeFromDob } from '@/domain/onboarding/utils';
 import { createPlanFromOnboarding, savePlan } from '@/domain/plan/service';
 import { parseAvatarId } from '@/domain/user/avatars';
 
 // Regeneration steps (much shorter than full onboarding)
 type RegenerateStep =
     | 'loading'
+    | 'name'
+    | 'demographics'
     | 'vdot-confirm'
     | 'training-goal'
     | 'race-details'
@@ -78,6 +85,7 @@ export default function RegeneratePlanPage() {
     const [currentVdot, setCurrentVdot] = useState<number | null>(null);
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [identitySteps, setIdentitySteps] = useState<RegenerateStep[]>([]);
 
     // Load existing user data on mount
     useEffect(() => {
@@ -98,6 +106,29 @@ export default function RegeneratePlanPage() {
                     .eq('id', user.id)
                     .single() as { data: { name?: string; date_of_birth?: string; age?: number; sex?: string; avatar?: string } | null };
 
+                const email = user.email || '';
+                const fallbackName = (
+                    athlete?.name
+                    || user.user_metadata?.full_name
+                    || user.user_metadata?.name
+                    || email.split('@')[0]
+                    || ''
+                ).trim();
+
+                const dateOfBirth = athlete?.date_of_birth || null;
+                const normalizedSex = typeof athlete?.sex === 'string' ? athlete.sex.toLowerCase() : null;
+                const sex = normalizedSex === 'male' || normalizedSex === 'female'
+                    ? (normalizedSex as 'male' | 'female')
+                    : null;
+                const derivedAge = dateOfBirth ? calculateAgeFromDob(dateOfBirth) : (athlete?.age ?? null);
+
+                const needsName = fallbackName.length < 2;
+                const needsDemographics = !sex || derivedAge === null || derivedAge <= 0;
+                const requiredIdentitySteps: RegenerateStep[] = [];
+                if (needsName) requiredIdentitySteps.push('name');
+                if (needsDemographics) requiredIdentitySteps.push('demographics');
+                setIdentitySteps(requiredIdentitySteps);
+
                 // Get current VDOT from existing plan
                 const vdot = plan?.vdot || null;
                 setCurrentVdot(vdot);
@@ -105,16 +136,16 @@ export default function RegeneratePlanPage() {
                 // Pre-populate data with existing profile
                 setData(prev => ({
                     ...prev,
-                    name: athlete?.name || prev.name,
-                    dateOfBirth: athlete?.date_of_birth || null,
-                    age: athlete?.age || prev.age,
-                    sex: (athlete?.sex as 'male' | 'female') || prev.sex,
+                    name: fallbackName,
+                    dateOfBirth,
+                    age: derivedAge,
+                    sex,
                     avatar: athlete?.avatar ? parseAvatarId(athlete.avatar) : prev.avatar,
                     vdot: vdot || prev.vdot,
                     vdotConfidence: vdot ? 'high' : prev.vdotConfidence,
                 }));
 
-                setStep('vdot-confirm');
+                setStep(requiredIdentitySteps[0] ?? 'vdot-confirm');
             } catch (err) {
                 console.error('Failed to load user data:', err);
                 setError('Failed to load your profile. Please try again.');
@@ -124,76 +155,94 @@ export default function RegeneratePlanPage() {
         loadUserData();
     }, [plan, router]);
 
-    // Navigation
-    const getNextStep = (current: RegenerateStep): RegenerateStep => {
-        switch (current) {
-            case 'vdot-confirm': return 'training-goal';
-            case 'training-goal':
-                return data.trainingGoal === 'general' ? 'weekly-mileage' : 'race-details';
-            case 'race-details': return 'weekly-mileage';
-            case 'weekly-mileage': return 'runs-per-week';
-            case 'runs-per-week': return 'longest-run';
-            case 'longest-run': return 'available-days';
-            case 'available-days': return 'long-run-day';
-            case 'long-run-day': return 'plan-start-date';
-            case 'plan-start-date': return 'training-intensity';
-            case 'training-intensity': return 'strength-training';
-            case 'strength-training': return 'generating';
-            default: return current;
-        }
-    };
-
-    const getPreviousStep = (current: RegenerateStep): RegenerateStep => {
-        switch (current) {
-            case 'training-goal': return 'vdot-confirm';
-            case 'race-details': return 'training-goal';
-            case 'weekly-mileage':
-                return data.trainingGoal === 'general' ? 'training-goal' : 'race-details';
-            case 'runs-per-week': return 'weekly-mileage';
-            case 'longest-run': return 'runs-per-week';
-            case 'available-days': return 'longest-run';
-            case 'long-run-day': return 'available-days';
-            case 'plan-start-date': return 'long-run-day';
-            case 'training-intensity': return 'plan-start-date';
-            case 'strength-training': return 'training-intensity';
-            default: return current;
-        }
-    };
+    const raceDetailSteps: RegenerateStep[] = data.trainingGoal === 'general' ? [] : ['race-details'];
+    const stepOrder: RegenerateStep[] = [
+        ...identitySteps,
+        'vdot-confirm',
+        'training-goal',
+        ...raceDetailSteps,
+        'weekly-mileage',
+        'runs-per-week',
+        'longest-run',
+        'available-days',
+        'long-run-day',
+        'plan-start-date',
+        'training-intensity',
+        'strength-training',
+    ];
 
     const goToNext = () => {
-        const next = getNextStep(step);
-        if (next === 'generating') {
+        const currentIndex = stepOrder.indexOf(step);
+        if (currentIndex === -1) return;
+        const next = stepOrder[currentIndex + 1];
+        if (!next) {
             handleGenerate();
-        } else {
-            setStep(next);
+            return;
         }
+        setStep(next);
     };
 
     const goBack = () => {
-        if (step === 'vdot-confirm') {
+        const currentIndex = stepOrder.indexOf(step);
+        if (currentIndex <= 0) {
             router.push('/settings');
-        } else {
-            setStep(getPreviousStep(step));
+            return;
         }
+        setStep(stepOrder[currentIndex - 1]);
     };
 
     // Generate the new plan
     const handleGenerate = async () => {
-        setStep('generating');
         setIsGenerating(true);
-        setError(null); // Clear previous errors
+        setError(null);
+
+        const trimmedName = data.name.trim();
+        const computedAge = data.dateOfBirth ? calculateAgeFromDob(data.dateOfBirth) : data.age;
+        const hasName = trimmedName.length >= 2;
+        const hasSex = data.sex === 'male' || data.sex === 'female';
+        const hasAge = computedAge !== null && computedAge > 0;
+
+        if (!hasName || !hasSex || !hasAge) {
+            setError('Please complete your profile before generating a plan.');
+            setStep(identitySteps[0] ?? 'vdot-confirm');
+            setIsGenerating(false);
+            return;
+        }
+
+        setStep('generating');
 
         try {
             const supabase = createSupabaseBrowserClient();
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error('Not authenticated');
 
+            const normalizedData: OnboardingData = {
+                ...data,
+                name: trimmedName,
+                age: computedAge ?? data.age,
+                sex: data.sex,
+            };
+
+            try {
+                const profileUpdate = {
+                    id: user.id,
+                    name: trimmedName || 'Athlete',
+                    age: computedAge ?? null,
+                    sex: normalizedData.sex,
+                    ...(data.dateOfBirth ? { date_of_birth: data.dateOfBirth } : {}),
+                    ...(data.avatar ? { avatar: data.avatar } : {}),
+                };
+                await supabase.from('athletes').upsert(profileUpdate, { onConflict: 'id' });
+            } catch (profileError) {
+                console.warn('Failed to update athlete profile:', profileError);
+            }
+
             // Generate plan from onboarding data
-            const planResult = createPlanFromOnboarding(data);
+            const planResult = createPlanFromOnboarding(normalizedData);
             if (!planResult.success) {
                 // Show the actual error message
                 setError(planResult.error?.message || 'Failed to generate plan');
-                setStep('vdot-confirm'); // Go back to start so user can fix issues
+                setStep(identitySteps[0] ?? 'vdot-confirm');
                 return;
             }
 
@@ -205,19 +254,13 @@ export default function RegeneratePlanPage() {
         } catch (err) {
             console.error('Plan generation failed:', err);
             setError(err instanceof Error ? err.message : 'Failed to generate plan. Please try again.');
-            setStep('vdot-confirm'); // Go back to start so user can review all data
+            setStep(identitySteps[0] ?? 'vdot-confirm');
         } finally {
             setIsGenerating(false);
         }
     };
 
     // Progress calculation
-    const stepOrder: RegenerateStep[] = [
-        'vdot-confirm', 'training-goal', 'race-details',
-        'weekly-mileage', 'runs-per-week', 'longest-run',
-        'available-days', 'long-run-day', 'plan-start-date',
-        'training-intensity', 'strength-training'
-    ];
     const currentIndex = stepOrder.indexOf(step);
     const progress = currentIndex >= 0 ? ((currentIndex + 1) / stepOrder.length) * 100 : 0;
 
@@ -271,6 +314,41 @@ export default function RegeneratePlanPage() {
                             >
                                 <Loader2 className="w-8 h-8 animate-spin mb-4" style={{ color: 'var(--color-accent)' }} />
                                 <p style={{ color: 'var(--text-muted)' }}>Loading your profile...</p>
+                            </motion.div>
+                        )}
+
+                        {/* Name */}
+                        {step === 'name' && (
+                            <motion.div
+                                key="name"
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -20 }}
+                            >
+                                <NameScreen
+                                    name={data.name}
+                                    onNameChange={(name) => setData(prev => ({ ...prev, name }))}
+                                    onContinue={goToNext}
+                                    onBack={goBack}
+                                />
+                            </motion.div>
+                        )}
+
+                        {/* Demographics */}
+                        {step === 'demographics' && (
+                            <motion.div
+                                key="demographics"
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -20 }}
+                            >
+                                <DemographicsScreen
+                                    data={data}
+                                    onDobChange={(dateOfBirth) => setData(prev => ({ ...prev, dateOfBirth }))}
+                                    onSexChange={(sex) => setData(prev => ({ ...prev, sex }))}
+                                    onContinue={goToNext}
+                                    onBack={goBack}
+                                />
                             </motion.div>
                         )}
 

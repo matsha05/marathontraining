@@ -1,11 +1,5 @@
 import { z } from 'zod';
-
-const numberFromParam = (schema: z.ZodNumber) => z.preprocess((value) => {
-    if (typeof value === 'string' && value.trim() !== '') {
-        return Number(value);
-    }
-    return value;
-}, schema);
+import { numberFromParam } from '@/lib/schema-utils';
 
 export const stravaWebhookQuerySchema = z.object({
     'hub.mode': z.string().optional(),

@@ -19,6 +19,7 @@ import {
 import { OnboardingData } from '@/domain/onboarding/types';
 import { STEP_TOOLTIPS } from '@/domain/onboarding/types';
 import { WeekRow } from '@/components/ui/WeekRow';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { toDateKey } from '@/lib/dates';
 import {
     RUNS_PER_WEEK_OPTIONS,
@@ -348,6 +349,11 @@ interface PlanStartDateScreenProps {
     onBack: () => void;
 }
 
+// Helper to get today
+function getToday(): string {
+    return toDateKey(new Date());
+}
+
 // Helper to get next Monday
 function getNextMonday(): string {
     const today = new Date();
@@ -381,6 +387,7 @@ export function PlanStartDateScreen({
     onContinue,
     onBack
 }: PlanStartDateScreenProps) {
+    const today = getToday();
     const nextMonday = getNextMonday();
     const thisWeekend = getThisWeekend();
 
@@ -392,8 +399,9 @@ export function PlanStartDateScreen({
         onEnter: canContinue ? onContinue : undefined,
         onBack,
         onNumber: (num) => {
-            if (num === 1) onChange(nextMonday);
-            if (num === 2) onChange(thisWeekend);
+            if (num === 1) onChange(today);
+            if (num === 2) onChange(nextMonday);
+            if (num === 3) onChange(thisWeekend);
         },
     });
 
@@ -405,42 +413,45 @@ export function PlanStartDateScreen({
             />
 
             {/* Quick options */}
-            <OptionGrid columns={2}>
+            <div className="space-y-3">
+                {/* Today - full width */}
                 <OptionButton
-                    label="Next Monday"
-                    description={formatDate(nextMonday)}
+                    label="Today"
+                    description={formatDate(today)}
                     shortcut="1"
-                    selected={value === nextMonday}
-                    onClick={() => onChange(nextMonday)}
-                    recommended
+                    selected={value === today}
+                    onClick={() => onChange(today)}
                 />
-                <OptionButton
-                    label="This Weekend"
-                    description={formatDate(thisWeekend)}
-                    shortcut="2"
-                    selected={value === thisWeekend}
-                    onClick={() => onChange(thisWeekend)}
-                />
-            </OptionGrid>
+                {/* Next Monday & This Weekend - 2 columns */}
+                <OptionGrid columns={2}>
+                    <OptionButton
+                        label="Next Monday"
+                        description={formatDate(nextMonday)}
+                        shortcut="2"
+                        selected={value === nextMonday}
+                        onClick={() => onChange(nextMonday)}
+                        recommended
+                    />
+                    <OptionButton
+                        label="This Weekend"
+                        description={formatDate(thisWeekend)}
+                        shortcut="3"
+                        selected={value === thisWeekend}
+                        onClick={() => onChange(thisWeekend)}
+                    />
+                </OptionGrid>
+            </div>
 
             {/* Custom date picker */}
             <div className="mt-6">
                 <label className="text-xs font-medium block mb-2" style={{ color: 'var(--text-subtle)' }}>
                     Or pick a different date:
                 </label>
-                <input
-                    type="date"
+                <DatePicker
                     value={value || ''}
-                    onChange={(e) => onChange(e.target.value || null)}
-                    min={toDateKey(new Date())}
-                    max={raceDate || undefined}
-                    className="w-full p-3 rounded-xl"
-                    style={{
-                        background: 'var(--bg-elevated)',
-                        border: `1px solid ${value && value !== nextMonday && value !== thisWeekend ? 'var(--color-accent)' : 'var(--border-base)'}`,
-                        color: 'var(--text-base)',
-                        colorScheme: 'dark',
-                    }}
+                    onChange={(v) => onChange(v || null)}
+                    minDate={toDateKey(new Date())}
+                    placeholder="Select a date"
                 />
             </div>
 

@@ -16,6 +16,8 @@
  */
 
 import type { TrainingPlan } from '../types';
+import type { TrainingPlanPayload } from '../schemas';
+import { toTrainingPlanPayload } from '../payload';
 import { emitSyncEvent, queueWrite } from '@/domain/sync';
 import { clearPlanCache, loadPlanCache, savePlanCache } from './cache';
 import { planApiRequest } from './network';
@@ -41,7 +43,7 @@ function toVoidResult(result: PlanResult<unknown>): PlanResult<void> {
     return result.success ? { success: true, data: undefined } : result;
 }
 
-async function savePlanToApi(plan: TrainingPlan): Promise<PlanResult<void>> {
+async function savePlanToApi(plan: TrainingPlanPayload): Promise<PlanResult<void>> {
     const result = await planApiRequest<unknown>('/api/plan/save', 'SAVE_FAILED', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -73,12 +75,13 @@ export async function savePlanV2(plan: TrainingPlan): Promise<PlanResult<void>> 
     savePlanCache(plan);
 
     // 3. Save via API
-    const result = await savePlanToApi(plan);
+    const payload = toTrainingPlanPayload(plan);
+    const result = await savePlanToApi(payload);
 
     if (!result.success) {
         // Queue for retry
         console.error('[PlanRepository] Plan save failed, queuing:', result.error);
-        queueWrite({ id: plan.id, type: 'plan', payload: { plan } });
+        queueWrite({ id: plan.id, type: 'plan', payload: { plan: payload } });
         emitSyncEvent('pending');
         // Return success since we have it cached and queued
         return { success: true, data: undefined };
@@ -93,7 +96,7 @@ export async function savePlanV2(plan: TrainingPlan): Promise<PlanResult<void>> 
  * Direct save via API (used by sync processor for retries).
  */
 export async function savePlanViaApiDirectly(payload: unknown): Promise<PlanResult<void>> {
-    const { plan } = payload as { plan?: TrainingPlan };
+    const { plan } = payload as { plan?: TrainingPlanPayload };
 
     if (!plan) {
         return {
@@ -102,7 +105,7 @@ export async function savePlanViaApiDirectly(payload: unknown): Promise<PlanResu
         };
     }
 
-    return savePlanToApi(plan);
+    return savePlanToApi(toTrainingPlanPayload(plan));
 }
 
 /**

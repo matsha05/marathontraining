@@ -21,6 +21,7 @@ import { OnboardingData } from '@/domain/onboarding/types';
 import { STEP_TOOLTIPS } from '@/domain/onboarding/types';
 import { addYears, toDateKey } from '@/lib/dates';
 import { WeekRow } from '@/components/ui/WeekRow';
+import { DatePicker } from '@/components/ui/DatePicker';
 
 // Animation ease curve
 const ease = [0.25, 0.46, 0.45, 0.94] as const;
@@ -334,6 +335,8 @@ export function DemographicsScreen({
     const age = data.dateOfBirth ? calculateAge(data.dateOfBirth) : null;
     const isValidAge = age !== null && age >= 13 && age <= 99;
     const canContinue = isValidAge && data.sex !== null;
+    const minDobDate = toDateKey(addYears(new Date(), -99));
+    const maxDobDate = toDateKey(addYears(new Date(), -13));
 
     useKeyboardNavigation({
         onEnter: canContinue ? onContinue : undefined,
@@ -355,21 +358,12 @@ export function DemographicsScreen({
                 {/* Date of Birth */}
                 <div>
                     <label className="v3-label block mb-2">Date of Birth</label>
-                    <input
-                        type="date"
+                    <DatePicker
                         value={data.dateOfBirth || ''}
-                        onChange={(e) => onDobChange(e.target.value || null)}
-                        className="v3-input w-full"
-                        max={toDateKey(addYears(new Date(), -13))}
-                        min={toDateKey(addYears(new Date(), -99))}
-                        style={{
-                            background: 'var(--bg-elevated)',
-                            border: '1px solid var(--border-base)',
-                            borderRadius: '0.75rem',
-                            padding: '0.75rem 1rem',
-                            color: 'var(--text-base)',
-                            fontSize: '1rem',
-                        }}
+                        onChange={(value) => onDobChange(value || null)}
+                        minDate={minDobDate}
+                        maxDate={maxDobDate}
+                        placeholder="Select your date of birth"
                     />
                     {age !== null && (
                         <p className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>
