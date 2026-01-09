@@ -11,6 +11,12 @@ export function reconstructPlan(
     planRow: DbTrainingPlan,
     workouts: DbPlannedWorkout[]
 ): TrainingPlan {
+    const goalDistance = planRow.plan_type === 'half_marathon'
+        ? 'half'
+        : planRow.plan_type === 'base'
+            ? 'general'
+            : planRow.plan_type;
+
     const workoutsByWeek = new Map<number, DbPlannedWorkout[]>();
     for (const w of workouts) {
         const prescription = w.prescription as Record<string, unknown>;
@@ -100,7 +106,7 @@ export function reconstructPlan(
         createdAt: planRow.created_at,
         athleteName: '',
         vdot: planRow.vdot_at_creation,
-        goalDistance: planRow.plan_type as TrainingPlan['goalDistance'],
+        goalDistance: goalDistance as TrainingPlan['goalDistance'],
         raceName: undefined,
         raceDate: planRow.end_date,
         weeks,

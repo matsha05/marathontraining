@@ -23,8 +23,11 @@ function formatPlanType(planType: string): string {
     const types: Record<string, string> = {
         marathon: 'Marathon',
         half_marathon: 'Half Marathon',
+        half: 'Half Marathon',
         '10k': '10K',
         '5k': '5K',
+        base: 'Base',
+        general: 'Base',
         ultra: 'Ultra',
     };
     return types[planType] || planType;

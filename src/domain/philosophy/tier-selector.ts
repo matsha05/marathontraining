@@ -44,6 +44,15 @@ function getMileageValue(mileage: CurrentMileage): number {
     }
 }
 
+function getMileageLabel(mileage: CurrentMileage): string {
+    switch (mileage) {
+        case 'under_20': return 'under 20 mpw';
+        case '20_40': return '20-40 mpw';
+        case 'over_40': return 'over 40 mpw';
+        default: return 'your current mileage';
+    }
+}
+
 // =============================================================================
 // HIGDON TIER SELECTION
 // =============================================================================
@@ -51,6 +60,7 @@ function getMileageValue(mileage: CurrentMileage): number {
 function selectHigdonTier(input: TierSelectionInput): TierSelectionResult {
     const { distance, experience } = input;
     const mileageValue = getMileageValue(input.currentMileage);
+    const mileageLabel = getMileageLabel(input.currentMileage);
     const warnings: string[] = [];
     let tier: string;
     let effectiveLevel: 'novice' | 'intermediate' | 'advanced';
@@ -67,13 +77,13 @@ function selectHigdonTier(input: TierSelectionInput): TierSelectionResult {
                 tier = '5k_intermediate';
                 effectiveLevel = 'intermediate';
                 if (experience === 'advanced') {
-                    warnings.push(`Your current mileage (${mileageValue} mpw) is best suited for Intermediate tier.`);
+                    warnings.push(`Your current mileage (${mileageLabel}) is best suited for Intermediate tier.`);
                 }
             } else {
                 tier = '5k_novice';
                 effectiveLevel = 'novice';
                 if (experience !== 'beginner' && mileageValue < 20) {
-                    warnings.push(`Your current mileage (${mileageValue} mpw) is best suited for Novice tier.`);
+                    warnings.push(`Your current mileage (${mileageLabel}) is best suited for Novice tier.`);
                 }
             }
             break;
@@ -87,13 +97,13 @@ function selectHigdonTier(input: TierSelectionInput): TierSelectionResult {
                 tier = '10k_intermediate';
                 effectiveLevel = 'intermediate';
                 if (experience === 'advanced') {
-                    warnings.push(`Your current mileage (${mileageValue} mpw) is best suited for Intermediate tier.`);
+                    warnings.push(`Your current mileage (${mileageLabel}) is best suited for Intermediate tier.`);
                 }
             } else {
                 tier = '10k_novice';
                 effectiveLevel = 'novice';
                 if (experience !== 'beginner' && mileageValue < 25) {
-                    warnings.push(`Your current mileage (${mileageValue} mpw) is best suited for Novice tier.`);
+                    warnings.push(`Your current mileage (${mileageLabel}) is best suited for Novice tier.`);
                 }
             }
             break;
@@ -107,13 +117,13 @@ function selectHigdonTier(input: TierSelectionInput): TierSelectionResult {
                 tier = 'half_intermediate_1';
                 effectiveLevel = 'intermediate';
                 if (experience === 'advanced') {
-                    warnings.push(`Your current mileage (${mileageValue} mpw) is best suited for Intermediate tier.`);
+                    warnings.push(`Your current mileage (${mileageLabel}) is best suited for Intermediate tier.`);
                 }
             } else {
                 tier = 'half_novice_1';
                 effectiveLevel = 'novice';
                 if (experience !== 'beginner' && mileageValue < 25) {
-                    warnings.push(`Your current mileage (${mileageValue} mpw) is best suited for Novice tier.`);
+                    warnings.push(`Your current mileage (${mileageLabel}) is best suited for Novice tier.`);
                 }
             }
             break;
@@ -127,13 +137,13 @@ function selectHigdonTier(input: TierSelectionInput): TierSelectionResult {
                 tier = 'marathon_intermediate_1';
                 effectiveLevel = 'intermediate';
                 if (experience === 'advanced') {
-                    warnings.push(`Your current mileage (${mileageValue} mpw) is best suited for Intermediate tier.`);
+                    warnings.push(`Your current mileage (${mileageLabel}) is best suited for Intermediate tier.`);
                 }
             } else {
                 tier = 'marathon_novice_1';
                 effectiveLevel = 'novice';
                 if (experience !== 'beginner' && mileageValue < 30) {
-                    warnings.push(`Your current mileage (${mileageValue} mpw) is best suited for Novice tier.`);
+                    warnings.push(`Your current mileage (${mileageLabel}) is best suited for Novice tier.`);
                 }
             }
             break;
@@ -147,13 +157,13 @@ function selectHigdonTier(input: TierSelectionInput): TierSelectionResult {
                 tier = 'base_intermediate';
                 effectiveLevel = 'intermediate';
                 if (experience === 'advanced') {
-                    warnings.push(`Your current mileage (${mileageValue} mpw) is best suited for Intermediate tier.`);
+                    warnings.push(`Your current mileage (${mileageLabel}) is best suited for Intermediate tier.`);
                 }
             } else {
                 tier = 'base_novice';
                 effectiveLevel = 'novice';
                 if (experience !== 'beginner' && mileageValue < 20) {
-                    warnings.push(`Your current mileage (${mileageValue} mpw) is best suited for Novice tier.`);
+                    warnings.push(`Your current mileage (${mileageLabel}) is best suited for Novice tier.`);
                 }
             }
             break;
