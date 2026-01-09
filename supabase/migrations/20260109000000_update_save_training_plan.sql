@@ -44,8 +44,8 @@ begin
         v_athlete_id,
         plan->>'plan_type',
         (plan->>'vdot_at_creation')::double precision,
-        plan->>'start_date',
-        plan->>'end_date',
+        nullif(plan->>'start_date', '')::date,
+        nullif(plan->>'end_date', '')::date,
         nullif(plan->>'goal_race_id', '')::uuid,
         coalesce((plan->>'is_active')::boolean, true)
     )
@@ -78,7 +78,7 @@ begin
         (w->>'id')::uuid,
         v_plan_id,
         v_athlete_id,
-        w->>'scheduled_date',
+        nullif(w->>'scheduled_date', '')::date,
         (w->>'day_of_week')::int,
         w->>'session_type',
         w->'prescription',

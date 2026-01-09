@@ -740,7 +740,7 @@ function OnboardingContent() {
 
                                     // 2. Save goal race if we have race details
                                     if (data.raceDate) {
-                                        const goalRaceId = `${user.id}-${data.raceDate}`;
+                                        const goalRaceId = crypto.randomUUID();
                                         await supabase.from('goal_races').upsert({
                                             id: goalRaceId,
                                             athlete_id: user.id,
@@ -748,6 +748,7 @@ function OnboardingContent() {
                                             race_date: data.raceDate,
                                             distance: data.trainingGoal || 'marathon',
                                             is_active: true,
+                                            terrain: 'road',
                                         }, { onConflict: 'id' });
                                     }
                                 }

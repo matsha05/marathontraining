@@ -50,10 +50,17 @@ function AuthForm() {
     const errorDescription = searchParams.get('error_description');
 
     useEffect(() => {
+        if (step !== 'email') return;
         if (errorParam || errorDescription) {
             setErrorMessage(formatAuthError(errorParam ?? 'auth_error', errorDescription));
         }
-    }, [errorParam, errorDescription]);
+    }, [errorParam, errorDescription, step]);
+
+    useEffect(() => {
+        if (step === 'otp') {
+            setErrorMessage(null);
+        }
+    }, [step]);
 
     // Auto-submit when all 8 digits are entered
     useEffect(() => {
@@ -182,6 +189,9 @@ function AuthForm() {
         const newOtp = [...otp];
         newOtp[index] = value;
         setOtp(newOtp);
+        if (errorMessage) {
+            setErrorMessage(null);
+        }
 
         if (value && index < OTP_LENGTH - 1) {
             inputRefs.current[index + 1]?.focus();
@@ -200,6 +210,9 @@ function AuthForm() {
         if (pastedData.length === OTP_LENGTH) {
             const newOtp = pastedData.split('');
             setOtp(newOtp);
+            if (errorMessage) {
+                setErrorMessage(null);
+            }
         }
     };
 
