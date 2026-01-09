@@ -208,6 +208,7 @@ import { generateCoachPlan } from '@/domain/plan/coach-generators';
 import { PfitzFRRTier, DanielsTier, HigdonTier } from '@/domain/plan/types';
 import { HansonsTier } from '@/domain/plan/coaches/hansons';
 import { PfitzTier } from '@/domain/plan/coaches/pfitzinger';
+import { generateMaintenanceBlockWeeks } from '@/domain/plan/prep-block';
 
 /**
  * Map OnboardingData experience/mileage to tier-selector format
@@ -228,21 +229,51 @@ function mapCurrentMileage(data: OnboardingData): 'under_20' | '20_40' | 'over_4
 
 function buildBaseWeeks(basePlan: TrainingPlan, weeksNeeded: number): WeekPlan[] {
     if (weeksNeeded <= 0 || basePlan.weeks.length === 0) return [];
+    const take = Math.min(weeksNeeded, basePlan.weeks.length);
+    return basePlan.weeks.slice(0, take).map(week => ({
+        ...week,
+        phase: 'base' as TrainingPhase,
+    }));
+}
 
-    const baseWeeks: WeekPlan[] = [];
-    let remaining = weeksNeeded;
+type MaintenanceDayType = 'rest' | 'easy' | 'long';
 
-    while (remaining > 0) {
-        const take = Math.min(remaining, basePlan.weeks.length);
-        const slice = basePlan.weeks.slice(0, take).map(week => ({
-            ...week,
-            phase: 'base' as TrainingPhase,
-        }));
-        baseWeeks.push(...slice);
-        remaining -= take;
+const DAY_NAME_TO_INDEX: Record<string, number> = {
+    sunday: 0,
+    monday: 1,
+    tuesday: 2,
+    wednesday: 3,
+    thursday: 4,
+    friday: 5,
+    saturday: 6,
+};
+
+function getDayIndexFromName(dayName: string): number {
+    return DAY_NAME_TO_INDEX[dayName.toLowerCase()] ?? 6;
+}
+
+function deriveMaintenanceDayTypes(baseWeek: WeekPlan, longRunDay?: string): MaintenanceDayType[] {
+    const dayTypes: MaintenanceDayType[] = Array(7).fill('rest');
+    let longRunIndex = -1;
+    let maxMiles = 0;
+
+    baseWeek.days.forEach(day => {
+        if (day.runWorkout) {
+            dayTypes[day.dayOfWeek] = 'easy';
+            if (day.totalMiles >= maxMiles) {
+                maxMiles = day.totalMiles;
+                longRunIndex = day.dayOfWeek;
+            }
+        }
+    });
+
+    if (longRunIndex >= 0) {
+        dayTypes[longRunIndex] = 'long';
+    } else if (longRunDay) {
+        dayTypes[getDayIndexFromName(longRunDay)] = 'long';
     }
 
-    return baseWeeks;
+    return dayTypes;
 }
 
 function resequenceWeeks(weeks: WeekPlan[], raceDate?: string): WeekPlan[] {
@@ -323,17 +354,14 @@ function derivePlanMetrics(weeks: WeekPlan[]): Pick<TrainingPlan, 'peakMileage' 
     return { peakMileage, peakWeek, totalMiles };
 }
 
-function extendHigdonPlanWithBase(
+function extendPlanWithPreWeeks(
     racePlan: TrainingPlan,
-    basePlan: TrainingPlan,
-    totalWeeks: number,
+    preWeeks: WeekPlan[],
     raceDate?: string
 ): TrainingPlan {
-    const extraWeeks = Math.max(0, totalWeeks - racePlan.totalWeeks);
-    if (extraWeeks === 0) return racePlan;
+    if (preWeeks.length === 0) return racePlan;
 
-    const baseWeeks = buildBaseWeeks(basePlan, extraWeeks);
-    const combinedWeeks = resequenceWeeks([...baseWeeks, ...racePlan.weeks], raceDate);
+    const combinedWeeks = resequenceWeeks([...preWeeks, ...racePlan.weeks], raceDate);
     const weeksWithPhaseWeek = applyPhaseWeekNumbers(combinedWeeks);
     const phases = buildPhaseBreakdownFromWeeks(weeksWithPhaseWeek);
     const metrics = derivePlanMetrics(weeksWithPhaseWeek);
@@ -389,6 +417,9 @@ export function createPlanFromOnboarding(
     try {
         let plan: TrainingPlan;
         let extendedWithBase = false;
+        let extendedWithMaintenance = false;
+        let partialBase = false;
+        let baseWeeksApplied = 0;
 
         // Route based on tier prefix
         if (tierResult.tier.startsWith('pfitz_frr_')) {
@@ -424,18 +455,63 @@ export function createPlanFromOnboarding(
             philosophy === 'higdon' &&
             inputResult.data.raceDate &&
             !tierResult.tier.startsWith('base_') &&
-            weeksToRace !== null &&
-            weeksToRace > plan.totalWeeks
+            weeksToRace !== null
         ) {
             const baseTierResult = selectPlanTier({ ...tierInput, distance: 'base' });
-            const basePlan = generateCoachPlan(inputResult.data, baseTierResult.tier as HigdonTier);
-            plan = extendHigdonPlanWithBase(plan, basePlan, weeksToRace, inputResult.data.raceDate);
-            extendedWithBase = true;
+            const baseTier = baseTierResult.tier as HigdonTier;
+            const gapWeeks = weeksToRace - plan.totalWeeks;
+
+            if (gapWeeks > 0) {
+                const basePlan = generateCoachPlan(inputResult.data, baseTier);
+                const baseWeeksAvailable = basePlan.weeks.length;
+                baseWeeksApplied = Math.min(gapWeeks, baseWeeksAvailable);
+                const baseWeeks = buildBaseWeeks(basePlan, baseWeeksApplied);
+                const preWeeks: WeekPlan[] = [...baseWeeks];
+                extendedWithBase = baseWeeksApplied > 0;
+                partialBase = baseWeeksApplied > 0 && baseWeeksApplied < baseWeeksAvailable;
+
+                if (gapWeeks > baseWeeksAvailable) {
+                    const maintenanceWeeksNeeded = gapWeeks - baseWeeksAvailable;
+                    const baseWeekTemplate = basePlan.weeks[0] ?? baseWeeks[0];
+                    const dayTypes = baseWeekTemplate
+                        ? deriveMaintenanceDayTypes(baseWeekTemplate, inputResult.data.longRunDay)
+                        : deriveMaintenanceDayTypes(plan.weeks[0], inputResult.data.longRunDay);
+                    const basePeakLongRunMiles = basePlan.weeks.reduce(
+                        (max, week) => Math.max(max, week.longRunMiles),
+                        0
+                    );
+                    const lastBaseWeek = baseWeeks[baseWeeks.length - 1] ?? basePlan.weeks[basePlan.weeks.length - 1];
+                    const targetWeek = plan.weeks[0];
+
+                    const maintenanceWeeks = generateMaintenanceBlockWeeks(inputResult.data, {
+                        weeks: maintenanceWeeksNeeded,
+                        totalWeeks: weeksToRace,
+                        dayTypes,
+                        startWeeklyMiles: lastBaseWeek?.totalMiles ?? inputResult.data.weeklyMiles ?? 0,
+                        startLongRunMiles: lastBaseWeek?.longRunMiles ?? inputResult.data.longestRecentRun ?? 0,
+                        targetWeeklyMiles: targetWeek?.totalMiles ?? inputResult.data.weeklyMiles ?? 0,
+                        targetLongRunMiles: targetWeek?.longRunMiles ?? inputResult.data.longestRecentRun ?? 0,
+                        basePeakLongRunMiles,
+                    });
+                    preWeeks.push(...maintenanceWeeks);
+                    extendedWithMaintenance = maintenanceWeeks.length > 0;
+                }
+
+                plan = extendPlanWithPreWeeks(plan, preWeeks, inputResult.data.raceDate);
+            }
         }
 
         // Step 4: Add philosophy metadata (for display)
         plan.philosophy = philosophy as TrainingPlan['philosophy'];
-        plan.planTier = extendedWithBase ? `${tierResult.displayName} + Base` : tierResult.displayName;
+        if (extendedWithMaintenance) {
+            plan.planTier = `${tierResult.displayName} + Base + Maintenance (not Higdon)`;
+        } else if (extendedWithBase && partialBase) {
+            plan.planTier = `${tierResult.displayName} + Base Weeks 1-${baseWeeksApplied} (partial)`;
+        } else if (extendedWithBase) {
+            plan.planTier = `${tierResult.displayName} + Base`;
+        } else {
+            plan.planTier = tierResult.displayName;
+        }
 
         // Step 5: Validate plan
         if (!plan.verification.passed) {

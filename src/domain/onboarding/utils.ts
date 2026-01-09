@@ -4,13 +4,34 @@
  * Helper functions for onboarding data processing.
  */
 
+import { addYears, toDateKey } from '@/lib/dates';
+
+/**
+ * Parse a YYYY-MM-DD string as LOCAL time (not UTC).
+ * This avoids timezone shifts when calculating age.
+ */
+function parseDateLocal(dateString: string): Date | null {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString);
+    if (match) {
+        const year = Number(match[1]);
+        const month = Number(match[2]) - 1;
+        const day = Number(match[3]);
+        const date = new Date(year, month, day);
+        return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    const parsed = new Date(dateString);
+    if (Number.isNaN(parsed.getTime())) return null;
+    return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+}
+
 /**
  * Calculate age from date of birth.
  * Handles edge cases around birthdays correctly.
  */
 export function calculateAgeFromDob(dob: string): number {
-    const birth = new Date(dob);
-    if (isNaN(birth.getTime())) return 0;
+    const birth = parseDateLocal(dob);
+    if (!birth) return 0;
 
     const today = new Date();
     let age = today.getFullYear() - birth.getFullYear();
@@ -22,6 +43,14 @@ export function calculateAgeFromDob(dob: string): number {
     }
 
     return Math.max(0, age);
+}
+
+export function getDobBounds(minAge = 13, maxAge = 99): { minDate: string; maxDate: string } {
+    const today = new Date();
+    return {
+        minDate: toDateKey(addYears(today, -maxAge)),
+        maxDate: toDateKey(addYears(today, -minAge)),
+    };
 }
 
 /**

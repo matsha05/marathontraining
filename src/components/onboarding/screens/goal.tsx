@@ -117,7 +117,7 @@ export function TrainingGoalScreen({
 interface RaceDetailsScreenProps {
     data: OnboardingData;
     onRaceNameChange: (name: string) => void;
-    onRaceDateChange: (date: string) => void;
+    onRaceDateChange: (date: string | null) => void;
     onContinue: () => void;
     onBack: () => void;
 }
@@ -144,10 +144,11 @@ export function RaceDetailsScreen({
     const recommendedWeeks = RECOMMENDED_WEEKS[data.trainingGoal ?? 'marathon'];
 
     const handleDateChange = (date: string) => {
-        onRaceDateChange(date);
+        const normalizedDate = date || null;
+        onRaceDateChange(normalizedDate);
 
-        if (date) {
-            const weeks = Math.floor((new Date(date).getTime() - Date.now()) / (7 * 24 * 60 * 60 * 1000));
+        if (normalizedDate) {
+            const weeks = Math.floor((new Date(normalizedDate).getTime() - Date.now()) / (7 * 24 * 60 * 60 * 1000));
             if (weeks < minWeeks) {
                 setDateError(`A ${data.trainingGoal} requires at least ${minWeeks} weeks to prepare safely.`);
             } else {
@@ -193,7 +194,7 @@ export function RaceDetailsScreen({
                 <div>
                     <label className="v3-label block mb-2">Race date (optional)</label>
                     <DatePicker
-                        value={data.raceDate}
+                        value={data.raceDate ?? ''}
                         onChange={handleDateChange}
                         minDate={minDateStr}
                         placeholder="Select your race date"

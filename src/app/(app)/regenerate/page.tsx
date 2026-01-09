@@ -52,7 +52,7 @@ import {
     StrengthTrainingScreen,
 } from '@/components/onboarding/screens/preferences';
 
-import { OnboardingData, INITIAL_ONBOARDING_DATA, TrainingGoal, TrainingIntensity } from '@/domain/onboarding/types';
+import { OnboardingData, INITIAL_ONBOARDING_DATA, TrainingGoal, TrainingIntensity, getLinearStepProgress } from '@/domain/onboarding/types';
 import { calculateAgeFromDob } from '@/domain/onboarding/utils';
 import { createPlanFromOnboarding, savePlan } from '@/domain/plan/service';
 import { parseAvatarId } from '@/domain/user/avatars';
@@ -104,7 +104,7 @@ export default function RegeneratePlanPage() {
                     .from('athletes')
                     .select('name, date_of_birth, age, sex, avatar')
                     .eq('id', user.id)
-                    .single() as { data: { name?: string; date_of_birth?: string; age?: number; sex?: string; avatar?: string } | null };
+                    .single();
 
                 const email = user.email || '';
                 const fallbackName = (
@@ -261,8 +261,8 @@ export default function RegeneratePlanPage() {
     };
 
     // Progress calculation
-    const currentIndex = stepOrder.indexOf(step);
-    const progress = currentIndex >= 0 ? ((currentIndex + 1) / stepOrder.length) * 100 : 0;
+    const { index: currentIndex, total: stepCount, progress } = getLinearStepProgress(stepOrder, step);
+    const displayIndex = stepOrder.includes(step) ? currentIndex + 1 : 0;
 
     return (
         <div className="min-h-screen" style={{ background: 'var(--bg-base)' }}>
@@ -294,7 +294,7 @@ export default function RegeneratePlanPage() {
                         </div>
                     </div>
                     <span className="text-xs tabular-nums" style={{ color: 'var(--text-subtle)' }}>
-                        {currentIndex + 1}/{stepOrder.length}
+                        {displayIndex}/{stepCount}
                     </span>
                 </div>
             </header>

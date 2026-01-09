@@ -19,9 +19,9 @@ import {
 } from '../ui';
 import { OnboardingData } from '@/domain/onboarding/types';
 import { STEP_TOOLTIPS } from '@/domain/onboarding/types';
-import { addYears, toDateKey } from '@/lib/dates';
 import { WeekRow } from '@/components/ui/WeekRow';
 import { DatePicker } from '@/components/ui/DatePicker';
+import { calculateAgeFromDob, getDobBounds } from '@/domain/onboarding/utils';
 
 // Animation ease curve
 const ease = [0.25, 0.46, 0.45, 0.94] as const;
@@ -312,18 +312,6 @@ interface DemographicsScreenProps {
     onBack: () => void;
 }
 
-// Helper to calculate age from DOB
-function calculateAge(dob: string): number {
-    const birth = new Date(dob);
-    const today = new Date();
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-        age--;
-    }
-    return age;
-}
-
 export function DemographicsScreen({
     data,
     onDobChange,
@@ -332,11 +320,10 @@ export function DemographicsScreen({
     onBack
 }: DemographicsScreenProps) {
     // Calculate age from DOB for display and validation
-    const age = data.dateOfBirth ? calculateAge(data.dateOfBirth) : null;
+    const age = data.dateOfBirth ? calculateAgeFromDob(data.dateOfBirth) : null;
     const isValidAge = age !== null && age >= 13 && age <= 99;
     const canContinue = isValidAge && data.sex !== null;
-    const minDobDate = toDateKey(addYears(new Date(), -99));
-    const maxDobDate = toDateKey(addYears(new Date(), -13));
+    const { minDate: minDobDate, maxDate: maxDobDate } = getDobBounds();
 
     useKeyboardNavigation({
         onEnter: canContinue ? onContinue : undefined,

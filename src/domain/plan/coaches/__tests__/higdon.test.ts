@@ -20,7 +20,9 @@ import {
     getMicrocycleForTier,
     hasBackToBackWeekend,
 } from '../higdon';
+import { generateHigdonPlan } from '../../coach-generators';
 import { HIGDON_TIER_CONFIGS, HigdonTier } from '../../types';
+import type { PlanGenerationInput } from '../../types';
 
 // =============================================================================
 // TIER CONFIG TESTS
@@ -365,5 +367,43 @@ describe('Distance Helpers', () => {
         expect(getDistanceFromTier('10k_intermediate')).toBe('10k');
         expect(getDistanceFromTier('5k_novice')).toBe('5k');
         expect(getDistanceFromTier('base_spring')).toBe('base');
+    });
+});
+
+// =============================================================================
+// PLAN GENERATION SANITY TESTS
+// =============================================================================
+
+describe('Higdon plan generation', () => {
+    it('keeps 10K novice long runs and skips cross-train days', () => {
+        const input: PlanGenerationInput = {
+            name: 'Test Runner',
+            age: 30,
+            sex: 'male',
+            vdot: 45,
+            vdotConfidence: 'medium',
+            goalDistance: '10k',
+            raceName: 'Test 10K',
+            raceDate: '2025-05-25',
+            fitnessDuration: undefined,
+            weeklyMiles: 10,
+            runsPerWeek: 3,
+            longestRecentRun: 4,
+            availableDays: 3,
+            longRunDay: 'sunday',
+            currentPain: false,
+            painLocation: undefined,
+            recentInjury: false,
+            injuryLocation: undefined,
+            trainingIntensity: 'moderate',
+            includeStrength: false,
+        };
+
+        const plan = generateHigdonPlan(input, '10k_novice');
+        const weekOne = plan.weeks[0];
+
+        expect(weekOne.days[0].runWorkout?.totalDistance).toBe(3);
+        expect(weekOne.days[3].runWorkout).toBeNull();
+        expect(weekOne.days[6].runWorkout).toBeNull();
     });
 });

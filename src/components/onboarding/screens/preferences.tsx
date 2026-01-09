@@ -32,6 +32,10 @@ import {
     TRAINING_INTENSITY_OPTIONS,
     TRAINING_GOALS,
 } from '@/domain/onboarding/constants';
+import { formatDistance, formatDuration } from '@/lib/format';
+import type { TierSelectionInput } from '@/domain/philosophy/tier-selector';
+import type { HigdonTier } from '@/domain/plan/types';
+import { calculateWeeksToRace } from '@/domain/plan/date-utils';
 
 // =============================================================================
 // TRAINING INTENSITY SCREEN
@@ -264,6 +268,8 @@ export function CoachRevealScreen({ data, onConfirm, onBack }: CoachRevealScreen
     // Import recommendation logic
     const { calculateRecommendation } = require('@/domain/philosophy/recommendation');
     const { PHILOSOPHIES } = require('@/domain/philosophy/types');
+    const { selectPlanTier } = require('@/domain/philosophy/tier-selector');
+    const { HIGDON_TIER_CONFIGS } = require('@/domain/plan/types');
 
     // Map onboarding data to quiz answers format
     const mapMileageToQuizFormat = (weeklyMiles: number | null): 'under_20' | '20_40' | 'over_40' | null => {
@@ -274,6 +280,19 @@ export function CoachRevealScreen({ data, onConfirm, onBack }: CoachRevealScreen
     };
 
     const mapMindsetToQuizFormat = (mindset: TrainingMindset | null) => mindset;
+
+    const mapExperienceToTierFormat = (intensity: TrainingIntensity | null): 'beginner' | 'intermediate' | 'advanced' => {
+        if (intensity === 'aggressive') return 'advanced';
+        if (intensity === 'conservative') return 'beginner';
+        return 'intermediate';
+    };
+
+    const mapMileageToTierFormat = (weeklyMiles: number | null): 'under_20' | '20_40' | 'over_40' => {
+        const mileage = weeklyMiles ?? 20;
+        if (mileage >= 40) return 'over_40';
+        if (mileage >= 20) return '20_40';
+        return 'under_20';
+    };
 
     const mapGoalToDistance = (goal: OnboardingData['trainingGoal']): '5k' | '10k' | 'half' | 'marathon' | 'base' | null => {
         if (goal === 'general') return 'base';
@@ -292,6 +311,27 @@ export function CoachRevealScreen({ data, onConfirm, onBack }: CoachRevealScreen
 
     const recommendation = calculateRecommendation(quizAnswers);
     const coach = PHILOSOPHIES[recommendation.primary];
+    const targetDistance = mapGoalToDistance(data.trainingGoal) ?? 'base';
+
+    let longRunCap = coach.longRunCap;
+
+    if (recommendation.primary === 'higdon') {
+        const tierInput: TierSelectionInput = {
+            philosophy: 'higdon',
+            distance: targetDistance,
+            experience: mapExperienceToTierFormat(data.trainingIntensity),
+            currentMileage: mapMileageToTierFormat(data.weeklyMiles),
+            daysPerWeek: data.availableDays ?? 4,
+        };
+        const tierResult = selectPlanTier(tierInput);
+        const higdonConfig = HIGDON_TIER_CONFIGS[tierResult.tier as HigdonTier];
+
+        if (higdonConfig?.peakLongRunMinutes) {
+            longRunCap = `${formatDuration(higdonConfig.peakLongRunMinutes)} max`;
+        } else if (higdonConfig?.peakLongRunMiles) {
+            longRunCap = `${formatDistance(higdonConfig.peakLongRunMiles)} max`;
+        }
+    }
 
     useKeyboardNavigation({
         onEnter: () => onConfirm(recommendation.primary),
@@ -342,7 +382,7 @@ export function CoachRevealScreen({ data, onConfirm, onBack }: CoachRevealScreen
                         <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>Run days</p>
                     </div>
                     <div>
-                        <p className="v3-body-lg font-medium">{coach.longRunCap}</p>
+                        <p className="v3-body-lg font-medium">{longRunCap}</p>
                         <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>Long run</p>
                     </div>
                     <div>
@@ -378,6 +418,7 @@ interface ReadinessCheckScreenProps {
     data: OnboardingData;
     readinessStatus: ReadinessStatus;
     baseWeeksNeeded: number;
+    maintenanceWeeksNeeded: number;
     onProceed: () => void;
     onProceedAnyway: () => void;
     onBack: () => void;
@@ -388,15 +429,16 @@ export function ReadinessCheckScreen({
     data,
     readinessStatus,
     baseWeeksNeeded,
+    maintenanceWeeksNeeded,
     onProceed,
     onProceedAnyway,
     onBack,
     error
 }: ReadinessCheckScreenProps) {
     const goalLabel = TRAINING_GOALS.find(g => g.value === data.trainingGoal)?.label ?? 'Race';
-    const weeksToRace = data.raceDate
-        ? Math.floor((new Date(data.raceDate).getTime() - Date.now()) / (7 * 24 * 60 * 60 * 1000))
-        : null;
+    const weeksToRace = data.raceDate ? calculateWeeksToRace(data.raceDate) : null;
+    const isHigdon = data.trainingPhilosophy === 'higdon';
+    const baseLabel = isHigdon ? 'Higdon Base' : 'Base Building';
 
     useKeyboardNavigation({
         onEnter: onProceed,
@@ -485,6 +527,14 @@ export function ReadinessCheckScreen({
                     <br /><br />
                     Pete Pfitzinger calls this &quot;base readiness&quot; — making sure you can
                     absorb Week 1 before you start Week 1.
+                    {maintenanceWeeksNeeded > 0 && (
+                        <>
+                            <br /><br />
+                            Your timeline is longer than the official base plan, so we&apos;ll add a
+                            short maintenance block after the base weeks. That maintenance block is
+                            not part of Higdon&apos;s official plan.
+                        </>
+                    )}
                 </WarningBanner>
 
                 <div
@@ -494,10 +544,20 @@ export function ReadinessCheckScreen({
                     <div className="space-y-2 v3-body-sm">
                         <div className="flex justify-between">
                             <span style={{ color: 'var(--text-muted)' }}>Weeks 1-{baseWeeksNeeded}</span>
-                            <span>Base Building</span>
+                            <span>{baseLabel}</span>
                         </div>
+                        {maintenanceWeeksNeeded > 0 && (
+                            <div className="flex justify-between">
+                                <span style={{ color: 'var(--text-muted)' }}>
+                                    Weeks {baseWeeksNeeded + 1}-{baseWeeksNeeded + maintenanceWeeksNeeded}
+                                </span>
+                                <span>Maintenance (not Higdon)</span>
+                            </div>
+                        )}
                         <div className="flex justify-between">
-                            <span style={{ color: 'var(--text-muted)' }}>Weeks {baseWeeksNeeded + 1}+</span>
+                            <span style={{ color: 'var(--text-muted)' }}>
+                                Weeks {baseWeeksNeeded + maintenanceWeeksNeeded + 1}+
+                            </span>
                             <span>{goalLabel} Plan</span>
                         </div>
                     </div>
@@ -515,6 +575,56 @@ export function ReadinessCheckScreen({
                         className="v3-btn v3-btn-secondary w-full"
                     >
                         I know my limits — start plan anyway
+                    </button>
+                </div>
+            </QuestionScreen>
+        );
+    }
+
+    if (readinessStatus === 'base_unavailable') {
+        return (
+            <QuestionScreen onBack={onBack}>
+                {error && (
+                    <WarningBanner title="Plan generation failed">
+                        {error}
+                    </WarningBanner>
+                )}
+                <div className="text-center">
+                    <div
+                        className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
+                        style={{ background: 'var(--v3-warning-subtle)' }}
+                    >
+                        <AlertTriangle className="w-8 h-8" style={{ color: 'var(--v3-warning)' }} />
+                    </div>
+                    <h1 className="v3-heading-md mb-4">Let&apos;s start with a maintenance block.</h1>
+                </div>
+
+                <WarningBanner title="Why this is different">
+                    Your timeline needs extra weeks before the official plan. We&apos;ll add a gentle maintenance block
+                    that is not part of Higdon&apos;s official plan.
+                </WarningBanner>
+
+                <div className="mt-6 text-left v3-body-sm" style={{ color: 'var(--text-muted)' }}>
+                    {baseWeeksNeeded > 0 && (
+                        <p>Weeks 1-{baseWeeksNeeded}: Maintenance block. Weeks {baseWeeksNeeded + 1}+: {goalLabel} plan.</p>
+                    )}
+                    {baseWeeksNeeded === 0 && (
+                        <p>We&apos;ll start your race plan closer to race day.</p>
+                    )}
+                </div>
+
+                <div className="mt-8 space-y-3">
+                    <button
+                        onClick={onProceed}
+                        className="v3-btn v3-btn-primary v3-btn-lg w-full"
+                    >
+                        Start maintenance block
+                    </button>
+                    <button
+                        onClick={onBack}
+                        className="v3-btn v3-btn-secondary w-full"
+                    >
+                        Go back and change my race date
                     </button>
                 </div>
             </QuestionScreen>
@@ -656,7 +766,7 @@ export function CompleteScreen({ data, onViewDashboard, onViewPlan }: CompleteSc
                     <p>• {data.availableDays} training days per week</p>
                     <p>• Long runs on {data.longRunDays?.length > 0
                         ? data.longRunDays.map(d => d.charAt(0).toUpperCase() + d.slice(1)).join(' & ')
-                        : data.longRunDay || 'Weekend'}</p>
+                        : 'Weekend'}</p>
                     {data.includeStrength && <p>• Strength training included</p>}
                 </div>
             </SuccessBanner>

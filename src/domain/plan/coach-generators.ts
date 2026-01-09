@@ -622,6 +622,93 @@ interface HigdonWeekDistances {
 
 import { HigdonMicrocycle, HigdonDaySlot } from './coaches/higdon';
 
+const HIGDON_RUN_DAY_TYPES: HigdonDaySlot['type'][] = [
+    'easy_run',
+    'race_pace_run',
+    'tempo',
+    'intervals',
+    'hills',
+    'fartlek',
+    'speedwork',
+    'long_run',
+];
+
+const HIGDON_MINUTE_DISTANCE_THRESHOLD = 20;
+
+function isHigdonRunSlot(slot?: HigdonDaySlot): boolean {
+    return !!slot && HIGDON_RUN_DAY_TYPES.includes(slot.type);
+}
+
+function getHigdonPaceSeconds(
+    slotType: HigdonDaySlot['type'],
+    paces: ReturnType<typeof calculateTrainingPaces>
+): number {
+    switch (slotType) {
+        case 'tempo':
+        case 'race_pace_run':
+            return paces.threshold;
+        case 'intervals':
+        case 'speedwork':
+        case 'hills':
+        case 'fartlek':
+            return paces.interval;
+        default:
+            return (paces.easy.min + paces.easy.max) / 2;
+    }
+}
+
+function estimateHigdonMilesFromMinutes(
+    minutes: number,
+    slotType: HigdonDaySlot['type'],
+    paces: ReturnType<typeof calculateTrainingPaces>
+): number {
+    const paceSeconds = getHigdonPaceSeconds(slotType, paces);
+    const miles = (minutes * 60) / paceSeconds;
+    return Math.round(miles * 10) / 10;
+}
+
+function resolveHigdonDistanceMiles(
+    rawValue: number,
+    slot: HigdonDaySlot | undefined,
+    paces: ReturnType<typeof calculateTrainingPaces>,
+    options?: { isLongRun?: boolean; tier?: HigdonTier }
+): number {
+    if (!slot || rawValue <= 0) return 0;
+
+    if (options?.isLongRun && options?.tier) {
+        const config = HIGDON_TIER_CONFIGS[options.tier];
+        if (config?.peakLongRunMinutes) {
+            return estimateHigdonMilesFromMinutes(rawValue, 'long_run', paces);
+        }
+    }
+
+    if (slot.distanceRange) return rawValue;
+
+    if (slot.durationRange && rawValue >= HIGDON_MINUTE_DISTANCE_THRESHOLD) {
+        return estimateHigdonMilesFromMinutes(rawValue, slot.type, paces);
+    }
+
+    return rawValue;
+}
+
+function buildHigdonWorkoutExact(
+    template: typeof EASY_TEMPLATES[number],
+    paces: ReturnType<typeof calculateTrainingPaces>,
+    targetMiles: number
+): Workout {
+    let adjustedTemplate = template;
+
+    if (targetMiles < template.minMiles) {
+        adjustedTemplate = { ...adjustedTemplate, minMiles: 0 };
+    }
+
+    if (targetMiles > template.maxMiles) {
+        adjustedTemplate = { ...adjustedTemplate, maxMiles: targetMiles };
+    }
+
+    return buildWorkout(adjustedTemplate, paces, targetMiles);
+}
+
 /**
  * Generate days using EXACT Higdon microcycle structure and distances.
  * This follows the official day-by-day structure from halhigdon.com.
@@ -641,58 +728,67 @@ function generateHigdonWeekDaysExact(
 
     // Determine long run day - respect user preference for any day
     const longRunDayIndex = getLongRunDayIndex(input.longRunDay);
+    const longRunSlot: HigdonDaySlot = { type: 'long_run' };
 
     for (let i = 0; i < 7; i++) {
         const date = getDateForDay(weekNumber, i, input.raceDate, totalWeeks);
         const dayName = dayNames[i];
         const slot: HigdonDaySlot | undefined = microcycle[dayName];
+        const isRunSlot = isHigdonRunSlot(slot);
 
         let runWorkout: Workout | null = null;
         let isKeyDay = false;
+        let isLongRun = false;
         let distance = 0;
 
         // Get exact distance for this day based on Higdon arrays
-        if (i === longRunDayIndex || (slot?.type === 'long_run' && i !== longRunDayIndex)) {
+        if (i === longRunDayIndex) {
             // Long run - use exact long run array value
-            distance = distances.longRunMiles;
+            distance = resolveHigdonDistanceMiles(
+                distances.longRunMiles,
+                longRunSlot,
+                paces,
+                { isLongRun: true, tier }
+            );
             if (distance > 0) {
-                const template = phase === 'taper' ? LONG_RUN_TEMPLATES[0] : LONG_RUN_TEMPLATES[1];
-                runWorkout = buildWorkout(template, paces, distance);
+                const template = LONG_RUN_TEMPLATES[0];
+                runWorkout = buildHigdonWorkoutExact(template, paces, distance);
                 isKeyDay = true;
+                isLongRun = true;
             }
-        } else if (i === 2) { // Tuesday
-            distance = distances.tueRun;
+        } else if (i === 2 && isRunSlot) { // Tuesday
+            distance = resolveHigdonDistanceMiles(distances.tueRun, slot, paces);
             if (distance > 0) {
                 const template = getHigdonDayTemplate(slot, phase);
-                runWorkout = buildWorkout(template, paces, distance);
+                runWorkout = buildHigdonWorkoutExact(template, paces, distance);
                 isKeyDay = slot?.type === 'speedwork' || slot?.type === 'tempo' || slot?.type === 'intervals';
             }
-        } else if (i === 3) { // Wednesday
-            distance = distances.wedRun;
+        } else if (i === 3 && isRunSlot) { // Wednesday
+            distance = resolveHigdonDistanceMiles(distances.wedRun, slot, paces);
             if (distance > 0) {
                 const template = getHigdonDayTemplate(slot, phase);
-                runWorkout = buildWorkout(template, paces, distance);
+                runWorkout = buildHigdonWorkoutExact(template, paces, distance);
                 isKeyDay = slot?.type === 'speedwork' || slot?.type === 'tempo' || slot?.type === 'intervals';
             }
-        } else if (i === 4) { // Thursday
-            distance = distances.thuRun;
+        } else if (i === 4 && isRunSlot) { // Thursday
+            distance = resolveHigdonDistanceMiles(distances.thuRun, slot, paces);
             if (distance > 0) {
                 const template = getHigdonDayTemplate(slot, phase);
-                runWorkout = buildWorkout(template, paces, distance);
+                runWorkout = buildHigdonWorkoutExact(template, paces, distance);
                 isKeyDay = slot?.type === 'speedwork' || slot?.type === 'tempo' || slot?.type === 'intervals';
             }
-        } else if (i === 6 && i !== longRunDayIndex) { // Saturday (when not long run day)
-            distance = distances.satRun;
+        } else if (i === 6 && i !== longRunDayIndex && isRunSlot) { // Saturday (when not long run day)
+            distance = resolveHigdonDistanceMiles(distances.satRun, slot, paces);
             if (distance > 0) {
                 const template = getHigdonDayTemplate(slot, phase);
-                runWorkout = buildWorkout(template, paces, distance);
+                runWorkout = buildHigdonWorkoutExact(template, paces, distance);
                 isKeyDay = slot?.type === 'race_pace_run';
             }
         } else if (slot?.type === 'easy_run' && slot.distanceRange) {
             // Other easy run days from microcycle
             distance = slot.distanceRange[0]; // Use min distance
             if (distance > 0) {
-                runWorkout = buildWorkout(EASY_TEMPLATES[0], paces, distance);
+                runWorkout = buildHigdonWorkoutExact(EASY_TEMPLATES[0], paces, distance);
             }
         }
         // Rest, cross_train, walk days = no run workout
@@ -700,7 +796,7 @@ function generateHigdonWeekDaysExact(
         // Determine day type for scheduling
         const dayType: 'rest' | 'easy' | 'quality' | 'long' =
             runWorkout === null ? 'rest' :
-                (i === longRunDayIndex && distances.longRunMiles > 0) ? 'long' :
+                isLongRun ? 'long' :
                     isKeyDay ? 'quality' : 'easy';
 
         days.push({

@@ -13,6 +13,9 @@ import { AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { ProgressBar } from '@/components/onboarding/ui';
 import { createPlanFromOnboarding, savePlan } from '@/domain/plan/service';
+import { calculateWeeksToRace } from '@/domain/plan/date-utils';
+import { HIGDON_TIER_CONFIGS, HigdonTier } from '@/domain/plan/types';
+import { selectPlanTier } from '@/domain/philosophy/tier-selector';
 
 import {
     OnboardingStep,
@@ -40,6 +43,7 @@ import {
 } from '@/domain/onboarding/types';
 
 import { EXPERIENCE_LEVELS, RACE_RECENCY_OPTIONS } from '@/domain/onboarding/constants';
+import { calculateAgeFromDob } from '@/domain/onboarding/utils';
 import { calculateVdotFromRace, vdotFromVO2max } from '@/domain/vdot/vdot-estimator';
 import { useAuth } from '@/domain/auth/context';
 
@@ -144,7 +148,11 @@ function calculateVdotFromData(data: OnboardingData): { vdot: number; confidence
     return { vdot: 35, confidence: 'low' };
 }
 
-function calculateReadiness(data: OnboardingData): { status: ReadinessStatus; baseWeeksNeeded: number } {
+function calculateReadiness(data: OnboardingData): {
+    status: ReadinessStatus;
+    baseWeeksNeeded: number;
+    maintenanceWeeksNeeded: number;
+} {
     const weeklyMiles = data.weeklyMiles ?? 0;
     const longestRun = data.longestRecentRun ?? 0;
 
@@ -164,6 +172,15 @@ function calculateReadiness(data: OnboardingData): { status: ReadinessStatus; ba
     const needsLongerRun = longestRun < req.longRun * 0.7;
 
     if (needsMoreMiles || needsLongerRun) {
+        const basePlanAvailability = getHigdonBaseAvailability(data);
+        if (basePlanAvailability.status === 'available') {
+            return {
+                status: 'needs_base',
+                baseWeeksNeeded: basePlanAvailability.baseWeeks,
+                maintenanceWeeksNeeded: basePlanAvailability.maintenanceWeeks,
+            };
+        }
+
         // Calculate how many weeks of base building needed
         const mileGap = Math.max(0, req.weeklyMiles - weeklyMiles);
         const weeksForMiles = Math.ceil(mileGap / 3); // ~3 miles increase per week max
@@ -173,14 +190,16 @@ function calculateReadiness(data: OnboardingData): { status: ReadinessStatus; ba
 
         const baseWeeks = Math.max(weeksForMiles, weeksForRun, 2);
 
-        return { status: 'needs_base', baseWeeksNeeded: Math.min(baseWeeks, 8) };
+        return {
+            status: 'needs_base',
+            baseWeeksNeeded: Math.min(baseWeeks, 8),
+            maintenanceWeeksNeeded: 0,
+        };
     }
 
     // Check timeline
     if (data.raceDate) {
-        const weeksToRace = Math.floor(
-            (new Date(data.raceDate).getTime() - Date.now()) / (7 * 24 * 60 * 60 * 1000)
-        );
+        const weeksToRace = calculateWeeksToRace(data.raceDate);
 
         const minWeeks: Record<string, number> = {
             '5k': 4,
@@ -190,11 +209,76 @@ function calculateReadiness(data: OnboardingData): { status: ReadinessStatus; ba
         };
 
         if (weeksToRace < (minWeeks[data.trainingGoal ?? 'marathon'] ?? 8)) {
-            return { status: 'timeline_short', baseWeeksNeeded: 0 };
+            return { status: 'timeline_short', baseWeeksNeeded: 0, maintenanceWeeksNeeded: 0 };
         }
     }
 
-    return { status: 'ready', baseWeeksNeeded: 0 };
+    return { status: 'ready', baseWeeksNeeded: 0, maintenanceWeeksNeeded: 0 };
+}
+
+function mapTrainingIntensityToExperience(
+    intensity: TrainingIntensity | null
+): 'beginner' | 'intermediate' | 'advanced' {
+    if (intensity === 'aggressive') return 'advanced';
+    if (intensity === 'conservative') return 'beginner';
+    return 'intermediate';
+}
+
+function mapWeeklyMilesToTierFormat(
+    weeklyMiles: number | null
+): 'under_20' | '20_40' | 'over_40' {
+    const mileage = weeklyMiles ?? 20;
+    if (mileage >= 40) return 'over_40';
+    if (mileage >= 20) return '20_40';
+    return 'under_20';
+}
+
+function mapGoalToTierDistance(
+    goal: TrainingGoal | null
+): 'base' | '5k' | '10k' | 'half' | 'marathon' | null {
+    if (!goal) return null;
+    return goal === 'general' ? 'base' : goal;
+}
+
+function getHigdonBaseAvailability(
+    data: OnboardingData
+): { status: 'available'; baseWeeks: number; maintenanceWeeks: number } | { status: 'not_applicable' } {
+    if (data.trainingPhilosophy !== 'higdon') return { status: 'not_applicable' };
+    if (!data.raceDate) return { status: 'not_applicable' };
+
+    const targetDistance = mapGoalToTierDistance(data.trainingGoal);
+    if (!targetDistance || targetDistance === 'base') return { status: 'not_applicable' };
+
+    const experience = mapTrainingIntensityToExperience(data.trainingIntensity);
+    const currentMileage = mapWeeklyMilesToTierFormat(data.weeklyMiles);
+    const daysPerWeek = data.availableDays ?? 4;
+
+    const raceTierResult = selectPlanTier({
+        philosophy: 'higdon',
+        distance: targetDistance,
+        experience,
+        currentMileage,
+        daysPerWeek,
+    });
+    const raceConfig = HIGDON_TIER_CONFIGS[raceTierResult.tier as HigdonTier];
+
+    const baseTierResult = selectPlanTier({
+        philosophy: 'higdon',
+        distance: 'base',
+        experience,
+        currentMileage,
+        daysPerWeek,
+    });
+    const baseTier = baseTierResult.tier as HigdonTier;
+    const baseConfig = HIGDON_TIER_CONFIGS[baseTier];
+
+    const weeksToRace = calculateWeeksToRace(data.raceDate);
+    const gapWeeks = weeksToRace - raceConfig.durationWeeks;
+
+    if (gapWeeks <= 0) return { status: 'not_applicable' };
+    const baseWeeks = Math.min(gapWeeks, baseConfig.durationWeeks);
+    const maintenanceWeeks = Math.max(0, gapWeeks - baseConfig.durationWeeks);
+    return { status: 'available', baseWeeks, maintenanceWeeks };
 }
 
 function formatConnectError(provider: string | null, error: string | null): string | null {
@@ -318,8 +402,8 @@ function OnboardingContent() {
 
         // Calculate readiness before check
         if (nextStep === 'readiness-check') {
-            const { status, baseWeeksNeeded } = calculateReadiness(data);
-            setData(prev => ({ ...prev, readinessStatus: status, baseWeeksNeeded }));
+            const { status, baseWeeksNeeded, maintenanceWeeksNeeded } = calculateReadiness(data);
+            setData(prev => ({ ...prev, readinessStatus: status, baseWeeksNeeded, maintenanceWeeksNeeded }));
         }
 
         setStep(nextStep);
@@ -651,7 +735,7 @@ function OnboardingContent() {
                 {step === 'plan-start-date' && (
                     <PlanStartDateScreen
                         value={data.planStartDate}
-                        raceDate={data.raceDate || null}
+                        raceDate={data.raceDate}
                         onChange={(planStartDate) => setData(prev => ({ ...prev, planStartDate }))}
                         onContinue={goToNext}
                         onBack={goBack}
@@ -742,6 +826,7 @@ function OnboardingContent() {
                         data={data}
                         readinessStatus={data.readinessStatus ?? 'ready'}
                         baseWeeksNeeded={data.baseWeeksNeeded ?? 0}
+                        maintenanceWeeksNeeded={data.maintenanceWeeksNeeded ?? 0}
                         onProceed={() => {
                             setGenerationError(null); // Clear any previous errors
                             goToNext();
@@ -776,7 +861,7 @@ function OnboardingContent() {
                                     await supabase.from('athletes').upsert({
                                         id: user.id,
                                         name: data.name || 'Athlete', // Default if empty
-                                        age: data.age || null,
+                                        age: data.dateOfBirth ? calculateAgeFromDob(data.dateOfBirth) : (data.age || null),
                                         sex: data.sex || null,
                                         avatar: data.avatar || 'marathon', // Default avatar
                                     }, { onConflict: 'id' });

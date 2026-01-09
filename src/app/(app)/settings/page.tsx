@@ -8,7 +8,7 @@ import { createSupabaseBrowserClient } from '@/infrastructure/supabase';
 import { usePlan } from '@/domain/plan/context';
 import { downloadPlanAsJSON, clearPlan } from '@/domain/plan/service';
 import { apiFetch } from '@/lib/api';
-import { addYears, toDateKey } from '@/lib/dates';
+import { calculateAgeFromDob, getDobBounds } from '@/domain/onboarding/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     AlertTriangle, X, Download, RefreshCcw, ChevronRight,
@@ -17,7 +17,7 @@ import {
 import { SiteHeader } from '@/components/ui/SiteHeader';
 import { AvatarPicker } from '@/components/ui/AvatarPicker';
 import { AvatarDisplay } from '@/components/ui/AvatarDisplay';
-import { AvatarId, DEFAULT_AVATAR_ID, parseAvatarId } from '@/domain/user/avatars';
+import { AvatarId, parseAvatarId } from '@/domain/user/avatars';
 import { DatePicker } from '@/components/ui/DatePicker';
 
 /**
@@ -39,19 +39,6 @@ interface ProfileData {
     avatar: AvatarId | null;
 }
 
-// Helper to calculate age from DOB
-function calculateAgeFromDob(dob: string): number {
-    const birth = new Date(dob);
-    if (isNaN(birth.getTime())) return 0;
-    const today = new Date();
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-        age--;
-    }
-    return Math.max(0, age);
-}
-
 interface PreferencesData {
     notifyTrainingReminders: boolean;
     notifyWeeklySummary: boolean;
@@ -70,8 +57,7 @@ function formatPace(seconds: number): string {
 export default function SettingsPage() {
     const router = useRouter();
     const { plan, refreshPlan } = usePlan();
-    const minDobDate = toDateKey(addYears(new Date(), -99));
-    const maxDobDate = toDateKey(addYears(new Date(), -13));
+    const { minDate: minDobDate, maxDate: maxDobDate } = getDobBounds();
 
     // Profile state
     const [profile, setProfile] = useState<ProfileData>({ name: '', email: '', dateOfBirth: null, avatar: null });
@@ -117,7 +103,7 @@ export default function SettingsPage() {
                     .from('athletes')
                     .select('name, date_of_birth, age, avatar, notify_training_reminders, notify_weekly_summary, units')
                     .eq('id', user.id)
-                    .single() as { data: { name?: string; date_of_birth?: string; age?: number; avatar?: string; notify_training_reminders?: boolean; notify_weekly_summary?: boolean; units?: string } | null };
+                    .single();
 
                 setProfile({
                     name: athlete?.name || user.user_metadata?.name || email.split('@')[0] || '',

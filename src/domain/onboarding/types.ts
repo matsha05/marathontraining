@@ -103,7 +103,7 @@ export type TrainingIntensity = 'conservative' | 'moderate' | 'aggressive';
 
 export type TrainingMindset = 'rest_focus' | 'consistency' | 'push_limits';
 
-export type ReadinessStatus = 'ready' | 'needs_base' | 'timeline_short';
+export type ReadinessStatus = 'ready' | 'needs_base' | 'base_unavailable' | 'timeline_short';
 
 export type VdotConfidence = 'high' | 'medium' | 'low';
 
@@ -121,7 +121,7 @@ export interface OnboardingData {
     // Phase 3: Goal
     trainingGoal: TrainingGoal | null;
     raceName: string;
-    raceDate: string;  // ISO date
+    raceDate: string | null;  // ISO date
     fitnessDuration: FitnessDuration | null;
 
     // Phase 4: Fitness Calibration
@@ -185,6 +185,7 @@ export interface OnboardingData {
     // Phase 9: Readiness
     readinessStatus: ReadinessStatus | null;
     baseWeeksNeeded: number | null;
+    maintenanceWeeksNeeded: number | null;
 
     // User profile
     avatar: AvatarId | null; // Strict avatar ID from avatars.ts
@@ -204,7 +205,7 @@ export const INITIAL_ONBOARDING_DATA: OnboardingData = {
     // Goal
     trainingGoal: null,
     raceName: '',
-    raceDate: '',
+    raceDate: null,
     fitnessDuration: null,
 
     // Calibration
@@ -256,6 +257,7 @@ export const INITIAL_ONBOARDING_DATA: OnboardingData = {
     // Readiness
     readinessStatus: null,
     baseWeeksNeeded: null,
+    maintenanceWeeksNeeded: null,
 
     // User profile
     avatar: null,
@@ -527,8 +529,27 @@ const STEP_PROGRESS: Record<OnboardingStep, number> = {
     'complete': 100,
 };
 
+export function getLinearStepProgress<T extends string>(
+    steps: readonly T[],
+    step: T
+): { index: number; total: number; progress: number } {
+    const total = steps.length;
+    const index = steps.indexOf(step);
+    if (index === -1 || total === 0) {
+        return { index, total, progress: 0 };
+    }
+    return {
+        index,
+        total,
+        progress: ((index + 1) / total) * 100,
+    };
+}
+
+const STEP_ORDER = Object.keys(STEP_PROGRESS) as OnboardingStep[];
+
 export function getStepProgress(step: OnboardingStep): number {
-    return STEP_PROGRESS[step] ?? 0;
+    const fallback = getLinearStepProgress(STEP_ORDER, step).progress;
+    return STEP_PROGRESS[step] ?? fallback;
 }
 
 // =============================================================================
@@ -609,7 +630,7 @@ export function isStepComplete(step: OnboardingStep, data: OnboardingData): bool
             return data.name.trim().length >= 2;
 
         case 'demographics':
-            return data.age !== null && data.age > 0 && data.sex !== null;
+            return data.dateOfBirth !== null && data.sex !== null;
 
         case 'avatar':
             return true; // Avatar has default, always complete
@@ -618,7 +639,7 @@ export function isStepComplete(step: OnboardingStep, data: OnboardingData): bool
             return data.trainingGoal !== null;
 
         case 'race-details':
-            return data.raceDate !== '';
+            return true;
 
         case 'fitness-duration':
             return data.fitnessDuration !== null;
@@ -748,9 +769,18 @@ export function loadOnboardingProgress(): { step: OnboardingStep; data: Onboardi
         return null;
     }
 
+    const merged = { ...INITIAL_ONBOARDING_DATA, ...(data as Partial<OnboardingData>) };
+    const normalized: OnboardingData = {
+        ...merged,
+        raceDate: merged.raceDate === '' ? null : merged.raceDate,
+        longRunDays: merged.longRunDays.length === 0 && merged.longRunDay
+            ? [merged.longRunDay]
+            : merged.longRunDays,
+    };
+
     return {
         step: step as OnboardingStep,
-        data: { ...INITIAL_ONBOARDING_DATA, ...(data as Partial<OnboardingData>) },
+        data: normalized,
     };
 }
 
