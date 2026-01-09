@@ -16,7 +16,8 @@
 import { OnboardingData } from '@/domain/onboarding/types';
 import { calculateAgeFromDob } from '@/domain/onboarding/utils';
 import { PlanGenerationInput, TrainingPlan, TrainingPhase, WeekPlan } from '@/domain/plan/types';
-import { generatePlan, calculateWeeksToRace, getDateForDay, getWeekStartDate, parseDateOnly } from '@/domain/plan/generator';
+import { generatePlan, calculateWeeksToRace, getDateForDay, getWeekStartDate, parseDateOnly, verifyPlan } from '@/domain/plan/generator';
+import { PHASE_DEFINITIONS } from '@/domain/plan/phases';
 import { toDateKey } from '@/lib/dates';
 
 /**
@@ -208,7 +209,7 @@ import { generateCoachPlan } from '@/domain/plan/coach-generators';
 import { PfitzFRRTier, DanielsTier, HigdonTier } from '@/domain/plan/types';
 import { HansonsTier } from '@/domain/plan/coaches/hansons';
 import { PfitzTier } from '@/domain/plan/coaches/pfitzinger';
-import { generateMaintenanceBlockWeeks } from '@/domain/plan/prep-block';
+import { buildHigdonBridge } from '@/domain/plan/higdon-bridge';
 
 /**
  * Map OnboardingData experience/mileage to tier-selector format
@@ -225,55 +226,6 @@ function mapCurrentMileage(data: OnboardingData): 'under_20' | '20_40' | 'over_4
     if (mileage >= 40) return 'over_40';
     if (mileage >= 20) return '20_40';
     return 'under_20';
-}
-
-function buildBaseWeeks(basePlan: TrainingPlan, weeksNeeded: number): WeekPlan[] {
-    if (weeksNeeded <= 0 || basePlan.weeks.length === 0) return [];
-    const take = Math.min(weeksNeeded, basePlan.weeks.length);
-    return basePlan.weeks.slice(0, take).map(week => ({
-        ...week,
-        phase: 'base' as TrainingPhase,
-    }));
-}
-
-type MaintenanceDayType = 'rest' | 'easy' | 'long';
-
-const DAY_NAME_TO_INDEX: Record<string, number> = {
-    sunday: 0,
-    monday: 1,
-    tuesday: 2,
-    wednesday: 3,
-    thursday: 4,
-    friday: 5,
-    saturday: 6,
-};
-
-function getDayIndexFromName(dayName: string): number {
-    return DAY_NAME_TO_INDEX[dayName.toLowerCase()] ?? 6;
-}
-
-function deriveMaintenanceDayTypes(baseWeek: WeekPlan, longRunDay?: string): MaintenanceDayType[] {
-    const dayTypes: MaintenanceDayType[] = Array(7).fill('rest');
-    let longRunIndex = -1;
-    let maxMiles = 0;
-
-    baseWeek.days.forEach(day => {
-        if (day.runWorkout) {
-            dayTypes[day.dayOfWeek] = 'easy';
-            if (day.totalMiles >= maxMiles) {
-                maxMiles = day.totalMiles;
-                longRunIndex = day.dayOfWeek;
-            }
-        }
-    });
-
-    if (longRunIndex >= 0) {
-        dayTypes[longRunIndex] = 'long';
-    } else if (longRunDay) {
-        dayTypes[getDayIndexFromName(longRunDay)] = 'long';
-    }
-
-    return dayTypes;
 }
 
 function resequenceWeeks(weeks: WeekPlan[], raceDate?: string): WeekPlan[] {
@@ -420,6 +372,9 @@ export function createPlanFromOnboarding(
         let extendedWithMaintenance = false;
         let partialBase = false;
         let baseWeeksApplied = 0;
+        let baseStartWeek = 0;
+        let maintenanceWeeksApplied = 0;
+        let planExtended = false;
 
         // Route based on tier prefix
         if (tierResult.tier.startsWith('pfitz_frr_')) {
@@ -463,54 +418,59 @@ export function createPlanFromOnboarding(
 
             if (gapWeeks > 0) {
                 const basePlan = generateCoachPlan(inputResult.data, baseTier);
-                const baseWeeksAvailable = basePlan.weeks.length;
-                baseWeeksApplied = Math.min(gapWeeks, baseWeeksAvailable);
-                const baseWeeks = buildBaseWeeks(basePlan, baseWeeksApplied);
-                const preWeeks: WeekPlan[] = [...baseWeeks];
-                extendedWithBase = baseWeeksApplied > 0;
-                partialBase = baseWeeksApplied > 0 && baseWeeksApplied < baseWeeksAvailable;
+                const bridge = buildHigdonBridge({
+                    input: inputResult.data,
+                    racePlan: plan,
+                    basePlan,
+                    baseTier,
+                    gapWeeks,
+                    totalWeeks: weeksToRace,
+                });
 
-                if (gapWeeks > baseWeeksAvailable) {
-                    const maintenanceWeeksNeeded = gapWeeks - baseWeeksAvailable;
-                    const baseWeekTemplate = basePlan.weeks[0] ?? baseWeeks[0];
-                    const dayTypes = baseWeekTemplate
-                        ? deriveMaintenanceDayTypes(baseWeekTemplate, inputResult.data.longRunDay)
-                        : deriveMaintenanceDayTypes(plan.weeks[0], inputResult.data.longRunDay);
-                    const basePeakLongRunMiles = basePlan.weeks.reduce(
-                        (max, week) => Math.max(max, week.longRunMiles),
-                        0
-                    );
-                    const lastBaseWeek = baseWeeks[baseWeeks.length - 1] ?? basePlan.weeks[basePlan.weeks.length - 1];
-                    const targetWeek = plan.weeks[0];
-
-                    const maintenanceWeeks = generateMaintenanceBlockWeeks(inputResult.data, {
-                        weeks: maintenanceWeeksNeeded,
-                        totalWeeks: weeksToRace,
-                        dayTypes,
-                        startWeeklyMiles: lastBaseWeek?.totalMiles ?? inputResult.data.weeklyMiles ?? 0,
-                        startLongRunMiles: lastBaseWeek?.longRunMiles ?? inputResult.data.longestRecentRun ?? 0,
-                        targetWeeklyMiles: targetWeek?.totalMiles ?? inputResult.data.weeklyMiles ?? 0,
-                        targetLongRunMiles: targetWeek?.longRunMiles ?? inputResult.data.longestRecentRun ?? 0,
-                        basePeakLongRunMiles,
-                    });
-                    preWeeks.push(...maintenanceWeeks);
-                    extendedWithMaintenance = maintenanceWeeks.length > 0;
+                if (bridge.preWeeks.length > 0) {
+                    plan = extendPlanWithPreWeeks(plan, bridge.preWeeks, inputResult.data.raceDate);
+                    planExtended = true;
                 }
 
-                plan = extendPlanWithPreWeeks(plan, preWeeks, inputResult.data.raceDate);
+                baseWeeksApplied = bridge.baseWeeksApplied;
+                baseStartWeek = bridge.baseStartWeek;
+                maintenanceWeeksApplied = bridge.maintenanceWeeksApplied;
+                extendedWithBase = baseWeeksApplied > 0;
+                extendedWithMaintenance = maintenanceWeeksApplied > 0;
+                partialBase = bridge.partialBase;
             }
         }
 
         // Step 4: Add philosophy metadata (for display)
         plan.philosophy = philosophy as TrainingPlan['philosophy'];
-        if (extendedWithMaintenance) {
-            plan.planTier = `${tierResult.displayName} + Base + Maintenance (not Higdon)`;
+        const baseRangeLabel = baseStartWeek > 0 && baseWeeksApplied > 0
+            ? `Base Weeks ${baseStartWeek}-${baseStartWeek + baseWeeksApplied - 1}`
+            : 'Base';
+
+        if (extendedWithMaintenance && extendedWithBase) {
+            const baseLabel = partialBase ? baseRangeLabel : 'Base';
+            plan.planTier = `${tierResult.displayName} + ${baseLabel} + Maintenance (not Higdon)`;
+        } else if (extendedWithMaintenance) {
+            plan.planTier = `${tierResult.displayName} + Maintenance (not Higdon)`;
         } else if (extendedWithBase && partialBase) {
-            plan.planTier = `${tierResult.displayName} + Base Weeks 1-${baseWeeksApplied} (partial)`;
+            plan.planTier = `${tierResult.displayName} + ${baseRangeLabel} (partial)`;
         } else if (extendedWithBase) {
             plan.planTier = `${tierResult.displayName} + Base`;
         } else {
             plan.planTier = tierResult.displayName;
+        }
+
+        if (planExtended) {
+            const phases = plan.phases.map(phase => ({
+                ...phase,
+                config: PHASE_DEFINITIONS[phase.phase],
+            }));
+            const baseVerification = verifyPlan(plan.weeks, phases);
+            const existingChecks = plan.verification?.checks ?? [];
+            plan.verification = {
+                passed: baseVerification.passed && (plan.verification?.passed ?? true),
+                checks: [...existingChecks, ...baseVerification.checks],
+            };
         }
 
         // Step 5: Validate plan

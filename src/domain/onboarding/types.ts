@@ -103,7 +103,7 @@ export type TrainingIntensity = 'conservative' | 'moderate' | 'aggressive';
 
 export type TrainingMindset = 'rest_focus' | 'consistency' | 'push_limits';
 
-export type ReadinessStatus = 'ready' | 'needs_base' | 'base_unavailable' | 'timeline_short';
+export type ReadinessStatus = 'ready' | 'needs_base' | 'timeline_short';
 
 export type VdotConfidence = 'high' | 'medium' | 'low';
 
@@ -770,12 +770,14 @@ export function loadOnboardingProgress(): { step: OnboardingStep; data: Onboardi
     }
 
     const merged = { ...INITIAL_ONBOARDING_DATA, ...(data as Partial<OnboardingData>) };
+    const storedReadiness = merged.readinessStatus as string | null;
     const normalized: OnboardingData = {
         ...merged,
         raceDate: merged.raceDate === '' ? null : merged.raceDate,
         longRunDays: merged.longRunDays.length === 0 && merged.longRunDay
             ? [merged.longRunDay]
             : merged.longRunDays,
+        readinessStatus: storedReadiness === 'base_unavailable' ? 'needs_base' : merged.readinessStatus,
     };
 
     return {

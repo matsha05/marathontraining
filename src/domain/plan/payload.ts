@@ -13,6 +13,7 @@ export function toTrainingPlanPayload(plan: TrainingPlanSource): TrainingPlanPay
             weekNumber: week.weekNumber,
             weekOf: week.weekOf,
             phase: week.phase,
+            blockType: week.blockType,
             isRecoveryWeek: week.isRecoveryWeek,
             focus: week.focus,
             days: week.days.map((day) => ({

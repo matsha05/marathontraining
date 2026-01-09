@@ -82,22 +82,10 @@ import {
     scheduleDurabilityRoutineForDay,
     scheduleCrossTrainingForDay,
 } from './generator';
-
-// =============================================================================
-// HELPER: DAY NAME TO INDEX MAPPING
-// =============================================================================
-
-/**
- * Map day name to day-of-week index (0 = Sunday, 6 = Saturday).
- * Used for long run day placement in all coach generators.
- */
-const DAY_NAME_TO_INDEX: Record<string, number> = {
-    'sunday': 0, 'monday': 1, 'tuesday': 2, 'wednesday': 3,
-    'thursday': 4, 'friday': 5, 'saturday': 6
-};
+import { getDayIndex } from '@/domain/shared/day-utils';
 
 function getLongRunDayIndex(longRunDay: string): number {
-    return DAY_NAME_TO_INDEX[longRunDay.toLowerCase()] ?? 6; // Default to Saturday
+    return getDayIndex(longRunDay);
 }
 
 // =============================================================================
@@ -158,6 +146,7 @@ export function generateFRRPlan(
             weekOf: getWeekStartDate(week, input.raceDate, config.durationWeeks),
             phase,
             phaseWeek: config.phases[frrPhase].indexOf(week) + 1,
+            blockType: 'race_plan',
             days,
             totalMiles: mileage,
             longRunMiles: longRun,
@@ -351,6 +340,7 @@ export function generateDanielsPlan(
             weekOf: getWeekStartDate(week, input.raceDate, config.durationWeeks),
             phase,
             phaseWeek: week,
+            blockType: 'race_plan',
             days,
             totalMiles: mileage,
             longRunMiles: q2workout?.q1.totalMiles ?? 0,
@@ -512,6 +502,7 @@ export function generateHigdonPlan(
     const config = HIGDON_TIER_CONFIGS[tier];
     const paces = calculateTrainingPaces(input.vdot);
     const totalWeeks = config.durationWeeks;
+    const blockType = config.distance === 'base' ? 'base_official' : 'race_plan';
 
     // Get EXACT Higdon progressions - these are the official week-by-week values
     const longRunArray = HIGDON_LONG_RUN_ARRAYS[tier];
@@ -566,6 +557,7 @@ export function generateHigdonPlan(
             weekOf: getWeekStartDate(week, input.raceDate, totalWeeks),
             phase,
             phaseWeek: week,
+            blockType,
             days,
             totalMiles: actualTotalMiles, // FIXED: Use actual sum of day distances
             longRunMiles,
@@ -908,6 +900,7 @@ export function generateHansonsPlan(
             weekOf: getWeekStartDate(week, input.raceDate, totalWeeks),
             phase,
             phaseWeek: week,
+            blockType: 'race_plan',
             days,
             totalMiles: mileage,
             longRunMiles,
@@ -1091,6 +1084,7 @@ export function generatePfitzAMPlan(
             weekOf: getWeekStartDate(week, input.raceDate, totalWeeks),
             phase,
             phaseWeek: week,
+            blockType: 'race_plan',
             days,
             totalMiles: mileage,
             longRunMiles,

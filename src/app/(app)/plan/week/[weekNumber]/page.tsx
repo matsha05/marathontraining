@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { usePlan } from '@/domain/plan/context';
+import { WeekBlockType } from '@/domain/plan/types';
 import { formatPace, getDayName } from '@/lib/format';
 import { CheckIcon } from '@/components/ui/check';
 import { AppHeader } from '@/components/ui/SiteHeader';
@@ -29,6 +30,12 @@ interface DayDisplay {
         duration: number;
         exercises: number;
     };
+}
+
+function getBlockLabel(blockType?: WeekBlockType): string | null {
+    if (blockType === 'base_official') return 'Base';
+    if (blockType === 'maintenance') return 'Maintenance';
+    return null;
 }
 
 export default function WeekDetailPage() {
@@ -145,6 +152,7 @@ export default function WeekDetailPage() {
 
     const isCurrent = weekNumber === currentWeek;
     const phaseLabel = weekPlan.phase.charAt(0).toUpperCase() + weekPlan.phase.slice(1);
+    const blockLabel = getBlockLabel(weekPlan.blockType);
 
     return (
         <div className="v3-root min-h-screen">
@@ -156,6 +164,7 @@ export default function WeekDetailPage() {
                     <div className="flex items-center gap-2">
                         {isCurrent && <span className="v3-badge v3-badge-accent">Current Week</span>}
                         {weekPlan.isRecoveryWeek && <span className="v3-badge">Cutback</span>}
+                        {blockLabel && <span className="v3-badge">{blockLabel}</span>}
                     </div>
                 }
             />

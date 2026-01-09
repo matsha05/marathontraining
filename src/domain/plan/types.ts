@@ -244,6 +244,8 @@ export interface DayPlan {
 // WEEK PLAN
 // =============================================================================
 
+export type WeekBlockType = 'base_official' | 'maintenance' | 'race_plan';
+
 /**
  * A complete training week
  */
@@ -252,6 +254,7 @@ export interface WeekPlan {
     weekOf: string; // Start date ISO
     phase: TrainingPhase;
     phaseWeek: number; // Week # within the phase
+    blockType?: WeekBlockType;
 
     // Structure
     days: DayPlan[];
@@ -1086,4 +1089,3 @@ export interface DanielsWorkout {
     qualityMiles: number;  // Non-E miles
     segments: DanielsWorkoutSegment[];
 }
-

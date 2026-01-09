@@ -18,6 +18,7 @@ import {
     VERIFICATION_CHECKS,
     TrainingPhase,
 } from './types';
+import { getDayIndex } from '@/domain/shared/day-utils';
 import { calculatePhases, scheduleRecoveryWeeks, isRecoveryWeek, PhaseBreakdown } from './phases';
 import { calculateWeeksToRace, getDateForDay, getWeekStartDate } from './date-utils';
 import {
@@ -178,6 +179,7 @@ function generateWeek(
         weekOf: getWeekStartDate(weekNumber, input.raceDate),
         phase: phase.phase,
         phaseWeek: weekNumber - phase.startWeek + 1,
+        blockType: 'race_plan',
         days,
         totalMiles: days.reduce((sum, d) => sum + d.totalMiles, 0),
         longRunMiles,
@@ -419,12 +421,7 @@ function getWeekStructure(
     longRunDay: string,
     isRecovery: boolean
 ): DaySlot[] {
-    // Map day name to index (0 = Sunday, 6 = Saturday)
-    const DAY_NAME_TO_INDEX: Record<string, number> = {
-        'sunday': 0, 'monday': 1, 'tuesday': 2, 'wednesday': 3,
-        'thursday': 4, 'friday': 5, 'saturday': 6
-    };
-    const longDayIndex = DAY_NAME_TO_INDEX[longRunDay.toLowerCase()] ?? 6; // Default to Saturday
+    const longDayIndex = getDayIndex(longRunDay);
 
     // Hansons-style structure: SOS on Tue/Thu
     // Mon = easy/rest, Tue = SOS, Wed = easy, Thu = SOS, Fri = rest, Sat = long, Sun = easy/rest
@@ -626,7 +623,7 @@ function selectLongRunTemplate(phase: TrainingPhase, goalDistance: string): Work
 // VERIFICATION
 // =============================================================================
 
-function verifyPlan(weeks: WeekPlan[], phases: PhaseBreakdown[]): PlanVerification {
+export function verifyPlan(weeks: WeekPlan[], phases: PhaseBreakdown[]): PlanVerification {
     const checks: VerificationCheck[] = [];
 
     // Check 1: 80/20 Polarization

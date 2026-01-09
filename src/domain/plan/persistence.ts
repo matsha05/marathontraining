@@ -83,6 +83,7 @@ function buildPrescription(
         } : null,
         weekNumber: week.weekNumber,
         phase: week.phase,
+        blockType: week.blockType ?? null,
         isKeyDay: day.isKeyDay,
         isRecoveryWeek: week.isRecoveryWeek,
         weekFocus: week.focus,

@@ -1,4 +1,4 @@
-import type { TrainingPlan, WeekPlan, DayPlan } from './types';
+import type { TrainingPlan, WeekPlan, DayPlan, WeekBlockType } from './types';
 import type { Database } from '@/infrastructure/supabase/types';
 
 type DbTrainingPlan = Database['public']['Tables']['training_plans']['Row'];
@@ -28,6 +28,7 @@ export function reconstructPlan(
         const weekWorkouts = workoutsByWeek.get(weekNum) || [];
         const firstWorkout = weekWorkouts[0];
         const prescription = firstWorkout?.prescription as Record<string, unknown>;
+        const blockType = (prescription?.blockType as WeekBlockType | undefined) ?? 'race_plan';
 
         const days: DayPlan[] = weekWorkouts.map(w => {
             const p = w.prescription as Record<string, unknown>;
@@ -72,6 +73,7 @@ export function reconstructPlan(
             weekOf: (prescription?.weekOf as string) || firstWorkout?.scheduled_date || '',
             phase: (prescription?.phase as string) || 'base',
             phaseWeek: 1,
+            blockType,
             days,
             totalMiles,
             longRunMiles,

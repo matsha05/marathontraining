@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { usePlan } from '@/domain/plan/context';
-import { TrainingPlan, WeekPlan, TrainingPhase } from '@/domain/plan/types';
+import { TrainingPlan, WeekPlan, TrainingPhase, WeekBlockType } from '@/domain/plan/types';
 import { calculateWeeksToRace, formatDateLong } from '@/domain/plan/date-utils';
 import { motion } from 'framer-motion';
 import { SiteHeader } from '@/components/ui/SiteHeader';
@@ -28,6 +28,7 @@ interface WeekDisplay {
     phase: string;
     isCurrent: boolean;
     cutback?: boolean;
+    blockLabel?: string | null;
 }
 
 function formatPhaseDisplay(plan: TrainingPlan, currentWeekNum: number): PhaseDisplay[] {
@@ -102,7 +103,14 @@ function formatWeekDisplay(weeks: WeekPlan[], currentWeekNum: number): WeekDispl
             phase: week.phase.charAt(0).toUpperCase() + week.phase.slice(1),
             isCurrent: week.weekNumber === currentWeekNum,
             cutback: week.isRecoveryWeek,
+            blockLabel: getBlockLabel(week.blockType),
         }));
+}
+
+function getBlockLabel(blockType?: WeekBlockType): string | null {
+    if (blockType === 'base_official') return 'Base';
+    if (blockType === 'maintenance') return 'Maintenance';
+    return null;
 }
 
 function getWeeksUntilRace(raceDate: string | undefined): number | null {
@@ -311,6 +319,7 @@ export default function PlanPage() {
                                                     Week {week.number}
                                                     {week.isCurrent && <span className="v3-badge v3-badge-accent">Current</span>}
                                                     {week.cutback && <span className="v3-badge">Cutback</span>}
+                                                    {week.blockLabel && <span className="v3-badge">{week.blockLabel}</span>}
                                                 </p>
                                                 <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>{week.phase} Phase</p>
                                             </div>

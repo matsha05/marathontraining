@@ -16,6 +16,7 @@ import { createPlanFromOnboarding, savePlan } from '@/domain/plan/service';
 import { calculateWeeksToRace } from '@/domain/plan/date-utils';
 import { HIGDON_TIER_CONFIGS, HigdonTier } from '@/domain/plan/types';
 import { selectPlanTier } from '@/domain/philosophy/tier-selector';
+import { getHigdonBridgeCounts } from '@/domain/plan/higdon-bridge';
 
 import {
     OnboardingStep,
@@ -276,8 +277,7 @@ function getHigdonBaseAvailability(
     const gapWeeks = weeksToRace - raceConfig.durationWeeks;
 
     if (gapWeeks <= 0) return { status: 'not_applicable' };
-    const baseWeeks = Math.min(gapWeeks, baseConfig.durationWeeks);
-    const maintenanceWeeks = Math.max(0, gapWeeks - baseConfig.durationWeeks);
+    const { baseWeeks, maintenanceWeeks } = getHigdonBridgeCounts(gapWeeks, baseConfig.durationWeeks);
     return { status: 'available', baseWeeks, maintenanceWeeks };
 }
 

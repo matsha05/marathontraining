@@ -15,7 +15,7 @@ export * from './phases';
 export * from './mileage';
 
 // Main generator
-export { generatePlan, calculateWeeksToRace, getWeekFocus } from './generator';
+export { generatePlan, calculateWeeksToRace, getWeekFocus, verifyPlan } from './generator';
 
 // Service layer (transformation, CRUD, queries)
 export * from './service';

@@ -5,6 +5,7 @@
  */
 
 import { addYears, toDateKey } from '@/lib/dates';
+export { DAY_NAME_TO_INDEX, getDayIndex } from '@/domain/shared/day-utils';
 
 /**
  * Parse a YYYY-MM-DD string as LOCAL time (not UTC).
@@ -53,26 +54,6 @@ export function getDobBounds(minAge = 13, maxAge = 99): { minDate: string; maxDa
     };
 }
 
-/**
- * Map day names to day-of-week indices (0 = Sunday, 6 = Saturday).
- * Used throughout plan generation for long run day placement.
- */
-export const DAY_NAME_TO_INDEX: Record<string, number> = {
-    'sunday': 0,
-    'monday': 1,
-    'tuesday': 2,
-    'wednesday': 3,
-    'thursday': 4,
-    'friday': 5,
-    'saturday': 6,
-};
-
-/**
- * Get day index from day name, with fallback to Saturday.
- */
-export function getDayIndex(dayName: string): number {
-    return DAY_NAME_TO_INDEX[dayName.toLowerCase()] ?? 6;
-}
 
 /**
  * Format date as YYYY-MM-DD for form inputs.

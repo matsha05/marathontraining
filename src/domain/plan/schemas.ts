@@ -35,6 +35,7 @@ const weekPlanSchema = z.object({
     weekNumber: z.number().int(),
     weekOf: z.string(),
     phase: z.string(),
+    blockType: z.string().optional(),
     isRecoveryWeek: z.boolean(),
     focus: z.string(),
     days: z.array(dayPlanSchema),

@@ -581,56 +581,6 @@ export function ReadinessCheckScreen({
         );
     }
 
-    if (readinessStatus === 'base_unavailable') {
-        return (
-            <QuestionScreen onBack={onBack}>
-                {error && (
-                    <WarningBanner title="Plan generation failed">
-                        {error}
-                    </WarningBanner>
-                )}
-                <div className="text-center">
-                    <div
-                        className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-                        style={{ background: 'var(--v3-warning-subtle)' }}
-                    >
-                        <AlertTriangle className="w-8 h-8" style={{ color: 'var(--v3-warning)' }} />
-                    </div>
-                    <h1 className="v3-heading-md mb-4">Let&apos;s start with a maintenance block.</h1>
-                </div>
-
-                <WarningBanner title="Why this is different">
-                    Your timeline needs extra weeks before the official plan. We&apos;ll add a gentle maintenance block
-                    that is not part of Higdon&apos;s official plan.
-                </WarningBanner>
-
-                <div className="mt-6 text-left v3-body-sm" style={{ color: 'var(--text-muted)' }}>
-                    {baseWeeksNeeded > 0 && (
-                        <p>Weeks 1-{baseWeeksNeeded}: Maintenance block. Weeks {baseWeeksNeeded + 1}+: {goalLabel} plan.</p>
-                    )}
-                    {baseWeeksNeeded === 0 && (
-                        <p>We&apos;ll start your race plan closer to race day.</p>
-                    )}
-                </div>
-
-                <div className="mt-8 space-y-3">
-                    <button
-                        onClick={onProceed}
-                        className="v3-btn v3-btn-primary v3-btn-lg w-full"
-                    >
-                        Start maintenance block
-                    </button>
-                    <button
-                        onClick={onBack}
-                        className="v3-btn v3-btn-secondary w-full"
-                    >
-                        Go back and change my race date
-                    </button>
-                </div>
-            </QuestionScreen>
-        );
-    }
-
     // Timeline too short
     return (
         <QuestionScreen onBack={onBack}>
