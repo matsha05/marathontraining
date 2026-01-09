@@ -1,7 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { TrainingPhase } from '@/domain/plan/types';
+import { TrainingPhase, WeekBlockType } from '@/domain/plan/types';
+import { getBlockLabel } from '@/domain/plan/block-labels';
 
 /**
  * PhaseTimeline - Horizontal phase indicator
@@ -12,6 +13,11 @@ import { TrainingPhase } from '@/domain/plan/types';
 interface PhaseTimelineProps {
     phases: Array<{
         name: TrainingPhase;
+        startWeek: number;
+        endWeek: number;
+    }>;
+    blocks?: Array<{
+        type: WeekBlockType;
         startWeek: number;
         endWeek: number;
     }>;
@@ -26,7 +32,13 @@ const PHASE_DISPLAY: Record<TrainingPhase, { label: string; color: string }> = {
     taper: { label: 'Taper', color: 'var(--color-zone-interval)' },
 };
 
-export function PhaseTimeline({ phases, currentWeek, totalWeeks }: PhaseTimelineProps) {
+const BLOCK_DISPLAY: Record<WeekBlockType, { color: string }> = {
+    base_official: { color: 'var(--color-zone-easy)' },
+    maintenance: { color: 'var(--color-accent)' },
+    race_plan: { color: 'var(--color-zone-threshold)' },
+};
+
+export function PhaseTimeline({ phases, blocks, currentWeek, totalWeeks }: PhaseTimelineProps) {
     const isPrePlan = currentWeek < 1;
 
     const currentPhaseName = (() => {
@@ -53,6 +65,35 @@ export function PhaseTimeline({ phases, currentWeek, totalWeeks }: PhaseTimeline
                     border: '1px solid var(--border-base)',
                 }}
             >
+                {blocks && blocks.length > 0 && (
+                    <div className="mb-4">
+                        <p className="text-caption text-[10px] mb-2" style={{ color: 'var(--text-subtle)' }}>
+                            Plan Blocks
+                        </p>
+                        <div className="flex gap-2">
+                            {blocks.map(block => {
+                                const weeks = block.endWeek - block.startWeek + 1;
+                                const display = BLOCK_DISPLAY[block.type];
+                                const label = getBlockLabel(block.type, { includeRacePlan: true }) ?? 'Block';
+                                return (
+                                    <div
+                                        key={`${block.type}-${block.startWeek}`}
+                                        className="rounded-lg px-3 py-2 text-xs font-medium"
+                                        style={{
+                                            flex: `${weeks} 1 0%`,
+                                            border: `1px solid color-mix(in srgb, ${display.color} 30%, transparent)`,
+                                            background: `color-mix(in srgb, ${display.color} 12%, var(--bg-elevated))`,
+                                            color: display.color,
+                                        }}
+                                    >
+                                        {label} · W{block.startWeek}-{block.endWeek}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
                 {/* Phase dots and labels */}
                 <div className="flex items-center justify-between">
                     {phases.map((phase, index) => {
@@ -183,4 +224,39 @@ export function extractPhasesFromWeeks(
     });
 
     return phases;
+}
+
+export function extractBlockSegmentsFromWeeks(
+    weeks: Array<{ weekNumber: number; blockType?: WeekBlockType }>
+): PhaseTimelineProps['blocks'] {
+    if (!weeks.length) return [];
+
+    const blocks: NonNullable<PhaseTimelineProps['blocks']> = [];
+    let currentType: WeekBlockType | null = null;
+    let startWeek = 1;
+
+    weeks.forEach((week, index) => {
+        const blockType = week.blockType ?? 'race_plan';
+        if (blockType !== currentType) {
+            if (currentType !== null) {
+                blocks.push({
+                    type: currentType,
+                    startWeek,
+                    endWeek: week.weekNumber - 1,
+                });
+            }
+            currentType = blockType;
+            startWeek = week.weekNumber;
+        }
+
+        if (index === weeks.length - 1 && currentType) {
+            blocks.push({
+                type: currentType,
+                startWeek,
+                endWeek: week.weekNumber,
+            });
+        }
+    });
+
+    return blocks;
 }

@@ -4,7 +4,8 @@ import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { usePlan } from '@/domain/plan/context';
-import { TrainingPlan, WeekPlan, TrainingPhase, WeekBlockType } from '@/domain/plan/types';
+import { TrainingPlan, WeekPlan, TrainingPhase } from '@/domain/plan/types';
+import { getBlockLabel } from '@/domain/plan/block-labels';
 import { calculateWeeksToRace, formatDateLong } from '@/domain/plan/date-utils';
 import { motion } from 'framer-motion';
 import { SiteHeader } from '@/components/ui/SiteHeader';
@@ -105,12 +106,6 @@ function formatWeekDisplay(weeks: WeekPlan[], currentWeekNum: number): WeekDispl
             cutback: week.isRecoveryWeek,
             blockLabel: getBlockLabel(week.blockType),
         }));
-}
-
-function getBlockLabel(blockType?: WeekBlockType): string | null {
-    if (blockType === 'base_official') return 'Base';
-    if (blockType === 'maintenance') return 'Maintenance';
-    return null;
 }
 
 function getWeeksUntilRace(raceDate: string | undefined): number | null {

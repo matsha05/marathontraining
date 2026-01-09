@@ -5,7 +5,7 @@
  */
 
 import { addYears, toDateKey } from '@/lib/dates';
-export { DAY_NAME_TO_INDEX, getDayIndex } from '@/domain/shared/day-utils';
+export { DAY_NAME_TO_INDEX, getDayIndex, normalizeDayName } from '@/domain/shared/day-utils';
 
 /**
  * Parse a YYYY-MM-DD string as LOCAL time (not UTC).

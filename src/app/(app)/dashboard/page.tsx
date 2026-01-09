@@ -22,7 +22,7 @@ import { DurabilityStatusCard } from '@/components/durability';
 import { SiteHeader } from '@/components/ui/SiteHeader';
 import { WeeklyCalendar } from '@/components/ui/WeeklyCalendar';
 import confetti from 'canvas-confetti';
-import { RaceCommandBar, CoachingWhisper, MileageGauge, PhaseTimeline, extractPhasesFromWeeks } from '@/components/dashboard';
+import { RaceCommandBar, CoachingWhisper, MileageGauge, PhaseTimeline, extractPhasesFromWeeks, extractBlockSegmentsFromWeeks } from '@/components/dashboard';
 import { toDateKey } from '@/lib/dates';
 
 /**
@@ -434,6 +434,7 @@ export default function DashboardPage() {
                 {plan && plan.weeks.length > 0 && (
                     <PhaseTimeline
                         phases={extractPhasesFromWeeks(plan.weeks.map(w => ({ weekNumber: w.weekNumber, phase: w.phase })))}
+                        blocks={extractBlockSegmentsFromWeeks(plan.weeks.map(w => ({ weekNumber: w.weekNumber, blockType: w.blockType })))}
                         currentWeek={currentWeek ?? 1}
                         totalWeeks={plan.totalWeeks}
                     />

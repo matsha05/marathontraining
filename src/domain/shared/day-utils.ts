@@ -8,6 +8,10 @@ export const DAY_NAME_TO_INDEX: Record<string, number> = {
     saturday: 6,
 };
 
+export function normalizeDayName(dayName: string): string {
+    return dayName.trim().toLowerCase();
+}
+
 export function getDayIndex(dayName: string): number {
-    return DAY_NAME_TO_INDEX[dayName.toLowerCase()] ?? 6;
+    return DAY_NAME_TO_INDEX[normalizeDayName(dayName)] ?? 6;
 }

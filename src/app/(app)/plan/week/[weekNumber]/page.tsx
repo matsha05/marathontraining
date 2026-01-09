@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { usePlan } from '@/domain/plan/context';
-import { WeekBlockType } from '@/domain/plan/types';
+import { getBlockLabel } from '@/domain/plan/block-labels';
 import { formatPace, getDayName } from '@/lib/format';
 import { CheckIcon } from '@/components/ui/check';
 import { AppHeader } from '@/components/ui/SiteHeader';
@@ -30,12 +30,6 @@ interface DayDisplay {
         duration: number;
         exercises: number;
     };
-}
-
-function getBlockLabel(blockType?: WeekBlockType): string | null {
-    if (blockType === 'base_official') return 'Base';
-    if (blockType === 'maintenance') return 'Maintenance';
-    return null;
 }
 
 export default function WeekDetailPage() {

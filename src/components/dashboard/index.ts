@@ -2,4 +2,4 @@
 export { RaceCommandBar } from './RaceCommandBar';
 export { CoachingWhisper } from './CoachingWhisper';
 export { MileageGauge } from './MileageGauge';
-export { PhaseTimeline, extractPhasesFromWeeks } from './PhaseTimeline';
+export { PhaseTimeline, extractPhasesFromWeeks, extractBlockSegmentsFromWeeks } from './PhaseTimeline';

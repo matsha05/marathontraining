@@ -15,6 +15,7 @@
 
 import { OnboardingData } from '@/domain/onboarding/types';
 import { calculateAgeFromDob } from '@/domain/onboarding/utils';
+import { normalizeDayName } from '@/domain/shared/day-utils';
 import { PlanGenerationInput, TrainingPlan, TrainingPhase, WeekPlan } from '@/domain/plan/types';
 import { generatePlan, calculateWeeksToRace, getDateForDay, getWeekStartDate, parseDateOnly, verifyPlan } from '@/domain/plan/generator';
 import { PHASE_DEFINITIONS } from '@/domain/plan/phases';
@@ -114,7 +115,7 @@ export function transformOnboardingToPlanInput(
         : data.age!;
 
     // Get long run day - prefer new array format, fallback to old string
-    const longRunDay = data.longRunDays?.[0] || data.longRunDay || 'saturday';
+    const longRunDay = normalizeDayName(data.longRunDays?.[0] || data.longRunDay || 'saturday');
 
     const input: PlanGenerationInput = {
         // Identity
