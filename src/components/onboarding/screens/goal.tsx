@@ -21,6 +21,7 @@ import {
 import { DatePicker } from '@/components/ui/DatePicker';
 import { OnboardingData, TrainingGoal, FitnessDuration } from '@/domain/onboarding/types';
 import { STEP_TOOLTIPS } from '@/domain/onboarding/types';
+import { calculateWeeksToRace } from '@/domain/plan/date-utils';
 import { toDateKey } from '@/lib/dates';
 import {
     TRAINING_GOALS,
@@ -137,7 +138,7 @@ export function RaceDetailsScreen({
 
     // Calculate weeks to race
     const weeksToRace = data.raceDate
-        ? Math.floor((new Date(data.raceDate).getTime() - Date.now()) / (7 * 24 * 60 * 60 * 1000))
+        ? calculateWeeksToRace(data.raceDate)
         : null;
 
     const minWeeks = MINIMUM_WEEKS[data.trainingGoal ?? 'marathon'];
@@ -148,7 +149,7 @@ export function RaceDetailsScreen({
         onRaceDateChange(normalizedDate);
 
         if (normalizedDate) {
-            const weeks = Math.floor((new Date(normalizedDate).getTime() - Date.now()) / (7 * 24 * 60 * 60 * 1000));
+            const weeks = calculateWeeksToRace(normalizedDate);
             if (weeks < minWeeks) {
                 setDateError(`A ${data.trainingGoal} requires at least ${minWeeks} weeks to prepare safely.`);
             } else {

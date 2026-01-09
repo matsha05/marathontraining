@@ -41,10 +41,16 @@ function createUuidV5(name: string, namespace: string): string {
 }
 
 export function buildTrainingPlanInsert(plan: PersistedPlan, athleteId: string): InsertTrainingPlan {
+    const planType = plan.goalDistance === 'half'
+        ? 'half_marathon'
+        : plan.goalDistance === 'general'
+            ? 'base'
+            : plan.goalDistance;
+
     return {
         id: plan.id,
         athlete_id: athleteId,
-        plan_type: plan.goalDistance,
+        plan_type: planType,
         vdot_at_creation: plan.vdot,
         start_date: plan.weeks[0]?.weekOf || toDateKey(new Date()),
         end_date: plan.raceDate || plan.weeks[plan.weeks.length - 1]?.weekOf || toDateKey(new Date()),

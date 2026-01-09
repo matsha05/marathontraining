@@ -21,6 +21,7 @@ import { STEP_TOOLTIPS } from '@/domain/onboarding/types';
 import { WeekRow } from '@/components/ui/WeekRow';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { toDateKey } from '@/lib/dates';
+import { parseDateOnly } from '@/domain/plan/date-utils';
 import {
     RUNS_PER_WEEK_OPTIONS,
     AVAILABLE_DAYS_OPTIONS,
@@ -390,9 +391,14 @@ export function PlanStartDateScreen({
     const today = getToday();
     const nextMonday = getNextMonday();
     const thisWeekend = getThisWeekend();
+    const startDate = value ? parseDateOnly(value) : null;
+    const raceDateValue = raceDate ? parseDateOnly(raceDate) : null;
+    const weeksAvailable = startDate && raceDateValue
+        ? Math.ceil((raceDateValue.getTime() - startDate.getTime()) / (7 * 24 * 60 * 60 * 1000))
+        : null;
 
     // Validate: start date must be before race date (if set)
-    const isValid = !value || !raceDate || new Date(value) < new Date(raceDate);
+    const isValid = !value || !raceDate || (!!startDate && !!raceDateValue && startDate < raceDateValue);
     const canContinue = value !== null && isValid;
 
     useKeyboardNavigation({
@@ -461,9 +467,9 @@ export function PlanStartDateScreen({
                 </p>
             )}
 
-            {value && isValid && raceDate && (
+            {value && isValid && weeksAvailable !== null && (
                 <p className="text-xs mt-3" style={{ color: 'var(--text-muted)' }}>
-                    That gives you {Math.ceil((new Date(raceDate).getTime() - new Date(value).getTime()) / (7 * 24 * 60 * 60 * 1000))} weeks of training.
+                    That gives you {weeksAvailable} weeks of training.
                 </p>
             )}
 

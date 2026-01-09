@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronRight, RotateCcw, Calendar, Dumbbell } from 'lucide-react';
 import { loadPlanHistory, loadPlanWorkouts, restorePlan } from '@/domain/plan/repository';
 import { useAuth } from '@/domain/auth/context';
+import { parseDateOnly } from '@/domain/plan/date-utils';
 import type { Database } from '@/infrastructure/supabase/types';
 
 type DbTrainingPlan = Database['public']['Tables']['training_plans']['Row'];
@@ -34,10 +35,11 @@ function formatPlanType(planType: string): string {
 }
 
 function formatDateRange(startDate: string, endDate: string): string {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
-    const yearOptions: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+    const start = parseDateOnly(startDate);
+    const end = parseDateOnly(endDate);
+    if (!start || !end) return `${startDate} – ${endDate}`;
+    const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', timeZone: 'UTC' };
+    const yearOptions: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' };
 
     if (start.getFullYear() === end.getFullYear()) {
         return `${start.toLocaleDateString('en-US', options)} – ${end.toLocaleDateString('en-US', yearOptions)}`;

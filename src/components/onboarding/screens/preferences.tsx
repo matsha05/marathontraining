@@ -687,7 +687,7 @@ interface CompleteScreenProps {
 export function CompleteScreen({ data, onViewDashboard, onViewPlan }: CompleteScreenProps) {
     const goalLabel = TRAINING_GOALS.find(g => g.value === data.trainingGoal)?.label ?? 'Training';
     const weeksToRace = data.raceDate
-        ? Math.floor((new Date(data.raceDate).getTime() - Date.now()) / (7 * 24 * 60 * 60 * 1000))
+        ? calculateWeeksToRace(data.raceDate)
         : null;
 
     return (
