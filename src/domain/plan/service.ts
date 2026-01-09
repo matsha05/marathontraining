@@ -351,9 +351,12 @@ export function createPlanFromOnboarding(
 
     // Step 2: Select tier based on philosophy + profile
     const philosophy = onboardingData.trainingPhilosophy ?? 'higdon';
+    const tierDistance = inputResult.data.goalDistance === 'general'
+        ? 'base'
+        : inputResult.data.goalDistance;
     const tierInput: TierSelectionInput = {
         philosophy: philosophy as 'higdon' | 'hansons' | 'pfitzinger' | 'daniels',
-        distance: inputResult.data.goalDistance as 'base' | '5k' | '10k' | 'half' | 'marathon',
+        distance: tierDistance as 'base' | '5k' | '10k' | 'half' | 'marathon',
         experience: mapExperience(onboardingData),
         currentMileage: mapCurrentMileage(onboardingData),
         daysPerWeek: inputResult.data.availableDays,

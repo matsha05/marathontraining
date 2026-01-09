@@ -40,6 +40,17 @@ function createUuidV5(name: string, namespace: string): string {
     ].join('-');
 }
 
+function resolveSessionType(day: PersistedDay): string {
+    if (day.runWorkout) {
+        if (day.runWorkout.type === 'cross_train') return 'cross_train';
+        if (day.runWorkout.type === 'rest') return 'rest';
+        return 'run';
+    }
+
+    if (day.strengthWorkout) return 'strength';
+    return 'rest';
+}
+
 export function buildTrainingPlanInsert(plan: PersistedPlan, athleteId: string): InsertTrainingPlan {
     const planType = plan.goalDistance === 'half'
         ? 'half_marathon'
@@ -95,7 +106,7 @@ function buildPlannedWorkoutInsert(
         athlete_id: athleteId,
         scheduled_date: day.date,
         day_of_week: day.dayOfWeek,
-        session_type: day.runWorkout?.type || 'rest',
+        session_type: resolveSessionType(day),
         prescription,
         status: 'planned',
         durability_modules: null,
