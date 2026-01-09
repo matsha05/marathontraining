@@ -168,7 +168,7 @@ export function generateFRRPlan(
     }));
 
     return {
-        id: `frr-${tier}-${Date.now()}`,
+        id: crypto.randomUUID(),
         createdAt: new Date().toISOString(),
         athleteName: input.name,
         vdot: input.vdot,
@@ -363,7 +363,7 @@ export function generateDanielsPlan(
     }));
 
     return {
-        id: `daniels-${tier}-${Date.now()}`,
+        id: crypto.randomUUID(),
         createdAt: new Date().toISOString(),
         athleteName: input.name,
         vdot: input.vdot,
@@ -580,7 +580,7 @@ export function generateHigdonPlan(
     }));
 
     return {
-        id: `higdon-${tier}-${Date.now()}`,
+        id: crypto.randomUUID(),
         createdAt: new Date().toISOString(),
         athleteName: input.name,
         vdot: input.vdot,
@@ -924,7 +924,7 @@ export function generateHansonsPlan(
         }));
 
     return {
-        id: `hansons-${tier}-${Date.now()}`,
+        id: crypto.randomUUID(),
         createdAt: new Date().toISOString(),
         athleteName: input.name,
         vdot: input.vdot,
@@ -1108,7 +1108,7 @@ export function generatePfitzAMPlan(
         }));
 
     return {
-        id: `pfitz-am-${tier}-${Date.now()}`,
+        id: crypto.randomUUID(),
         createdAt: new Date().toISOString(),
         athleteName: input.name,
         vdot: input.vdot,

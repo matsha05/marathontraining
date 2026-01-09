@@ -2,16 +2,43 @@
  * Plan persistence helpers (server-side).
  */
 
+import { createHash } from 'crypto';
 import type { TrainingPlanPayload } from './schemas';
-import type { Database } from '@/infrastructure/supabase/types';
+import type { Database, Json } from '@/infrastructure/supabase/types';
 import { toDateKey } from '@/lib/dates';
 
 type InsertTrainingPlan = Database['public']['Tables']['training_plans']['Insert'];
 type InsertPlannedWorkout = Database['public']['Tables']['planned_workouts']['Insert'];
+type PlannedWorkoutPrescription = Database['public']['Tables']['planned_workouts']['Insert']['prescription'];
 
 type PersistedPlan = TrainingPlanPayload;
 type PersistedWeek = PersistedPlan['weeks'][number];
 type PersistedDay = PersistedWeek['days'][number];
+
+function toJson(value: unknown): Json {
+    if (value === undefined) return null;
+    return JSON.parse(JSON.stringify(value));
+}
+
+const WORKOUT_ID_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
+
+function createUuidV5(name: string, namespace: string): string {
+    const namespaceBytes = Buffer.from(namespace.replace(/-/g, ''), 'hex');
+    const nameBytes = Buffer.from(name, 'utf8');
+    const hash = createHash('sha1').update(namespaceBytes).update(nameBytes).digest();
+
+    hash[6] = (hash[6] & 0x0f) | 0x50;
+    hash[8] = (hash[8] & 0x3f) | 0x80;
+
+    const hex = hash.subarray(0, 16).toString('hex');
+    return [
+        hex.slice(0, 8),
+        hex.slice(8, 12),
+        hex.slice(12, 16),
+        hex.slice(16, 20),
+        hex.slice(20, 32),
+    ].join('-');
+}
 
 export function buildTrainingPlanInsert(plan: PersistedPlan, athleteId: string): InsertTrainingPlan {
     return {
@@ -50,7 +77,10 @@ function buildPlannedWorkoutInsert(
 ): InsertPlannedWorkout | null {
     if (!day.runWorkout && !day.strengthWorkout) return null;
 
-    const workoutId = `${plan.id}-w${week.weekNumber}-d${day.dayOfWeek}`;
+    const workoutId = createUuidV5(
+        `${plan.id}-w${week.weekNumber}-d${day.dayOfWeek}`,
+        WORKOUT_ID_NAMESPACE
+    );
     const prescription = buildPrescription(day, week, plan);
 
     return {
@@ -60,7 +90,7 @@ function buildPlannedWorkoutInsert(
         scheduled_date: day.date,
         day_of_week: day.dayOfWeek,
         session_type: day.runWorkout?.type || 'rest',
-        prescription: prescription as unknown as Database['public']['Tables']['planned_workouts']['Insert']['prescription'],
+        prescription,
         status: 'planned',
         durability_modules: null,
         fueling_plan: null,
@@ -71,7 +101,7 @@ function buildPrescription(
     day: PersistedDay,
     week: PersistedWeek,
     plan: PersistedPlan
-): Record<string, unknown> {
+): PlannedWorkoutPrescription {
     return {
         run: day.runWorkout ? {
             name: day.runWorkout.name,
@@ -81,14 +111,14 @@ function buildPrescription(
             primaryZone: day.runWorkout.primaryZone,
             purpose: day.runWorkout.purpose,
             coachSource: day.runWorkout.coachSource,
-            segments: day.runWorkout.segments,
-            notes: day.runWorkout.notes,
+            segments: toJson(day.runWorkout.segments ?? []),
+            notes: day.runWorkout.notes ?? null,
         } : null,
         strength: day.strengthWorkout ? {
             name: day.strengthWorkout.name,
             focus: day.strengthWorkout.focus,
             durationMin: day.strengthWorkout.duration,
-            exercises: day.strengthWorkout.exercises,
+            exercises: toJson(day.strengthWorkout.exercises ?? []),
             equipmentNeeded: day.strengthWorkout.equipmentNeeded,
         } : null,
         weekNumber: week.weekNumber,

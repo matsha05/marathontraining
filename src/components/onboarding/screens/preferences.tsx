@@ -25,7 +25,6 @@ import {
     TrainingIntensity,
     TrainingMindset,
     ReadinessStatus,
-    clearOnboardingProgress,
 } from '@/domain/onboarding/types';
 import { STEP_TOOLTIPS } from '@/domain/onboarding/types';
 import {

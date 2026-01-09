@@ -4,12 +4,11 @@ import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { createSupabaseBrowserClient } from '@/infrastructure/supabase';
-import type { User } from '@supabase/supabase-js';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { SettingsIcon } from '@/components/ui/settings';
 import { FlameIcon } from '@/components/ui/flame';
 import { MobileNav } from './MobileNav';
+import { useAuth } from '@/domain/auth/context';
 
 /**
  * SiteHeader - THE single header component for the entire site
@@ -103,31 +102,15 @@ export function SiteHeader({
     rightContent,
     streak,
 }: SiteHeaderProps) {
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
     const [exploreOpen, setExploreOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const { theme, toggleTheme } = useTheme();
     const pathname = usePathname();
     const exploreRef = useRef<HTMLDivElement>(null);
     const userMenuRef = useRef<HTMLDivElement>(null);
+    const { user, status: authStatus, signOut } = useAuth();
 
-    useEffect(() => {
-        const supabase = createSupabaseBrowserClient();
-
-        // Get initial session
-        supabase.auth.getUser().then(({ data }) => {
-            setUser(data.user);
-            setLoading(false);
-        });
-
-        // Listen for auth changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user ?? null);
-        });
-
-        return () => subscription.unsubscribe();
-    }, []);
+    const loading = authStatus === 'loading';
 
     // Close dropdowns when clicking outside
     useEffect(() => {
@@ -157,8 +140,7 @@ export function SiteHeader({
 
     // Handle logout
     const handleLogout = async () => {
-        const supabase = createSupabaseBrowserClient();
-        await supabase.auth.signOut();
+        await signOut();
         setUserMenuOpen(false);
         window.location.href = '/';
     };

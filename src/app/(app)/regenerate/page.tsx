@@ -22,6 +22,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Loader2, Check } from 'lucide-react';
 import { createSupabaseBrowserClient } from '@/infrastructure/supabase';
 import { usePlan } from '@/domain/plan/context';
+import { useAuth } from '@/domain/auth/context';
 
 // Reuse onboarding components
 import {
@@ -79,6 +80,7 @@ type RegenerateStep =
 export default function RegeneratePlanPage() {
     const router = useRouter();
     const { plan, refreshPlan } = usePlan();
+    const { athleteId } = useAuth();
 
     const [step, setStep] = useState<RegenerateStep>('loading');
     const [data, setData] = useState<OnboardingData>(INITIAL_ONBOARDING_DATA);
@@ -247,7 +249,7 @@ export default function RegeneratePlanPage() {
             }
 
             // Save to database (user ID fetched internally)
-            const saveResult = await savePlan(planResult.data);
+            const saveResult = await savePlan(planResult.data, athleteId);
             if (!saveResult.success) {
                 throw new Error(saveResult.error.message || 'Failed to save plan');
             }

@@ -72,12 +72,12 @@ function queuePlanSave(planId: string, payload: TrainingPlanPayload) {
  * 4. On failure: queue for retry, emit 'pending' status
  * 5. On success: emit 'synced' status
  */
-export async function savePlanV2(plan: TrainingPlan): Promise<PlanResult<void>> {
+export async function savePlanV2(plan: TrainingPlan, athleteId?: string | null): Promise<PlanResult<void>> {
     // 1. Emit saving status
     emitSyncEvent('start');
 
     // 2. Optimistic save to cache
-    savePlanCache(plan);
+    savePlanCache(plan, athleteId);
 
     // 3. Save via API
     const payload = toTrainingPlanPayload(plan);
@@ -122,48 +122,61 @@ export async function savePlanViaApiDirectly(payload: unknown): Promise<PlanResu
  * 2. Validate/refresh from server API in background
  * 3. If Supabase has newer version, update cache
  */
-export async function loadPlanV2(): Promise<PlanResult<TrainingPlan | null>> {
+export async function loadPlanV2(athleteId?: string | null): Promise<PlanResult<TrainingPlan | null>> {
     // 1. Try cache first for instant load
-    const cached = loadPlanCache();
+    const cached = loadPlanCache(athleteId);
 
     // 2. Load from API
     const result = await planApiRequest<{ plan: TrainingPlan | null }>('/api/plan/current', 'LOAD_FAILED');
 
     if (!result.success) {
         if (result.error.code === 'AUTH_REQUIRED') {
-            return { success: true, data: cached };
+            return { success: true, data: null };
         }
-        console.warn('[PlanRepository] API load failed, using cache:', result.error);
+        if (result.error.code !== 'NETWORK_ERROR') {
+            console.warn('[PlanRepository] API load failed, using cache:', result.error);
+        }
         return { success: true, data: cached };
     }
 
     const plan = result.data.plan ?? null;
     if (plan) {
-        savePlanCache(plan);
+        savePlanCache(plan, athleteId);
         return { success: true, data: plan };
     }
 
-    // No plan on server - return cache if exists
-    return { success: true, data: cached };
+    // No plan on server - clear cache to avoid stale state
+    clearPlanCache(athleteId);
+    return { success: true, data: null };
 }
 
 /**
  * Check if a plan exists (from cache or Supabase).
  */
-export async function hasPlanV2(): Promise<boolean> {
-    const cached = loadPlanCache();
-    if (cached) return true;
+export async function hasPlanV2(athleteId?: string | null): Promise<boolean> {
+    const cached = loadPlanCache(athleteId);
 
     const result = await planApiRequest<{ plan: TrainingPlan | null }>('/api/plan/current', 'LOAD_FAILED');
-    if (!result.success) return false;
-    return result.data.plan !== null;
+    if (!result.success) {
+        if (result.error.code === 'AUTH_REQUIRED') return false;
+        return Boolean(cached);
+    }
+
+    const plan = result.data.plan ?? null;
+    if (plan) {
+        savePlanCache(plan, athleteId);
+        return true;
+    }
+
+    clearPlanCache(athleteId);
+    return false;
 }
 
 /**
  * Clear the current plan.
  */
-export async function clearPlanV2(): Promise<PlanResult<void>> {
-    clearPlanCache();
+export async function clearPlanV2(athleteId?: string | null): Promise<PlanResult<void>> {
+    clearPlanCache(athleteId);
 
     const result = await planApiRequest<unknown>('/api/plan/clear', 'SAVE_FAILED', {
         method: 'POST',
@@ -177,7 +190,7 @@ export async function clearPlanV2(): Promise<PlanResult<void>> {
  * Restore an archived plan by making it active and deactivating the current plan.
  * Uses a transaction-safe RPC function to ensure atomicity.
  */
-export async function restorePlan(planId: string): Promise<PlanResult<void>> {
+export async function restorePlan(planId: string, athleteId?: string | null): Promise<PlanResult<void>> {
     const result = await planApiRequest<unknown>('/api/plan/restore', 'SAVE_FAILED', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -186,7 +199,7 @@ export async function restorePlan(planId: string): Promise<PlanResult<void>> {
 
     if (result.success) {
         // Clear cache so next load fetches fresh data
-        clearPlanCache();
+        clearPlanCache(athleteId);
     }
 
     return toVoidResult(result);

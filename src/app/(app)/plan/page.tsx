@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { usePlan } from '@/domain/plan/context';
@@ -134,9 +134,11 @@ export default function PlanPage() {
     const planStartLabel = planStartDate ? formatDateLong(planStartDate) : null;
     const weeksToStart = isPrePlan && planStartDate ? calculateWeeksToRace(planStartDate) : null;
 
-    if (selectedWeek === null && currentWeek !== null) {
-        setSelectedWeek(currentWeek > 0 ? currentWeek : 1);
-    }
+    useEffect(() => {
+        if (selectedWeek === null && currentWeek !== null) {
+            setSelectedWeek(currentWeek > 0 ? currentWeek : 1);
+        }
+    }, [selectedWeek, currentWeek]);
 
     // Loading state
     if (status === 'loading') {

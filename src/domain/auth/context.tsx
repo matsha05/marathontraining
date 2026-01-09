@@ -13,10 +13,13 @@ import {
     useState,
     useEffect,
     useCallback,
+    useRef,
     ReactNode,
 } from "react";
 import { createSupabaseBrowserClient } from "@/infrastructure/supabase";
 import type { User } from "@supabase/supabase-js";
+import { clearPlanCache } from "@/domain/plan/repository/cache";
+import { clearOnboardingProgress } from "@/domain/onboarding/types";
 
 // =============================================================================
 // TYPES
@@ -54,6 +57,16 @@ export interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
     const [status, setStatus] = useState<AuthStatus>("loading");
     const [user, setUser] = useState<User | null>(null);
+    const lastAthleteIdRef = useRef<string | null>(null);
+
+    const clearCachedState = useCallback((athleteId?: string | null) => {
+        if (athleteId) {
+            clearPlanCache(athleteId);
+            clearOnboardingProgress(athleteId, true);
+        } else {
+            clearOnboardingProgress(undefined, true);
+        }
+    }, []);
 
     // Load user on mount
     useEffect(() => {
@@ -71,7 +84,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 if (user) {
                     setUser(user);
                     setStatus("authenticated");
+                    lastAthleteIdRef.current = user.id;
                 } else {
+                    clearCachedState(lastAthleteIdRef.current);
+                    lastAthleteIdRef.current = null;
                     setUser(null);
                     setStatus("unauthenticated");
                 }
@@ -79,6 +95,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 // Log auth check failures for debugging but still gracefully fall back
                 console.error('[AuthContext] Failed to get user:', error);
                 if (!cancelled) {
+                    clearCachedState(lastAthleteIdRef.current);
+                    lastAthleteIdRef.current = null;
                     setUser(null);
                     setStatus("unauthenticated");
                 }
@@ -96,7 +114,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
             if (session?.user) {
                 setUser(session.user);
                 setStatus("authenticated");
+                lastAthleteIdRef.current = session.user.id;
             } else {
+                clearCachedState(lastAthleteIdRef.current);
+                lastAthleteIdRef.current = null;
                 setUser(null);
                 setStatus("unauthenticated");
             }
@@ -106,14 +127,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
             cancelled = true;
             subscription.unsubscribe();
         };
-    }, []);
+    }, [clearCachedState]);
 
     const signOut = useCallback(async () => {
         const supabase = createSupabaseBrowserClient();
         await supabase.auth.signOut();
+        clearCachedState(lastAthleteIdRef.current);
+        lastAthleteIdRef.current = null;
         setUser(null);
         setStatus("unauthenticated");
-    }, []);
+    }, [clearCachedState]);
 
     const refreshUser = useCallback(async () => {
         const supabase = createSupabaseBrowserClient();
@@ -123,8 +146,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (user) {
             setUser(user);
             setStatus("authenticated");
+            lastAthleteIdRef.current = user.id;
+        } else {
+            clearCachedState(lastAthleteIdRef.current);
+            lastAthleteIdRef.current = null;
+            setUser(null);
+            setStatus("unauthenticated");
         }
-    }, []);
+    }, [clearCachedState]);
 
     const value: AuthContextValue = {
         status,

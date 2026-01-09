@@ -729,9 +729,21 @@ export function isStepComplete(step: OnboardingStep, data: OnboardingData): bool
 // LOCALSTORAGE PERSISTENCE
 // =============================================================================
 
-const STORAGE_KEY = 'long-game-onboarding';
+const STORAGE_KEY_PREFIX = 'long-game-onboarding';
+const LEGACY_STORAGE_KEY = STORAGE_KEY_PREFIX;
 
-export function saveOnboardingProgress(step: OnboardingStep, data: OnboardingData): void {
+function getOnboardingStorageKey(athleteId?: string | null): string {
+    return athleteId ? `${STORAGE_KEY_PREFIX}-${athleteId}` : LEGACY_STORAGE_KEY;
+}
+
+function migrateLegacyOnboardingProgress(athleteId: string): void {
+    const legacy = safeStorageGetJSON<unknown>(LEGACY_STORAGE_KEY);
+    if (!legacy.success || legacy.data === null) return;
+    safeStorageSetJSON(getOnboardingStorageKey(athleteId), legacy.data);
+    safeStorageRemove(LEGACY_STORAGE_KEY);
+}
+
+export function saveOnboardingProgress(step: OnboardingStep, data: OnboardingData, athleteId?: string | null): void {
     if (typeof window === 'undefined') return;
 
     const saved = {
@@ -740,13 +752,17 @@ export function saveOnboardingProgress(step: OnboardingStep, data: OnboardingDat
         timestamp: Date.now(),
     };
 
-    safeStorageSetJSON(STORAGE_KEY, saved);
+    safeStorageSetJSON(getOnboardingStorageKey(athleteId), saved);
 }
 
-export function loadOnboardingProgress(): { step: OnboardingStep; data: OnboardingData } | null {
+export function loadOnboardingProgress(athleteId?: string | null): { step: OnboardingStep; data: OnboardingData } | null {
     if (typeof window === 'undefined') return null;
 
-    const stored = safeStorageGetJSON<unknown>(STORAGE_KEY);
+    if (athleteId) {
+        migrateLegacyOnboardingProgress(athleteId);
+    }
+
+    const stored = safeStorageGetJSON<unknown>(getOnboardingStorageKey(athleteId));
     if (!stored.success || stored.data === null) return null;
 
     const parsed = stored.data;
@@ -765,7 +781,7 @@ export function loadOnboardingProgress(): { step: OnboardingStep; data: Onboardi
     // Check if saved data is less than 7 days old
     const weekOld = 7 * 24 * 60 * 60 * 1000;
     if (Date.now() - timestamp > weekOld) {
-        clearOnboardingProgress();
+        clearOnboardingProgress(athleteId, true);
         return null;
     }
 
@@ -786,7 +802,10 @@ export function loadOnboardingProgress(): { step: OnboardingStep; data: Onboardi
     };
 }
 
-export function clearOnboardingProgress(): void {
+export function clearOnboardingProgress(athleteId?: string | null, clearLegacy: boolean = false): void {
     if (typeof window === 'undefined') return;
-    safeStorageRemove(STORAGE_KEY);
+    safeStorageRemove(getOnboardingStorageKey(athleteId));
+    if (clearLegacy || athleteId) {
+        safeStorageRemove(LEGACY_STORAGE_KEY);
+    }
 }

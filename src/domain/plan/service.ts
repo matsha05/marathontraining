@@ -464,7 +464,11 @@ export function createPlanFromOnboarding(
         if (planExtended) {
             const phases = plan.phases.map(phase => ({
                 ...phase,
-                config: PHASE_DEFINITIONS[phase.phase],
+                config: {
+                    phase: phase.phase,
+                    weeks: phase.weeks,
+                    ...PHASE_DEFINITIONS[phase.phase],
+                },
             }));
             const baseVerification = verifyPlan(plan.weeks, phases);
             const existingChecks = plan.verification?.checks ?? [];

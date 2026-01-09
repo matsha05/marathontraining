@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronRight, RotateCcw, Calendar, Dumbbell } from 'lucide-react';
 import { loadPlanHistory, loadPlanWorkouts, restorePlan } from '@/domain/plan/repository';
+import { useAuth } from '@/domain/auth/context';
 import type { Database } from '@/infrastructure/supabase/types';
 
 type DbTrainingPlan = Database['public']['Tables']['training_plans']['Row'];
@@ -198,6 +199,7 @@ function PlanCard({ plan, isActive, onRestore, isRestoring }: PlanCardProps) {
 
 export default function PlanHistoryPage() {
     const router = useRouter();
+    const { athleteId } = useAuth();
     const [plans, setPlans] = useState<DbTrainingPlan[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -218,7 +220,7 @@ export default function PlanHistoryPage() {
 
     const handleRestore = async (planId: string) => {
         setRestoringId(planId);
-        const result = await restorePlan(planId);
+        const result = await restorePlan(planId, athleteId);
         if (result.success) {
             // Refresh the list
             const refreshed = await loadPlanHistory();

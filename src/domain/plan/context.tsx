@@ -135,7 +135,7 @@ export function PlanProvider({ children }: PlanProviderProps) {
     //
     // This avoids all race conditions and dependency array complexity.
 
-    const { status: authStatus } = useAuth();
+    const { status: authStatus, athleteId } = useAuth();
     const hasTriggeredLoad = useRef(false);
 
     useEffect(() => {
@@ -146,7 +146,7 @@ export function PlanProvider({ children }: PlanProviderProps) {
             const doLoad = async () => {
                 setStatus('loading');
 
-                const result = await loadPlan();
+                const result = await loadPlan(athleteId);
 
                 if (result.success && result.data) {
                     setPlan(result.data);
@@ -173,7 +173,7 @@ export function PlanProvider({ children }: PlanProviderProps) {
             computeDerivedState(null);
             setStatus('idle');
         }
-    }, [authStatus, computeDerivedState]);
+    }, [authStatus, athleteId, computeDerivedState]);
 
 
 
@@ -196,7 +196,7 @@ export function PlanProvider({ children }: PlanProviderProps) {
             computeDerivedState(result.data);
 
             // Persist (async - don't block)
-            const saveResult = await savePlan(result.data);
+            const saveResult = await savePlan(result.data, athleteId);
             if (!saveResult.success) {
                 console.warn('Failed to persist plan:', saveResult.error);
             }
@@ -208,12 +208,12 @@ export function PlanProvider({ children }: PlanProviderProps) {
             setStatus('error');
             return false;
         }
-    }, [computeDerivedState]);
+    }, [computeDerivedState, athleteId]);
 
     const refreshPlanAction = useCallback(async () => {
         setStatus('loading');
 
-        const result = await loadPlan();
+        const result = await loadPlan(athleteId);
 
         if (result.success && result.data) {
             setPlan(result.data);
@@ -222,15 +222,15 @@ export function PlanProvider({ children }: PlanProviderProps) {
         } else {
             setStatus('idle');
         }
-    }, [computeDerivedState]);
+    }, [computeDerivedState, athleteId]);
 
     const deletePlanAction = useCallback(async () => {
-        await clearPlan();
+        await clearPlan(athleteId);
         setPlan(null);
         computeDerivedState(null);
         setStatus('idle');
         setError(null);
-    }, [computeDerivedState]);
+    }, [computeDerivedState, athleteId]);
 
     const hasPlanAction = useCallback(() => {
         return plan !== null;

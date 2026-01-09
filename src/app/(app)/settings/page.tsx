@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/Badge';
 import { createSupabaseBrowserClient } from '@/infrastructure/supabase';
 import { usePlan } from '@/domain/plan/context';
 import { downloadPlanAsJSON, clearPlan } from '@/domain/plan/service';
+import { useAuth } from '@/domain/auth/context';
 import { apiFetch } from '@/lib/api';
 import { calculateAgeFromDob, getDobBounds } from '@/domain/onboarding/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -57,6 +58,7 @@ function formatPace(seconds: number): string {
 export default function SettingsPage() {
     const router = useRouter();
     const { plan, refreshPlan } = usePlan();
+    const { athleteId } = useAuth();
     const { minDate: minDobDate, maxDate: maxDobDate } = getDobBounds();
 
     // Profile state
@@ -201,7 +203,7 @@ export default function SettingsPage() {
     const handleResetPlan = async () => {
         setResetBusy(true);
         try {
-            await clearPlan();
+            await clearPlan(athleteId);
             await refreshPlan();
             setShowResetModal(false);
             router.push('/regenerate');  // Quick regeneration flow

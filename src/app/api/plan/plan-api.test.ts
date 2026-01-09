@@ -54,7 +54,7 @@ function buildSaveRequest(body: unknown) {
 }
 
 const validPlan = {
-    id: 'plan-1',
+    id: '3b49d356-2b8f-4ef1-9b48-41e9b16b2cfe',
     vdot: 45,
     goalDistance: 'marathon',
     raceDate: '2025-05-01',

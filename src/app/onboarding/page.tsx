@@ -182,7 +182,7 @@ type OnboardingPhase =
 function OnboardingContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const { status: authStatus } = useAuth();
+    const { status: authStatus, athleteId } = useAuth();
 
     // ==========================================================================
     // STATE MACHINE - Single source of truth for which UI to show
@@ -211,17 +211,17 @@ function OnboardingContent() {
             try {
                 // 1. Check if user has an existing plan
                 const { hasPlanV2 } = await import('@/domain/plan/repository');
-                const planExists = await hasPlanV2();
+                const planExists = await hasPlanV2(athleteId);
 
                 if (planExists) {
                     // Clear any stale onboarding progress
-                    clearOnboardingProgress();
+                    clearOnboardingProgress(athleteId);
                     setPhase('has-plan');
                     return;
                 }
 
                 // 2. Check for saved onboarding progress
-                const saved = loadOnboardingProgress();
+                const saved = loadOnboardingProgress(athleteId);
                 if (saved && saved.step !== 'welcome' && saved.step !== 'complete') {
                     setSavedProgress(saved);
                     setPhase('resume-prompt');
@@ -238,7 +238,7 @@ function OnboardingContent() {
         }
 
         initialize();
-    }, [authStatus]);
+    }, [authStatus, athleteId]);
 
     // ==========================================================================
     // SAVE PROGRESS (only when actively onboarding)
@@ -246,9 +246,9 @@ function OnboardingContent() {
 
     useEffect(() => {
         if (phase === 'active' && step !== 'welcome' && step !== 'generating' && step !== 'complete') {
-            saveOnboardingProgress(step, data);
+            saveOnboardingProgress(step, data, athleteId);
         }
-    }, [phase, step, data]);
+    }, [phase, step, data, athleteId]);
 
     // ==========================================================================
     // NAVIGATION HANDLERS
@@ -291,14 +291,14 @@ function OnboardingContent() {
 
     // Start fresh (discard saved progress)
     const handleStartFresh = () => {
-        clearOnboardingProgress();
+        clearOnboardingProgress(athleteId);
         setSavedProgress(null);
         setPhase('active');
     };
 
     // User wants to create new plan despite having one
     const handleCreateNewPlan = () => {
-        clearOnboardingProgress();
+        clearOnboardingProgress(athleteId);
         setPhase('active');
     };
 
@@ -677,8 +677,16 @@ function OnboardingContent() {
                     <CoachRevealScreen
                         data={data}
                         onConfirm={(philosophy) => {
-                            setData(prev => ({ ...prev, trainingPhilosophy: philosophy }));
-                            goToNext();
+                            const updated = { ...data, trainingPhilosophy: philosophy };
+                            const { status, baseWeeksNeeded, maintenanceWeeksNeeded } = calculateReadiness(updated);
+                            setData(prev => ({
+                                ...prev,
+                                trainingPhilosophy: philosophy,
+                                readinessStatus: status,
+                                baseWeeksNeeded,
+                                maintenanceWeeksNeeded,
+                            }));
+                            setStep('readiness-check');
                         }}
                         onBack={goBack}
                     />
@@ -749,11 +757,11 @@ function OnboardingContent() {
                             }
 
                             // 3. Save the training plan
-                            const saveResult = await savePlan(result.data);
+                            const saveResult = await savePlan(result.data, athleteId);
                             if (saveResult.success) {
                                 goToNext();
                             } else {
-                                setGenerationError('Failed to save your plan. Please try again.');
+                                setGenerationError(saveResult.error.message || 'Failed to save your plan. Please try again.');
                                 setStep('readiness-check');
                             }
                         }}
@@ -764,11 +772,11 @@ function OnboardingContent() {
                     <CompleteScreen
                         data={data}
                         onViewDashboard={() => {
-                            clearOnboardingProgress();
+                            clearOnboardingProgress(athleteId);
                             router.push('/dashboard');
                         }}
                         onViewPlan={() => {
-                            clearOnboardingProgress();
+                            clearOnboardingProgress(athleteId);
                             router.push('/plan');
                         }}
                     />
