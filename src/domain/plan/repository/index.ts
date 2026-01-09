@@ -53,6 +53,11 @@ async function savePlanToApi(plan: TrainingPlanPayload): Promise<PlanResult<void
     return toVoidResult(result);
 }
 
+function queuePlanSave(planId: string, payload: TrainingPlanPayload) {
+    queueWrite({ id: planId, type: 'plan', payload: { plan: payload } });
+    emitSyncEvent('pending');
+}
+
 // =============================================================================
 // PUBLIC API
 // =============================================================================
@@ -79,12 +84,13 @@ export async function savePlanV2(plan: TrainingPlan): Promise<PlanResult<void>> 
     const result = await savePlanToApi(payload);
 
     if (!result.success) {
-        // Queue for retry
-        console.error('[PlanRepository] Plan save failed, queuing:', result.error);
-        queueWrite({ id: plan.id, type: 'plan', payload: { plan: payload } });
-        emitSyncEvent('pending');
-        // Return success since we have it cached and queued
-        return { success: true, data: undefined };
+        console.error('[PlanRepository] Plan save failed:', result.error);
+        if (result.error.code === 'NETWORK_ERROR') {
+            queuePlanSave(plan.id, payload);
+            return { success: true, data: undefined };
+        }
+        emitSyncEvent('error');
+        return result;
     }
 
     // 5. Success!

@@ -52,6 +52,7 @@ const pacesSchema = z.object({
 export const trainingPlanSchema = z.object({
     id: z.string().min(1),
     vdot: z.number(),
+    athleteName: z.string().optional(),
     goalDistance: z.string(),
     raceDate: z.string().optional().nullable(),
     weeks: z.array(weekPlanSchema),

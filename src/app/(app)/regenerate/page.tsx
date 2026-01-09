@@ -247,7 +247,10 @@ export default function RegeneratePlanPage() {
             }
 
             // Save to database (user ID fetched internally)
-            await savePlan(planResult.data);
+            const saveResult = await savePlan(planResult.data);
+            if (!saveResult.success) {
+                throw new Error(saveResult.error.message || 'Failed to save plan');
+            }
             await refreshPlan();
 
             setStep('complete');

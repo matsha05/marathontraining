@@ -4,6 +4,7 @@ import type { NextRequest } from 'next/server';
 
 const requireAthleteIdMock = vi.fn();
 const createSupabaseRequestClientMock = vi.fn();
+const getSupabaseServerClientMock = vi.fn();
 const withAuthMock = (
     handler: (request: Request, auth: { athleteId: string; userId: string }) => Promise<Response> | Response,
     options: { onUnauthorized?: (request: Request) => Response } = {}
@@ -23,10 +24,34 @@ vi.mock('@/infrastructure/auth', () => ({
 
 vi.mock('@/infrastructure/supabase/server', () => ({
     createSupabaseRequestClient: createSupabaseRequestClientMock,
+    getSupabaseServerClient: getSupabaseServerClientMock,
 }));
 
 import { POST as savePlan } from '@/app/api/plan/save/route';
 import { GET as getCurrentPlan } from '@/app/api/plan/current/route';
+
+function mockAuthSuccess() {
+    requireAthleteIdMock.mockResolvedValue({
+        athleteId: 'user-1',
+        userId: 'user-1',
+        response: null,
+    });
+}
+
+function mockAuthFailure() {
+    requireAthleteIdMock.mockResolvedValue({
+        athleteId: null,
+        userId: null,
+        response: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }),
+    });
+}
+
+function buildSaveRequest(body: unknown) {
+    return new Request('http://localhost/api/plan/save', {
+        method: 'POST',
+        body: JSON.stringify(body),
+    });
+}
 
 const validPlan = {
     id: 'plan-1',
@@ -64,55 +89,38 @@ describe('plan API routes', () => {
     beforeEach(() => {
         requireAthleteIdMock.mockReset();
         createSupabaseRequestClientMock.mockReset();
+        getSupabaseServerClientMock.mockReset();
+        getSupabaseServerClientMock.mockReturnValue({
+            from: vi.fn(() => ({
+                upsert: vi.fn().mockResolvedValue({ error: null }),
+            })),
+        });
     });
 
     it('rejects save when unauthenticated', async () => {
-        requireAthleteIdMock.mockResolvedValue({
-            athleteId: null,
-            userId: null,
-            response: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }),
-        });
-
-        const request = new Request('http://localhost/api/plan/save', {
-            method: 'POST',
-            body: JSON.stringify({ plan: validPlan }),
-        });
+        mockAuthFailure();
+        const request = buildSaveRequest({ plan: validPlan });
 
         const response = await savePlan(request as NextRequest);
         expect(response.status).toBe(401);
     });
 
     it('validates save request body', async () => {
-        requireAthleteIdMock.mockResolvedValue({
-            athleteId: 'user-1',
-            userId: 'user-1',
-            response: null,
-        });
-
-        const request = new Request('http://localhost/api/plan/save', {
-            method: 'POST',
-            body: JSON.stringify({}),
-        });
+        mockAuthSuccess();
+        const request = buildSaveRequest({});
 
         const response = await savePlan(request as NextRequest);
         expect(response.status).toBe(400);
     });
 
     it('saves plan via rpc', async () => {
-        requireAthleteIdMock.mockResolvedValue({
-            athleteId: 'user-1',
-            userId: 'user-1',
-            response: null,
-        });
+        mockAuthSuccess();
 
         createSupabaseRequestClientMock.mockReturnValue({
             rpc: vi.fn().mockResolvedValue({ error: null }),
         });
 
-        const request = new Request('http://localhost/api/plan/save', {
-            method: 'POST',
-            body: JSON.stringify({ plan: validPlan }),
-        });
+        const request = buildSaveRequest({ plan: validPlan });
 
         const response = await savePlan(request as NextRequest);
         const payload = await response.json();
@@ -122,11 +130,7 @@ describe('plan API routes', () => {
     });
 
     it('returns null when no active plan', async () => {
-        requireAthleteIdMock.mockResolvedValue({
-            athleteId: 'user-1',
-            userId: 'user-1',
-            response: null,
-        });
+        mockAuthSuccess();
 
         const planQuery = {
             select: vi.fn().mockReturnThis(),

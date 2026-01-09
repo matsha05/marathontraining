@@ -3,7 +3,7 @@
 import { Suspense, useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { createSupabaseBrowserClient } from '@/infrastructure/supabase';
 import { getSafeRedirectPath } from '@/lib/redirects';
 import { hasPlan } from '@/domain/plan/service';
@@ -19,7 +19,6 @@ function formatAuthError(code: string, description?: string | null) {
 }
 
 function AuthForm() {
-    const router = useRouter();
     const searchParams = useSearchParams();
     const [email, setEmail] = useState('');
     const [otp, setOtp] = useState(() => Array.from({ length: OTP_LENGTH }, () => ''));
@@ -143,25 +142,31 @@ function AuthForm() {
         setErrorMessage(null);
 
         try {
-            const supabase = createSupabaseBrowserClient();
-            const { data, error } = await supabase.auth.verifyOtp({
-                email: email.toLowerCase().trim(),
-                token: code.trim(),
-                type: 'email',
-            });
+            const normalizedEmail = email.toLowerCase().trim();
 
-            if (error) {
-                setErrorMessage(error.message);
+            if (!normalizedEmail) {
+                setErrorMessage('Enter your email first.');
                 setOtp(Array.from({ length: OTP_LENGTH }, () => ''));
                 inputRefs.current[0]?.focus();
                 return;
             }
 
-            if (nextPath.startsWith('/api')) {
-                window.location.assign(nextPath);
-            } else {
-                router.push(nextPath);
+            const response = await fetch('/api/auth/verify-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: normalizedEmail, token: code.trim() }),
+            });
+
+            const payload = await response.json().catch(() => null);
+
+            if (!response.ok) {
+                setErrorMessage(payload?.error || 'Verification failed');
+                setOtp(Array.from({ length: OTP_LENGTH }, () => ''));
+                inputRefs.current[0]?.focus();
+                return;
             }
+
+            window.location.assign(nextPath);
         } catch (error) {
             setErrorMessage(error instanceof Error ? error.message : 'Verification failed');
             setOtp(Array.from({ length: OTP_LENGTH }, () => ''));

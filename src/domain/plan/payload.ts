@@ -2,11 +2,39 @@ import type { TrainingPlanPayload } from './schemas';
 import type { TrainingPlan } from './types';
 
 type TrainingPlanSource = TrainingPlan | TrainingPlanPayload;
+type DaySource = TrainingPlanSource['weeks'][number]['days'][number];
+type RunWorkoutSource = NonNullable<DaySource['runWorkout']>;
+type StrengthWorkoutSource = NonNullable<DaySource['strengthWorkout']>;
+
+function serializeRunWorkout(workout: RunWorkoutSource) {
+    return {
+        name: workout.name,
+        type: workout.type,
+        totalDistance: workout.totalDistance,
+        estimatedDuration: workout.estimatedDuration,
+        primaryZone: workout.primaryZone,
+        purpose: workout.purpose,
+        coachSource: workout.coachSource,
+        segments: workout.segments ?? [],
+        notes: workout.notes ?? null,
+    };
+}
+
+function serializeStrengthWorkout(workout: StrengthWorkoutSource) {
+    return {
+        name: workout.name,
+        focus: workout.focus ?? [],
+        duration: workout.duration,
+        exercises: workout.exercises ?? [],
+        equipmentNeeded: workout.equipmentNeeded,
+    };
+}
 
 export function toTrainingPlanPayload(plan: TrainingPlanSource): TrainingPlanPayload {
     return {
         id: plan.id,
         vdot: plan.vdot,
+        athleteName: plan.athleteName,
         goalDistance: plan.goalDistance,
         raceDate: plan.raceDate ?? null,
         weeks: plan.weeks.map((week) => ({
@@ -19,28 +47,8 @@ export function toTrainingPlanPayload(plan: TrainingPlanSource): TrainingPlanPay
             days: week.days.map((day) => ({
                 date: day.date,
                 dayOfWeek: day.dayOfWeek,
-                runWorkout: day.runWorkout
-                    ? {
-                        name: day.runWorkout.name,
-                        type: day.runWorkout.type,
-                        totalDistance: day.runWorkout.totalDistance,
-                        estimatedDuration: day.runWorkout.estimatedDuration,
-                        primaryZone: day.runWorkout.primaryZone,
-                        purpose: day.runWorkout.purpose,
-                        coachSource: day.runWorkout.coachSource,
-                        segments: day.runWorkout.segments ?? [],
-                        notes: day.runWorkout.notes ?? null,
-                    }
-                    : null,
-                strengthWorkout: day.strengthWorkout
-                    ? {
-                        name: day.strengthWorkout.name,
-                        focus: day.strengthWorkout.focus ?? [],
-                        duration: day.strengthWorkout.duration,
-                        exercises: day.strengthWorkout.exercises ?? [],
-                        equipmentNeeded: day.strengthWorkout.equipmentNeeded,
-                    }
-                    : null,
+                runWorkout: day.runWorkout ? serializeRunWorkout(day.runWorkout) : null,
+                strengthWorkout: day.strengthWorkout ? serializeStrengthWorkout(day.strengthWorkout) : null,
                 isKeyDay: day.isKeyDay,
             })),
         })),

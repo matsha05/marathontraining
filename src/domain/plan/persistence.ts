@@ -34,27 +34,37 @@ export function buildPlannedWorkoutInserts(
 
     for (const week of plan.weeks) {
         for (const day of week.days) {
-            if (!day.runWorkout && !day.strengthWorkout) continue;
-
-            const workoutId = `${plan.id}-w${week.weekNumber}-d${day.dayOfWeek}`;
-            const prescription = buildPrescription(day, week, plan);
-
-            workoutRows.push({
-                id: workoutId,
-                plan_id: plan.id,
-                athlete_id: athleteId,
-                scheduled_date: day.date,
-                day_of_week: day.dayOfWeek,
-                session_type: day.runWorkout?.type || 'rest',
-                prescription: prescription as unknown as Database['public']['Tables']['planned_workouts']['Insert']['prescription'],
-                status: 'planned',
-                durability_modules: null,
-                fueling_plan: null,
-            });
+            const row = buildPlannedWorkoutInsert(plan, week, day, athleteId);
+            if (row) workoutRows.push(row);
         }
     }
 
     return workoutRows;
+}
+
+function buildPlannedWorkoutInsert(
+    plan: PersistedPlan,
+    week: PersistedWeek,
+    day: PersistedDay,
+    athleteId: string
+): InsertPlannedWorkout | null {
+    if (!day.runWorkout && !day.strengthWorkout) return null;
+
+    const workoutId = `${plan.id}-w${week.weekNumber}-d${day.dayOfWeek}`;
+    const prescription = buildPrescription(day, week, plan);
+
+    return {
+        id: workoutId,
+        plan_id: plan.id,
+        athlete_id: athleteId,
+        scheduled_date: day.date,
+        day_of_week: day.dayOfWeek,
+        session_type: day.runWorkout?.type || 'rest',
+        prescription: prescription as unknown as Database['public']['Tables']['planned_workouts']['Insert']['prescription'],
+        status: 'planned',
+        durability_modules: null,
+        fueling_plan: null,
+    };
 }
 
 function buildPrescription(
