@@ -12,7 +12,7 @@
  * 2. Training goal
  * 3. Race details (if applicable)
  * 4. Schedule (days, long run days, start date)
- * 5. Preferences (intensity, strength)
+ * 5. Preferences (intensity)
  * 6. Generate
  */
 
@@ -22,7 +22,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Loader2, Check } from 'lucide-react';
 import { createSupabaseBrowserClient } from '@/infrastructure/supabase';
 import { usePlan } from '@/domain/plan/context';
-import { useAuth } from '@/domain/auth/context';
+import { useRequireAuth } from '@/domain/auth/context';
+import { fetchAthleteById } from '@/domain/athlete/repository';
 
 // Reuse onboarding components
 import {
@@ -50,7 +51,6 @@ import {
 } from '@/components/onboarding/screens/training-load';
 import {
     TrainingIntensityScreen,
-    StrengthTrainingScreen,
 } from '@/components/onboarding/screens/preferences';
 
 import { OnboardingData, INITIAL_ONBOARDING_DATA, TrainingGoal, TrainingIntensity, getLinearStepProgress } from '@/domain/onboarding/types';
@@ -73,14 +73,13 @@ type RegenerateStep =
     | 'long-run-day'
     | 'plan-start-date'
     | 'training-intensity'
-    | 'strength-training'
     | 'generating'
     | 'complete';
 
 export default function RegeneratePlanPage() {
     const router = useRouter();
     const { plan, refreshPlan } = usePlan();
-    const { athleteId } = useAuth();
+    const { user, athleteId, status: authStatus } = useRequireAuth();
 
     const [step, setStep] = useState<RegenerateStep>('loading');
     const [data, setData] = useState<OnboardingData>(INITIAL_ONBOARDING_DATA);
@@ -93,20 +92,20 @@ export default function RegeneratePlanPage() {
     useEffect(() => {
         const loadUserData = async () => {
             try {
-                const supabase = createSupabaseBrowserClient();
-                const { data: { user } } = await supabase.auth.getUser();
-
-                if (!user) {
-                    router.push('/auth');
-                    return;
-                }
+                if (authStatus === 'loading') return;
+                if (!user || !athleteId) return;
 
                 // Fetch athlete profile
-                const { data: athlete } = await supabase
-                    .from('athletes')
-                    .select('name, date_of_birth, age, sex, avatar')
-                    .eq('id', user.id)
-                    .single();
+                const athlete = await fetchAthleteById<{
+                    name: string;
+                    date_of_birth: string | null;
+                    age: number | null;
+                    sex: string | null;
+                    avatar: string | null;
+                }>(
+                    athleteId,
+                    'name, date_of_birth, age, sex, avatar'
+                );
 
                 const email = user.email || '';
                 const fallbackName = (
@@ -155,7 +154,7 @@ export default function RegeneratePlanPage() {
         };
 
         loadUserData();
-    }, [plan, router]);
+    }, [authStatus, user, athleteId, plan]);
 
     const raceDetailSteps: RegenerateStep[] = data.trainingGoal === 'general' ? [] : ['race-details'];
     const stepOrder: RegenerateStep[] = [
@@ -170,7 +169,6 @@ export default function RegeneratePlanPage() {
         'long-run-day',
         'plan-start-date',
         'training-intensity',
-        'strength-training',
     ];
 
     const goToNext = () => {
@@ -574,23 +572,6 @@ export default function RegeneratePlanPage() {
                                 <TrainingIntensityScreen
                                     value={data.trainingIntensity}
                                     onChange={(trainingIntensity) => setData(prev => ({ ...prev, trainingIntensity: trainingIntensity as TrainingIntensity }))}
-                                    onContinue={goToNext}
-                                    onBack={goBack}
-                                />
-                            </motion.div>
-                        )}
-
-                        {/* Strength Training */}
-                        {step === 'strength-training' && (
-                            <motion.div
-                                key="strength"
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -20 }}
-                            >
-                                <StrengthTrainingScreen
-                                    value={data.includeStrength}
-                                    onChange={(includeStrength) => setData(prev => ({ ...prev, includeStrength }))}
                                     onContinue={goToNext}
                                     onBack={goBack}
                                 />

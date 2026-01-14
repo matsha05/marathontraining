@@ -7,7 +7,8 @@ import { Badge } from '@/components/ui/Badge';
 import { createSupabaseBrowserClient } from '@/infrastructure/supabase';
 import { usePlan } from '@/domain/plan/context';
 import { downloadPlanAsJSON, clearPlan } from '@/domain/plan/service';
-import { useAuth } from '@/domain/auth/context';
+import { useRequireAuth } from '@/domain/auth/context';
+import { fetchAthleteById } from '@/domain/athlete/repository';
 import { apiFetch } from '@/lib/api';
 import { calculateAgeFromDob, getDobBounds } from '@/domain/onboarding/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -58,7 +59,7 @@ function formatPace(seconds: number): string {
 export default function SettingsPage() {
     const router = useRouter();
     const { plan, refreshPlan } = usePlan();
-    const { athleteId } = useAuth();
+    const { user, athleteId, status: authStatus } = useRequireAuth();
     const { minDate: minDobDate, maxDate: maxDobDate } = getDobBounds();
 
     // Profile state
@@ -95,17 +96,26 @@ export default function SettingsPage() {
     // Load profile
     useEffect(() => {
         const fetchData = async () => {
+            if (authStatus === 'loading') return;
             try {
-                const supabase = createSupabaseBrowserClient();
-                const { data: { user } } = await supabase.auth.getUser();
-                if (!user) { setProfileLoading(false); return; }
+                if (!user || !athleteId) {
+                    setProfileLoading(false);
+                    return;
+                }
 
                 const email = user.email || '';
-                const { data: athlete } = await supabase
-                    .from('athletes')
-                    .select('name, date_of_birth, age, avatar, notify_training_reminders, notify_weekly_summary, units')
-                    .eq('id', user.id)
-                    .single();
+                const athlete = await fetchAthleteById<{
+                    name: string;
+                    date_of_birth: string | null;
+                    age: number | null;
+                    avatar: string | null;
+                    notify_training_reminders: boolean | null;
+                    notify_weekly_summary: boolean | null;
+                    units: string | null;
+                }>(
+                    athleteId,
+                    'name, date_of_birth, age, avatar, notify_training_reminders, notify_weekly_summary, units'
+                );
 
                 setProfile({
                     name: athlete?.name || user.user_metadata?.name || email.split('@')[0] || '',
@@ -127,7 +137,7 @@ export default function SettingsPage() {
             }
         };
         fetchData();
-    }, []);
+    }, [authStatus, user, athleteId]);
 
     // Strava status check
     useEffect(() => {

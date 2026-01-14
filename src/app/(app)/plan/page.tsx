@@ -1,15 +1,18 @@
 "use client";
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { usePlan } from '@/domain/plan/context';
+import { useAuth } from '@/domain/auth/context';
 import { TrainingPlan, WeekPlan, TrainingPhase } from '@/domain/plan/types';
 import { getBlockLabel } from '@/domain/plan/block-labels';
 import { calculateWeeksToRace, formatDateLong } from '@/domain/plan/date-utils';
 import { motion } from 'framer-motion';
 import { SiteHeader } from '@/components/ui/SiteHeader';
 import { MobileScroller } from '@/components/ui/MobileScroller';
+import { Toggle } from '@/components/ui/Toggle';
+import { useStrengthVisibility } from '@/hooks/useStrengthVisibility';
 
 /**
  * Training Plan View V2
@@ -32,6 +35,15 @@ interface WeekDisplay {
     blockLabel?: string | null;
 }
 
+const PHASE_LABELS: Record<TrainingPhase, string> = {
+    base: 'Base',
+    build: 'Build',
+    peak: 'Peak',
+    taper: 'Taper',
+};
+
+const PHASE_ORDER: TrainingPhase[] = ['base', 'build', 'peak', 'taper'];
+
 function formatPhaseDisplay(plan: TrainingPlan, currentWeekNum: number): PhaseDisplay[] {
     if (!plan.phases || plan.phases.length === 0) {
         const phaseMap = new Map<TrainingPhase, { start: number; end: number }>();
@@ -51,15 +63,8 @@ function formatPhaseDisplay(plan: TrainingPlan, currentWeekNum: number): PhaseDi
                     currentWeekNum >= range.start && currentWeekNum <= range.end ? 'current' :
                         'upcoming';
 
-            const phaseNames: Record<TrainingPhase, string> = {
-                base: 'Base',
-                build: 'Build',
-                peak: 'Peak',
-                taper: 'Taper',
-            };
-
             return {
-                name: phaseNames[phase] || phase,
+                name: PHASE_LABELS[phase] || phase,
                 weeks: range.start === range.end
                     ? `${range.start}`
                     : `${range.start}-${range.end}`,
@@ -74,15 +79,8 @@ function formatPhaseDisplay(plan: TrainingPlan, currentWeekNum: number): PhaseDi
                 currentWeekNum >= phase.startWeek && currentWeekNum <= phase.endWeek ? 'current' :
                     'upcoming';
 
-        const phaseNames: Record<TrainingPhase, string> = {
-            base: 'Base',
-            build: 'Build',
-            peak: 'Peak',
-            taper: 'Taper',
-        };
-
         return {
-            name: phaseNames[phase.phase] || phase.phase,
+            name: PHASE_LABELS[phase.phase] || phase.phase,
             weeks: phase.startWeek === phase.endWeek
                 ? `${phase.startWeek}`
                 : `${phase.startWeek}-${phase.endWeek}`,
@@ -91,21 +89,25 @@ function formatPhaseDisplay(plan: TrainingPlan, currentWeekNum: number): PhaseDi
     });
 }
 
+function toWeekDisplay(week: WeekPlan, currentWeekNum: number): WeekDisplay {
+    return {
+        number: week.weekNumber,
+        mileage: Math.round(week.totalMiles),
+        quality: week.keyWorkouts,
+        phase: (PHASE_LABELS[week.phase] || week.phase).toString(),
+        isCurrent: week.weekNumber === currentWeekNum,
+        cutback: week.isRecoveryWeek,
+        blockLabel: getBlockLabel(week.blockType),
+    };
+}
+
 function formatWeekDisplay(weeks: WeekPlan[], currentWeekNum: number): WeekDisplay[] {
     const startWeek = Math.max(1, currentWeekNum - 2);
     const endWeek = Math.min(weeks.length, currentWeekNum + 5);
 
     return weeks
         .filter(w => w.weekNumber >= startWeek && w.weekNumber <= endWeek)
-        .map(week => ({
-            number: week.weekNumber,
-            mileage: Math.round(week.totalMiles),
-            quality: week.keyWorkouts,
-            phase: week.phase.charAt(0).toUpperCase() + week.phase.slice(1),
-            isCurrent: week.weekNumber === currentWeekNum,
-            cutback: week.isRecoveryWeek,
-            blockLabel: getBlockLabel(week.blockType),
-        }));
+        .map(week => toWeekDisplay(week, currentWeekNum));
 }
 
 function getWeeksUntilRace(raceDate: string | undefined): number | null {
@@ -116,29 +118,40 @@ function getWeeksUntilRace(raceDate: string | undefined): number | null {
 export default function PlanPage() {
     const router = useRouter();
     const { status, plan, currentWeek } = usePlan();
-    const [selectedWeek, setSelectedWeek] = useState<number | null>(null);
+    const { athleteId } = useAuth();
+    const { showStrength, setShowStrength } = useStrengthVisibility(false, athleteId);
+    const [phaseFilter, setPhaseFilter] = useState<'all' | TrainingPhase>('all');
 
     const phases = useMemo(() => {
         if (!plan) return [];
         return formatPhaseDisplay(plan, currentWeek ?? 1);
     }, [plan, currentWeek]);
 
+    const phaseOptions = useMemo(() => {
+        if (!plan) return [];
+        const presentPhases = new Set(plan.weeks.map(week => week.phase));
+        return PHASE_ORDER.filter(phase => presentPhases.has(phase));
+    }, [plan]);
+
     const weeks = useMemo(() => {
         if (!plan) return [];
-        return formatWeekDisplay(plan.weeks, currentWeek ?? 1);
-    }, [plan, currentWeek]);
+        if (phaseFilter === 'all') {
+            return formatWeekDisplay(plan.weeks, currentWeek ?? 1);
+        }
+        return plan.weeks
+            .filter(week => week.phase === phaseFilter)
+            .map(week => toWeekDisplay(week, currentWeek ?? 1));
+    }, [plan, currentWeek, phaseFilter]);
+
+    const selectedWeek = phaseFilter === 'all'
+        ? (currentWeek && currentWeek > 0 ? currentWeek : 1)
+        : (weeks[0]?.number ?? null);
 
     const weeksUntilRace = plan?.raceDate ? getWeeksUntilRace(plan.raceDate) : null;
     const planStartDate = plan?.weeks[0]?.weekOf;
     const isPrePlan = currentWeek === 0 && !!planStartDate;
     const planStartLabel = planStartDate ? formatDateLong(planStartDate) : null;
     const weeksToStart = isPrePlan && planStartDate ? calculateWeeksToRace(planStartDate) : null;
-
-    useEffect(() => {
-        if (selectedWeek === null && currentWeek !== null) {
-            setSelectedWeek(currentWeek > 0 ? currentWeek : 1);
-        }
-    }, [selectedWeek, currentWeek]);
 
     // Loading state
     if (status === 'loading') {
@@ -179,6 +192,7 @@ export default function PlanPage() {
     const totalStrengthSessions = plan.weeks.reduce((sum, w) =>
         sum + w.days.filter(d => d.strengthWorkout).length, 0
     );
+    const overviewColumns = showStrength ? 'md:grid-cols-4' : 'md:grid-cols-3';
 
     return (
         <div className="v3-root min-h-screen">
@@ -290,6 +304,30 @@ export default function PlanPage() {
                     transition={{ duration: 0.4, delay: 0.1 }}
                 >
                     <h2 className="v3-heading-md mb-4">Weekly Plan</h2>
+                    <div className="flex flex-wrap items-center gap-2 mb-4">
+                        <button
+                            type="button"
+                            onClick={() => setPhaseFilter('all')}
+                            className={`v3-btn v3-btn-sm ${phaseFilter === 'all' ? 'v3-btn-primary' : 'v3-btn-secondary'}`}
+                        >
+                            All weeks
+                        </button>
+                        {phaseOptions.map(phase => (
+                            <button
+                                key={phase}
+                                type="button"
+                                onClick={() => setPhaseFilter(phase)}
+                                className={`v3-btn v3-btn-sm ${phaseFilter === phase ? 'v3-btn-primary' : 'v3-btn-secondary'}`}
+                            >
+                                {PHASE_LABELS[phase]}
+                            </button>
+                        ))}
+                    </div>
+                    {phaseFilter !== 'all' && (
+                        <p className="v3-body-xs mb-3" style={{ color: 'var(--text-muted)' }}>
+                            Showing {PHASE_LABELS[phaseFilter]} weeks only
+                        </p>
+                    )}
                     <div className="space-y-3">
                         {weeks.map((week, i) => (
                             <motion.div
@@ -376,6 +414,44 @@ export default function PlanPage() {
                     </div>
                 </motion.section>
 
+                {/* Strength Add-On - Optional */}
+                <motion.section
+                    className="mb-10"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.18 }}
+                >
+                    <div
+                        className="v3-card p-5"
+                        style={{
+                            border: '1px solid var(--border-base)',
+                            background: 'linear-gradient(135deg, color-mix(in srgb, var(--color-strength) 14%, var(--bg-elevated)) 0%, var(--bg-elevated) 60%)',
+                        }}
+                    >
+                        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                            <div>
+                                <p className="v3-label mb-1" style={{ color: 'var(--text-muted)' }}>
+                                    Strength add-on
+                                </p>
+                                <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
+                                    Optional sessions, not part of the coach plan.
+                                </p>
+                            </div>
+                            <div className="min-w-[220px]">
+                                <Toggle
+                                    checked={showStrength}
+                                    onChange={setShowStrength}
+                                    label="Show strength add-on"
+                                    description={showStrength
+                                        ? 'Strength sessions are visible in this plan.'
+                                        : 'Keeps the plan strictly coach only.'}
+                                    size="sm"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </motion.section>
+
                 {/* Plan Stats */}
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
@@ -383,7 +459,7 @@ export default function PlanPage() {
                     transition={{ duration: 0.4, delay: 0.2 }}
                 >
                     <h2 className="v3-heading-md mb-4">Plan Overview</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className={`grid grid-cols-1 sm:grid-cols-2 ${overviewColumns} gap-4`}>
                         <div className="v3-card p-5">
                             <p className="v3-heading-lg v3-mono mb-1">{plan.totalWeeks}</p>
                             <p className="v3-label mb-1">Weeks</p>
@@ -399,11 +475,13 @@ export default function PlanPage() {
                             <p className="v3-label mb-1">Quality</p>
                             <p className="v3-mono text-[10px]" style={{ color: 'var(--text-muted)' }}>Total sessions</p>
                         </div>
-                        <div className="v3-card p-5">
-                            <p className="v3-heading-lg v3-mono mb-1">{totalStrengthSessions}</p>
-                            <p className="v3-label mb-1">Strength</p>
-                            <p className="v3-mono text-[10px]" style={{ color: 'var(--text-muted)' }}>Total sessions</p>
-                        </div>
+                        {showStrength && (
+                            <div className="v3-card p-5">
+                                <p className="v3-heading-lg v3-mono mb-1">{totalStrengthSessions}</p>
+                                <p className="v3-label mb-1">Strength</p>
+                                <p className="v3-mono text-[10px]" style={{ color: 'var(--text-muted)' }}>Total sessions</p>
+                            </div>
+                        )}
                     </div>
                 </motion.section>
             </main>

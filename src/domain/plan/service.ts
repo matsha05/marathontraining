@@ -90,13 +90,14 @@ export type PlanErrorCode =
 export function transformOnboardingToPlanInput(
     data: OnboardingData
 ): ServiceResult<PlanGenerationInput> {
-    // Calculate age from DOB if not already set (before validation)
-    if (data.age === null && data.dateOfBirth) {
-        data.age = calculateAgeFromDateOfBirth(data.dateOfBirth);
-    }
+    const normalizedAge = data.age ?? (data.dateOfBirth ? calculateAgeFromDateOfBirth(data.dateOfBirth) : null);
+    const normalizedData: OnboardingData = {
+        ...data,
+        age: normalizedAge,
+    };
 
     // Validate required fields
-    const validation = validateOnboardingData(data);
+    const validation = validateOnboardingData(normalizedData);
     if (!validation.valid) {
         return {
             success: false,
@@ -110,48 +111,48 @@ export function transformOnboardingToPlanInput(
 
     // Transform with type coercion (validation already passed)
     // Calculate age from DOB if available, otherwise use stored age
-    const age = data.dateOfBirth
-        ? calculateAgeFromDateOfBirth(data.dateOfBirth)
-        : data.age!;
+    const age = normalizedData.dateOfBirth
+        ? calculateAgeFromDateOfBirth(normalizedData.dateOfBirth)
+        : normalizedData.age!;
 
     // Get long run day - prefer new array format, fallback to old string
-    const longRunDay = normalizeDayName(data.longRunDays?.[0] || data.longRunDay || 'saturday');
+    const longRunDay = normalizeDayName(normalizedData.longRunDays?.[0] || normalizedData.longRunDay || 'saturday');
 
     const input: PlanGenerationInput = {
         // Identity
-        name: data.name,
+        name: normalizedData.name,
         age,
-        sex: data.sex!,
+        sex: normalizedData.sex!,
 
         // VDOT
-        vdot: data.vdot!,
-        vdotConfidence: data.vdotConfidence!,
+        vdot: normalizedData.vdot!,
+        vdotConfidence: normalizedData.vdotConfidence!,
 
         // Goal
-        goalDistance: data.trainingGoal!,
-        raceName: data.raceName || undefined,
-        raceDate: data.raceDate || undefined,
-        planStartDate: data.planStartDate || undefined,
-        fitnessDuration: data.fitnessDuration || undefined,
+        goalDistance: normalizedData.trainingGoal!,
+        raceName: normalizedData.raceName || undefined,
+        raceDate: normalizedData.raceDate || undefined,
+        planStartDate: normalizedData.planStartDate || undefined,
+        fitnessDuration: normalizedData.fitnessDuration || undefined,
 
         // Training load
-        weeklyMiles: data.weeklyMiles!,
-        runsPerWeek: data.runsPerWeek!,
-        longestRecentRun: data.longestRecentRun!,
+        weeklyMiles: normalizedData.weeklyMiles!,
+        runsPerWeek: normalizedData.runsPerWeek!,
+        longestRecentRun: normalizedData.longestRecentRun!,
 
         // Schedule
-        availableDays: clampAvailableDays(data.availableDays!),
+        availableDays: clampAvailableDays(normalizedData.availableDays!),
         longRunDay,
 
         // Safety
-        currentPain: data.hasCurrentPain ?? false,
-        painLocation: data.painLocation || undefined,
-        recentInjury: data.hasRecentInjury ?? false,
-        injuryLocation: data.injuryLocation || undefined,
+        currentPain: normalizedData.hasCurrentPain ?? false,
+        painLocation: normalizedData.painLocation || undefined,
+        recentInjury: normalizedData.hasRecentInjury ?? false,
+        injuryLocation: normalizedData.injuryLocation || undefined,
 
         // Preferences
-        trainingIntensity: data.trainingIntensity!,
-        includeStrength: data.includeStrength ?? true,
+        trainingIntensity: normalizedData.trainingIntensity!,
+        includeStrength: normalizedData.includeStrength ?? true,
     };
 
     return { success: true, data: input };
@@ -298,7 +299,7 @@ function derivePlanMetrics(weeks: WeekPlan[]): Pick<TrainingPlan, 'peakMileage' 
 
     weeks.forEach(week => {
         totalMiles += week.totalMiles;
-        if (week.totalMiles > peakMileage) {
+        if (week.totalMiles >= peakMileage) {
             peakMileage = week.totalMiles;
             peakWeek = week.weekNumber;
         }

@@ -22,8 +22,8 @@ import {
     parseWodFavorites,
     saveWodFavoritesToStorage,
 } from "@/domain/plan/wod-favorites";
-import { createSupabaseBrowserClient } from "@/infrastructure/supabase";
 import { useAuth } from "@/domain/auth/context";
+import { fetchAthleteById, updateAthleteById } from "@/domain/athlete/repository";
 
 const ease = [0.25, 0.46, 0.45, 0.94] as const;
 
@@ -64,44 +64,41 @@ export default function WodLibraryPage() {
     const [favorites, setFavorites] = useState<string[]>([]);
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
     const [expandedWod, setExpandedWod] = useState<string | null>(null);
-    const { user, status: authStatus } = useAuth();
+    const { user, athleteId, status: authStatus } = useAuth();
 
     // Load user and favorites
     useEffect(() => {
         if (authStatus === 'loading') return;
 
-        if (!user) {
+        if (!user || !athleteId) {
             setFavorites(loadWodFavoritesFromStorage());
             return;
         }
 
-        const supabase = createSupabaseBrowserClient();
         const loadFavorites = async () => {
             try {
-                const { data: athlete } = await supabase
-                    .from('athletes')
-                    .select('*')
-                    .eq('user_id', user.id)
-                    .single();
+                const athlete = await fetchAthleteById<{ wod_favorites?: string[] }>(
+                    athleteId,
+                    'wod_favorites'
+                );
 
-                const athleteData = athlete as { wod_favorites?: string[] } | null;
-                if (athleteData?.wod_favorites) {
-                    const validated = parseWodFavorites(athleteData.wod_favorites);
+                if (athlete?.wod_favorites) {
+                    const validated = parseWodFavorites(athlete.wod_favorites);
                     if (validated) {
                         setFavorites(validated);
                         return;
                     }
                 }
 
-                setFavorites(loadWodFavoritesFromStorage());
+                setFavorites(loadWodFavoritesFromStorage(athleteId));
             } catch (error) {
                 console.warn('[WodLibrary] Supabase favorites not available, using localStorage:', error);
-                setFavorites(loadWodFavoritesFromStorage());
+                setFavorites(loadWodFavoritesFromStorage(athleteId));
             }
         };
 
         loadFavorites();
-    }, [user, authStatus]);
+    }, [user, athleteId, authStatus]);
 
     // Toggle favorite - saves to Supabase if logged in, otherwise localStorage
     const toggleFavorite = useCallback(async (wodId: string) => {
@@ -111,23 +108,16 @@ export default function WodLibraryPage() {
 
         setFavorites(next);
 
-        if (user) {
-            // Save to Supabase - use type assertion for new column
-            const supabase = createSupabaseBrowserClient();
-            try {
-                await supabase
-                    .from('athletes')
-                    .update({ wod_favorites: next } as Record<string, unknown>)
-                    .eq('user_id', user.id);
-            } catch {
-                // Column doesn't exist yet - fallback to localStorage
-                saveWodFavoritesToStorage(next);
+        if (user && athleteId) {
+            const updated = await updateAthleteById(athleteId, { wod_favorites: next });
+            if (!updated) {
+                saveWodFavoritesToStorage(next, athleteId);
             }
         } else {
             // Save to localStorage
             saveWodFavoritesToStorage(next);
         }
-    }, [favorites, user]);
+    }, [favorites, user, athleteId]);
 
     // Filter WODs
     let filteredWods = [...WOD_LIBRARY];

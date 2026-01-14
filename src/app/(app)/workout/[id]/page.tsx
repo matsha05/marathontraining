@@ -5,13 +5,15 @@ import { useRouter } from 'next/navigation';
 import { SiteHeader } from '@/components/ui/SiteHeader';
 import { handleMissedWorkout, MissedWorkoutDecision } from '@/domain/plan-generator/missed-workout-handler';
 import { usePlan } from '@/domain/plan/context';
-import { useAuth } from '@/domain/auth/context';
+import { useRequireAuth } from '@/domain/auth/context';
+import { fetchAthleteById } from '@/domain/athlete/repository';
 import { DayPlan, Workout, TrainingZone, WorkoutType } from '@/domain/plan/types';
 import { WorkoutSkeleton } from '@/components/ui/Skeleton';
 import { formatPace, formatPaceRange, getPaceForZone, formatDuration } from '@/lib/format';
 import { paceZoneToHRZone, estimateMaxHR } from '@/domain/hr/zones';
 import { HeartIcon } from '@/components/ui/heart';
 import { CoachingContextCard, PhaseBanner } from '@/components/coaching';
+import { useStrengthVisibility } from '@/hooks/useStrengthVisibility';
 
 /**
  * Workout Detail Page
@@ -49,7 +51,8 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
     const resolvedParams = use(params);
     const router = useRouter();
     const { plan, currentWeek, currentWeekPlan, todayWorkout } = usePlan();
-    const { athleteId } = useAuth();
+    const { athleteId } = useRequireAuth();
+    const { showStrength } = useStrengthVisibility(false, athleteId);
     const [showLogging, setShowLogging] = useState(false);
     const [workout, setWorkout] = useState<DayPlan | null>(null);
     const [loading, setLoading] = useState(true);
@@ -61,16 +64,13 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
         const fetchAthleteAge = async () => {
             if (!athleteId) return;
             try {
-                const { createSupabaseBrowserClient } = await import('@/infrastructure/supabase');
-                const supabase = createSupabaseBrowserClient();
-                const { data } = await supabase
-                    .from('athletes')
-                    .select('age')
-                    .eq('id', athleteId)
-                    .single();
-                if (data?.age) {
-                    setAthleteAge(data.age);
-                    setMaxHR(estimateMaxHR(data.age));
+                const athlete = await fetchAthleteById<{ age: number | null }>(
+                    athleteId,
+                    'age'
+                );
+                if (athlete?.age) {
+                    setAthleteAge(athlete.age);
+                    setMaxHR(estimateMaxHR(athlete.age));
                 }
             } catch (e) {
                 console.warn('Failed to fetch athlete age:', e);
@@ -477,7 +477,7 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
                 )}
 
                 {/* Strength Work */}
-                {workout.strengthWorkout && (
+                {showStrength && workout.strengthWorkout && (
                     <section className="mb-8">
                         <h2 className="v3-heading-sm mb-4">Strength Training</h2>
                         <div
@@ -520,6 +520,7 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
             {showLogging && (
                 <WorkoutLoggingModal
                     workout={workout}
+                    athleteId={athleteId}
                     onClose={() => setShowLogging(false)}
                     onComplete={async () => {
                         setShowLogging(false);
@@ -536,10 +537,12 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
  */
 function WorkoutLoggingModal({
     workout,
+    athleteId,
     onClose,
     onComplete
 }: {
     workout: DayPlan;
+    athleteId: string | null;
     onClose: () => void;
     onComplete: () => void;
 }) {
@@ -561,40 +564,41 @@ function WorkoutLoggingModal({
         try {
             const { createSupabaseBrowserClient } = await import('@/infrastructure/supabase');
             const supabase = createSupabaseBrowserClient();
-            const { data: { user } } = await supabase.auth.getUser();
-
-            if (user) {
-                let plannedWorkoutId: string | null = null;
-
-                const { data: plannedWorkout } = await supabase
-                    .from('planned_workouts')
-                    .select('id')
-                    .eq('athlete_id', user.id)
-                    .eq('scheduled_date', workout.date)
-                    .single();
-
-                if (plannedWorkout) {
-                    plannedWorkoutId = plannedWorkout.id;
-
-                    await supabase
-                        .from('planned_workouts')
-                        .update({ status: completed === 'full' ? 'completed' : completed === 'partial' ? 'partial' : 'skipped' })
-                        .eq('id', plannedWorkoutId);
-                }
-
-                await supabase.from('completed_workouts').insert({
-                    athlete_id: user.id,
-                    completed_date: workout.date,
-                    planned_workout_id: plannedWorkoutId,
-                    actual_session: JSON.parse(JSON.stringify({
-                        completed,
-                        feelRating,
-                        notes,
-                        runWorkout: workout.runWorkout,
-                        strengthWorkout: workout.strengthWorkout,
-                    })),
-                });
+            if (!athleteId) {
+                onComplete();
+                return;
             }
+
+            let plannedWorkoutId: string | null = null;
+
+            const { data: plannedWorkout } = await supabase
+                .from('planned_workouts')
+                .select('id')
+                .eq('athlete_id', athleteId)
+                .eq('scheduled_date', workout.date)
+                .single();
+
+            if (plannedWorkout) {
+                plannedWorkoutId = plannedWorkout.id;
+
+                await supabase
+                    .from('planned_workouts')
+                    .update({ status: completed === 'full' ? 'completed' : completed === 'partial' ? 'partial' : 'skipped' })
+                    .eq('id', plannedWorkoutId);
+            }
+
+            await supabase.from('completed_workouts').insert({
+                athlete_id: athleteId,
+                completed_date: workout.date,
+                planned_workout_id: plannedWorkoutId,
+                actual_session: JSON.parse(JSON.stringify({
+                    completed,
+                    feelRating,
+                    notes,
+                    runWorkout: workout.runWorkout,
+                    strengthWorkout: workout.strengthWorkout,
+                })),
+            });
 
             onComplete();
         } catch (error) {

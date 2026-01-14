@@ -21,9 +21,12 @@ import { RecalibrationModal } from '@/components/vdot/RecalibrationModal';
 import { DurabilityStatusCard } from '@/components/durability';
 import { SiteHeader } from '@/components/ui/SiteHeader';
 import { WeeklyCalendar } from '@/components/ui/WeeklyCalendar';
+import { Toggle } from '@/components/ui/Toggle';
+import { fetchAthleteById } from '@/domain/athlete/repository';
 import confetti from 'canvas-confetti';
 import { RaceCommandBar, CoachingWhisper, MileageGauge, PhaseTimeline, extractPhasesFromWeeks, extractBlockSegmentsFromWeeks } from '@/components/dashboard';
 import { toDateKey } from '@/lib/dates';
+import { useStrengthVisibility } from '@/hooks/useStrengthVisibility';
 
 /**
  * THE LONG GAME - Dashboard V2
@@ -118,6 +121,7 @@ export default function DashboardPage() {
     const [maxHROverride, setMaxHROverride] = useState<number | null>(null);
     const [completedToday, setCompletedToday] = useState<Set<string>>(new Set());
     const [viewingWeek, setViewingWeek] = useState<number | null>(null);  // null = current week
+    const { showStrength, setShowStrength } = useStrengthVisibility(false, athleteId);
 
     // Handle VDOT recalibration
     const handleRecalibrate = async (newVdot: number) => {
@@ -142,12 +146,10 @@ export default function DashboardPage() {
             try {
                 const { createSupabaseBrowserClient } = await import('@/infrastructure/supabase');
                 const supabase = createSupabaseBrowserClient();
-
-                const { data: athleteData } = await supabase
-                    .from('athletes')
-                    .select('name, age')
-                    .eq('id', athleteId)
-                    .single();
+                const athleteData = await fetchAthleteById<{ name: string | null; age: number | null }>(
+                    athleteId,
+                    'name, age'
+                );
 
                 if (athleteData) {
                     setAthlete({
@@ -250,7 +252,7 @@ export default function DashboardPage() {
             });
         }
 
-        if (todayWorkout.strengthWorkout) {
+        if (showStrength && todayWorkout.strengthWorkout) {
             const strength = todayWorkout.strengthWorkout;
             const exerciseSummary = strength.exercises
                 .slice(0, 2)
@@ -269,7 +271,7 @@ export default function DashboardPage() {
         }
 
         return workouts;
-    }, [todayWorkout, plan]);
+    }, [todayWorkout, plan, showStrength]);
 
     // Build week overview from plan data - MUST be before any conditional returns
     const weekOverview = useMemo(() => {
@@ -349,6 +351,7 @@ export default function DashboardPage() {
                     distance: undefined,
                     workoutType: 'rest' as const,
                     date: dateStr,
+                    hasStrength: false,
                 };
             }
 
@@ -372,7 +375,7 @@ export default function DashboardPage() {
             };
 
             const info = typeInfo[workout.type] || { label: 'Easy', workoutType: 'easy' as const };
-            const hasStrength = !!dayPlan.strengthWorkout;
+            const hasStrength = showStrength && !!dayPlan.strengthWorkout;
 
             return {
                 day: getDayName(dayNum).toUpperCase(),
@@ -386,7 +389,7 @@ export default function DashboardPage() {
                 date: dateStr,
             };
         });
-    }, [viewingWeek, currentWeek, plan]);
+    }, [viewingWeek, currentWeek, plan, showStrength]);
 
     // Determine if today is a quality session (Starrett: "before I go smash myself")
     const isQualityDay = useMemo(() => {
@@ -411,6 +414,9 @@ export default function DashboardPage() {
     const defaultWeekNum = currentWeek && currentWeek > 0 ? currentWeek : 1;
     const calendarWeekNum = viewingWeek ?? defaultWeekNum;
     const calendarWeekPlan = plan?.weeks.find(w => w.weekNumber === calendarWeekNum) ?? plan?.weeks[0] ?? null;
+    const strengthSessionsThisWeek = calendarWeekPlan
+        ? calendarWeekPlan.days.filter(day => day.strengthWorkout).length
+        : 0;
 
 
     return (
@@ -611,6 +617,56 @@ export default function DashboardPage() {
                         weekNumber={currentWeek ?? 1}
                         totalWeeks={plan.totalWeeks}
                     />
+                )}
+
+                {/* Strength Add-On - Optional */}
+                {plan && (
+                    <motion.section
+                        className="mb-10"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.16 }}
+                    >
+                        <div
+                            className="v3-card p-6"
+                            style={{
+                                border: '1px solid var(--border-base)',
+                                background: 'linear-gradient(135deg, color-mix(in srgb, var(--color-strength) 16%, var(--bg-elevated)) 0%, var(--bg-elevated) 60%)',
+                            }}
+                        >
+                            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                                <div className="flex items-start gap-3">
+                                    <div
+                                        className="w-10 h-10 rounded-xl flex items-center justify-center"
+                                        style={{ background: 'color-mix(in srgb, var(--color-strength) 20%, var(--bg-muted))' }}
+                                    >
+                                        <ChartBarIncreasingIcon size={18} style={{ color: 'var(--color-strength)' }} />
+                                    </div>
+                                    <div>
+                                        <p className="v3-label mb-1" style={{ color: 'var(--text-muted)' }}>
+                                            Strength add-on
+                                        </p>
+                                        <p className="v3-heading-sm">Optional sessions</p>
+                                        <p className="v3-body-sm mt-1" style={{ color: 'var(--text-muted)' }}>
+                                            Not part of the coach plan. Toggle to surface strength sessions in your calendar.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="min-w-[220px]">
+                                    <Toggle
+                                        checked={showStrength}
+                                        onChange={setShowStrength}
+                                        label="Show strength add-on"
+                                        description={showStrength
+                                            ? strengthSessionsThisWeek > 0
+                                                ? `Showing ${strengthSessionsThisWeek} optional sessions this week.`
+                                                : 'Showing optional strength sessions when they fit this phase.'
+                                            : 'Keeps your plan 1:1 to the coach.'}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </motion.section>
                 )}
 
                 {/* Week Overview - Week Grid Style */}

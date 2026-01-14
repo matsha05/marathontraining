@@ -16,10 +16,12 @@ import {
     useRef,
     ReactNode,
 } from "react";
+import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/infrastructure/supabase";
 import type { User } from "@supabase/supabase-js";
 import { clearPlanCache } from "@/domain/plan/repository/cache";
 import { clearOnboardingProgress } from "@/domain/onboarding/types";
+import { fetchAthleteById } from "@/domain/athlete/repository";
 
 // =============================================================================
 // TYPES
@@ -27,10 +29,18 @@ import { clearOnboardingProgress } from "@/domain/onboarding/types";
 
 export type AuthStatus = "loading" | "authenticated" | "unauthenticated";
 
+/** Athlete profile data loaded from database */
+export interface AthleteProfile {
+    name: string | null;
+    avatarId: string | null;
+}
+
 export interface AuthState {
     status: AuthStatus;
     user: User | null;
     athleteId: string | null;
+    /** Profile data from athletes table (name, avatar) */
+    athleteProfile: AthleteProfile | null;
 }
 
 export interface AuthActions {
@@ -57,6 +67,7 @@ export interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
     const [status, setStatus] = useState<AuthStatus>("loading");
     const [user, setUser] = useState<User | null>(null);
+    const [athleteProfile, setAthleteProfile] = useState<AthleteProfile | null>(null);
     const lastAthleteIdRef = useRef<string | null>(null);
 
     const clearCachedState = useCallback((athleteId?: string | null) => {
@@ -65,6 +76,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
             clearOnboardingProgress(athleteId, true);
         } else {
             clearOnboardingProgress(undefined, true);
+        }
+    }, []);
+
+    // Load athlete profile from database
+    const loadAthleteProfile = useCallback(async (userId: string) => {
+        const data = await fetchAthleteById<{ name: string | null; avatar: string | null }>(
+            userId,
+            'name, avatar'
+        );
+
+        if (data) {
+            setAthleteProfile({
+                name: data.name || null,
+                avatarId: data.avatar || null,
+            });
         }
     }, []);
 
@@ -85,10 +111,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
                     setUser(user);
                     setStatus("authenticated");
                     lastAthleteIdRef.current = user.id;
+                    // Load profile data
+                    loadAthleteProfile(user.id);
                 } else {
                     clearCachedState(lastAthleteIdRef.current);
                     lastAthleteIdRef.current = null;
                     setUser(null);
+                    setAthleteProfile(null);
                     setStatus("unauthenticated");
                 }
             } catch (error) {
@@ -98,6 +127,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                     clearCachedState(lastAthleteIdRef.current);
                     lastAthleteIdRef.current = null;
                     setUser(null);
+                    setAthleteProfile(null);
                     setStatus("unauthenticated");
                 }
             }
@@ -115,10 +145,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 setUser(session.user);
                 setStatus("authenticated");
                 lastAthleteIdRef.current = session.user.id;
+                // Load profile data
+                loadAthleteProfile(session.user.id);
             } else {
                 clearCachedState(lastAthleteIdRef.current);
                 lastAthleteIdRef.current = null;
                 setUser(null);
+                setAthleteProfile(null);
                 setStatus("unauthenticated");
             }
         });
@@ -127,7 +160,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             cancelled = true;
             subscription.unsubscribe();
         };
-    }, [clearCachedState]);
+    }, [clearCachedState, loadAthleteProfile]);
 
     const signOut = useCallback(async () => {
         const supabase = createSupabaseBrowserClient();
@@ -135,6 +168,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         clearCachedState(lastAthleteIdRef.current);
         lastAthleteIdRef.current = null;
         setUser(null);
+        setAthleteProfile(null);
         setStatus("unauthenticated");
     }, [clearCachedState]);
 
@@ -147,18 +181,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
             setUser(user);
             setStatus("authenticated");
             lastAthleteIdRef.current = user.id;
+            loadAthleteProfile(user.id);
         } else {
             clearCachedState(lastAthleteIdRef.current);
             lastAthleteIdRef.current = null;
             setUser(null);
+            setAthleteProfile(null);
             setStatus("unauthenticated");
         }
-    }, [clearCachedState]);
+    }, [clearCachedState, loadAthleteProfile]);
 
     const value: AuthContextValue = {
         status,
         user,
         athleteId: user?.id ?? null,
+        athleteProfile,
 
         signOut,
         refreshUser,
@@ -201,4 +238,22 @@ export function useIsAuthenticated(): boolean {
 export function useAthleteId(): string | null {
     const { athleteId } = useAuth();
     return athleteId;
+}
+
+/**
+ * Redirects to /auth when unauthenticated (client-side safeguard).
+ */
+export function useRequireAuth(redirectTo: string = "/auth") {
+    const router = useRouter();
+    const { status, user, athleteId } = useAuth();
+
+    useEffect(() => {
+        if (status !== "unauthenticated") return;
+        if (typeof window === "undefined") return;
+        const next = `${window.location.pathname}${window.location.search}`;
+        const destination = `${redirectTo}?next=${encodeURIComponent(next)}`;
+        router.replace(destination);
+    }, [status, router, redirectTo]);
+
+    return { status, user, athleteId };
 }

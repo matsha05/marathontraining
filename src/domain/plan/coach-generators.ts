@@ -119,7 +119,7 @@ export function generateFRRPlan(
         const keyWorkout = getFRRKeyWorkout(tier, week);
 
         // Track peak
-        if (mileage > maxMileage) {
+        if (mileage >= maxMileage) {
             maxMileage = mileage;
             peakWeek = week;
         }
@@ -311,7 +311,7 @@ export function generateDanielsPlan(
         const phase = danielsToPhase(danielsPhase);
 
         // Track peak
-        if (mileage > maxMileage) {
+        if (mileage >= maxMileage) {
             maxMileage = mileage;
             peakWeek = week;
         }
@@ -547,7 +547,7 @@ export function generateHigdonPlan(
         const keyWorkouts = days.filter(d => d.isKeyDay).length;
 
         // Track peak
-        if (actualTotalMiles > maxMileage) {
+        if (actualTotalMiles >= maxMileage) {
             maxMileage = actualTotalMiles;
             peakWeek = week;
         }
@@ -873,7 +873,7 @@ export function generateHansonsPlan(
         const phase = hansonsToPhase(hansonsPhase);
 
         // Track peak
-        if (mileage > maxMileage) {
+        if (mileage >= maxMileage) {
             maxMileage = mileage;
             peakWeek = week;
         }
@@ -1057,7 +1057,7 @@ export function generatePfitzAMPlan(
         const phase = pfitzToPhase(pfitzPhase);
 
         // Track peak
-        if (mileage > maxMileage) {
+        if (mileage >= maxMileage) {
             maxMileage = mileage;
             peakWeek = week;
         }

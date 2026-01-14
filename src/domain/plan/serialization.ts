@@ -101,6 +101,16 @@ export function reconstructPlan(
         repetition: 330,
     };
 
+    let peakMileage = 0;
+    let peakWeek = 1;
+
+    for (const week of weeks) {
+        if (week.totalMiles >= peakMileage) {
+            peakMileage = week.totalMiles;
+            peakWeek = week.weekNumber;
+        }
+    }
+
     return {
         id: planRow.id,
         createdAt: planRow.created_at,
@@ -112,8 +122,8 @@ export function reconstructPlan(
         weeks,
         totalWeeks: weeks.length,
         phases: [],
-        peakMileage: Math.max(...weeks.map(w => w.totalMiles), 0),
-        peakWeek: weeks.findIndex(w => w.totalMiles === Math.max(...weeks.map(ww => ww.totalMiles))) + 1,
+        peakMileage,
+        peakWeek,
         totalMiles: weeks.reduce((sum, w) => sum + w.totalMiles, 0),
         paces,
         intensityLevel: 'moderate',

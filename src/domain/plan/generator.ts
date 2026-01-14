@@ -96,7 +96,7 @@ export function generatePlan(input: PlanGenerationInput): TrainingPlan {
         );
         weeks.push(week);
 
-        if (week.totalMiles > maxMileage) {
+        if (week.totalMiles >= maxMileage) {
             maxMileage = week.totalMiles;
             peakWeek = weekNum;
         }

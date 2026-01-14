@@ -1,4 +1,5 @@
 import type { TrainingPlan } from '../types';
+import { trainingPlanSchema } from '../schemas';
 import { safeStorageGet, safeStorageRemove, safeStorageSet } from '@/lib/safe-storage';
 
 const STORAGE_KEYS = {
@@ -16,8 +17,17 @@ function loadPlanCacheFromKey(key: string): TrainingPlan | null {
     if (!storedResult.success || !storedResult.data) return null;
     try {
         const parsed = JSON.parse(storedResult.data);
-        return parsed.plan as TrainingPlan;
+        if (!parsed || typeof parsed !== 'object' || !('plan' in parsed)) return null;
+        const planCandidate = (parsed as { plan?: unknown }).plan;
+        const validation = trainingPlanSchema.safeParse(planCandidate);
+        if (!validation.success) {
+            console.warn('[PlanCache] Invalid cached plan, clearing.');
+            safeStorageRemove(key);
+            return null;
+        }
+        return planCandidate as TrainingPlan;
     } catch {
+        safeStorageRemove(key);
         return null;
     }
 }

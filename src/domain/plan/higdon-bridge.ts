@@ -105,14 +105,20 @@ function findBestBaseSlice(
     desiredWeeks: number,
     raceWeek: WeekPlan | undefined,
     athleteWeeklyMiles: number,
-    athleteLongRun: number
+    athleteLongRun: number,
+    options?: { enforceCaps?: boolean }
 ): { weeks: WeekPlan[]; startIndex: number } {
     if (desiredWeeks <= 0 || baseWeeks.length === 0) {
         return { weeks: [], startIndex: 0 };
     }
 
-    const totalCap = raceWeek && raceWeek.totalMiles > 0 ? raceWeek.totalMiles : Number.POSITIVE_INFINITY;
-    const longCap = raceWeek && raceWeek.longRunMiles > 0 ? raceWeek.longRunMiles : Number.POSITIVE_INFINITY;
+    const enforceCaps = options?.enforceCaps ?? true;
+    const totalCap = enforceCaps && raceWeek && raceWeek.totalMiles > 0
+        ? raceWeek.totalMiles
+        : Number.POSITIVE_INFINITY;
+    const longCap = enforceCaps && raceWeek && raceWeek.longRunMiles > 0
+        ? raceWeek.longRunMiles
+        : Number.POSITIVE_INFINITY;
     const preferLater = athleteWeeklyMiles > 0 || athleteLongRun > 0;
 
     for (let length = Math.min(desiredWeeks, baseWeeks.length); length >= 1; length--) {
@@ -181,13 +187,24 @@ export function buildHigdonBridge(params: {
     const baseWeeks = basePlan.weeks ?? [];
     const desiredBaseWeeks = Math.min(gapWeeks, baseWeeks.length);
 
-    const baseSlice = findBestBaseSlice(
+    let baseSlice = findBestBaseSlice(
         baseWeeks,
         desiredBaseWeeks,
         raceWeek,
         input.weeklyMiles,
-        input.longestRecentRun
+        input.longestRecentRun,
+        { enforceCaps: true }
     );
+    if (baseSlice.weeks.length === 0 && desiredBaseWeeks > 0) {
+        baseSlice = findBestBaseSlice(
+            baseWeeks,
+            desiredBaseWeeks,
+            raceWeek,
+            input.weeklyMiles,
+            input.longestRecentRun,
+            { enforceCaps: false }
+        );
+    }
 
     const baseWeeksApplied = baseSlice.weeks.length;
     const baseStartWeek = baseWeeksApplied > 0 ? baseSlice.startIndex + 1 : 0;

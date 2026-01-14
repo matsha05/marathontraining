@@ -74,7 +74,6 @@ import {
 import {
     TrainingIntensityScreen,
     TrainingMindsetScreen,
-    StrengthTrainingScreen,
     CoachRevealScreen,
     ReadinessCheckScreen,
     GeneratingScreen,
@@ -658,15 +657,6 @@ function OnboardingContent() {
                     <TrainingMindsetScreen
                         value={data.trainingMindset}
                         onChange={(mindset) => setData(prev => ({ ...prev, trainingMindset: mindset as TrainingMindset }))}
-                        onContinue={goToNext}
-                        onBack={goBack}
-                    />
-                )}
-
-                {step === 'strength-training' && (
-                    <StrengthTrainingScreen
-                        value={data.includeStrength}
-                        onChange={(includeStrength) => setData(prev => ({ ...prev, includeStrength }))}
                         onContinue={goToNext}
                         onBack={goBack}
                     />

@@ -8,6 +8,7 @@ import { useTheme } from '@/components/providers/ThemeProvider';
 import { SettingsIcon } from '@/components/ui/settings';
 import { FlameIcon } from '@/components/ui/flame';
 import { MobileNav } from './MobileNav';
+import { AvatarDisplay } from './AvatarDisplay';
 import { useAuth } from '@/domain/auth/context';
 
 /**
@@ -108,7 +109,7 @@ export function SiteHeader({
     const pathname = usePathname();
     const exploreRef = useRef<HTMLDivElement>(null);
     const userMenuRef = useRef<HTMLDivElement>(null);
-    const { user, status: authStatus, signOut } = useAuth();
+    const { user, status: authStatus, signOut, athleteProfile } = useAuth();
 
     const loading = authStatus === 'loading';
 
@@ -135,8 +136,8 @@ export function SiteHeader({
     const isLoggedIn = !!user;
     const logoHref = isLoggedIn ? '/dashboard' : '/';
 
-    // Get user initial for avatar
-    const userInitial = user?.email?.charAt(0).toUpperCase() || 'U';
+    // User display info
+    const userDisplayName = athleteProfile?.name || user?.user_metadata?.full_name || 'Runner';
 
     // Handle logout
     const handleLogout = async () => {
@@ -170,7 +171,7 @@ export function SiteHeader({
                     {/* Mobile Navigation - only show when not in back mode */}
                     {!backHref && !loading && (
                         <MobileNav
-                            user={user ? { email: user.email || '', name: user.user_metadata?.name, avatarId: user.user_metadata?.avatarId } : null}
+                            user={user ? { email: user.email || '', name: userDisplayName, avatarId: athleteProfile?.avatarId ?? undefined } : null}
                             onSignOut={handleLogout}
                         />
                     )}
@@ -348,17 +349,19 @@ export function SiteHeader({
                             <div className="relative" ref={userMenuRef}>
                                 <button
                                     onClick={() => setUserMenuOpen(!userMenuOpen)}
-                                    className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all"
+                                    className="rounded-full transition-all"
                                     style={{
-                                        background: 'var(--color-accent)',
-                                        color: 'white',
                                         boxShadow: userMenuOpen ? '0 0 0 2px var(--color-accent-subtle)' : 'none',
                                     }}
                                     aria-expanded={userMenuOpen}
                                     aria-haspopup="true"
                                     aria-label="User menu"
                                 >
-                                    {userInitial}
+                                    <AvatarDisplay
+                                        avatarId={athleteProfile?.avatarId}
+                                        name={userDisplayName}
+                                        size={40}
+                                    />
                                 </button>
 
                                 {/* User dropdown menu */}
@@ -373,7 +376,7 @@ export function SiteHeader({
                                         {/* User info */}
                                         <div className="px-4 py-3 border-b" style={{ borderColor: 'var(--border-base)' }}>
                                             <p className="text-sm font-medium" style={{ color: 'var(--text-base)' }}>
-                                                {user?.user_metadata?.full_name || 'Runner'}
+                                                {userDisplayName}
                                             </p>
                                             <p className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>
                                                 {user?.email}

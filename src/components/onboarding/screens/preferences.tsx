@@ -36,6 +36,45 @@ import type { TierSelectionInput } from '@/domain/philosophy/tier-selector';
 import type { HigdonTier } from '@/domain/plan/types';
 import { calculateWeeksToRace } from '@/domain/plan/date-utils';
 
+function mapExperienceToTierFormat(intensity: TrainingIntensity | null): 'beginner' | 'intermediate' | 'advanced' {
+    if (intensity === 'aggressive') return 'advanced';
+    if (intensity === 'conservative') return 'beginner';
+    return 'intermediate';
+}
+
+function mapMileageToTierFormat(weeklyMiles: number | null): 'under_20' | '20_40' | 'over_40' {
+    const mileage = weeklyMiles ?? 20;
+    if (mileage >= 40) return 'over_40';
+    if (mileage >= 20) return '20_40';
+    return 'under_20';
+}
+
+function mapGoalToDistance(goal: OnboardingData['trainingGoal']): '5k' | '10k' | 'half' | 'marathon' | 'base' | null {
+    if (goal === 'general') return 'base';
+    return goal;
+}
+
+function resolveTierRunDays(tier: string): number | null {
+    const { HIGDON_TIER_CONFIGS } = require('@/domain/plan/types');
+    const { HANSONS_TIER_CONFIGS } = require('@/domain/plan/coaches/hansons');
+    const { PFITZ_TIER_CONFIGS } = require('@/domain/plan/coaches/pfitzinger');
+    const { PFITZ_FRR_TIER_CONFIGS } = require('@/domain/plan/coaches/pfitzinger-frr');
+
+    if (tier.startsWith('hansons_')) return HANSONS_TIER_CONFIGS[tier]?.runDays ?? null;
+    if (tier.startsWith('pfitz_frr_')) return PFITZ_FRR_TIER_CONFIGS[tier]?.runDays ?? null;
+    if (tier.startsWith('pfitz_')) return PFITZ_TIER_CONFIGS[tier]?.runDays ?? null;
+    if (
+        tier.startsWith('base_') ||
+        tier.startsWith('5k_') ||
+        tier.startsWith('10k_') ||
+        tier.startsWith('half_') ||
+        tier.startsWith('marathon_')
+    ) {
+        return HIGDON_TIER_CONFIGS[tier]?.runDays ?? null;
+    }
+    return null;
+}
+
 // =============================================================================
 // TRAINING INTENSITY SCREEN
 // =============================================================================
@@ -219,7 +258,6 @@ export function StrengthTrainingScreen({
         <QuestionScreen onBack={onBack}>
             <QuestionHeader
                 title="Include strength training in your plan?"
-                tooltip={STEP_TOOLTIPS['strength-training']}
             />
 
             <OptionGrid>
@@ -280,24 +318,6 @@ export function CoachRevealScreen({ data, onConfirm, onBack }: CoachRevealScreen
 
     const mapMindsetToQuizFormat = (mindset: TrainingMindset | null) => mindset;
 
-    const mapExperienceToTierFormat = (intensity: TrainingIntensity | null): 'beginner' | 'intermediate' | 'advanced' => {
-        if (intensity === 'aggressive') return 'advanced';
-        if (intensity === 'conservative') return 'beginner';
-        return 'intermediate';
-    };
-
-    const mapMileageToTierFormat = (weeklyMiles: number | null): 'under_20' | '20_40' | 'over_40' => {
-        const mileage = weeklyMiles ?? 20;
-        if (mileage >= 40) return 'over_40';
-        if (mileage >= 20) return '20_40';
-        return 'under_20';
-    };
-
-    const mapGoalToDistance = (goal: OnboardingData['trainingGoal']): '5k' | '10k' | 'half' | 'marathon' | 'base' | null => {
-        if (goal === 'general') return 'base';
-        return goal;
-    };
-
     const quizAnswers = {
         targetDistance: mapGoalToDistance(data.trainingGoal),
         raceTiming: data.raceDate ? 'specific' : 'no_race',
@@ -312,17 +332,22 @@ export function CoachRevealScreen({ data, onConfirm, onBack }: CoachRevealScreen
     const coach = PHILOSOPHIES[recommendation.primary];
     const targetDistance = mapGoalToDistance(data.trainingGoal) ?? 'base';
 
+    const tierInput: TierSelectionInput = {
+        philosophy: recommendation.primary,
+        distance: targetDistance,
+        experience: mapExperienceToTierFormat(data.trainingIntensity),
+        currentMileage: mapMileageToTierFormat(data.weeklyMiles),
+        daysPerWeek: data.availableDays ?? 4,
+    };
+    const tierResult = selectPlanTier(tierInput);
+    const requiredRunDays = resolveTierRunDays(tierResult.tier);
+    const runDaysMismatch = requiredRunDays !== null
+        && data.availableDays !== null
+        && requiredRunDays > data.availableDays;
+
     let longRunCap = coach.longRunCap;
 
     if (recommendation.primary === 'higdon') {
-        const tierInput: TierSelectionInput = {
-            philosophy: 'higdon',
-            distance: targetDistance,
-            experience: mapExperienceToTierFormat(data.trainingIntensity),
-            currentMileage: mapMileageToTierFormat(data.weeklyMiles),
-            daysPerWeek: data.availableDays ?? 4,
-        };
-        const tierResult = selectPlanTier(tierInput);
         const higdonConfig = HIGDON_TIER_CONFIGS[tierResult.tier as HigdonTier];
 
         if (higdonConfig?.peakLongRunMinutes) {
@@ -377,8 +402,14 @@ export function CoachRevealScreen({ data, onConfirm, onBack }: CoachRevealScreen
                 <p className="v3-label mb-3">Your Plan Structure</p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                     <div>
-                        <p className="v3-body-lg font-medium">{data.availableDays} days/week</p>
-                        <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>Run days</p>
+                        <p className="v3-body-lg font-medium">
+                            {runDaysMismatch
+                                ? `${data.availableDays} to ${requiredRunDays} days/week`
+                                : `${requiredRunDays ?? data.availableDays ?? '?'} days/week`}
+                        </p>
+                        <p className="v3-body-sm" style={{ color: 'var(--text-muted)' }}>
+                            {runDaysMismatch ? 'Run days (adjusted)' : 'Run days'}
+                        </p>
                     </div>
                     <div>
                         <p className="v3-body-lg font-medium">{longRunCap}</p>
@@ -395,6 +426,13 @@ export function CoachRevealScreen({ data, onConfirm, onBack }: CoachRevealScreen
             {recommendation.warnings.length > 0 && (
                 <WarningBanner title="Heads up">
                     {recommendation.warnings[0]}
+                </WarningBanner>
+            )}
+
+            {runDaysMismatch && (
+                <WarningBanner title="Schedule check">
+                    You selected {data.availableDays} run days/week, but this plan uses {requiredRunDays}.
+                    If that doesn&apos;t work, go back and change your days.
                 </WarningBanner>
             )}
 
@@ -438,6 +476,19 @@ export function ReadinessCheckScreen({
     const weeksToRace = data.raceDate ? calculateWeeksToRace(data.raceDate) : null;
     const isHigdon = data.trainingPhilosophy === 'higdon';
     const baseLabel = isHigdon ? 'Higdon Base' : 'Base Building';
+    const targetDistance = mapGoalToDistance(data.trainingGoal) ?? 'base';
+    const { selectPlanTier } = require('@/domain/philosophy/tier-selector');
+    const tierResult = selectPlanTier({
+        philosophy: (data.trainingPhilosophy ?? 'higdon') as 'hansons' | 'higdon' | 'pfitzinger' | 'daniels',
+        distance: targetDistance,
+        experience: mapExperienceToTierFormat(data.trainingIntensity),
+        currentMileage: mapMileageToTierFormat(data.weeklyMiles),
+        daysPerWeek: data.availableDays ?? 4,
+    } as TierSelectionInput);
+    const requiredRunDays = resolveTierRunDays(tierResult.tier);
+    const runDaysMismatch = requiredRunDays !== null
+        && data.availableDays !== null
+        && requiredRunDays > data.availableDays;
 
     useKeyboardNavigation({
         onEnter: onProceed,
@@ -474,11 +525,26 @@ export function ReadinessCheckScreen({
                             <Check className="w-4 h-4" style={{ color: 'var(--v3-success)' }} />
                             <span>Your longest run matches plan requirements</span>
                         </div>
-                        <div className="flex items-center gap-2 v3-body-sm">
-                            <Check className="w-4 h-4" style={{ color: 'var(--v3-success)' }} />
-                            <span>Training days align with plan structure</span>
-                        </div>
+                        {!runDaysMismatch && (
+                            <div className="flex items-center gap-2 v3-body-sm">
+                                <Check className="w-4 h-4" style={{ color: 'var(--v3-success)' }} />
+                                <span>Training days align with plan structure</span>
+                            </div>
+                        )}
+                        {runDaysMismatch && (
+                            <div className="flex items-center gap-2 v3-body-sm">
+                                <AlertTriangle className="w-4 h-4" style={{ color: 'var(--v3-warning)' }} />
+                                <span>Plan uses {requiredRunDays} run days/week (you selected {data.availableDays})</span>
+                            </div>
+                        )}
                     </div>
+
+                    {runDaysMismatch && (
+                        <WarningBanner title="Schedule note">
+                            This plan needs {requiredRunDays} run days/week. If that&apos;s too much,
+                            go back and adjust your availability.
+                        </WarningBanner>
+                    )}
 
                     <button
                         onClick={onProceed}
@@ -519,6 +585,13 @@ export function ReadinessCheckScreen({
                         {weeksToRace && <li>• Race date: {weeksToRace} weeks away</li>}
                     </ul>
                 </div>
+
+                {runDaysMismatch && (
+                    <WarningBanner title="Schedule note">
+                        This plan uses {requiredRunDays} run days/week, but you selected {data.availableDays}.
+                        If that&apos;s too much, go back and change your days.
+                    </WarningBanner>
+                )}
 
                 <WarningBanner title="Why we recommend base building">
                     Week 1 of your {goalLabel.toLowerCase()} plan needs more mileage than you&apos;re
@@ -716,7 +789,6 @@ export function CompleteScreen({ data, onViewDashboard, onViewPlan }: CompleteSc
                     <p>• Long runs on {data.longRunDays?.length > 0
                         ? data.longRunDays.map(d => d.charAt(0).toUpperCase() + d.slice(1)).join(' & ')
                         : 'Weekend'}</p>
-                    {data.includeStrength && <p>• Strength training included</p>}
                 </div>
             </SuccessBanner>
 

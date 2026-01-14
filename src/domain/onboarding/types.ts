@@ -55,7 +55,6 @@ export type OnboardingStep =
     // Phase 8: Preferences & Mindset
     | 'training-intensity'
     | 'training-mindset'  // rest-focus / consistency / push-limits
-    | 'strength-training'
 
     // Phase 9: Coach Selection & Generation
     | 'coach-reveal'  // Show recommended coach based on collected data
@@ -357,9 +356,6 @@ export function getNextStep(
             return 'training-mindset';
 
         case 'training-mindset':
-            return 'strength-training';
-
-        case 'strength-training':
             return 'coach-reveal';
 
         case 'coach-reveal':
@@ -469,11 +465,8 @@ export function getPreviousStep(
         case 'training-mindset':
             return 'training-intensity';
 
-        case 'strength-training':
-            return 'training-mindset';
-
         case 'coach-reveal':
-            return 'strength-training';
+            return 'training-mindset';
 
         case 'readiness-check':
             return 'coach-reveal';
@@ -521,8 +514,7 @@ const STEP_PROGRESS: Record<OnboardingStep, number> = {
     'injury-history': 75,
     'injury-details': 77,
     'training-intensity': 80,
-    'training-mindset': 83,
-    'strength-training': 86,
+    'training-mindset': 86,
     'coach-reveal': 90,
     'readiness-check': 95,
     'generating': 98,
@@ -605,12 +597,6 @@ export const STEP_TOOLTIPS: Partial<Record<OnboardingStep, CoachTooltip>> = {
     'training-intensity': {
         title: 'What this changes',
         content: 'Conservative plans have gentler progressions and more recovery. Aggressive plans push closer to your limits — more potential upside, but also more injury risk.',
-    },
-    'strength-training': {
-        title: 'Why strength matters',
-        content: 'The research is clear: heavy strength training improves running economy by 2-8% (Støren et al., 2008) and reduces injury rates. ACSM recommends 2x/week for endurance athletes. Jay Dicharry builds running-specific strength into all his programs.',
-        coach: 'Øyvind Støren',
-        coachLink: '/methodology#storen',
     },
 };
 
@@ -705,9 +691,6 @@ export function isStepComplete(step: OnboardingStep, data: OnboardingData): bool
         case 'training-mindset':
             return data.trainingMindset !== null;
 
-        case 'strength-training':
-            return data.includeStrength !== null;
-
         case 'coach-reveal':
             return data.trainingPhilosophy !== null;
 
@@ -774,7 +757,8 @@ export function loadOnboardingProgress(athleteId?: string | null): { step: Onboa
         timestamp?: unknown;
     };
 
-    if (typeof step !== 'string' || !(step in STEP_PROGRESS)) return null;
+    const normalizedStep = step === 'strength-training' ? 'coach-reveal' : step;
+    if (typeof normalizedStep !== 'string' || !(normalizedStep in STEP_PROGRESS)) return null;
     if (typeof timestamp !== 'number') return null;
     if (typeof data !== 'object' || data === null || Array.isArray(data)) return null;
 
@@ -797,7 +781,7 @@ export function loadOnboardingProgress(athleteId?: string | null): { step: Onboa
     };
 
     return {
-        step: step as OnboardingStep,
+        step: normalizedStep as OnboardingStep,
         data: normalized,
     };
 }

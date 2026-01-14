@@ -4,11 +4,13 @@ import { useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { usePlan } from '@/domain/plan/context';
+import { useAuth } from '@/domain/auth/context';
 import { getBlockLabel } from '@/domain/plan/block-labels';
 import { formatPace, getDayName } from '@/lib/format';
 import { CheckIcon } from '@/components/ui/check';
 import { AppHeader } from '@/components/ui/SiteHeader';
 import { motion } from 'framer-motion';
+import { useStrengthVisibility } from '@/hooks/useStrengthVisibility';
 
 /**
  * Week Detail View - Shows all workouts for a specific training week
@@ -36,6 +38,8 @@ export default function WeekDetailPage() {
     const params = useParams();
     const weekNumber = parseInt(params.weekNumber as string, 10);
     const { status, plan, currentWeek } = usePlan();
+    const { athleteId } = useAuth();
+    const { showStrength } = useStrengthVisibility(false, athleteId);
 
     const weekPlan = useMemo(() => {
         if (!plan) return null;
@@ -59,10 +63,11 @@ export default function WeekDetailPage() {
                 return { dayOfWeek: dayNum, dayName, isRest: true };
             }
 
+            const hasStrength = showStrength && !!dayPlan.strengthWorkout;
             const result: DayDisplay = {
                 dayOfWeek: dayNum,
                 dayName,
-                isRest: !dayPlan.runWorkout && !dayPlan.strengthWorkout,
+                isRest: !dayPlan.runWorkout && !hasStrength,
             };
 
             if (dayPlan.runWorkout) {
@@ -95,7 +100,7 @@ export default function WeekDetailPage() {
                 };
             }
 
-            if (dayPlan.strengthWorkout) {
+            if (hasStrength && dayPlan.strengthWorkout) {
                 const strength = dayPlan.strengthWorkout;
                 result.strengthWorkout = {
                     name: strength.name,
@@ -106,7 +111,7 @@ export default function WeekDetailPage() {
 
             return result;
         });
-    }, [weekPlan, plan]);
+    }, [weekPlan, plan, showStrength]);
 
     // Loading state
     if (status === 'loading') {
@@ -147,6 +152,8 @@ export default function WeekDetailPage() {
     const isCurrent = weekNumber === currentWeek;
     const phaseLabel = weekPlan.phase.charAt(0).toUpperCase() + weekPlan.phase.slice(1);
     const blockLabel = getBlockLabel(weekPlan.blockType);
+
+    const summaryColumns = showStrength ? 'sm:grid-cols-3' : 'sm:grid-cols-2';
 
     return (
         <div className="v3-root min-h-screen">
@@ -278,7 +285,7 @@ export default function WeekDetailPage() {
                     transition={{ duration: 0.4, delay: 0.3 }}
                 >
                     <h2 className="v3-heading-md mb-4">Week Summary</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className={`grid grid-cols-1 ${summaryColumns} gap-4`}>
                         <div className="v3-card p-5 text-center">
                             <p className="v3-heading-lg v3-mono mb-1">{Math.round(weekPlan.totalMiles)}</p>
                             <p className="v3-label">Total Miles</p>
@@ -287,10 +294,12 @@ export default function WeekDetailPage() {
                             <p className="v3-heading-lg v3-mono mb-1">{weekPlan.keyWorkouts}</p>
                             <p className="v3-label">Quality Sessions</p>
                         </div>
-                        <div className="v3-card p-5 text-center">
-                            <p className="v3-heading-lg v3-mono mb-1">{weekPlan.days.filter(d => d.strengthWorkout).length}</p>
-                            <p className="v3-label">Strength Days</p>
-                        </div>
+                        {showStrength && (
+                            <div className="v3-card p-5 text-center">
+                                <p className="v3-heading-lg v3-mono mb-1">{weekPlan.days.filter(d => d.strengthWorkout).length}</p>
+                                <p className="v3-label">Strength Days</p>
+                            </div>
+                        )}
                     </div>
                 </motion.section>
 
