@@ -41,11 +41,8 @@ import {
 } from './coaches/daniels';
 import type { DanielsPhase } from './types';
 import {
-    generateHigdonLongRunProgression,
     getHigdonPhase,
     isHigdonStepbackWeek,
-    getMicrocycleForTier,
-    getHigdonTierConfig,
     HIGDON_MICROCYCLES,
 } from './coaches/higdon';
 import {
@@ -74,14 +71,8 @@ import {
     type PfitzPhase,
 } from './coaches/pfitzinger';
 import { HigdonTier, HIGDON_TIER_CONFIGS } from './types';
-import { generateMileageProgression, calculatePeakMileage } from './mileage';
-import { calculatePhases, scheduleRecoveryWeeks } from './phases';
-import {
-    scheduleStrengthForDay,
-    scheduleDurabilityForDay,
-    scheduleDurabilityRoutineForDay,
-    scheduleCrossTrainingForDay,
-} from './generator';
+import { calculatePhases } from './phases';
+import { buildDayPlan, finalizeTrainingPlan, summarizeWeekFromDays } from './generation-helpers';
 import { getDayIndex } from '@/domain/shared/day-utils';
 
 function getLongRunDayIndex(longRunDay: string): number {
@@ -108,8 +99,6 @@ export function generateFRRPlan(
     }
 
     const weeks: WeekPlan[] = [];
-    let peakWeek = 1;
-    let maxMileage = 0;
 
     for (let week = 1; week <= config.durationWeeks; week++) {
         const mileage = getFRRWeeklyMileage(tier, week);
@@ -118,13 +107,6 @@ export function generateFRRPlan(
         const phase = frrToPhase(frrPhase);
         const keyWorkout = getFRRKeyWorkout(tier, week);
 
-        // Track peak
-        if (mileage >= maxMileage) {
-            maxMileage = mileage;
-            peakWeek = week;
-        }
-
-        // Generate days for this week
         const days = generateFRRWeekDays(
             week,
             mileage,
@@ -135,11 +117,7 @@ export function generateFRRPlan(
             paces,
             config.durationWeeks
         );
-
-        // Calculate distribution
-        const easyMiles = days.reduce((sum, d) => sum + (d.runWorkout && d.runWorkout.primaryZone === 'E' ? d.totalMiles : 0), 0);
-        const qualityMiles = days.reduce((sum, d) => sum + d.qualityMiles, 0);
-        const keyWorkouts = days.filter(d => d.isKeyDay).length;
+        const summary = summarizeWeekFromDays(days, mileage);
 
         weeks.push({
             weekNumber: week,
@@ -148,12 +126,12 @@ export function generateFRRPlan(
             phaseWeek: config.phases[frrPhase].indexOf(week) + 1,
             blockType: 'race_plan',
             days,
-            totalMiles: mileage,
+            totalMiles: summary.totalMiles,
             longRunMiles: longRun,
-            easyMiles,
-            qualityMiles,
-            easyPercentage: mileage > 0 ? (easyMiles / mileage) * 100 : 0,
-            keyWorkouts,
+            easyMiles: summary.easyMiles,
+            qualityMiles: summary.qualityMiles,
+            easyPercentage: summary.easyPercentage,
+            keyWorkouts: summary.keyWorkouts,
             isRecoveryWeek: frrPhase === 'taper' || week === 4, // Week 4 is typically recovery
             focus: getFRRWeekFocus(frrPhase, week, keyWorkout?.type),
         });
@@ -167,7 +145,7 @@ export function generateFRRPlan(
         weeks: weekNums.length,
     }));
 
-    return {
+    return finalizeTrainingPlan({
         id: crypto.randomUUID(),
         createdAt: new Date().toISOString(),
         athleteName: input.name,
@@ -178,9 +156,6 @@ export function generateFRRPlan(
         weeks,
         totalWeeks: config.durationWeeks,
         phases,
-        peakMileage: maxMileage,
-        peakWeek,
-        totalMiles: weeks.reduce((sum, w) => sum + w.totalMiles, 0),
         paces,
         intensityLevel: input.trainingIntensity,
         verification: {
@@ -189,7 +164,7 @@ export function generateFRRPlan(
                 { name: 'Coach Fidelity', passed: true, message: `Using Pfitzinger FRR ${tier}` },
             ],
         },
-    };
+    });
 }
 
 function generateFRRWeekDays(
@@ -240,18 +215,15 @@ function generateFRRWeekDays(
                 isKeyDay && i !== longRunDayIndex ? 'quality' :
                     i === longRunDayIndex ? 'long' : 'easy';
 
-        days.push({
+        days.push(buildDayPlan({
             date,
             dayOfWeek: i,
             runWorkout,
-            strengthWorkout: scheduleStrengthForDay(phase, dayType, i, input),
-            durabilityModule: scheduleDurabilityForDay(dayType),
-            durabilityRoutine: scheduleDurabilityRoutineForDay(dayType),
-            crossTraining: scheduleCrossTrainingForDay(dayType, input),
             isKeyDay,
-            totalMiles: runWorkout?.totalDistance ?? 0,
-            qualityMiles: runWorkout?.qualityMiles ?? 0,
-        });
+            phase,
+            dayType,
+            input,
+        }));
     }
 
     return days;
@@ -302,21 +274,12 @@ export function generateDanielsPlan(
     }
 
     const weeks: WeekPlan[] = [];
-    let peakWeek = 1;
-    let maxMileage = 0;
 
     for (let week = 1; week <= config.durationWeeks; week++) {
         const mileage = getDanielsWeeklyMileage(tier, week);
         const danielsPhase = getDanielsPhase(tier, week);
         const phase = danielsToPhase(danielsPhase);
 
-        // Track peak
-        if (mileage >= maxMileage) {
-            maxMileage = mileage;
-            peakWeek = week;
-        }
-
-        // Get 2Q workout data if available
         const q2workout = config.structure === '2q' ? getDaniels2QWorkout(tier, week) : null;
 
         // Generate days for this week
@@ -330,10 +293,7 @@ export function generateDanielsPlan(
             config.durationWeeks
         );
 
-        // Calculate distribution
-        const easyMiles = days.reduce((sum, d) => sum + (d.runWorkout && d.runWorkout.primaryZone === 'E' ? d.totalMiles : 0), 0);
-        const qualityMiles = days.reduce((sum, d) => sum + d.qualityMiles, 0);
-        const keyWorkouts = days.filter(d => d.isKeyDay).length;
+        const summary = summarizeWeekFromDays(days, mileage);
 
         weeks.push({
             weekNumber: week,
@@ -342,12 +302,12 @@ export function generateDanielsPlan(
             phaseWeek: week,
             blockType: 'race_plan',
             days,
-            totalMiles: mileage,
+            totalMiles: summary.totalMiles,
             longRunMiles: q2workout?.q1.totalMiles ?? 0,
-            easyMiles,
-            qualityMiles,
-            easyPercentage: mileage > 0 ? (easyMiles / mileage) * 100 : 0,
-            keyWorkouts,
+            easyMiles: summary.easyMiles,
+            qualityMiles: summary.qualityMiles,
+            easyPercentage: summary.easyPercentage,
+            keyWorkouts: summary.keyWorkouts,
             isRecoveryWeek: config.phases.taper.includes(week),
             focus: getDanielsWeekFocus(danielsPhase, q2workout),
         });
@@ -362,7 +322,7 @@ export function generateDanielsPlan(
         weeks: weekNums.length,
     }));
 
-    return {
+    return finalizeTrainingPlan({
         id: crypto.randomUUID(),
         createdAt: new Date().toISOString(),
         athleteName: input.name,
@@ -373,9 +333,6 @@ export function generateDanielsPlan(
         weeks,
         totalWeeks: config.durationWeeks,
         phases,
-        peakMileage: maxMileage,
-        peakWeek,
-        totalMiles: weeks.reduce((sum, w) => sum + w.totalMiles, 0),
         paces,
         intensityLevel: input.trainingIntensity,
         verification: {
@@ -384,7 +341,7 @@ export function generateDanielsPlan(
                 { name: 'Coach Fidelity', passed: true, message: `Using Daniels ${tier}` },
             ],
         },
-    };
+    });
 }
 
 function generateDanielsWeekDays(
@@ -433,18 +390,15 @@ function generateDanielsWeekDays(
                 isKeyDay && i === 0 ? 'long' :  // Q1 is a long quality run
                     isKeyDay ? 'quality' : 'easy';
 
-        days.push({
+        days.push(buildDayPlan({
             date,
             dayOfWeek: i,
             runWorkout,
-            strengthWorkout: scheduleStrengthForDay(phase, dayType, i, input),
-            durabilityModule: scheduleDurabilityForDay(dayType),
-            durabilityRoutine: scheduleDurabilityRoutineForDay(dayType),
-            crossTraining: scheduleCrossTrainingForDay(dayType, input),
             isKeyDay,
-            totalMiles: runWorkout?.totalDistance ?? 0,
-            qualityMiles: runWorkout?.qualityMiles ?? 0,
-        });
+            phase,
+            dayType,
+            input,
+        }));
     }
 
     return days;
@@ -513,8 +467,6 @@ export function generateHigdonPlan(
     const microcycle = HIGDON_MICROCYCLES[tier];
 
     const weeks: WeekPlan[] = [];
-    let peakWeek = 1;
-    let maxMileage = 0;
 
     for (let week = 1; week <= totalWeeks; week++) {
         const weekIndex = week - 1;
@@ -540,17 +492,7 @@ export function generateHigdonPlan(
             totalWeeks
         );
 
-        // Calculate ACTUAL totals from days (not from generic progression)
-        const actualTotalMiles = days.reduce((sum, d) => sum + d.totalMiles, 0);
-        const easyMiles = days.reduce((sum, d) => sum + (d.runWorkout && d.runWorkout.primaryZone === 'E' ? d.totalMiles : 0), 0);
-        const qualityMiles = days.reduce((sum, d) => sum + d.qualityMiles, 0);
-        const keyWorkouts = days.filter(d => d.isKeyDay).length;
-
-        // Track peak
-        if (actualTotalMiles >= maxMileage) {
-            maxMileage = actualTotalMiles;
-            peakWeek = week;
-        }
+        const summary = summarizeWeekFromDays(days);
 
         weeks.push({
             weekNumber: week,
@@ -559,12 +501,12 @@ export function generateHigdonPlan(
             phaseWeek: week,
             blockType,
             days,
-            totalMiles: actualTotalMiles, // FIXED: Use actual sum of day distances
+            totalMiles: summary.totalMiles,
             longRunMiles,
-            easyMiles,
-            qualityMiles,
-            easyPercentage: actualTotalMiles > 0 ? (easyMiles / actualTotalMiles) * 100 : 0,
-            keyWorkouts,
+            easyMiles: summary.easyMiles,
+            qualityMiles: summary.qualityMiles,
+            easyPercentage: summary.easyPercentage,
+            keyWorkouts: summary.keyWorkouts,
             isRecoveryWeek: isRecovery,
             focus: getHigdonWeekFocus(phase, tier, week),
         });
@@ -579,7 +521,7 @@ export function generateHigdonPlan(
         weeks: p.weeks,
     }));
 
-    return {
+    return finalizeTrainingPlan({
         id: crypto.randomUUID(),
         createdAt: new Date().toISOString(),
         athleteName: input.name,
@@ -590,9 +532,6 @@ export function generateHigdonPlan(
         weeks,
         totalWeeks,
         phases: phaseBreakdown,
-        peakMileage: maxMileage,
-        peakWeek,
-        totalMiles: weeks.reduce((sum, w) => sum + w.totalMiles, 0),
         paces,
         intensityLevel: input.trainingIntensity,
         verification: {
@@ -601,7 +540,7 @@ export function generateHigdonPlan(
                 { name: 'Coach Fidelity', passed: true, message: `Using Hal Higdon ${tier} - exact week-by-week data` },
             ],
         },
-    };
+    });
 }
 
 interface HigdonWeekDistances {
@@ -791,18 +730,15 @@ function generateHigdonWeekDaysExact(
                 isLongRun ? 'long' :
                     isKeyDay ? 'quality' : 'easy';
 
-        days.push({
+        days.push(buildDayPlan({
             date,
             dayOfWeek: i,
             runWorkout,
-            strengthWorkout: scheduleStrengthForDay(phase, dayType, i, input),
-            durabilityModule: scheduleDurabilityForDay(dayType),
-            durabilityRoutine: scheduleDurabilityRoutineForDay(dayType),
-            crossTraining: scheduleCrossTrainingForDay(dayType, input),
             isKeyDay,
-            totalMiles: runWorkout?.totalDistance ?? 0,
-            qualityMiles: runWorkout?.qualityMiles ?? 0,
-        });
+            phase,
+            dayType,
+            input,
+        }));
     }
 
     return days;
@@ -863,8 +799,6 @@ export function generateHansonsPlan(
     const longRunProgression = generateHansonsLongRunProgression(tier);
 
     const weeks: WeekPlan[] = [];
-    let peakWeek = 1;
-    let maxMileage = 0;
 
     for (let week = 1; week <= totalWeeks; week++) {
         const mileage = getHansonsWeeklyMileage(tier, week);
@@ -872,13 +806,6 @@ export function generateHansonsPlan(
         const hansonsPhase = getHansonsPhase(tier, week);
         const phase = hansonsToPhase(hansonsPhase);
 
-        // Track peak
-        if (mileage >= maxMileage) {
-            maxMileage = mileage;
-            peakWeek = week;
-        }
-
-        // Generate days for this week
         const days = generateHansonsWeekDays(
             week,
             mileage,
@@ -889,11 +816,7 @@ export function generateHansonsPlan(
             paces,
             totalWeeks
         );
-
-        // Calculate distribution
-        const easyMiles = days.reduce((sum, d) => sum + (d.runWorkout && d.runWorkout.primaryZone === 'E' ? d.totalMiles : 0), 0);
-        const qualityMiles = days.reduce((sum, d) => sum + d.qualityMiles, 0);
-        const keyWorkouts = days.filter(d => d.isKeyDay).length;
+        const summary = summarizeWeekFromDays(days, mileage);
 
         weeks.push({
             weekNumber: week,
@@ -902,12 +825,12 @@ export function generateHansonsPlan(
             phaseWeek: week,
             blockType: 'race_plan',
             days,
-            totalMiles: mileage,
+            totalMiles: summary.totalMiles,
             longRunMiles,
-            easyMiles,
-            qualityMiles,
-            easyPercentage: mileage > 0 ? (easyMiles / mileage) * 100 : 0,
-            keyWorkouts,
+            easyMiles: summary.easyMiles,
+            qualityMiles: summary.qualityMiles,
+            easyPercentage: summary.easyPercentage,
+            keyWorkouts: summary.keyWorkouts,
             isRecoveryWeek: phase === 'taper',
             focus: getHansonsWeekFocus(hansonsPhase, week),
         });
@@ -923,7 +846,7 @@ export function generateHansonsPlan(
             weeks: weekNums.length,
         }));
 
-    return {
+    return finalizeTrainingPlan({
         id: crypto.randomUUID(),
         createdAt: new Date().toISOString(),
         athleteName: input.name,
@@ -935,9 +858,6 @@ export function generateHansonsPlan(
         weeks,
         totalWeeks,
         phases: phaseBreakdown,
-        peakMileage: maxMileage,
-        peakWeek,
-        totalMiles: weeks.reduce((sum, w) => sum + w.totalMiles, 0),
         paces,
         intensityLevel: input.trainingIntensity,
         verification: {
@@ -946,7 +866,7 @@ export function generateHansonsPlan(
                 { name: 'Coach Fidelity', passed: true, message: `Using Hansons ${tier}` },
             ],
         },
-    };
+    });
 }
 
 function generateHansonsWeekDays(
@@ -999,18 +919,15 @@ function generateHansonsWeekDays(
                 i === 0 ? 'long' :  // Sunday is long run
                     isKeyDay ? 'quality' : 'easy';
 
-        days.push({
+        days.push(buildDayPlan({
             date,
             dayOfWeek: i,
             runWorkout,
-            strengthWorkout: scheduleStrengthForDay(phase, dayType, i, input),
-            durabilityModule: scheduleDurabilityForDay(dayType),
-            durabilityRoutine: scheduleDurabilityRoutineForDay(dayType),
-            crossTraining: scheduleCrossTrainingForDay(dayType, input),
             isKeyDay,
-            totalMiles: runWorkout?.totalDistance ?? 0,
-            qualityMiles: runWorkout?.qualityMiles ?? 0,
-        });
+            phase,
+            dayType,
+            input,
+        }));
     }
 
     return days;
@@ -1047,8 +964,6 @@ export function generatePfitzAMPlan(
     const weeklyMileages = Array.from({ length: totalWeeks }, (_, i) => getPfitzWeeklyMileage(tier, i + 1));
 
     const weeks: WeekPlan[] = [];
-    let peakWeek = 1;
-    let maxMileage = 0;
 
     for (let week = 1; week <= totalWeeks; week++) {
         const mileage = weeklyMileages[week - 1];
@@ -1056,13 +971,6 @@ export function generatePfitzAMPlan(
         const pfitzPhase = getPfitzPhase(tier, week);
         const phase = pfitzToPhase(pfitzPhase);
 
-        // Track peak
-        if (mileage >= maxMileage) {
-            maxMileage = mileage;
-            peakWeek = week;
-        }
-
-        // Generate days for this week
         const days = generatePfitzAMWeekDays(
             week,
             mileage,
@@ -1073,11 +981,7 @@ export function generatePfitzAMPlan(
             paces,
             totalWeeks
         );
-
-        // Calculate distribution
-        const easyMiles = days.reduce((sum, d) => sum + (d.runWorkout && d.runWorkout.primaryZone === 'E' ? d.totalMiles : 0), 0);
-        const qualityMiles = days.reduce((sum, d) => sum + d.qualityMiles, 0);
-        const keyWorkouts = days.filter(d => d.isKeyDay).length;
+        const summary = summarizeWeekFromDays(days, mileage);
 
         weeks.push({
             weekNumber: week,
@@ -1086,12 +990,12 @@ export function generatePfitzAMPlan(
             phaseWeek: week,
             blockType: 'race_plan',
             days,
-            totalMiles: mileage,
+            totalMiles: summary.totalMiles,
             longRunMiles,
-            easyMiles,
-            qualityMiles,
-            easyPercentage: mileage > 0 ? (easyMiles / mileage) * 100 : 0,
-            keyWorkouts,
+            easyMiles: summary.easyMiles,
+            qualityMiles: summary.qualityMiles,
+            easyPercentage: summary.easyPercentage,
+            keyWorkouts: summary.keyWorkouts,
             isRecoveryWeek: phase === 'taper',
             focus: getPfitzAMWeekFocus(pfitzPhase, week),
         });
@@ -1107,7 +1011,7 @@ export function generatePfitzAMPlan(
             weeks: weekNums.length,
         }));
 
-    return {
+    return finalizeTrainingPlan({
         id: crypto.randomUUID(),
         createdAt: new Date().toISOString(),
         athleteName: input.name,
@@ -1118,9 +1022,6 @@ export function generatePfitzAMPlan(
         weeks,
         totalWeeks,
         phases: phaseBreakdown,
-        peakMileage: maxMileage,
-        peakWeek,
-        totalMiles: weeks.reduce((sum, w) => sum + w.totalMiles, 0),
         paces,
         intensityLevel: input.trainingIntensity,
         verification: {
@@ -1129,7 +1030,7 @@ export function generatePfitzAMPlan(
                 { name: 'Coach Fidelity', passed: true, message: `Using Pfitzinger AM ${tier.replace('pfitz_', '')}` },
             ],
         },
-    };
+    });
 }
 
 function generatePfitzAMWeekDays(
@@ -1183,18 +1084,15 @@ function generatePfitzAMWeekDays(
                 i === 0 ? 'long' :  // Sunday is long run
                     isKeyDay ? 'quality' : 'easy';
 
-        days.push({
+        days.push(buildDayPlan({
             date,
             dayOfWeek: i,
             runWorkout,
-            strengthWorkout: scheduleStrengthForDay(phase, dayType, i, input),
-            durabilityModule: scheduleDurabilityForDay(dayType),
-            durabilityRoutine: scheduleDurabilityRoutineForDay(dayType),
-            crossTraining: scheduleCrossTrainingForDay(dayType, input),
             isKeyDay,
-            totalMiles: runWorkout?.totalDistance ?? 0,
-            qualityMiles: runWorkout?.qualityMiles ?? 0,
-        });
+            phase,
+            dayType,
+            input,
+        }));
     }
 
     return days;

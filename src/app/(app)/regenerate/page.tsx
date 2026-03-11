@@ -55,7 +55,7 @@ import {
 
 import { OnboardingData, INITIAL_ONBOARDING_DATA, TrainingGoal, TrainingIntensity, getLinearStepProgress } from '@/domain/onboarding/types';
 import { calculateAgeFromDob } from '@/domain/onboarding/utils';
-import { createPlanFromOnboarding, savePlan } from '@/domain/plan/service';
+import { generateAndPersistPlanFromOnboarding } from '@/domain/plan/service';
 import { parseAvatarId } from '@/domain/user/avatars';
 
 // Regeneration steps (much shorter than full onboarding)
@@ -212,10 +212,6 @@ export default function RegeneratePlanPage() {
         setStep('generating');
 
         try {
-            const supabase = createSupabaseBrowserClient();
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) throw new Error('Not authenticated');
-
             const normalizedData: OnboardingData = {
                 ...data,
                 name: trimmedName,
@@ -223,36 +219,14 @@ export default function RegeneratePlanPage() {
                 sex: data.sex,
             };
 
-            try {
-                const profileUpdate = {
-                    id: user.id,
-                    name: trimmedName || 'Athlete',
-                    age: computedAge ?? null,
-                    sex: normalizedData.sex,
-                    ...(data.dateOfBirth ? { date_of_birth: data.dateOfBirth } : {}),
-                    ...(data.avatar ? { avatar: data.avatar } : {}),
-                };
-                await supabase.from('athletes').upsert(profileUpdate, { onConflict: 'id' });
-            } catch (profileError) {
-                console.warn('Failed to update athlete profile:', profileError);
-            }
-
-            // Generate plan from onboarding data
-            const planResult = createPlanFromOnboarding(normalizedData);
+            const planResult = await generateAndPersistPlanFromOnboarding(normalizedData, athleteId);
             if (!planResult.success) {
-                // Show the actual error message
                 setError(planResult.error?.message || 'Failed to generate plan');
                 setStep(identitySteps[0] ?? 'vdot-confirm');
                 return;
             }
 
-            // Save to database (user ID fetched internally)
-            const saveResult = await savePlan(planResult.data, athleteId);
-            if (!saveResult.success) {
-                throw new Error(saveResult.error.message || 'Failed to save plan');
-            }
             await refreshPlan();
-
             setStep('complete');
         } catch (err) {
             console.error('Plan generation failed:', err);

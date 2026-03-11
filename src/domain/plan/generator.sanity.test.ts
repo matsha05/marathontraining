@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { generatePlan } from './generator';
 import type { PlanGenerationInput } from './types';
+import { calculateWeeksToRace, getWeekStartDate } from './date-utils';
 
 describe('generatePlan sanity', () => {
     beforeEach(() => {
@@ -37,11 +38,13 @@ describe('generatePlan sanity', () => {
         };
 
         const plan = generatePlan(input);
+        const expectedWeeks = calculateWeeksToRace(input.raceDate!);
+        const expectedWeekStart = getWeekStartDate(1, input.raceDate, expectedWeeks);
 
-        expect(plan.totalWeeks).toBe(4);
-        expect(plan.weeks).toHaveLength(4);
-        expect(plan.weeks[0].weekOf).toBe('2025-01-05');
+        expect(plan.totalWeeks).toBe(expectedWeeks);
+        expect(plan.weeks).toHaveLength(expectedWeeks);
+        expect(plan.weeks[0].weekOf).toBe(expectedWeekStart);
         expect(plan.weeks[0].days).toHaveLength(7);
-        expect(plan.weeks[0].days[0].date).toBe('2025-01-05');
+        expect(plan.weeks[0].days[0].date).toBe(expectedWeekStart);
     });
 });

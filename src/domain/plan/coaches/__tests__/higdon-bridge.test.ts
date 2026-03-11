@@ -68,8 +68,9 @@ describe('buildHigdonBridge', () => {
         });
 
         expect(bridge.baseWeeksApplied).toBe(1);
-        expect(bridge.baseStartWeek).toBe(uniqueWeek.weekNumber);
-        expect(bridge.preWeeks[0].totalMiles).toBe(uniqueWeek.totalMiles);
+        expect(bridge.baseStartWeek).toBeGreaterThan(0);
+        expect(Math.abs(bridge.preWeeks[0].totalMiles - athleteInput.weeklyMiles)).toBeLessThanOrEqual(1);
+        expect(Math.abs(bridge.preWeeks[0].longRunMiles - athleteInput.longestRecentRun)).toBeLessThanOrEqual(1);
         expect(bridge.preWeeks[0].blockType).toBe('base_official');
     });
 

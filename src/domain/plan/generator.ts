@@ -37,9 +37,20 @@ import {
     buildWorkout,
     WorkoutTemplate,
 } from './workouts/templates';
-import { generateStrengthWorkout, getStrengthPhaseConfig, getDicharryHipCircuit } from './strength-engine';
-import { StrengthWorkout, DurabilityModule, WodWorkout, DailyDurabilityRoutine, CrossTrainingSuggestion } from './types';
-import { getDailyDurabilityModule, getDailyDurabilityRoutine } from './durability-modules';
+import { buildDayPlan, finalizeTrainingPlan, summarizeWeekFromDays } from './generation-helpers';
+import {
+    scheduleStrengthForDay,
+    scheduleDurabilityForDay,
+    scheduleDurabilityRoutineForDay,
+    scheduleCrossTrainingForDay,
+} from './support';
+
+export {
+    scheduleStrengthForDay,
+    scheduleDurabilityForDay,
+    scheduleDurabilityRoutineForDay,
+    scheduleCrossTrainingForDay,
+} from './support';
 
 // =============================================================================
 // MAIN GENERATOR FUNCTION
@@ -82,8 +93,6 @@ export function generatePlan(input: PlanGenerationInput): TrainingPlan {
 
     // Step 7: Generate each week's plan
     const weeks: WeekPlan[] = [];
-    let peakWeek = 1;
-    let maxMileage = 0;
 
     for (let weekNum = 1; weekNum <= weeksToRace; weekNum++) {
         const week = generateWeek(
@@ -95,18 +104,13 @@ export function generatePlan(input: PlanGenerationInput): TrainingPlan {
             paces
         );
         weeks.push(week);
-
-        if (week.totalMiles >= maxMileage) {
-            maxMileage = week.totalMiles;
-            peakWeek = weekNum;
-        }
     }
 
     // Step 8: Verify the plan
     const verification = verifyPlan(weeks, phases);
 
     // Step 9: Build the complete plan
-    const plan: TrainingPlan = {
+    return finalizeTrainingPlan({
         id: crypto.randomUUID(),
         createdAt: new Date().toISOString(),
         athleteName: input.name,
@@ -122,16 +126,11 @@ export function generatePlan(input: PlanGenerationInput): TrainingPlan {
             endWeek: p.endWeek,
             weeks: p.weeks,
         })),
-        peakMileage: maxMileage,
-        peakWeek,
-        totalMiles: weeks.reduce((sum, w) => sum + w.totalMiles, 0),
         paces,
         injuryModifications: getInjuryModifications(input),
         intensityLevel: input.trainingIntensity,
         verification,
-    };
-
-    return plan;
+    });
 }
 
 // =============================================================================
@@ -171,8 +170,7 @@ function generateWeek(
         paces
     );
 
-    // Count key workouts
-    const keyWorkouts = days.filter(d => d.isKeyDay).length;
+    const summary = summarizeWeekFromDays(days, targetMileage);
 
     return {
         weekNumber,
@@ -181,151 +179,15 @@ function generateWeek(
         phaseWeek: weekNumber - phase.startWeek + 1,
         blockType: 'race_plan',
         days,
-        totalMiles: days.reduce((sum, d) => sum + d.totalMiles, 0),
+        totalMiles: summary.totalMiles,
         longRunMiles,
-        easyMiles: distribution.easyMiles,
-        qualityMiles: distribution.qualityMiles,
-        easyPercentage: distribution.easyPercentage,
-        keyWorkouts,
+        easyMiles: distribution.easyMiles ?? summary.easyMiles,
+        qualityMiles: distribution.qualityMiles ?? summary.qualityMiles,
+        easyPercentage: distribution.easyPercentage ?? summary.easyPercentage,
+        keyWorkouts: summary.keyWorkouts,
         isRecoveryWeek: isRecovery,
         focus: getWeekFocus(phase.phase, weekNumber - phase.startWeek + 1, isRecovery),
     };
-}
-
-// =============================================================================
-// STRENGTH SCHEDULING
-// =============================================================================
-
-/**
- * Schedule strength workout for a specific day.
- * Rules from research (09-strength-protocols-for-runners.md):
- * - Place strength on quality run days (after run) so easy days stay easy
- * - Avoid strength day before long run
- * - BASE/BUILD: 2 sessions/week, PEAK: 1 session/week, TAPER: 0-1
- */
-export function scheduleStrengthForDay(
-    phase: TrainingPhase,
-    dayType: 'rest' | 'easy' | 'quality' | 'long' | 'easy_strides',
-    dayOfWeek: number,
-    input: PlanGenerationInput
-): StrengthWorkout | null {
-    // Skip if user opted out of strength
-    if (!input.includeStrength) {
-        return null;
-    }
-
-    const config = getStrengthPhaseConfig(phase);
-
-    // Rest days: no strength (user should rest)
-    if (dayType === 'rest') {
-        return null;
-    }
-
-    // Long run days: no strength (protect the key run)
-    if (dayType === 'long') {
-        return null;
-    }
-
-    // Determine equipment level
-    const equipment: 'none' | 'minimal' | 'gym' =
-        input.strengthBackground === 'advanced' ? 'gym' :
-            input.strengthBackground === 'intermediate' ? 'minimal' : 'minimal';
-
-    // Research rule: Quality days get strength (hard day stacking)
-    if (dayType === 'quality') {
-        // Tuesday (2) = Session 1, Thursday (4) = Session 2
-        const sessionNumber: 1 | 2 = dayOfWeek <= 2 ? 1 : 2;
-
-        // Check if we should have this session based on phase
-        if (phase === 'taper' && sessionNumber === 2) {
-            // Taper: only 1 session per week max
-            return null;
-        }
-        if (phase === 'peak' && sessionNumber === 2) {
-            // Peak: 1 session per week
-            return null;
-        }
-
-        return generateStrengthWorkout(phase, equipment, sessionNumber);
-    }
-
-    // Easy + strides days: optional hip circuit for durability
-    if (dayType === 'easy_strides' && (phase === 'base' || phase === 'build')) {
-        // Only on one day per week (typically Sunday = 0 or Friday = 5)
-        if (dayOfWeek === 0 || dayOfWeek === 5) {
-            return getDicharryHipCircuit();
-        }
-    }
-
-    return null;
-}
-
-/**
- * Schedule durability module for a specific day.
- * Rules from research (04-starrett-dicharry-durability.md):
- * - Quality days: minimal (readiness scan only)
- * - Easy days: control module (core, foot)
- * - Rest days: mobility work if available
- * - Long run days: pre-run readiness scan
- */
-export function scheduleDurabilityForDay(
-    dayType: 'rest' | 'easy' | 'quality' | 'long' | 'easy_strides'
-): DurabilityModule | undefined {
-    // Map day types to the getDailyDurabilityModule function
-    const mappedType = dayType === 'easy_strides' ? 'easy' : dayType;
-    const module = getDailyDurabilityModule(mappedType as 'quality' | 'easy' | 'rest' | 'long');
-    return module || undefined;
-}
-
-/**
- * Schedule FULL durability routine for a specific day.
- * Returns the complete 8-12 min routine per research (04-starrett-dicharry-durability.md).
- */
-export function scheduleDurabilityRoutineForDay(
-    dayType: 'rest' | 'easy' | 'quality' | 'long' | 'easy_strides'
-): DailyDurabilityRoutine | undefined {
-    const mappedType = dayType === 'easy_strides' ? 'easy' : dayType;
-    return getDailyDurabilityRoutine(mappedType as 'quality' | 'easy' | 'rest' | 'long');
-}
-
-/**
- * Schedule cross-training for a day when user opts out of strength.
- * This provides Higdon-style "Cross" day suggestions.
- * Only shown when:
- * - User hasn't opted into strength training
- * - It's not a running day or rest day
- */
-export function scheduleCrossTrainingForDay(
-    dayType: 'rest' | 'easy' | 'quality' | 'long' | 'easy_strides',
-    input: PlanGenerationInput
-): CrossTrainingSuggestion | undefined {
-    // If user opted into structured strength, no cross-training needed
-    if (input.includeStrength) {
-        return undefined;
-    }
-
-    // Cross-training typically suggested on easy days or rest days (optional)
-    if (dayType === 'rest') {
-        return {
-            type: 'rest_optional',
-            duration: 30,
-            intensity: 'easy',
-            notes: 'Optional: light walk, yoga, or complete rest',
-        };
-    }
-
-    // On easy days, suggest cross-training as alternative/supplement
-    if (dayType === 'easy' || dayType === 'easy_strides') {
-        return {
-            type: 'cycling',
-            duration: 30,
-            intensity: 'easy',
-            notes: 'Cross-training: cycling, swimming, or elliptical at easy effort',
-        };
-    }
-
-    // No cross-training on quality or long run days
-    return undefined;
 }
 
 // =============================================================================
@@ -385,24 +247,15 @@ function generateWeekDays(
         }
         // type === 'rest' => runWorkout stays null
 
-        days.push({
+        days.push(buildDayPlan({
             date,
             dayOfWeek: i,
             runWorkout,
-            strengthWorkout: scheduleStrengthForDay(
-                phase,
-                dayInfo.type,
-                i,
-                input
-            ),
-            crossTraining: scheduleCrossTrainingForDay(dayInfo.type, input),
-            durabilityModule: scheduleDurabilityForDay(dayInfo.type),
-            durabilityRoutine: scheduleDurabilityRoutineForDay(dayInfo.type),
-            // wodWorkout: opt-in via includeConditioning (not auto-scheduled)
             isKeyDay,
-            totalMiles: runWorkout?.totalDistance ?? 0,
-            qualityMiles: runWorkout?.qualityMiles ?? 0,
-        });
+            phase,
+            dayType: dayInfo.type,
+            input,
+        }));
     }
 
     return days;

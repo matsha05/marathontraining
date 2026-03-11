@@ -25,9 +25,8 @@ import {
 import { TrainingPlan, WeekPlan, DayPlan } from '@/domain/plan/types';
 import {
     loadPlan,
-    savePlan,
     clearPlan,
-    createPlanFromOnboarding,
+    generateAndPersistPlanFromOnboarding,
     getCurrentWeek,
     getTodaysWorkoutFromPlan,
     getUpcomingKeyWorkouts,
@@ -189,18 +188,11 @@ export function PlanProvider({ children }: PlanProviderProps) {
         // Small delay for UX (shows generating state)
         await new Promise(resolve => setTimeout(resolve, 100));
 
-        const result = createPlanFromOnboarding(onboardingData);
+        const result = await generateAndPersistPlanFromOnboarding(onboardingData, athleteId);
 
         if (result.success) {
             setPlan(result.data);
             computeDerivedState(result.data);
-
-            // Persist (async - don't block)
-            const saveResult = await savePlan(result.data, athleteId);
-            if (!saveResult.success) {
-                console.warn('Failed to persist plan:', saveResult.error);
-            }
-
             setStatus('ready');
             return true;
         } else {

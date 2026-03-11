@@ -20,6 +20,7 @@ import { PlanGenerationInput, TrainingPlan, TrainingPhase, WeekPlan } from '@/do
 import { generatePlan, calculateWeeksToRace, getDateForDay, getWeekStartDate, parseDateOnly, verifyPlan } from '@/domain/plan/generator';
 import { PHASE_DEFINITIONS } from '@/domain/plan/phases';
 import { toDateKey } from '@/lib/dates';
+import { createSupabaseBrowserClient } from '@/infrastructure/supabase';
 
 /**
  * Calculate age from date of birth string.
@@ -498,6 +499,97 @@ export function createPlanFromOnboarding(
             },
         };
     }
+}
+
+async function resolveAthleteId(athleteId?: string | null): Promise<string | null> {
+    if (athleteId) {
+        return athleteId;
+    }
+
+    try {
+        const supabase = createSupabaseBrowserClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        return user?.id ?? null;
+    } catch (error) {
+        console.warn('[PlanService] Failed to resolve athlete id:', error);
+        return null;
+    }
+}
+
+async function persistAthleteProfileAndGoalRace(
+    onboardingData: OnboardingData,
+    athleteId?: string | null
+): Promise<void> {
+    const resolvedAthleteId = await resolveAthleteId(athleteId);
+    if (!resolvedAthleteId) {
+        return;
+    }
+
+    const supabase = createSupabaseBrowserClient();
+    const normalizedName = onboardingData.name.trim() || 'Athlete';
+    const computedAge = onboardingData.dateOfBirth
+        ? calculateAgeFromDateOfBirth(onboardingData.dateOfBirth)
+        : onboardingData.age;
+
+    await supabase.from('athletes').upsert({
+        id: resolvedAthleteId,
+        name: normalizedName,
+        age: computedAge ?? null,
+        sex: onboardingData.sex || null,
+        avatar: onboardingData.avatar || 'marathon',
+        ...(onboardingData.dateOfBirth ? { date_of_birth: onboardingData.dateOfBirth } : {}),
+    }, { onConflict: 'id' });
+
+    if (!onboardingData.raceDate) {
+        return;
+    }
+
+    await supabase.from('goal_races').upsert({
+        id: crypto.randomUUID(),
+        athlete_id: resolvedAthleteId,
+        race_name: onboardingData.raceName || `${onboardingData.trainingGoal?.toUpperCase() || 'Marathon'} Race`,
+        race_date: onboardingData.raceDate,
+        distance: onboardingData.trainingGoal || 'marathon',
+        is_active: true,
+        terrain: 'road',
+    }, { onConflict: 'id' });
+}
+
+function toStorageError(message: string, details?: Record<string, unknown>): PlanServiceError {
+    return {
+        code: 'STORAGE_ERROR',
+        message,
+        details,
+    };
+}
+
+export async function generateAndPersistPlanFromOnboarding(
+    onboardingData: OnboardingData,
+    athleteId?: string | null
+): Promise<ServiceResult<TrainingPlan>> {
+    const generationResult = createPlanFromOnboarding(onboardingData);
+    if (!generationResult.success) {
+        return generationResult;
+    }
+
+    try {
+        await persistAthleteProfileAndGoalRace(onboardingData, athleteId);
+    } catch (error) {
+        console.warn('[PlanService] Failed to persist athlete profile or goal race:', error);
+    }
+
+    const saveResult = await savePlanV2(generationResult.data, athleteId);
+    if (!saveResult.success) {
+        return {
+            success: false,
+            error: toStorageError(
+                saveResult.error.message || 'Failed to save your plan. Please try again.',
+                { athleteId, cause: saveResult.error }
+            ),
+        };
+    }
+
+    return generationResult;
 }
 
 // NOTE: Legacy localStorage-only functions removed in cleanup.

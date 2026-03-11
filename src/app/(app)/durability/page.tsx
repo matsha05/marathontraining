@@ -49,11 +49,13 @@ import {
 } from '@/components/durability/PrescriptionModuleCard';
 import {
     getAllAssessments,
-    getModulesForFailedAssessments,
     DurabilityAssessment,
     AssessmentResult,
 } from '@/domain/durability';
-import { DURABILITY_MODULES, DurabilityModule } from '@/domain/durability/modules';
+import {
+    getPrescriptionForResults,
+    type PrescriptionModule,
+} from '@/domain/durability/prescription-modules';
 import { DurabilityLabContent } from './durability-lab-content';
 
 type AssessmentResultMap = Record<string, { result: AssessmentResult; side?: 'left' | 'right' | 'both' }>;
@@ -95,10 +97,14 @@ export default function DurabilityPage() {
         .filter(([_, r]) => r.result === 'fail')
         .map(([id]) => id);
 
-    const prescribedModuleIds = getModulesForFailedAssessments(failedIds);
-    const prescribedModules = prescribedModuleIds
-        .map(id => DURABILITY_MODULES[id])
-        .filter((m): m is DurabilityModule => m !== undefined);
+    const prescription = getPrescriptionForResults(
+        Object.entries(results).map(([assessmentId, result]) => ({
+            assessmentId,
+            result: result.result,
+        }))
+    );
+    const prescribedModules: PrescriptionModule[] = [...prescription.priorityModules, ...prescription.maintenanceModules];
+    const prescribedModuleIds = prescribedModules.map(module => module.id);
 
     const handleResult = (id: string, result: AssessmentResult) => {
         setResults(prev => ({
@@ -149,7 +155,7 @@ export default function DurabilityPage() {
         }
     };
 
-    const totalPrescribedTime = prescribedModules.reduce((sum, m) => sum + m.durationMin, 0);
+    const totalPrescribedTime = prescribedModules.reduce((sum, module) => sum + module.durationMinutes, 0);
 
     // INTRO MODE - Render full-screen premium Durability Lab
     if (mode === 'intro') {

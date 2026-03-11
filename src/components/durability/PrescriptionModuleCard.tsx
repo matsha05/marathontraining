@@ -19,46 +19,37 @@ import {
     ChevronDown,
     Clock,
     Play,
-    ExternalLink,
     Calendar,
     CheckCircle2,
     Sparkles,
 } from 'lucide-react';
-import { DurabilityModule } from '@/domain/durability/modules';
+import { PrescriptionModule } from '@/domain/durability/prescription-modules';
 
 interface PrescriptionModuleCardProps {
-    module: DurabilityModule;
+    module: PrescriptionModule;
     index: number;
     isCompleted?: boolean;
     onComplete?: (id: string) => void;
 }
 
-// Map exercise IDs to video URLs where available
-const EXERCISE_VIDEOS: Record<string, string> = {
-    'toe_yoga': 'https://www.youtube.com/watch?v=QwJJL3k9Z3c',
-    'short_foot': 'https://www.youtube.com/watch?v=QwJJL3k9Z3c',
-    'couch_stretch': 'https://www.youtube.com/watch?v=JawPBvtf7Qs',
-    'wall_ankle': 'https://www.youtube.com/watch?v=IikP_teeLkI',
-    'dead_bug': 'https://www.youtube.com/watch?v=I5xbsA71v1A',
-    'single_leg_bridge': 'https://www.youtube.com/watch?v=AVAXhy6pl7o',
-    'single_leg_calf': 'https://www.youtube.com/watch?v=GcDX2R6BhWc',
-    'calf_foam_roll': 'https://www.youtube.com/watch?v=6-rPEpnJvvU',
+const MODULE_VIDEOS: Record<string, string> = {
+    toe_yoga: 'https://www.youtube.com/watch?v=QwJJL3k9Z3c',
+    foot_screws: 'https://www.youtube.com/watch?v=QwJJL3k9Z3c',
+    couch_stretch: 'https://www.youtube.com/watch?v=JawPBvtf7Qs',
+    ankle_df_mobility: 'https://www.youtube.com/watch?v=IikP_teeLkI',
+    deep_core_mini: 'https://www.youtube.com/watch?v=I5xbsA71v1A',
+    bridge_control: 'https://www.youtube.com/watch?v=AVAXhy6pl7o',
+    calf_raise_capacity: 'https://www.youtube.com/watch?v=GcDX2R6BhWc',
+    calf_tissue_work: 'https://www.youtube.com/watch?v=6-rPEpnJvvU',
 };
 
 // Category colors for visual distinction
 const CATEGORY_STYLES: Record<string, { gradient: string; color: string; bg: string }> = {
-    'foot': { gradient: 'linear-gradient(135deg, #10b981, #059669)', color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)' },
-    'ankle': { gradient: 'linear-gradient(135deg, #3b82f6, #1d4ed8)', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.1)' },
-    'hip': { gradient: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)' },
-    'core': { gradient: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.1)' },
     'mobility': { gradient: 'linear-gradient(135deg, #ec4899, #be185d)', color: '#ec4899', bg: 'rgba(236, 72, 153, 0.1)' },
-    'balance': { gradient: 'linear-gradient(135deg, #06b6d4, #0891b2)', color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.1)' },
-};
-
-const FREQUENCY_LABELS: Record<string, string> = {
-    'daily': 'Every day',
-    'every_other_day': 'Every other day',
-    '3x_week': '3× per week',
+    'control': { gradient: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.1)' },
+    'capacity': { gradient: 'linear-gradient(135deg, #10b981, #059669)', color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)' },
+    'tissue': { gradient: 'linear-gradient(135deg, #06b6d4, #0891b2)', color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.1)' },
+    'integration': { gradient: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)' },
 };
 
 export function PrescriptionModuleCard({
@@ -115,7 +106,7 @@ export function PrescriptionModuleCard({
                                 style={{ color: 'var(--text-subtle)' }}
                             >
                                 <Calendar size={10} />
-                                {FREQUENCY_LABELS[module.frequency] || module.frequency}
+                                {module.frequencyGuidance}
                             </span>
                         </div>
                         <h3
@@ -127,10 +118,10 @@ export function PrescriptionModuleCard({
                         <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--text-muted)' }}>
                             <span className="flex items-center gap-1">
                                 <Clock size={14} />
-                                {module.durationMin} min
+                                {module.durationMinutes} min
                             </span>
                             <span>
-                                {module.exercises.length} exercise{module.exercises.length > 1 ? 's' : ''}
+                                {module.steps.length} step{module.steps.length > 1 ? 's' : ''}
                             </span>
                         </div>
                     </div>
@@ -163,12 +154,12 @@ export function PrescriptionModuleCard({
                         >
                             {/* Exercise list */}
                             <div className="mt-4 space-y-3">
-                                {module.exercises.map((exercise, exIndex) => {
-                                    const videoUrl = EXERCISE_VIDEOS[exercise.id];
+                                {module.steps.map((step, exIndex) => {
+                                    const videoUrl = MODULE_VIDEOS[module.id];
 
                                     return (
                                         <motion.div
-                                            key={exercise.id}
+                                            key={`${module.id}-${exIndex}`}
                                             initial={{ opacity: 0, x: -10 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: exIndex * 0.05 }}
@@ -187,7 +178,7 @@ export function PrescriptionModuleCard({
                                                         className="font-medium text-sm mb-2"
                                                         style={{ color: 'var(--text-base)' }}
                                                     >
-                                                        {exercise.name}
+                                                        {step.name}
                                                     </h4>
 
                                                     {/* Dosage pills */}
@@ -199,23 +190,12 @@ export function PrescriptionModuleCard({
                                                                 color: '#4ade80'
                                                             }}
                                                         >
-                                                            {exercise.sets}×{exercise.reps}
+                                                            {step.dosage}
                                                         </span>
-                                                        {exercise.holdSeconds && (
-                                                            <span
-                                                                className="text-xs px-2 py-1 rounded-md"
-                                                                style={{
-                                                                    background: 'rgba(59, 130, 246, 0.1)',
-                                                                    color: '#3b82f6'
-                                                                }}
-                                                            >
-                                                                Hold {exercise.holdSeconds}s
-                                                            </span>
-                                                        )}
                                                     </div>
 
                                                     {/* Coaching Cues - from Dicharry/Starrett */}
-                                                    {exercise.cues && exercise.cues.length > 0 && (
+                                                    {step.cues.length > 0 && (
                                                         <div
                                                             className="mb-2 p-2 rounded-lg text-xs"
                                                             style={{
@@ -227,21 +207,11 @@ export function PrescriptionModuleCard({
                                                                 Coaching Cues:
                                                             </p>
                                                             <ul className="space-y-0.5" style={{ color: 'var(--text-subtle)' }}>
-                                                                {exercise.cues.map((cue, i) => (
+                                                                {step.cues.map((cue, i) => (
                                                                     <li key={i} className="pl-2">• {cue}</li>
                                                                 ))}
                                                             </ul>
                                                         </div>
-                                                    )}
-
-                                                    {/* Notes */}
-                                                    {exercise.notes && (
-                                                        <p
-                                                            className="text-xs italic"
-                                                            style={{ color: 'var(--text-subtle)' }}
-                                                        >
-                                                            💡 {exercise.notes}
-                                                        </p>
                                                     )}
                                                 </div>
 
@@ -314,7 +284,7 @@ export function PrescriptionModuleCard({
                                     className="text-xs italic"
                                     style={{ color: 'var(--text-subtle)' }}
                                 >
-                                    Source: {module.source}
+                                    Source: {module.sourceBook}
                                 </p>
 
                                 {onComplete && (

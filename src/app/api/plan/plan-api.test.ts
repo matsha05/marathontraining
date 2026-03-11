@@ -2,20 +2,27 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const requireAthleteIdMock = vi.fn();
-const createSupabaseRequestClientMock = vi.fn();
-const getSupabaseServerClientMock = vi.fn();
-const withAuthMock = (
-    handler: (request: Request, auth: { athleteId: string; userId: string }) => Promise<Response> | Response,
-    options: { onUnauthorized?: (request: Request) => Response } = {}
-) => async (request: Request) => {
-    const auth = await requireAthleteIdMock(request, options);
-    if (auth?.response) return auth.response;
-    return handler(request, {
-        athleteId: auth?.athleteId as string,
-        userId: (auth?.userId ?? auth?.athleteId) as string,
-    });
-};
+const {
+    requireAthleteIdMock,
+    createSupabaseRequestClientMock,
+    getSupabaseServerClientMock,
+    withAuthMock,
+} = vi.hoisted(() => ({
+    requireAthleteIdMock: vi.fn(),
+    createSupabaseRequestClientMock: vi.fn(),
+    getSupabaseServerClientMock: vi.fn(),
+    withAuthMock: (
+        handler: (request: Request, auth: { athleteId: string; userId: string }) => Promise<Response> | Response,
+        options: { onUnauthorized?: (request: Request) => Response } = {}
+    ) => async (request: Request) => {
+        const auth = await requireAthleteIdMock(request, options);
+        if (auth?.response) return auth.response;
+        return handler(request, {
+            athleteId: auth?.athleteId as string,
+            userId: (auth?.userId ?? auth?.athleteId) as string,
+        });
+    },
+}));
 
 vi.mock('@/infrastructure/auth', () => ({
     requireAthleteId: requireAthleteIdMock,
